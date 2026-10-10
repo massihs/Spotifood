@@ -27,7 +27,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const steps = [
     { key: "profile", done: overview.profileComplete, href: `${base}/settings` },
     { key: "tables", done: overview.tables > 0, href: `${base}/tables` },
-    { key: "menu", done: overview.products > 0, href: null },
+    { key: "menu", done: overview.products > 0, href: `${base}/menu` },
     { key: "payments", done: false, href: null },
   ] as const;
 

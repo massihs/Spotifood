@@ -32,7 +32,7 @@ export function CollapsibleNav({ header, children }: { header: ReactNode; childr
           className="grid size-10 place-items-center rounded-lg text-fg-muted hover:bg-surface-2 lg:hidden"
           aria-expanded={open}
           aria-controls="app-sidebar-body"
-          aria-label={t("menu")}
+          aria-label={t("toggleNav")}
           onClick={() => setOpen((v) => !v)}
         >
           <svg
