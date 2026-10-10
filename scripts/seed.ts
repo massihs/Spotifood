@@ -20,6 +20,7 @@ import {
   users,
   restaurantMembers,
   restaurantSettings,
+  subscriptions,
 } from "@/server/db/schema";
 import { hashPassword } from "@/server/auth/password";
 import { DEFAULT_CATEGORY_TEMPLATES, DEFAULT_PLANS } from "@/server/modules/catalog/defaults";
@@ -415,9 +416,28 @@ async function seedDemoRestaurant() {
   console.log(`  staff: ${DEMO_STAFF.email} / ${DEMO_STAFF.password}`);
 }
 
+/** The demo runs on Professional so its 20 tables fit the plan limits. */
+async function ensureDemoPlan() {
+  const [demo] = await db.select().from(restaurants).where(eq(restaurants.slug, "restaurant-demo"));
+  const [pro] = await db.select().from(plans).where(eq(plans.code, "professional"));
+  if (!demo || !pro) return;
+  const updated = await db
+    .update(subscriptions)
+    .set({ planId: pro.id, status: "active" })
+    .where(eq(subscriptions.organizationId, demo.organizationId))
+    .returning({ id: subscriptions.id });
+  if (updated.length === 0) {
+    await db
+      .insert(subscriptions)
+      .values({ organizationId: demo.organizationId, planId: pro.id, status: "active" });
+  }
+  console.log("✓ demo organization on the Professional plan");
+}
+
 async function main() {
   await seedPlatform();
   await seedDemoRestaurant();
+  await ensureDemoPlan();
 }
 
 main()
