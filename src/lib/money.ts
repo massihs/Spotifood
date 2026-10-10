@@ -52,3 +52,10 @@ export function sumCents(values: readonly Cents[]): Cents {
 export function formatMoney(cents: Cents, currency: string, locale = "fr-FR"): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(cents / 100);
 }
+
+/** Value for a money <input>: 1990 → "19,90" (fr/fa/ar) or "19.90" (en). */
+export function centsToInput(cents: number | null | undefined, locale: string): string {
+  if (cents == null) return "";
+  const s = (cents / 100).toFixed(2);
+  return locale === "en" ? s : s.replace(".", ",");
+}
