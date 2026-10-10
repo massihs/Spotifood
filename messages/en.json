@@ -1,0 +1,150 @@
+{
+  "common": {
+    "appName": "Spotifood",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "search": "Search",
+    "language": "Language",
+    "logout": "Sign out",
+    "status": "Status",
+    "actions": "Actions",
+    "none": "Nothing here yet",
+    "createdAt": "Created",
+    "skipToContent": "Skip to content"
+  },
+  "landing": {
+    "metaTitle": "Spotifood — QR code table ordering for restaurants",
+    "metaDescription": "Digitize your menu and ordering: guests scan, order and pay from their table. Real-time kitchen, split payments, invoices and reviews.",
+    "badge": "Restaurant platform",
+    "title": "Guests scan. Order. Pay.",
+    "subtitle": "Spotifood turns every table into an ordering point. Online menu, real-time kitchen orders, individual payments and invoices — no app to install.",
+    "ctaPrimary": "Create my restaurant",
+    "ctaSecondary": "Sign in",
+    "features": {
+      "qr": {
+        "title": "One QR per table",
+        "body": "Generate and print QR codes for all your tables in one click."
+      },
+      "split": {
+        "title": "Everyone pays their share",
+        "body": "Several guests at one table, each with their own cart and bill."
+      },
+      "live": { "title": "Live kitchen", "body": "Orders reach the kitchen and floor instantly." },
+      "insights": {
+        "title": "Sales & reviews",
+        "body": "Revenue, best sellers, reviews and complaints in one place."
+      }
+    }
+  },
+  "auth": {
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to your restaurant workspace.",
+    "signupTitle": "Create your restaurant",
+    "signupSubtitle": "It takes seconds. No credit card required.",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Your name",
+    "restaurantName": "Restaurant name",
+    "passwordHint": "At least 10 characters.",
+    "loginSubmit": "Sign in",
+    "signupSubmit": "Create account",
+    "noAccount": "No account yet?",
+    "hasAccount": "Already have an account?",
+    "goSignup": "Create a restaurant",
+    "goLogin": "Sign in",
+    "errors": {
+      "invalid_credentials": "Incorrect email or password.",
+      "email_taken": "An account already exists with this email.",
+      "rate_limited": "Too many attempts. Please try again in a few minutes.",
+      "validation": "Please check the form fields.",
+      "password_too_short": "Password must be at least 10 characters.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "nav": {
+    "overview": "Overview",
+    "admin": "Administration",
+    "adminOverview": "Platform",
+    "adminRestaurants": "Restaurants",
+    "adminUsers": "Users",
+    "switchRestaurant": "Switch restaurant",
+    "myRestaurants": "My restaurants"
+  },
+  "dashboard": {
+    "welcome": "Hello {name}",
+    "overviewSubtitle": "Here is how your restaurant is doing.",
+    "setupTitle": "Getting started",
+    "setupSubtitle": "Complete these steps to receive your first orders.",
+    "setup": {
+      "profile": "Complete restaurant details",
+      "tables": "Create your tables",
+      "menu": "Build your menu",
+      "payments": "Configure payment methods"
+    },
+    "stats": {
+      "tables": "Tables",
+      "categories": "Categories",
+      "products": "Products",
+      "members": "Team members"
+    },
+    "role": "Your role",
+    "suspendedTitle": "Restaurant suspended",
+    "suspendedBody": "This restaurant is temporarily suspended. Please contact Spotifood support.",
+    "noRestaurantTitle": "No restaurant",
+    "noRestaurantBody": "Your account is not linked to any active restaurant.",
+    "pickRestaurant": "Choose a restaurant"
+  },
+  "roles": {
+    "owner": "Owner",
+    "admin": "Administrator",
+    "staff": "Staff"
+  },
+  "admin": {
+    "title": "Platform",
+    "subtitle": "Global view of Spotifood.",
+    "stats": {
+      "activeRestaurants": "Active restaurants",
+      "suspendedRestaurants": "Suspended restaurants",
+      "newRestaurants": "New (30 d)",
+      "users": "Users",
+      "orders": "Orders",
+      "revenue": "Collected revenue"
+    },
+    "subscriptions": "Subscriptions by plan",
+    "restaurants": {
+      "title": "Restaurants",
+      "name": "Name",
+      "organization": "Organization",
+      "orders": "Orders",
+      "suspend": "Suspend",
+      "reactivate": "Reactivate",
+      "open": "Open",
+      "searchPlaceholder": "Name or slug…",
+      "all": "All"
+    },
+    "users": {
+      "title": "Users",
+      "name": "Name",
+      "email": "Email",
+      "restaurants": "Restaurants",
+      "lastLogin": "Last sign-in",
+      "superAdmin": "Super admin",
+      "never": "Never",
+      "searchPlaceholder": "Name or email…"
+    },
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "disabled": "Disabled"
+    }
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "This page does not exist or is no longer available.",
+    "forbiddenTitle": "Access denied",
+    "forbiddenBody": "You don't have permission to access this page.",
+    "home": "Back to home"
+  }
+}

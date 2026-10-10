@@ -1,0 +1,153 @@
+{
+  "common": {
+    "appName": "Spotifood",
+    "loading": "Chargement…",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "search": "Rechercher",
+    "language": "Langue",
+    "logout": "Se déconnecter",
+    "status": "Statut",
+    "actions": "Actions",
+    "none": "Aucun élément",
+    "createdAt": "Créé le",
+    "skipToContent": "Aller au contenu"
+  },
+  "landing": {
+    "metaTitle": "Spotifood — Commande à table par QR code pour restaurants",
+    "metaDescription": "Digitalisez votre menu et vos commandes : vos clients scannent, commandent et paient depuis leur table. Cuisine en temps réel, paiement séparé, factures, avis.",
+    "badge": "Plateforme restaurant",
+    "title": "Vos clients scannent. Commandent. Paient.",
+    "subtitle": "Spotifood transforme chaque table en point de commande. Menu en ligne, commandes en temps réel en cuisine, paiement individuel et factures — sans application à installer.",
+    "ctaPrimary": "Créer mon restaurant",
+    "ctaSecondary": "Se connecter",
+    "features": {
+      "qr": {
+        "title": "Un QR par table",
+        "body": "Générez et imprimez les QR codes de toutes vos tables en un clic."
+      },
+      "split": {
+        "title": "Chacun paie sa part",
+        "body": "Plusieurs clients à la même table, chacun avec son panier et son addition."
+      },
+      "live": {
+        "title": "Cuisine en direct",
+        "body": "Les commandes arrivent instantanément en cuisine et en salle."
+      },
+      "insights": {
+        "title": "Ventes & avis",
+        "body": "Chiffre d'affaires, produits phares, avis et plaintes au même endroit."
+      }
+    }
+  },
+  "auth": {
+    "loginTitle": "Bon retour",
+    "loginSubtitle": "Connectez-vous à votre espace restaurant.",
+    "signupTitle": "Créez votre restaurant",
+    "signupSubtitle": "Quelques secondes suffisent. Aucune carte bancaire requise.",
+    "email": "Email",
+    "password": "Mot de passe",
+    "fullName": "Votre nom",
+    "restaurantName": "Nom du restaurant",
+    "passwordHint": "10 caractères minimum.",
+    "loginSubmit": "Se connecter",
+    "signupSubmit": "Créer mon compte",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "goSignup": "Créer un restaurant",
+    "goLogin": "Se connecter",
+    "errors": {
+      "invalid_credentials": "Email ou mot de passe incorrect.",
+      "email_taken": "Un compte existe déjà avec cet email.",
+      "rate_limited": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "validation": "Merci de vérifier les champs du formulaire.",
+      "password_too_short": "Le mot de passe doit contenir au moins 10 caractères.",
+      "unknown": "Une erreur est survenue. Réessayez."
+    }
+  },
+  "nav": {
+    "overview": "Vue d'ensemble",
+    "admin": "Administration",
+    "adminOverview": "Plateforme",
+    "adminRestaurants": "Restaurants",
+    "adminUsers": "Utilisateurs",
+    "switchRestaurant": "Changer de restaurant",
+    "myRestaurants": "Mes restaurants"
+  },
+  "dashboard": {
+    "welcome": "Bonjour {name}",
+    "overviewSubtitle": "Voici l'état de votre restaurant.",
+    "setupTitle": "Mise en route",
+    "setupSubtitle": "Terminez ces étapes pour recevoir vos premières commandes.",
+    "setup": {
+      "profile": "Compléter les informations du restaurant",
+      "tables": "Créer vos tables",
+      "menu": "Créer votre menu",
+      "payments": "Configurer les moyens de paiement"
+    },
+    "stats": {
+      "tables": "Tables",
+      "categories": "Catégories",
+      "products": "Produits",
+      "members": "Membres de l'équipe"
+    },
+    "role": "Votre rôle",
+    "suspendedTitle": "Restaurant suspendu",
+    "suspendedBody": "Ce restaurant est temporairement suspendu. Contactez le support Spotifood.",
+    "noRestaurantTitle": "Aucun restaurant",
+    "noRestaurantBody": "Votre compte n'est rattaché à aucun restaurant actif.",
+    "pickRestaurant": "Choisissez un restaurant"
+  },
+  "roles": {
+    "owner": "Propriétaire",
+    "admin": "Administrateur",
+    "staff": "Équipe"
+  },
+  "admin": {
+    "title": "Plateforme",
+    "subtitle": "Vue globale de Spotifood.",
+    "stats": {
+      "activeRestaurants": "Restaurants actifs",
+      "suspendedRestaurants": "Restaurants suspendus",
+      "newRestaurants": "Nouveaux (30 j)",
+      "users": "Utilisateurs",
+      "orders": "Commandes",
+      "revenue": "CA encaissé"
+    },
+    "subscriptions": "Abonnements par plan",
+    "restaurants": {
+      "title": "Restaurants",
+      "name": "Nom",
+      "organization": "Organisation",
+      "orders": "Commandes",
+      "suspend": "Suspendre",
+      "reactivate": "Réactiver",
+      "open": "Ouvrir",
+      "searchPlaceholder": "Nom ou slug…",
+      "all": "Tous"
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "name": "Nom",
+      "email": "Email",
+      "restaurants": "Restaurants",
+      "lastLogin": "Dernière connexion",
+      "superAdmin": "Super admin",
+      "never": "Jamais",
+      "searchPlaceholder": "Nom ou email…"
+    },
+    "status": {
+      "active": "Actif",
+      "suspended": "Suspendu",
+      "disabled": "Désactivé"
+    }
+  },
+  "errors": {
+    "notFoundTitle": "Page introuvable",
+    "notFoundBody": "Cette page n'existe pas ou n'est plus disponible.",
+    "forbiddenTitle": "Accès refusé",
+    "forbiddenBody": "Vous n'avez pas les droits nécessaires pour accéder à cette page.",
+    "home": "Retour à l'accueil"
+  }
+}

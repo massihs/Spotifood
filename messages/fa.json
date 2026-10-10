@@ -1,0 +1,144 @@
+{
+  "common": {
+    "appName": "Spotifood",
+    "loading": "در حال بارگذاری…",
+    "save": "ذخیره",
+    "cancel": "انصراف",
+    "back": "بازگشت",
+    "search": "جستجو",
+    "language": "زبان",
+    "logout": "خروج",
+    "status": "وضعیت",
+    "actions": "عملیات",
+    "none": "موردی وجود ندارد",
+    "createdAt": "تاریخ ایجاد",
+    "skipToContent": "رفتن به محتوا"
+  },
+  "landing": {
+    "metaTitle": "Spotifood — سفارش سر میز با کد QR برای رستوران‌ها",
+    "metaDescription": "منو و سفارش‌های خود را دیجیتال کنید: مشتریان اسکن می‌کنند، سفارش می‌دهند و از سر میز پرداخت می‌کنند.",
+    "badge": "پلتفرم رستوران",
+    "title": "مشتری اسکن می‌کند. سفارش می‌دهد. پرداخت می‌کند.",
+    "subtitle": "Spotifood هر میز را به یک نقطه سفارش تبدیل می‌کند. منوی آنلاین، سفارش لحظه‌ای در آشپزخانه، پرداخت جداگانه و فاکتور — بدون نصب اپلیکیشن.",
+    "ctaPrimary": "ساخت رستوران من",
+    "ctaSecondary": "ورود",
+    "features": {
+      "qr": { "title": "یک QR برای هر میز", "body": "کدهای QR همه میزها را با یک کلیک بسازید و چاپ کنید." },
+      "split": {
+        "title": "هر کس سهم خودش را می‌پردازد",
+        "body": "چند مشتری سر یک میز، هر کدام با سبد و صورتحساب خود."
+      },
+      "live": { "title": "آشپزخانه زنده", "body": "سفارش‌ها فوراً به آشپزخانه و سالن می‌رسند." },
+      "insights": { "title": "فروش و نظرات", "body": "درآمد، محصولات پرفروش، نظرات و شکایات در یک جا." }
+    }
+  },
+  "auth": {
+    "loginTitle": "خوش آمدید",
+    "loginSubtitle": "وارد فضای رستوران خود شوید.",
+    "signupTitle": "رستوران خود را بسازید",
+    "signupSubtitle": "فقط چند ثانیه. بدون نیاز به کارت بانکی.",
+    "email": "ایمیل",
+    "password": "رمز عبور",
+    "fullName": "نام شما",
+    "restaurantName": "نام رستوران",
+    "passwordHint": "حداقل ۱۰ کاراکتر.",
+    "loginSubmit": "ورود",
+    "signupSubmit": "ساخت حساب",
+    "noAccount": "حساب ندارید؟",
+    "hasAccount": "حساب دارید؟",
+    "goSignup": "ساخت رستوران",
+    "goLogin": "ورود",
+    "errors": {
+      "invalid_credentials": "ایمیل یا رمز عبور نادرست است.",
+      "email_taken": "حسابی با این ایمیل وجود دارد.",
+      "rate_limited": "تلاش‌های زیاد. چند دقیقه دیگر دوباره امتحان کنید.",
+      "validation": "لطفاً فیلدهای فرم را بررسی کنید.",
+      "password_too_short": "رمز عبور باید حداقل ۱۰ کاراکتر باشد.",
+      "unknown": "خطایی رخ داد. دوباره تلاش کنید."
+    }
+  },
+  "nav": {
+    "overview": "نمای کلی",
+    "admin": "مدیریت",
+    "adminOverview": "پلتفرم",
+    "adminRestaurants": "رستوران‌ها",
+    "adminUsers": "کاربران",
+    "switchRestaurant": "تغییر رستوران",
+    "myRestaurants": "رستوران‌های من"
+  },
+  "dashboard": {
+    "welcome": "سلام {name}",
+    "overviewSubtitle": "وضعیت رستوران شما.",
+    "setupTitle": "شروع کار",
+    "setupSubtitle": "این مراحل را کامل کنید تا اولین سفارش‌ها را دریافت کنید.",
+    "setup": {
+      "profile": "تکمیل اطلاعات رستوران",
+      "tables": "ساخت میزها",
+      "menu": "ساخت منو",
+      "payments": "تنظیم روش‌های پرداخت"
+    },
+    "stats": {
+      "tables": "میزها",
+      "categories": "دسته‌ها",
+      "products": "محصولات",
+      "members": "اعضای تیم"
+    },
+    "role": "نقش شما",
+    "suspendedTitle": "رستوران معلق شده",
+    "suspendedBody": "این رستوران موقتاً معلق شده است. با پشتیبانی Spotifood تماس بگیرید.",
+    "noRestaurantTitle": "رستورانی وجود ندارد",
+    "noRestaurantBody": "حساب شما به هیچ رستوران فعالی متصل نیست.",
+    "pickRestaurant": "یک رستوران انتخاب کنید"
+  },
+  "roles": {
+    "owner": "مالک",
+    "admin": "مدیر",
+    "staff": "کارمند"
+  },
+  "admin": {
+    "title": "پلتفرم",
+    "subtitle": "نمای کلی Spotifood.",
+    "stats": {
+      "activeRestaurants": "رستوران‌های فعال",
+      "suspendedRestaurants": "رستوران‌های معلق",
+      "newRestaurants": "جدید (۳۰ روز)",
+      "users": "کاربران",
+      "orders": "سفارش‌ها",
+      "revenue": "درآمد دریافت‌شده"
+    },
+    "subscriptions": "اشتراک‌ها بر اساس طرح",
+    "restaurants": {
+      "title": "رستوران‌ها",
+      "name": "نام",
+      "organization": "سازمان",
+      "orders": "سفارش‌ها",
+      "suspend": "تعلیق",
+      "reactivate": "فعال‌سازی مجدد",
+      "open": "باز کردن",
+      "searchPlaceholder": "نام یا شناسه…",
+      "all": "همه"
+    },
+    "users": {
+      "title": "کاربران",
+      "name": "نام",
+      "email": "ایمیل",
+      "restaurants": "رستوران‌ها",
+      "lastLogin": "آخرین ورود",
+      "superAdmin": "مدیر کل",
+      "never": "هرگز",
+      "searchPlaceholder": "نام یا ایمیل…"
+    },
+    "status": {
+      "active": "فعال",
+      "suspended": "معلق",
+      "disabled": "غیرفعال"
+    }
+  },
+  "errors": {
+    "notFoundTitle": "صفحه پیدا نشد",
+    "notFoundBody": "این صفحه وجود ندارد یا دیگر در دسترس نیست.",
+    "forbiddenTitle": "دسترسی غیرمجاز",
+    "forbiddenBody": "شما اجازه دسترسی به این صفحه را ندارید.",
+    "home": "بازگشت به خانه"
+  }
+}

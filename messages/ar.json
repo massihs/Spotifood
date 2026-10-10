@@ -1,0 +1,144 @@
+{
+  "common": {
+    "appName": "Spotifood",
+    "loading": "جارٍ التحميل…",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "back": "رجوع",
+    "search": "بحث",
+    "language": "اللغة",
+    "logout": "تسجيل الخروج",
+    "status": "الحالة",
+    "actions": "إجراءات",
+    "none": "لا توجد عناصر",
+    "createdAt": "تاريخ الإنشاء",
+    "skipToContent": "انتقل إلى المحتوى"
+  },
+  "landing": {
+    "metaTitle": "Spotifood — الطلب من الطاولة عبر رمز QR للمطاعم",
+    "metaDescription": "حوّل قائمتك وطلباتك إلى رقمية: يمسح الضيوف الرمز ويطلبون ويدفعون من طاولتهم.",
+    "badge": "منصة المطاعم",
+    "title": "يمسح الضيف. يطلب. يدفع.",
+    "subtitle": "تحوّل Spotifood كل طاولة إلى نقطة طلب. قائمة إلكترونية، طلبات فورية في المطبخ، دفع فردي وفواتير — دون تثبيت أي تطبيق.",
+    "ctaPrimary": "أنشئ مطعمي",
+    "ctaSecondary": "تسجيل الدخول",
+    "features": {
+      "qr": { "title": "رمز QR لكل طاولة", "body": "أنشئ واطبع رموز QR لجميع طاولاتك بنقرة واحدة." },
+      "split": { "title": "كلٌّ يدفع حصته", "body": "عدة ضيوف على طاولة واحدة، لكل منهم سلته وفاتورته." },
+      "live": { "title": "مطبخ مباشر", "body": "تصل الطلبات فورًا إلى المطبخ والصالة." },
+      "insights": {
+        "title": "المبيعات والتقييمات",
+        "body": "الإيرادات والأصناف الأكثر مبيعًا والتقييمات والشكاوى في مكان واحد."
+      }
+    }
+  },
+  "auth": {
+    "loginTitle": "مرحبًا بعودتك",
+    "loginSubtitle": "سجّل الدخول إلى مساحة مطعمك.",
+    "signupTitle": "أنشئ مطعمك",
+    "signupSubtitle": "يستغرق الأمر ثوانٍ. لا حاجة لبطاقة بنكية.",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "fullName": "اسمك",
+    "restaurantName": "اسم المطعم",
+    "passwordHint": "10 أحرف على الأقل.",
+    "loginSubmit": "تسجيل الدخول",
+    "signupSubmit": "إنشاء الحساب",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "goSignup": "إنشاء مطعم",
+    "goLogin": "تسجيل الدخول",
+    "errors": {
+      "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+      "email_taken": "يوجد حساب بهذا البريد الإلكتروني.",
+      "rate_limited": "محاولات كثيرة. حاول مجددًا بعد بضع دقائق.",
+      "validation": "يرجى التحقق من حقول النموذج.",
+      "password_too_short": "يجب أن تتكون كلمة المرور من 10 أحرف على الأقل.",
+      "unknown": "حدث خطأ. حاول مرة أخرى."
+    }
+  },
+  "nav": {
+    "overview": "نظرة عامة",
+    "admin": "الإدارة",
+    "adminOverview": "المنصة",
+    "adminRestaurants": "المطاعم",
+    "adminUsers": "المستخدمون",
+    "switchRestaurant": "تغيير المطعم",
+    "myRestaurants": "مطاعمي"
+  },
+  "dashboard": {
+    "welcome": "مرحبًا {name}",
+    "overviewSubtitle": "هذه حالة مطعمك.",
+    "setupTitle": "البدء",
+    "setupSubtitle": "أكمل هذه الخطوات لاستقبال طلباتك الأولى.",
+    "setup": {
+      "profile": "استكمال معلومات المطعم",
+      "tables": "إنشاء الطاولات",
+      "menu": "إنشاء القائمة",
+      "payments": "إعداد وسائل الدفع"
+    },
+    "stats": {
+      "tables": "الطاولات",
+      "categories": "الفئات",
+      "products": "المنتجات",
+      "members": "أعضاء الفريق"
+    },
+    "role": "دورك",
+    "suspendedTitle": "المطعم معلّق",
+    "suspendedBody": "هذا المطعم معلّق مؤقتًا. يرجى التواصل مع دعم Spotifood.",
+    "noRestaurantTitle": "لا يوجد مطعم",
+    "noRestaurantBody": "حسابك غير مرتبط بأي مطعم نشط.",
+    "pickRestaurant": "اختر مطعمًا"
+  },
+  "roles": {
+    "owner": "المالك",
+    "admin": "المسؤول",
+    "staff": "الفريق"
+  },
+  "admin": {
+    "title": "المنصة",
+    "subtitle": "نظرة شاملة على Spotifood.",
+    "stats": {
+      "activeRestaurants": "المطاعم النشطة",
+      "suspendedRestaurants": "المطاعم المعلّقة",
+      "newRestaurants": "جديدة (30 يومًا)",
+      "users": "المستخدمون",
+      "orders": "الطلبات",
+      "revenue": "الإيرادات المحصّلة"
+    },
+    "subscriptions": "الاشتراكات حسب الخطة",
+    "restaurants": {
+      "title": "المطاعم",
+      "name": "الاسم",
+      "organization": "المؤسسة",
+      "orders": "الطلبات",
+      "suspend": "تعليق",
+      "reactivate": "إعادة التفعيل",
+      "open": "فتح",
+      "searchPlaceholder": "الاسم أو المعرّف…",
+      "all": "الكل"
+    },
+    "users": {
+      "title": "المستخدمون",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "restaurants": "المطاعم",
+      "lastLogin": "آخر دخول",
+      "superAdmin": "مدير عام",
+      "never": "أبدًا",
+      "searchPlaceholder": "الاسم أو البريد…"
+    },
+    "status": {
+      "active": "نشط",
+      "suspended": "معلّق",
+      "disabled": "معطّل"
+    }
+  },
+  "errors": {
+    "notFoundTitle": "الصفحة غير موجودة",
+    "notFoundBody": "هذه الصفحة غير موجودة أو لم تعد متاحة.",
+    "forbiddenTitle": "الوصول مرفوض",
+    "forbiddenBody": "ليست لديك صلاحية الوصول إلى هذه الصفحة.",
+    "home": "العودة إلى الرئيسية"
+  }
+}
