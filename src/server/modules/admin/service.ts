@@ -1,14 +1,6 @@
 import { and, count, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import type { DbOrTx } from "@/server/db/client";
-import {
-  orders,
-  organizations,
-  plans,
-  restaurantMembers,
-  restaurants,
-  subscriptions,
-  users,
-} from "@/server/db/schema";
+import { orders, organizations, plans, restaurants, subscriptions, users } from "@/server/db/schema";
 
 export async function getPlatformStats(db: DbOrTx) {
   const since30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -71,7 +63,7 @@ export async function listRestaurantsForAdmin(
       createdAt: restaurants.createdAt,
       organizationName: organizations.name,
       ordersCount:
-        sql<number>`(select count(*) from ${orders} where ${orders.restaurantId} = ${restaurants.id})`.mapWith(
+        sql<number>`(select count(*) from orders o where o.restaurant_id = "restaurants"."id")`.mapWith(
           Number,
         ),
     })
@@ -102,7 +94,7 @@ export async function listUsersForAdmin(
       lastLoginAt: users.lastLoginAt,
       createdAt: users.createdAt,
       restaurantsCount:
-        sql<number>`(select count(*) from ${restaurantMembers} where ${restaurantMembers.userId} = ${users.id})`.mapWith(
+        sql<number>`(select count(*) from restaurant_members rm where rm.user_id = "users"."id")`.mapWith(
           Number,
         ),
     })
