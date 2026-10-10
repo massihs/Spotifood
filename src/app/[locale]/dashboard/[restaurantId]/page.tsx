@@ -7,6 +7,7 @@ import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { getSetupOverview } from "@/server/modules/dashboard/service";
 import { cn } from "@/lib/cn";
+import { Link } from "@/i18n/navigation";
 
 export default function OverviewPage({ params }: PageProps<"/[locale]/dashboard/[restaurantId]">) {
   return (
@@ -22,11 +23,12 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const t = await getTranslations("dashboard");
   const overview = await getSetupOverview(db, ctx);
 
+  const base = `/dashboard/${ctx.restaurant.id}`;
   const steps = [
-    { key: "profile", done: overview.profileComplete },
-    { key: "tables", done: overview.tables > 0 },
-    { key: "menu", done: overview.products > 0 },
-    { key: "payments", done: false },
+    { key: "profile", done: overview.profileComplete, href: `${base}/settings` },
+    { key: "tables", done: overview.tables > 0, href: `${base}/tables` },
+    { key: "menu", done: overview.products > 0, href: null },
+    { key: "payments", done: false, href: null },
   ] as const;
 
   return (
@@ -63,9 +65,15 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
                   i + 1
                 )}
               </span>
-              <span className={cn("text-sm", s.done && "text-fg-muted line-through")}>
-                {t(`setup.${s.key}`)}
-              </span>
+              {s.href && !s.done ? (
+                <Link href={s.href} className="text-sm font-medium text-accent hover:underline">
+                  {t(`setup.${s.key}`)} →
+                </Link>
+              ) : (
+                <span className={cn("text-sm", s.done && "text-fg-muted line-through")}>
+                  {t(`setup.${s.key}`)}
+                </span>
+              )}
             </li>
           ))}
         </ol>

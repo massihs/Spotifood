@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh } from "next/cache";
 import { z } from "zod";
 import { db } from "@/server/db/client";
 import { requestMeta, requireSuperAdmin } from "@/server/auth/current";
@@ -33,5 +33,5 @@ export async function setRestaurantStatusAction(formData: FormData) {
     }
     return row;
   });
-  if (updated) revalidatePath("/[locale]/admin/restaurants", "page");
+  if (updated) refresh();
 }

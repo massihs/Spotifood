@@ -7,6 +7,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
+      // Images are pre-optimized server-side (sharp → WebP variants) or are SVG/data URIs (QR codes);
+      // next/image would only add a second, redundant optimization pass.
+      "@next/next/no-img-element": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_", destructuredArrayIgnorePattern: "^_" },

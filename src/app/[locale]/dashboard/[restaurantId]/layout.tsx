@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
-import { IconHome, IconChart } from "@/components/ui/icons";
+import { IconChart, IconHome, IconSettings, IconTable, IconUsers } from "@/components/ui/icons";
+import { can } from "@/server/tenancy";
 import { requireRestaurant } from "@/server/auth/current";
 import { Link } from "@/i18n/navigation";
 
@@ -28,7 +29,16 @@ async function RestaurantShell({
   const t = await getTranslations();
   const base = `/dashboard/${ctx.restaurant.id}`;
 
-  const nav = [{ href: base, label: t("nav.overview"), icon: <IconHome />, exact: true }];
+  const nav = [
+    { href: base, label: t("nav.overview"), icon: <IconHome />, exact: true },
+    can(ctx, "tables.view") && { href: `${base}/tables`, label: t("nav.tables"), icon: <IconTable /> },
+    can(ctx, "members.manage") && { href: `${base}/team`, label: t("nav.team"), icon: <IconUsers /> },
+    can(ctx, "restaurant.view") && {
+      href: `${base}/settings`,
+      label: t("nav.settings"),
+      icon: <IconSettings />,
+    },
+  ].filter((x) => !!x);
 
   return (
     <AppShell
