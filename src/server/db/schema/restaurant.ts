@@ -50,9 +50,8 @@ export const restaurants = pgTable(
   ],
 );
 
-export type OpeningHours = Record<
-  "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun",
-  { open: string; close: string }[]
+export type OpeningHours = Partial<
+  Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", { open: string; close: string }[]>
 >;
 
 export const restaurantSettings = pgTable("restaurant_settings", {
