@@ -35,3 +35,15 @@ Légende : ✅ fait · 🚧 en cours · ⏳ à venir
 - **Images** : format détecté sur les octets (jamais l'extension), SVG/GIF refusés, 8 Mo et ~40 Mpx max, orientation EXIF appliquée puis toutes les métadonnées supprimées (GPS…), ré-encodage WebP/PNG. Le même pipeline servira aux photos produits (Phase 3).
 - **`/t/{token}`** : valide le QR et affiche restaurant + table. Il devient le menu client complet en Phase 4.
 - La démo est sur l'offre **Professional** (le Free plafonne à 5 tables et 2 membres).
+
+## Notes Phase 3
+
+- **Réorganisation** : drag & drop via dnd-kit (souris, tactile avec appui long, clavier : Espace puis flèches). Mise à jour optimiste, annulée si le serveur refuse. Le serveur exige la liste _complète_ : si un autre gérant a modifié le menu entre-temps, il répond `reorder_mismatch` et la page se recharge, au lieu d'appliquer un ordre partiel.
+- **Catégories prédéfinies** : 24 modèles (`templateKey`) nommés dans la _langue par défaut du restaurant_, pas dans celle du gérant. Un modèle déjà utilisé ne peut pas être ajouté deux fois ; les catégories personnalisées (« Spécialités iraniennes ») coexistent.
+- **Suppression** : une catégorie qui contient des produits ne peut pas être supprimée. Un produit supprimé est masqué (soft delete), son historique de commandes est conservé.
+- **Épuisé vs masqué** : le staff peut marquer un plat « épuisé » pendant le service ; seul un gestionnaire du menu peut le masquer ou le modifier.
+- **Options** : les choix gardent leur identifiant quand on les modifie (les paniers en cours restent valides) ; un choix retiré est soft-deleted. Règles validées : min ≤ max, assez de choix disponibles pour le minimum, pas plus de choix par défaut que le maximum.
+- **Isolation** : un produit ne peut référencer que la catégorie, le taux de TVA et les groupes d'options de _son_ restaurant (testé).
+- **Cache** : chaque modification du menu appelle `updateTag(menu:{restaurantId})`. Le menu client (Phase 4) sera mis en cache sous ce tag et toujours à jour.
+- **Bug corrigé** (phases 1 à 3) : dans un `select` mono-table, Drizzle n'écrit pas le nom de table des colonnes, donc une sous-requête corrélée `… where x = ${table.id}` comparait la mauvaise colonne. Les compteurs « commandes par restaurant » et « restaurants par utilisateur » du Super Admin étaient faux. Toutes les sous-requêtes sont maintenant qualifiées explicitement, avec des tests de régression (voir `src/server/db/README.md`).
+- **Mobile** : tous les écrans du dashboard sont vérifiés sans défilement horizontal à 390 px.

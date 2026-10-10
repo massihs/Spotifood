@@ -4,7 +4,8 @@
  * Creates plans, global category templates, a super admin and "Restaurant Demo" (20 tables, menu).
  */
 import "dotenv/config";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
+import sharp from "sharp";
 import { db } from "@/server/db/client";
 import {
   categories,
@@ -14,6 +15,7 @@ import {
   optionValues,
   plans,
   productOptionGroups,
+  productImages,
   products,
   restaurants,
   taxRates,
@@ -26,6 +28,8 @@ import { hashPassword } from "@/server/auth/password";
 import { DEFAULT_CATEGORY_TEMPLATES, DEFAULT_PLANS } from "@/server/modules/catalog/defaults";
 import { createOrganization, createRestaurant } from "@/server/modules/restaurants/service";
 import { randomToken } from "@/lib/ids";
+import { loadRestaurantContext } from "@/server/tenancy";
+import { addProductImage } from "@/server/modules/menu/images";
 
 const DEMO_OWNER = {
   email: "owner@demo.spotifood.local",
@@ -434,10 +438,64 @@ async function ensureDemoPlan() {
   console.log("✓ demo organization on the Professional plan");
 }
 
+const PALETTE: Record<string, [string, string]> = {
+  starters: ["#f4a261", "#e76f51"],
+  salads: ["#8ac926", "#2a9d8f"],
+  mains: ["#e9c46a", "#d62828"],
+  steak: ["#9d0208", "#370617"],
+  pasta: ["#ffb703", "#fb8500"],
+  desserts: ["#ffafcc", "#cdb4db"],
+  coffee: ["#7f5539", "#3e2723"],
+  soft_drinks: ["#48cae4", "#0077b6"],
+};
+
+const escapeXml = (v: string) => v.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
+
+/** Placeholder photo for demo products, processed by the same pipeline as real uploads. */
+async function placeholderPhoto(name: string, key: string) {
+  const [a, b] = PALETTE[key] ?? ["#adb5bd", "#495057"];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>
+    <rect width="1200" height="900" fill="url(#g)"/>
+    <circle cx="600" cy="400" r="230" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="28"/>
+    <circle cx="600" cy="400" r="150" fill="rgba(255,255,255,0.18)"/>
+    <text x="600" y="780" font-family="DejaVu Sans, sans-serif" font-size="64" font-weight="700" fill="white" text-anchor="middle">${escapeXml(name)}</text>
+  </svg>`;
+  return sharp(Buffer.from(svg)).jpeg({ quality: 90 }).toBuffer();
+}
+
+async function seedDemoImages() {
+  const [demo] = await db.select().from(restaurants).where(eq(restaurants.slug, "restaurant-demo"));
+  if (!demo) return;
+  const rows = await db
+    .select({ id: products.id, name: products.name, key: categories.templateKey })
+    .from(products)
+    .innerJoin(categories, eq(categories.id, products.categoryId))
+    .where(and(eq(products.restaurantId, demo.id), isNull(products.deletedAt)));
+  const [owner] = await db
+    .select()
+    .from(users)
+    .where(sql`lower(${users.email}) = ${DEMO_OWNER.email}`);
+  const ctx = await loadRestaurantContext(db, { ...owner!, locale: owner!.locale }, demo.id);
+  let added = 0;
+  for (const p of rows) {
+    const [has] = await db
+      .select({ id: productImages.id })
+      .from(productImages)
+      .where(eq(productImages.productId, p.id))
+      .limit(1);
+    if (has) continue;
+    await addProductImage(db, ctx, p.id, await placeholderPhoto(p.name, p.key ?? ""));
+    added++;
+  }
+  console.log(`✓ demo product photos: ${added} generated (${rows.length - added} already present)`);
+}
+
 async function main() {
   await seedPlatform();
   await seedDemoRestaurant();
   await ensureDemoPlan();
+  await seedDemoImages();
 }
 
 main()
