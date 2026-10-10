@@ -42,6 +42,7 @@ export const RATE_LIMITS = {
   login: { limit: 10, windowMs: 15 * 60_000 },
   signup: { limit: 5, windowMs: 60 * 60_000 },
   guestWrite: { limit: 60, windowMs: 60_000 },
+  qrEntry: { limit: 30, windowMs: 60_000 },
   upload: { limit: 20, windowMs: 10 * 60_000 },
 } as const;
 
