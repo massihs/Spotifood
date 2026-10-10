@@ -1,16 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
+import { cn } from "@/lib/cn";
 
 /** Transient, non-blocking confirmation (announced to screen readers). */
 export function Toast({
   message,
   onDone,
   duration = 5000,
+  className = "bottom-6",
 }: {
   message: string | null;
   onDone: () => void;
   duration?: number;
+  /** Vertical placement, e.g. above a sticky bottom bar. */
+  className?: string;
 }) {
   useEffect(() => {
     if (!message) return;
@@ -20,7 +24,10 @@ export function Toast({
   return (
     <div
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4 print:hidden"
+      className={cn(
+        "pointer-events-none fixed inset-x-0 z-50 flex justify-center px-4 print:hidden",
+        className,
+      )}
     >
       {message ? (
         <p

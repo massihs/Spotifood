@@ -5,7 +5,13 @@ import { useTransition } from "react";
 import { LOCALE_LABELS, LOCALES, type AppLocale } from "@/i18n/config";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
-export function LanguageSwitcher({ className }: { className?: string }) {
+export function LanguageSwitcher({
+  className,
+  locales = LOCALES,
+}: {
+  className?: string;
+  locales?: readonly AppLocale[];
+}) {
   const t = useTranslations("common");
   const locale = useLocale() as AppLocale;
   const router = useRouter();
@@ -23,7 +29,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         }
         className="h-9 rounded-lg border border-border bg-surface px-2 text-sm text-fg-muted hover:text-fg"
       >
-        {LOCALES.map((l) => (
+        {locales.map((l) => (
           <option key={l} value={l}>
             {LOCALE_LABELS[l]}
           </option>

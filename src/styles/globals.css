@@ -120,3 +120,20 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Horizontal scrollers (category chips, featured strip) */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

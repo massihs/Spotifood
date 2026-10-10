@@ -11,6 +11,8 @@ const sans = Inter({ subsets: ["latin"], variable: "--font-sans-loaded", display
 export const metadata: Metadata = {
   title: { default: "Spotifood", template: "%s · Spotifood" },
   applicationName: "Spotifood",
+  manifest: "/manifest.webmanifest",
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
 };
 
