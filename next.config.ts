@@ -16,7 +16,13 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   typedRoutes: false,
-  serverExternalPackages: ["@node-rs/argon2", "pg"],
+  serverExternalPackages: ["@node-rs/argon2", "pg", "sharp"],
+  experimental: {
+    serverActions: {
+      // Image uploads (logo, product photos) go through server actions; images are re-encoded server-side.
+      bodySizeLimit: "10mb",
+    },
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
