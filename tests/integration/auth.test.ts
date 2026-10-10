@@ -5,14 +5,12 @@ import {
   auditLogs,
   authSessions,
   organizationMembers,
-  plans,
   restaurantMembers,
   restaurantSettings,
   subscriptions,
   taxRates,
   users,
 } from "@/server/db/schema";
-import { DEFAULT_PLANS } from "@/server/modules/catalog/defaults";
 import { authenticate, registerOwner } from "@/server/modules/auth/service";
 import { createAuthSession, revokeAuthSession, validateAuthSession } from "@/server/auth/sessions";
 import { createOwnerWithRestaurant, TEST_PASSWORD, uniqueEmail } from "../helpers/factories";
@@ -75,7 +73,6 @@ describe("restaurant signup", () => {
   });
 
   it("subscribes the organization to the free plan", async () => {
-    await db.insert(plans).values(DEFAULT_PLANS[0]!).onConflictDoNothing();
     const { organization } = await createOwnerWithRestaurant();
     const subs = await db
       .select()

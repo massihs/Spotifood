@@ -1,14 +1,17 @@
 import { randomUUID } from "node:crypto";
+import { eq } from "drizzle-orm";
 import { db } from "@/server/db/client";
 import { registerOwner } from "@/server/modules/auth/service";
 import { hashPassword } from "@/server/auth/password";
-import { restaurantMembers, users } from "@/server/db/schema";
+import { plans, restaurantMembers, subscriptions, users } from "@/server/db/schema";
 import type { SessionUser } from "@/server/auth/sessions";
+import { loadRestaurantContext } from "@/server/tenancy";
 
 export const uniqueEmail = (prefix = "user") => `${prefix}-${randomUUID().slice(0, 8)}@test.local`;
 export const TEST_PASSWORD = "CorrectHorse42!";
 
-export async function createOwnerWithRestaurant(name = "Le Test") {
+/** New owner + organization + restaurant (Free plan unless `plan` is given) and its owner context. */
+export async function createOwnerWithRestaurant(name = "Le Test", opts: { plan?: string } = {}) {
   const email = uniqueEmail("owner");
   const res = await registerOwner(db, {
     email,
@@ -16,7 +19,22 @@ export async function createOwnerWithRestaurant(name = "Le Test") {
     fullName: "Owner Test",
     restaurantName: name,
   });
-  return { ...res, sessionUser: toSessionUser(res.user) };
+  if (opts.plan) await setPlan(res.organization.id, opts.plan);
+  const sessionUser = toSessionUser(res.user);
+  const ctx = await loadRestaurantContext(db, sessionUser, res.restaurant.id);
+  return { ...res, sessionUser, ctx };
+}
+
+export async function setPlan(organizationId: string, code: string) {
+  const [plan] = await db.select().from(plans).where(eq(plans.code, code));
+  await db
+    .update(subscriptions)
+    .set({ planId: plan!.id })
+    .where(eq(subscriptions.organizationId, organizationId));
+}
+
+export function contextFor(user: SessionUser, restaurantId: string) {
+  return loadRestaurantContext(db, user, restaurantId);
 }
 
 export async function createUser(opts: { superAdmin?: boolean } = {}) {
