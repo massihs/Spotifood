@@ -47,3 +47,15 @@ Légende : ✅ fait · 🚧 en cours · ⏳ à venir
 - **Cache** : chaque modification du menu appelle `updateTag(menu:{restaurantId})`. Le menu client (Phase 4) sera mis en cache sous ce tag et toujours à jour.
 - **Bug corrigé** (phases 1 à 3) : dans un `select` mono-table, Drizzle n'écrit pas le nom de table des colonnes, donc une sous-requête corrélée `… where x = ${table.id}` comparait la mauvaise colonne. Les compteurs « commandes par restaurant » et « restaurants par utilisateur » du Super Admin étaient faux. Toutes les sous-requêtes sont maintenant qualifiées explicitement, avec des tests de régression (voir `src/server/db/README.md`).
 - **Mobile** : tous les écrans du dashboard sont vérifiés sans défilement horizontal à 390 px.
+
+## Notes Phase 4
+
+- **Entrée QR** (`GET /t/{jeton}`, route handler) : résout la table, identifie l'appareil (`sf_guest`, signé HMAC, 1 an), ouvre ou rejoint la session de table, attribue un siège (`sf_seat`, signé, 12 h) puis redirige vers `/table`. Le jeton du QR ne reste jamais dans l'URL de l'app.
+- **Participants** : un appareil = un participant par session (« Client N », prénom facultatif). Rescanner redonne le même siège. Un cookie de siège copié sur un autre appareil, ou modifié, est refusé (testé en navigateur).
+- **Concurrence** : premier scan simultané de 8 téléphones → une seule session (index unique partiel + retry) et des numéros de siège uniques (testé).
+- **Clôture automatique** : appliquée paresseusement au scan suivant si la session est inactive depuis plus que le délai configuré **et** qu'il ne reste rien à payer. La clôture manuelle par le staff arrive avec la vue tables live (Phase 6).
+- **Menu public** : `use cache` + `cacheTag(menu:{id})` + `cacheLife('hours')`. Chaque modification du dashboard appelle `updateTag` : un plat marqué épuisé apparaît immédiatement côté client (testé). Mesuré en local : TTFB ≈ 35–240 ms, ≈ 170 Ko de JS, scan → menu affiché < 1 s.
+- **Prix** : moteur pur (`src/server/modules/pricing`) partagé client/serveur. Le client l'utilise pour l'affichage, le serveur recalcule **toujours** depuis la base (prix, options, min/max, disponibilité). Le panier est re-pricé à chaque lecture : une hausse de prix ou un plat épuisé est signalé dans le panier au lieu d'être commandé à l'ancien prix.
+- **TVA** : calculée par taux sur les montants cumulés (un arrondi par taux), comme sur une facture.
+- **PWA** : manifest + icônes (dont maskable) — « Ajouter à l'écran d'accueil » sur iOS et Android. Pas de service worker hors-ligne : une commande nécessite de toute façon le réseau.
+- Le bouton « Commander » arrive en Phase 5 (création de commande, envoi en cuisine).
