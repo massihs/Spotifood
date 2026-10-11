@@ -93,7 +93,9 @@
     "menu": "Menu",
     "menuEditor": "Menu & produits",
     "toggleNav": "Ouvrir le menu de navigation",
-    "orders": "Commandes"
+    "orders": "Commandes",
+    "kitchen": "Cuisine",
+    "floor": "Salle"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -232,7 +234,10 @@
     "cart_empty": "Votre panier est vide.",
     "cart_has_issues": "Certains articles ne sont plus disponibles. Corrigez votre panier.",
     "invalid_transition": "Ce changement de statut n'est pas possible.",
-    "status_changed": "La commande vient d'être modifiée par un collègue. Rafraîchissement…"
+    "status_changed": "La commande vient d'être modifiée par un collègue. Rafraîchissement…",
+    "session_has_unpaid": "Il reste un montant à encaisser sur cette table.",
+    "session_has_active_orders": "Des commandes sont encore en cours sur cette table.",
+    "no_open_session": "Cette table est déjà libre."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -470,8 +475,7 @@
       "served": "Bon appétit !",
       "cancelled": "Cette commande a été annulée. Contactez l'équipe si besoin."
     },
-    "ordersLink": "Mes commandes ({count})",
-    "liveHint": "Mise à jour automatique"
+    "ordersLink": "Mes commandes ({count})"
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -676,5 +680,56 @@
     "back": "Retour aux tables",
     "clientTotal": "Total",
     "noOrdersYet": "Pas encore de commande"
+  },
+  "live": {
+    "connecting": "Connexion…",
+    "live": "En direct",
+    "reconnecting": "Reconnexion…"
+  },
+  "kitchen": {
+    "title": "Cuisine",
+    "subtitle": "Écran cuisine en temps réel. Touchez le bouton pour faire avancer une commande.",
+    "columns": {
+      "received": "Nouvelles",
+      "accepted": "Acceptées",
+      "preparing": "En préparation",
+      "ready": "Prêtes",
+      "served": "Servies (30 min)"
+    },
+    "soundOn": "Son activé",
+    "soundOff": "Activer le son",
+    "fullscreen": "Plein écran",
+    "waiting": "{min} min",
+    "empty": "—",
+    "newOrder": "Nouvelle commande {number}"
+  },
+  "floor": {
+    "title": "Salle",
+    "subtitle": "État des tables en temps réel.",
+    "free": "Libre",
+    "in_progress": "Commande en cours",
+    "occupied": "Occupée",
+    "people": "{count, plural, =0 {Personne} one {# pers.} other {# pers.}}",
+    "since": "Depuis {time}",
+    "total": "Consommé",
+    "toCollect": "À encaisser",
+    "orders": "{count, plural, =0 {Aucune commande} one {# commande} other {# commandes}}",
+    "ready": "{count, plural, one {# prête à servir} other {# prêtes à servir}}",
+    "lastOrder": "Dernière commande {time}",
+    "close": "Libérer la table",
+    "closeConfirm": "Libérer la table {label} ? Les clients devront rescanner le QR code.",
+    "forceConfirm": "La table a encore des commandes en cours ou impayées. Libérer quand même ? (action enregistrée)",
+    "closed": "Table {label} libérée.",
+    "summary": "{free} libres · {inProgress} en cours · {occupied} occupées"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification",
+    "markRead": "Tout marquer comme lu",
+    "open": "Notifications ({count} non lues)",
+    "types": {
+      "order.created": "Nouvelle commande {number} · Table {table}",
+      "order.ready": "Commande {number} prête · Table {table}"
+    }
   }
 }

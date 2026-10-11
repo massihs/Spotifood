@@ -93,7 +93,9 @@
     "menu": "القائمة",
     "menuEditor": "القائمة والمنتجات",
     "toggleNav": "فتح قائمة التنقل",
-    "orders": "الطلبات"
+    "orders": "الطلبات",
+    "kitchen": "المطبخ",
+    "floor": "الصالة"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -232,7 +234,10 @@
     "cart_empty": "سلتك فارغة.",
     "cart_has_issues": "بعض العناصر لم تعد متوفرة. يرجى تصحيح سلتك.",
     "invalid_transition": "تغيير الحالة هذا غير ممكن.",
-    "status_changed": "قام زميل للتو بتحديث هذا الطلب. جارٍ التحديث…"
+    "status_changed": "قام زميل للتو بتحديث هذا الطلب. جارٍ التحديث…",
+    "session_has_unpaid": "لا يزال هناك مبلغ للتحصيل على هذه الطاولة.",
+    "session_has_active_orders": "لا تزال هناك طلبات قيد التنفيذ على هذه الطاولة.",
+    "no_open_session": "هذه الطاولة متاحة بالفعل."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -470,8 +475,7 @@
       "served": "بالهناء والشفاء!",
       "cancelled": "تم إلغاء هذا الطلب. تواصل مع الفريق عند الحاجة."
     },
-    "ordersLink": "طلباتي ({count})",
-    "liveHint": "تحديث تلقائي"
+    "ordersLink": "طلباتي ({count})"
   },
   "categoryTemplates": {
     "starters": "المقبلات",
@@ -676,5 +680,56 @@
     "back": "العودة إلى الطاولات",
     "clientTotal": "الإجمالي",
     "noOrdersYet": "لا يوجد طلب بعد"
+  },
+  "live": {
+    "connecting": "جارٍ الاتصال…",
+    "live": "مباشر",
+    "reconnecting": "إعادة الاتصال…"
+  },
+  "kitchen": {
+    "title": "المطبخ",
+    "subtitle": "شاشة المطبخ في الوقت الفعلي. المس الزر لتقديم الطلب إلى المرحلة التالية.",
+    "columns": {
+      "received": "جديدة",
+      "accepted": "مقبولة",
+      "preparing": "قيد التحضير",
+      "ready": "جاهزة",
+      "served": "مقدَّمة (30 دقيقة)"
+    },
+    "soundOn": "الصوت مفعّل",
+    "soundOff": "تفعيل الصوت",
+    "fullscreen": "ملء الشاشة",
+    "waiting": "{min} د",
+    "empty": "—",
+    "newOrder": "طلب جديد {number}"
+  },
+  "floor": {
+    "title": "الصالة",
+    "subtitle": "حالة الطاولات في الوقت الفعلي.",
+    "free": "متاحة",
+    "in_progress": "طلب قيد التنفيذ",
+    "occupied": "مشغولة",
+    "people": "{count, plural, =0 {لا أحد} one {شخص واحد} other {# أشخاص}}",
+    "since": "منذ {time}",
+    "total": "المستهلك",
+    "toCollect": "للتحصيل",
+    "orders": "{count, plural, =0 {لا طلبات} one {طلب واحد} other {# طلبات}}",
+    "ready": "{count, plural, one {طلب جاهز للتقديم} other {# جاهزة للتقديم}}",
+    "lastOrder": "آخر طلب {time}",
+    "close": "تحرير الطاولة",
+    "closeConfirm": "تحرير الطاولة {label}؟ سيحتاج الضيوف إلى مسح رمز QR مجددًا.",
+    "forceConfirm": "لا تزال لهذه الطاولة طلبات جارية أو غير مدفوعة. هل تريد تحريرها رغم ذلك؟ (سيتم تسجيل الإجراء)",
+    "closed": "تم تحرير الطاولة {label}.",
+    "summary": "{free} متاحة · {inProgress} قيد التنفيذ · {occupied} مشغولة"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "empty": "لا توجد إشعارات",
+    "markRead": "تعيين الكل كمقروء",
+    "open": "الإشعارات ({count} غير مقروءة)",
+    "types": {
+      "order.created": "طلب جديد {number} · طاولة {table}",
+      "order.ready": "الطلب {number} جاهز · طاولة {table}"
+    }
   }
 }

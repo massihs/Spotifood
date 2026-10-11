@@ -93,7 +93,9 @@
     "menu": "منو",
     "menuEditor": "منو و محصولات",
     "toggleNav": "باز کردن منوی ناوبری",
-    "orders": "سفارش‌ها"
+    "orders": "سفارش‌ها",
+    "kitchen": "آشپزخانه",
+    "floor": "سالن"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -232,7 +234,10 @@
     "cart_empty": "سبد شما خالی است.",
     "cart_has_issues": "برخی اقلام دیگر موجود نیستند. سبد را اصلاح کنید.",
     "invalid_transition": "این تغییر وضعیت ممکن نیست.",
-    "status_changed": "همکار شما همین حالا این سفارش را تغییر داد. در حال به‌روزرسانی…"
+    "status_changed": "همکار شما همین حالا این سفارش را تغییر داد. در حال به‌روزرسانی…",
+    "session_has_unpaid": "هنوز مبلغی برای دریافت روی این میز باقی است.",
+    "session_has_active_orders": "هنوز سفارش‌هایی روی این میز در جریان است.",
+    "no_open_session": "این میز از قبل آزاد است."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -470,8 +475,7 @@
       "served": "نوش جان!",
       "cancelled": "این سفارش لغو شد. در صورت نیاز با کارکنان صحبت کنید."
     },
-    "ordersLink": "سفارش‌های من ({count})",
-    "liveHint": "به‌روزرسانی خودکار"
+    "ordersLink": "سفارش‌های من ({count})"
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",
@@ -676,5 +680,56 @@
     "back": "بازگشت به میزها",
     "clientTotal": "جمع",
     "noOrdersYet": "هنوز سفارشی نیست"
+  },
+  "live": {
+    "connecting": "در حال اتصال…",
+    "live": "زنده",
+    "reconnecting": "اتصال مجدد…"
+  },
+  "kitchen": {
+    "title": "آشپزخانه",
+    "subtitle": "نمایشگر لحظه‌ای آشپزخانه. برای پیشبرد سفارش دکمه را لمس کنید.",
+    "columns": {
+      "received": "جدید",
+      "accepted": "پذیرفته",
+      "preparing": "در حال آماده‌سازی",
+      "ready": "آماده",
+      "served": "سرو شده (۳۰ دقیقه)"
+    },
+    "soundOn": "صدا روشن",
+    "soundOff": "فعال‌سازی صدا",
+    "fullscreen": "تمام‌صفحه",
+    "waiting": "{min} دقیقه",
+    "empty": "—",
+    "newOrder": "سفارش جدید {number}"
+  },
+  "floor": {
+    "title": "سالن",
+    "subtitle": "وضعیت لحظه‌ای میزها.",
+    "free": "آزاد",
+    "in_progress": "سفارش در جریان",
+    "occupied": "اشغال",
+    "people": "{count, plural, =0 {کسی نیست} other {# نفر}}",
+    "since": "از {time}",
+    "total": "مصرف‌شده",
+    "toCollect": "قابل دریافت",
+    "orders": "{count, plural, =0 {بدون سفارش} other {# سفارش}}",
+    "ready": "{count, plural, other {# آماده سرو}}",
+    "lastOrder": "آخرین سفارش {time}",
+    "close": "آزاد کردن میز",
+    "closeConfirm": "میز {label} آزاد شود؟ مشتریان باید دوباره کد QR را اسکن کنند.",
+    "forceConfirm": "این میز هنوز سفارش جاری یا پرداخت‌نشده دارد. با این حال آزاد شود؟ (ثبت می‌شود)",
+    "closed": "میز {label} آزاد شد.",
+    "summary": "{free} آزاد · {inProgress} در جریان · {occupied} اشغال"
+  },
+  "notifications": {
+    "title": "اعلان‌ها",
+    "empty": "اعلانی وجود ندارد",
+    "markRead": "علامت‌گذاری همه به‌عنوان خوانده‌شده",
+    "open": "اعلان‌ها ({count} خوانده‌نشده)",
+    "types": {
+      "order.created": "سفارش جدید {number} · میز {table}",
+      "order.ready": "سفارش {number} آماده است · میز {table}"
+    }
   }
 }

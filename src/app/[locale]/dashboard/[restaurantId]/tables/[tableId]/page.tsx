@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { OrderCard } from "@/components/dashboard/order-card";
-import { AutoRefresh } from "@/components/ui/auto-refresh";
+import { CloseTableButton } from "@/components/dashboard/close-table-button";
+import { LiveRefresh } from "@/components/realtime/live";
 import { Card, StatCard } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { requireRestaurant } from "@/server/auth/current";
@@ -39,7 +40,7 @@ async function TableDetail({ params }: { params: Params }) {
 
   return (
     <>
-      <AutoRefresh seconds={10} />
+      <LiveRefresh types={["order.created", "order.updated", "session.opened", "session.closed"]} />
       <Link href={`/dashboard/${ctx.restaurant.id}/tables`} className="text-sm text-fg-muted hover:text-fg">
         ← {t("tableView.back")}
       </Link>
@@ -50,6 +51,17 @@ async function TableDetail({ params }: { params: Params }) {
             view.session
               ? t("tableView.since", { time: format.relativeTime(view.session.openedAt) })
               : t("tableView.freeBody")
+          }
+          actions={
+            view.session && can(ctx, "sessions.close") ? (
+              <CloseTableButton
+                restaurantId={ctx.restaurant.id}
+                tableId={view.table.id}
+                label={view.table.label}
+                canForce={can(ctx, "restaurant.manage")}
+                size="md"
+              />
+            ) : null
           }
         />
       </div>

@@ -93,7 +93,9 @@
     "menu": "Menu",
     "menuEditor": "Menu & products",
     "toggleNav": "Toggle navigation",
-    "orders": "Orders"
+    "orders": "Orders",
+    "kitchen": "Kitchen",
+    "floor": "Floor"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -232,7 +234,10 @@
     "cart_empty": "Your cart is empty.",
     "cart_has_issues": "Some items are no longer available. Please fix your cart.",
     "invalid_transition": "This status change is not possible.",
-    "status_changed": "A colleague just updated this order. Refreshing…"
+    "status_changed": "A colleague just updated this order. Refreshing…",
+    "session_has_unpaid": "There is still an amount to collect on this table.",
+    "session_has_active_orders": "Orders are still in progress on this table.",
+    "no_open_session": "This table is already free."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -470,8 +475,7 @@
       "served": "Enjoy your meal!",
       "cancelled": "This order was cancelled. Ask the staff if needed."
     },
-    "ordersLink": "My orders ({count})",
-    "liveHint": "Updates automatically"
+    "ordersLink": "My orders ({count})"
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -676,5 +680,56 @@
     "back": "Back to tables",
     "clientTotal": "Total",
     "noOrdersYet": "No order yet"
+  },
+  "live": {
+    "connecting": "Connecting…",
+    "live": "Live",
+    "reconnecting": "Reconnecting…"
+  },
+  "kitchen": {
+    "title": "Kitchen",
+    "subtitle": "Real-time kitchen display. Tap the button to move an order forward.",
+    "columns": {
+      "received": "New",
+      "accepted": "Accepted",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "served": "Served (30 min)"
+    },
+    "soundOn": "Sound on",
+    "soundOff": "Enable sound",
+    "fullscreen": "Full screen",
+    "waiting": "{min} min",
+    "empty": "—",
+    "newOrder": "New order {number}"
+  },
+  "floor": {
+    "title": "Floor",
+    "subtitle": "Live table status.",
+    "free": "Free",
+    "in_progress": "Order in progress",
+    "occupied": "Occupied",
+    "people": "{count, plural, =0 {Nobody} one {# guest} other {# guests}}",
+    "since": "Since {time}",
+    "total": "Consumed",
+    "toCollect": "To collect",
+    "orders": "{count, plural, =0 {No orders} one {# order} other {# orders}}",
+    "ready": "{count, plural, one {# ready to serve} other {# ready to serve}}",
+    "lastOrder": "Last order {time}",
+    "close": "Free the table",
+    "closeConfirm": "Free table {label}? Guests will need to scan the QR code again.",
+    "forceConfirm": "This table still has orders in progress or unpaid. Free it anyway? (this is logged)",
+    "closed": "Table {label} freed.",
+    "summary": "{free} free · {inProgress} in progress · {occupied} occupied"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markRead": "Mark all as read",
+    "open": "Notifications ({count} unread)",
+    "types": {
+      "order.created": "New order {number} · Table {table}",
+      "order.ready": "Order {number} ready · Table {table}"
+    }
   }
 }

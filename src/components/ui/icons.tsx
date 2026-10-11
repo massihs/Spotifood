@@ -66,3 +66,16 @@ export const IconReceipt = () => (
     <path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3" />
   </svg>
 );
+export const IconFlame = () => (
+  <svg {...base}>
+    <path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.5 1.2 2.5 2.5 3-.5-3 .5-6 .5-8.5z" />
+  </svg>
+);
+export const IconFloor = () => (
+  <svg {...base}>
+    <rect x="3" y="3" width="7" height="7" rx="2" />
+    <rect x="14" y="3" width="7" height="7" rx="2" />
+    <rect x="3" y="14" width="7" height="7" rx="2" />
+    <rect x="14" y="14" width="7" height="7" rx="2" />
+  </svg>
+);

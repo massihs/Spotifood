@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { OrderCard } from "@/components/dashboard/order-card";
-import { AutoRefresh } from "@/components/ui/auto-refresh";
+import { LiveRefresh } from "@/components/realtime/live";
 import { Card } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
@@ -35,7 +35,7 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
 
   return (
     <>
-      <AutoRefresh seconds={10} />
+      <LiveRefresh types={["order.created", "order.updated", "session.opened", "session.closed"]} />
       <PageHeader title={t("title")} description={t("subtitle")} />
       <nav className="mb-5 flex gap-2" aria-label={t("title")}>
         {(

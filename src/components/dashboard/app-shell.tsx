@@ -15,12 +15,15 @@ export async function AppShell({
   nav,
   footer,
   user,
+  headerExtra,
   children,
 }: {
   title: string;
   subtitle?: string;
   nav: NavItem[];
   footer?: ReactNode;
+  /** Shown next to the logo on every breakpoint (notifications, live status). */
+  headerExtra?: ReactNode;
   user: { fullName: string; email: string };
   children: ReactNode;
 }) {
@@ -41,6 +44,11 @@ export async function AppShell({
                 <Logo withText={false} className="lg:hidden" />
                 <Logo className="hidden lg:inline-flex" />
               </Link>
+              {headerExtra ? (
+                <div className="order-last flex items-center gap-1 lg:order-none lg:ms-auto">
+                  {headerExtra}
+                </div>
+              ) : null}
               <div className="min-w-0 lg:hidden">
                 <p className="truncate text-sm font-semibold text-fg">{title}</p>
                 {subtitle ? <p className="truncate text-xs text-fg-muted">{subtitle}</p> : null}

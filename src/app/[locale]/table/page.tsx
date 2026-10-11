@@ -6,6 +6,7 @@ import { getPublicMenu } from "@/server/modules/menu/public-cache";
 import { MenuApp } from "@/components/guest/menu-app";
 import { GuestHeader } from "@/components/guest/guest-header";
 import { SessionExpired } from "@/components/guest/states";
+import { LiveProvider, LiveRefresh } from "@/components/realtime/live";
 
 export default async function GuestMenuPage() {
   const guest = await getGuest();
@@ -17,11 +18,14 @@ export default async function GuestMenuPage() {
     listGuestOrders(db, guest),
   ]);
   return (
-    <MenuApp
-      menu={menu}
-      currency={guest.restaurant.currency}
-      initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents }}
-      header={<GuestHeader guest={guest} orderCount={orders.length} />}
-    />
+    <LiveProvider url="/api/v1/realtime/guest">
+      <LiveRefresh types={["session.closed"]} />
+      <MenuApp
+        menu={menu}
+        currency={guest.restaurant.currency}
+        initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents }}
+        header={<GuestHeader guest={guest} orderCount={orders.length} />}
+      />
+    </LiveProvider>
   );
 }
