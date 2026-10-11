@@ -6,7 +6,7 @@
 
 1. **Application** : plateforme **Docker**, nom `spotifood-iran` (ou modifiez `"app"` dans `liara.json`), au moins 1 Go de RAM.
 2. **Base de données PostgreSQL** (version 16 ou plus).
-3. **Disque** nommé `uploads` pour les photos (déjà monté sur `/app/.storage` par `liara.json`). Plus tard, vous pourrez passer au stockage objet de Liara (compatible S3) : voir `deploy/.env.production.example`.
+3. **Disque** nommé exactement `uploads` (1 Go suffit pour commencer), pour les photos : il est monté sur `/app/.storage` par `liara.json`. **Sans ce disque, le déploiement échoue.** Plus tard, vous pourrez passer au stockage objet de Liara (compatible S3) : voir `deploy/.env.production.example`.
 4. **Domaine** : rattachez votre domaine `.ir` à l'application et activez le SSL.
 5. _(Facultatif)_ **Serveur mail** pour les emails (factures, invitations).
 
@@ -22,7 +22,18 @@ Dans l'application → Paramètres → Variables d'environnement, renseignez cel
 
 ## 3. Déployer
 
-Depuis ce dossier `iran/` (il contient `liara.json`) :
+### Option A — depuis GitHub (recommandé)
+
+Le dépôt contient un `liara.json` **à la racine**, prévu pour ce cas : Liara construit l'image Iran à partir du dossier `iran/` (`iran/Dockerfile`, argument `APP_DIR=iran`). Le dossier `global/` n'est jamais envoyé (voir `.dockerignore` à la racine).
+
+1. Dans Liara : votre application → **استقرار جدید / New deployment** → onglet **GitHub**.
+2. Dépôt `Spotifood`, branche **`main`**.
+3. Mode : « استقرار خودکار » (à chaque push) ou « استقرار در صورت CI موفق » (seulement si les tests GitHub passent ; **recommandé**).
+4. Cliquez sur « اتصال به برنامه », puis une première fois sur « استقرار دستی ».
+
+> Chaque push sur `main` redéploie l'Iran, y compris quand seul `global/` a changé. C'est sans risque : l'image ne contient que `iran/`.
+
+### Option B — en ligne de commande, depuis le dossier `iran/` (il contient son propre `liara.json`) :
 
 ```bash
 npm i -g @liara/cli
@@ -30,7 +41,9 @@ liara login
 liara deploy
 ```
 
-Ou depuis GitHub : onglet **Actions → « Deploy — Iran (Liara) » → Run workflow**. Ajoutez d'abord le secret `LIARA_API_TOKEN` (panel Liara → API) dans les réglages du dépôt.
+Ou depuis GitHub Actions : onglet **Actions → « Deploy — Iran (Liara) » → Run workflow**. Ajoutez d'abord le secret `LIARA_API_TOKEN` (panel Liara → API) dans les réglages du dépôt.
+
+### Au démarrage
 
 À chaque démarrage, le conteneur :
 
@@ -38,7 +51,7 @@ Ou depuis GitHub : onglet **Actions → « Deploy — Iran (Liara) » → Run wo
 2. crée ou met à jour les données de la plateforme (offres, modèles de catégories, super admin s'il n'existe pas) ;
 3. démarre le serveur sur le port 3000.
 
-`liara.json` construit l'image dans le datacenter **Allemagne** de Liara (`"build": {"location": "germany"}`) : Docker Hub et une partie du registre npm sont souvent inaccessibles depuis l'Iran. L'application, elle, **tourne en Iran**. Si le build en Iran fonctionne pour vous, vous pouvez retirer cette ligne.
+`liara.json` construit l'image dans le datacenter **Allemagne** de Liara (`"build": {"location": "germany"}`) : Docker Hub et une partie du registre npm sont souvent inaccessibles depuis l'Iran. L'application, elle, **tourne en Iran**.
 
 ## 4. Zarinpal
 

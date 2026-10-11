@@ -1,14 +1,19 @@
 # Spotifood Iran — production image.
-#   docker build -t spotifood-iran .
+#   from iran/:          docker build -t spotifood-iran .
+#   from the repo root:  docker build -f iran/Dockerfile --build-arg APP_DIR=iran -t spotifood-iran .
+# APP_DIR is where the application sits inside the build context: Liara's GitHub deployments
+# build from the repository root (see /liara.json).
 ARG NODE_IMAGE=node:22-bookworm-slim
 
 FROM ${NODE_IMAGE} AS deps
+ARG APP_DIR=.
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
-COPY package.json package-lock.json ./
+COPY ${APP_DIR}/package.json ${APP_DIR}/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
 FROM ${NODE_IMAGE} AS build
+ARG APP_DIR=.
 WORKDIR /app
 ARG NEXT_PUBLIC_EDITION=iran
 ENV NEXT_PUBLIC_EDITION=${NEXT_PUBLIC_EDITION} \
@@ -18,7 +23,7 @@ ENV NEXT_PUBLIC_EDITION=${NEXT_PUBLIC_EDITION} \
     APP_SECRET=build-time-placeholder-not-used-at-runtime-000000 \
     DATABASE_URL=postgres://build:build@127.0.0.1:1/build
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY ${APP_DIR}/ .
 RUN npm run build \
  && node_modules/.bin/esbuild scripts/seed.ts --bundle --platform=node --format=esm --target=node22 \
       --conditions=react-server --external:pg --external:@node-rs/argon2 --external:sharp \
@@ -27,13 +32,15 @@ RUN npm run build \
 
 # Production dependencies only (no build tooling in the final image).
 FROM ${NODE_IMAGE} AS prod-deps
+ARG APP_DIR=.
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY ${APP_DIR}/package.json ${APP_DIR}/package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
 
 # Runs `next start` (not `output: "standalone"`: with Next 16.4 the standalone server re-runs the
 # proxy on rewritten URLs, which breaks the unprefixed default-locale routes).
 FROM ${NODE_IMAGE} AS runner
+ARG APP_DIR=.
 WORKDIR /app
 ARG NEXT_PUBLIC_EDITION=iran
 ENV NODE_ENV=production \
@@ -47,8 +54,8 @@ COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/drizzle ./drizzle
 COPY --from=build --chown=node:node /app/messages ./messages
 COPY --from=build --chown=node:node /app/dist/seed.mjs ./dist/seed.mjs
-COPY --chown=node:node package.json next.config.ts ./
-COPY --chown=node:node scripts/migrate.mjs ./scripts/migrate.mjs
+COPY --chown=node:node ${APP_DIR}/package.json ${APP_DIR}/next.config.ts ./
+COPY --chown=node:node ${APP_DIR}/scripts/migrate.mjs ./scripts/migrate.mjs
 RUN mkdir -p /app/.storage && chown node:node /app/.storage && rm -rf .next/cache
 USER node
 EXPOSE 3000

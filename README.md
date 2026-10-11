@@ -32,6 +32,10 @@ scripts/port.sh <sha> global iran
 
 S'il y a un conflit parce que les deux versions ont trop divergé à cet endroit, le script s'arrête et laisse les parties à résoudre à la main (fichiers `.rej`).
 
+## Déploiement Iran sur Liara depuis GitHub
+
+`liara.json` et `.dockerignore` à la racine servent aux déploiements GitHub de Liara : ils construisent uniquement `iran/` (branche `main`). Détails : [`iran/DEPLOY.md`](iran/DEPLOY.md).
+
 ## CI
 
 `.github/workflows/ci.yml` teste et construit chaque dossier séparément. Le job d'un dossier ne tourne que si ce dossier a changé. `deploy-iran.yml` déploie `iran/` sur Liara, à la main depuis l'onglet Actions.
