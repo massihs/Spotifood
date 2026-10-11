@@ -4,7 +4,7 @@
 
 ## 1. Créer les ressources dans le panel Liara
 
-1. **Application** : plateforme **Docker**, nom `spotifood-iran` (ou modifiez `"app"` dans `liara.json`), au moins 1 Go de RAM.
+1. **Application** : plateforme **Docker**, nom `spotifood` (sinon modifiez `"app"` dans `iran/liara.json`), au moins 1 Go de RAM.
 2. **Base de données PostgreSQL** (version 16 ou plus).
 3. **Disque** nommé exactement `uploads` (1 Go suffit pour commencer), pour les photos : il est monté sur `/app/.storage` par `liara.json`. **Sans ce disque, le déploiement échoue.** Plus tard, vous pourrez passer au stockage objet de Liara (compatible S3) : voir `deploy/.env.production.example`.
 4. **Domaine** : rattachez votre domaine `.ir` à l'application et activez le SSL.
