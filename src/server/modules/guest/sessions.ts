@@ -24,7 +24,7 @@ async function hasOpenBusiness(tx: DbOrTx, sessionId: string) {
       and(
         eq(orders.tableSessionId, sessionId),
         sql`${orders.status} <> 'cancelled'`,
-        sql`${orders.paymentStatus} not in ('paid', 'refunded')`,
+        sql`${orders.paymentStatus} in ('unpaid', 'pending')`,
       ),
     );
   return (row?.n ?? 0) > 0;

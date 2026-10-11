@@ -384,7 +384,7 @@ export async function getTableOverview(db: Database, ctx: RestaurantContext, tab
       orders: own,
       totalCents: own.filter(counted).reduce((s, o) => s + o.totalCents, 0),
       unpaidCents: own
-        .filter((o) => counted(o) && o.paymentStatus !== "paid")
+        .filter((o) => counted(o) && (o.paymentStatus === "unpaid" || o.paymentStatus === "pending"))
         .reduce((s, o) => s + o.totalCents, 0),
     };
   });

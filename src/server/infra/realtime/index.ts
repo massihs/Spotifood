@@ -15,7 +15,8 @@ export type RealtimeEvent = {
     | "session.opened"
     | "session.closed"
     | "notification.created"
-    | "menu.updated";
+    | "menu.updated"
+    | "payment.updated";
   data?: Record<string, string | number | boolean | null>;
 };
 

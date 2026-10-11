@@ -59,7 +59,7 @@ export async function getFloor(db: Database, ctx: RestaurantContext): Promise<Fl
           Number,
         ),
       unpaidCents:
-        sql<number>`(select coalesce(sum(o.total_cents), 0) from orders o where o.table_session_id = "table_sessions"."id" and o.status <> 'cancelled' and o.payment_status not in ('paid','refunded'))`.mapWith(
+        sql<number>`(select coalesce(sum(o.total_cents), 0) from orders o where o.table_session_id = "table_sessions"."id" and o.status <> 'cancelled' and o.payment_status in ('unpaid','pending'))`.mapWith(
           Number,
         ),
       lastOrderAt:
@@ -112,7 +112,7 @@ export async function closeTableSession(
     const [stats] = await tx
       .select({
         unpaid:
-          sql<number>`coalesce(sum(${orders.totalCents}) filter (where ${orders.status} <> 'cancelled' and ${orders.paymentStatus} not in ('paid','refunded')), 0)`.mapWith(
+          sql<number>`coalesce(sum(${orders.totalCents}) filter (where ${orders.status} <> 'cancelled' and ${orders.paymentStatus} in ('unpaid','pending')), 0)`.mapWith(
             Number,
           ),
         active:
