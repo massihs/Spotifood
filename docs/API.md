@@ -39,3 +39,19 @@ Correction d'erreur niveau **H** (≈30 %) pour rester lisible imprimé petit ou
 
 Point d'entrée de chaque QR. `noindex`, `Referrer-Policy: no-referrer`.
 Jeton inconnu, QR désactivé, table supprimée ou restaurant suspendu → page « QR code inactif ».
+
+## Paiements
+
+### `POST /api/v1/payments/webhooks/{provider}`
+
+Appelé par le prestataire de paiement (aujourd'hui `stripe`). Public : l'authenticité vient **uniquement** de la signature du prestataire, vérifiée sur le corps brut (`Stripe-Signature`, tolérance 5 min contre le rejeu). Traitement idempotent : un même événement peut être livré plusieurs fois.
+
+| Réponse                                    | Sens                                                |
+| ------------------------------------------ | --------------------------------------------------- |
+| `200 {"received": true, "handled": true}`  | Paiement validé ou échoué                           |
+| `200 {"received": true, "handled": false}` | Événement ignoré (type non suivi, paiement inconnu) |
+| `401`                                      | Signature invalide                                  |
+| `404`                                      | Prestataire inconnu                                 |
+| `5xx`                                      | Erreur temporaire : le prestataire réessaiera       |
+
+Les autres opérations de paiement (démarrer un paiement, encaisser, rembourser) sont des Server Actions authentifiées, pas des endpoints publics.
