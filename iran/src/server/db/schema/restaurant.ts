@@ -77,6 +77,8 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   legalName: varchar({ length: 200 }),
   legalId: varchar({ length: 64 }),
   vatNumber: varchar({ length: 64 }),
+  /** شماره ثبت (company registration number), printed on invoices. */
+  registrationNumber: varchar({ length: 64 }),
   legalNotice: text(),
   privacyPolicyUrl: text(),
   enabledLocales: text()

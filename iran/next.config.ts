@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   typedRoutes: false,
-  serverExternalPackages: ["@node-rs/argon2", "pg", "sharp"],
+  serverExternalPackages: ["@node-rs/argon2", "pg", "sharp", "pdfkit"],
   experimental: {
     serverActions: {
       // Image uploads (logo, product photos) go through server actions; images are re-encoded server-side.

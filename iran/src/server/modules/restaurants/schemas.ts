@@ -69,6 +69,7 @@ export const legalSchema = z.object({
   legalName: optionalText(200),
   legalId: optionalText(64),
   vatNumber: optionalText(64),
+  registrationNumber: optionalText(64),
   legalNotice: optionalText(4000),
   privacyPolicyUrl: optionalText(500).refine((v) => !v || /^https:\/\/\S+$/.test(v), "invalid_url"),
 });

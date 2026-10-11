@@ -256,31 +256,50 @@ export const refunds = pgTable(
   ],
 );
 
+/**
+ * Everything printed on an invoice, frozen at issue time: later changes to the menu, the
+ * restaurant's legal details or the orders never alter an issued invoice.
+ * Field set follows Iranian sales invoices (صورتحساب فروش کالا و خدمات), so it can later be
+ * submitted to the tax system (سامانه مودیان) without missing data.
+ */
+export type InvoiceParty = {
+  name: string;
+  /** شناسه ملی (legal entity) or کد ملی (individual). */
+  nationalId?: string | null;
+  /** کد اقتصادی */
+  economicCode?: string | null;
+  /** شماره ثبت */
+  registrationNumber?: string | null;
+  address?: string | null;
+  city?: string | null;
+  postalCode?: string | null;
+  phone?: string | null;
+};
+
 export type InvoiceSnapshot = {
-  restaurant: {
-    name: string;
-    legalName?: string | null;
-    address?: string | null;
-    vatNumber?: string | null;
-    legalId?: string | null;
-  };
-  tableLabel?: string | null;
+  version: 2;
+  seller: InvoiceParty & { tradeName: string };
+  buyer: InvoiceParty | null;
+  tableLabel: string | null;
   orders: { number: string; placedAt: string }[];
   lines: {
     name: string;
     options: string[];
     quantity: number;
+    /** Unit price including options. */
     unitPriceCents: number;
     lineTotalCents: number;
     taxRateBps: number;
   }[];
+  pricesIncludeTax: boolean;
   taxes: { rateBps: number; baseCents: number; taxCents: number }[];
   subtotalCents: number;
   discountCents: number;
   taxCents: number;
   totalCents: number;
   currency: string;
-  payments: { provider: string; amountCents: number; at: string }[];
+  payments: { provider: string; amountCents: number; at: string; reference: string | null }[];
+  notes: string | null;
 };
 
 /** Immutable once issued. Numbered gap-free per restaurant. */
@@ -311,6 +330,10 @@ export const invoices = pgTable(
   (t) => [
     uniqueIndex("invoices_restaurant_number_uq").on(t.restaurantId, t.number),
     uniqueIndex("invoices_public_token_uq").on(t.publicToken),
+    // One invoice per payment: issuing twice (double tap, guest + staff) returns the same one.
+    uniqueIndex("invoices_payment_uq")
+      .on(t.paymentId)
+      .where(sql`${t.paymentId} IS NOT NULL`),
     index("invoices_restaurant_issued_idx").on(t.restaurantId, t.issuedAt),
   ],
 );

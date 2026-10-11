@@ -41,6 +41,8 @@ export const ROLE_PERMISSIONS: Record<MemberRole, ReadonlySet<Permission>> = {
     "orders.update_status",
     "payments.view",
     "payments.record",
+    // Waiters hand out invoices (فاکتور) when a guest asks for one.
+    "invoices.view",
     "feedback.view",
   ]),
 };
