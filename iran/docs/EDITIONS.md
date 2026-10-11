@@ -13,6 +13,7 @@ Les deux versions sont nées du même code. Les réglages qui les distinguaient 
 - Chaque restaurant encaisse sur **son propre compte Zarinpal** (code marchand dans Paramètres → Paiements).
 - Polices et ressources auto-hébergées : aucune requête vers Google ou un CDN étranger.
 - Démo : menu iranien en persan, sans alcool, prix en tomans.
+- Factures iraniennes (صورتحساب) : numérotation par année persane, mentions légales iraniennes, PDF en persan. Pas encore d'envoi à la سامانه مودیان.
 - Déploiement Liara : `liara.json` à la racine du dossier, guide dans `DEPLOY.md`.
 
 ## À décider ou à faire

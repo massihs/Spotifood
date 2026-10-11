@@ -317,7 +317,7 @@ async function seedDemoRestaurant() {
         // Persian names produce no Latin slug: keep a stable one for the demo.
         slug: "restaurant-demo",
         phone: "+98 21 1234 5678",
-        addressLine1: "تهران، خیابان ولیعصر، پلاک ۱۲",
+        addressLine1: "خیابان ولیعصر، پلاک ۱۲",
         city: "تهران",
         postalCode: "1234567890",
         email: "contact@demo.spotifood.local",

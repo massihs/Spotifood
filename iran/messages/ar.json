@@ -96,7 +96,8 @@
     "orders": "الطلبات",
     "kitchen": "المطبخ",
     "floor": "الصالة",
-    "payments": "المدفوعات"
+    "payments": "المدفوعات",
+    "invoices": "الفواتير"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -253,7 +254,12 @@
     "payment_method_required": "فعّل وسيلة دفع واحدة على الأقل.",
     "invalid_signature": "توقيع غير صالح.",
     "zarinpal_merchant_required": "أدخل معرّف التاجر لتفعيل Zarinpal.",
-    "invalid_merchant_id": "معرّف تاجر غير صالح (36 حرفًا، مثل xxxxxxxx-xxxx-…)."
+    "invalid_merchant_id": "معرّف تاجر غير صالح (36 حرفًا، مثل xxxxxxxx-xxxx-…).",
+    "payment_refunded": "تم استرداد هذا الدفع: لا فاتورة.",
+    "payment_not_settled": "لم يكتمل الدفع بعد.",
+    "invalid_national_id": "يجب أن يتكون الرقم الوطني من 10 أو 11 رقمًا.",
+    "invalid_economic_code": "رمز اقتصادي غير صالح.",
+    "invalid_postal_code": "يجب أن يتكون الرمز البريدي من 10 أرقام."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -429,9 +435,9 @@
     "makeDefault": "تعيين كافتراضي",
     "legal": "المعلومات القانونية",
     "legalHint": "تظهر على الفواتير.",
-    "legalName": "الاسم القانوني",
-    "legalId": "رقم السجل التجاري",
-    "vatNumber": "الرقم الضريبي",
+    "legalName": "الاسم القانوني للبائع",
+    "legalId": "الرقم الوطني",
+    "vatNumber": "الرمز الاقتصادي",
     "legalNotice": "ملاحظات إضافية",
     "privacyPolicyUrl": "رابط سياسة الخصوصية",
     "payments": "المدفوعات",
@@ -453,7 +459,8 @@
     "requirePaymentHint": "تُرسل الطلبات إلى المطبخ بعد دفعها.",
     "zarinpalMerchant": "معرّف التاجر في Zarinpal",
     "zarinpalMerchantHint": "انسخه من لوحة Zarinpal. تُودَع المدفوعات مباشرة في حساب مطعمك.",
-    "zarinpalMerchantHintFallback": "انسخه من لوحة Zarinpal لتُودَع المدفوعات مباشرة في حسابك. إذا ترك فارغًا، يُستخدم حساب المنصة."
+    "zarinpalMerchantHintFallback": "انسخه من لوحة Zarinpal لتُودَع المدفوعات مباشرة في حسابك. إذا ترك فارغًا، يُستخدم حساب المنصة.",
+    "registrationNumber": "رقم السجل"
   },
   "guest": {
     "table": "طاولة {label}",
@@ -900,6 +907,52 @@
       "cancelled": "ملغى",
       "refunded": "مسترد",
       "partially_refunded": "مسترد جزئيًا"
+    }
+  },
+  "invoice": {
+    "title": "فاتورة مبيعات",
+    "number": "رقم الفاتورة",
+    "date": "تاريخ الإصدار",
+    "table": "الطاولة",
+    "orders": "الطلبات",
+    "seller": "البائع",
+    "buyer": "المشتري",
+    "finalConsumer": "المستهلك النهائي",
+    "nationalId": "الرقم الوطني",
+    "economicCode": "الرمز الاقتصادي",
+    "registrationNumber": "رقم السجل",
+    "postalCode": "الرمز البريدي",
+    "phone": "الهاتف",
+    "row": "#",
+    "description": "الوصف",
+    "quantity": "الكمية",
+    "unitPrice": "سعر الوحدة",
+    "lineTotal": "المبلغ",
+    "beforeTax": "المجموع قبل الضريبة",
+    "vat": "ضريبة القيمة المضافة {rate}",
+    "total": "المبلغ المستحق",
+    "rial": "ريال",
+    "paidWith": "الدفع: {method}",
+    "reference": "رقم المرجع",
+    "downloadPdf": "تنزيل PDF",
+    "print": "طباعة",
+    "get": "الحصول على الفاتورة",
+    "issue": "إصدار فاتورة",
+    "open": "الفاتورة {number}",
+    "buyerOptional": "لفاتورة رسمية، أدخل بيانات المشتري (اختياري).",
+    "buyerName": "اسم المشتري / الشركة",
+    "list": "الفواتير",
+    "listSubtitle": "جميع الفواتير الصادرة حسب الرقم.",
+    "empty": "لم تصدر أي فاتورة بعد",
+    "emptyBody": "تصدر الفواتير من صفحة المدفوعات أو من قبل العملاء بعد الدفع.",
+    "yourPayments": "مدفوعاتك",
+    "provider": {
+      "cash": "نقدًا",
+      "on_site_terminal": "جهاز البطاقات",
+      "zarinpal": "Zarinpal",
+      "mock_online": "إلكتروني (تجريبي)",
+      "stripe": "Stripe",
+      "pay_later": "الدفع على الطاولة"
     }
   }
 }

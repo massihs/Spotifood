@@ -357,6 +357,7 @@ export type LegalValues = {
   legalName: string | null;
   legalId: string | null;
   vatNumber: string | null;
+  registrationNumber: string | null;
   legalNotice: string | null;
   privacyPolicyUrl: string | null;
 };
@@ -382,7 +383,18 @@ export function LegalForm({
           <Field label={t("settings.legalId")} name="legalId" defaultValue={values.legalId ?? ""} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={t("settings.vatNumber")} name="vatNumber" defaultValue={values.vatNumber ?? ""} />
+          <Field
+            label={t("settings.vatNumber")}
+            name="vatNumber"
+            dir="ltr"
+            defaultValue={values.vatNumber ?? ""}
+          />
+          <Field
+            label={t("settings.registrationNumber")}
+            name="registrationNumber"
+            dir="ltr"
+            defaultValue={values.registrationNumber ?? ""}
+          />
           <Field
             label={t("settings.privacyPolicyUrl")}
             name="privacyPolicyUrl"

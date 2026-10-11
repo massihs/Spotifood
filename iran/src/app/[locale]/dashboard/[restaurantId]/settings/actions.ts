@@ -70,6 +70,7 @@ export async function updateLegalAction(restaurantId: string, _prev: unknown, fd
       legalName: str(fd, "legalName"),
       legalId: str(fd, "legalId"),
       vatNumber: str(fd, "vatNumber"),
+      registrationNumber: str(fd, "registrationNumber"),
       legalNotice: str(fd, "legalNotice"),
       privacyPolicyUrl: str(fd, "privacyPolicyUrl"),
     });

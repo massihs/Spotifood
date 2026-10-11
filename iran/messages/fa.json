@@ -96,7 +96,8 @@
     "orders": "سفارش‌ها",
     "kitchen": "آشپزخانه",
     "floor": "سالن",
-    "payments": "پرداخت‌ها"
+    "payments": "پرداخت‌ها",
+    "invoices": "فاکتورها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -253,7 +254,12 @@
     "payment_method_required": "دست‌کم یک روش پرداخت را فعال کنید.",
     "invalid_signature": "امضای نامعتبر.",
     "zarinpal_merchant_required": "برای فعال‌سازی زرین‌پال، کد مرچنت را وارد کنید.",
-    "invalid_merchant_id": "کد مرچنت نامعتبر است (۳۶ کاراکتر، مثل xxxxxxxx-xxxx-…)."
+    "invalid_merchant_id": "کد مرچنت نامعتبر است (۳۶ کاراکتر، مثل xxxxxxxx-xxxx-…).",
+    "payment_refunded": "این پرداخت بازپرداخت شده و فاکتور ندارد.",
+    "payment_not_settled": "پرداخت هنوز کامل نشده است.",
+    "invalid_national_id": "شناسه / کد ملی باید ۱۰ یا ۱۱ رقم باشد.",
+    "invalid_economic_code": "کد اقتصادی نامعتبر است.",
+    "invalid_postal_code": "کد پستی باید ۱۰ رقم باشد."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -429,9 +435,9 @@
     "makeDefault": "تعیین به‌عنوان پیش‌فرض",
     "legal": "اطلاعات حقوقی",
     "legalHint": "روی فاکتورها درج می‌شود.",
-    "legalName": "نام حقوقی",
-    "legalId": "شماره ثبت",
-    "vatNumber": "شماره مالیاتی",
+    "legalName": "نام فروشنده (حقیقی یا حقوقی)",
+    "legalId": "شناسه ملی / کد ملی",
+    "vatNumber": "کد اقتصادی",
     "legalNotice": "توضیحات تکمیلی",
     "privacyPolicyUrl": "لینک سیاست حریم خصوصی",
     "payments": "پرداخت‌ها",
@@ -453,7 +459,8 @@
     "requirePaymentHint": "سفارش‌ها پس از پرداخت به آشپزخانه می‌روند.",
     "zarinpalMerchant": "کد مرچنت زرین‌پال",
     "zarinpalMerchantHint": "از پنل زرین‌پال خود کپی کنید. پرداخت‌ها مستقیم به حساب رستوران شما واریز می‌شود.",
-    "zarinpalMerchantHintFallback": "از پنل زرین‌پال خود کپی کنید تا پرداخت‌ها مستقیم به حساب شما واریز شود. اگر خالی بماند، از حساب پلتفرم استفاده می‌شود."
+    "zarinpalMerchantHintFallback": "از پنل زرین‌پال خود کپی کنید تا پرداخت‌ها مستقیم به حساب شما واریز شود. اگر خالی بماند، از حساب پلتفرم استفاده می‌شود.",
+    "registrationNumber": "شماره ثبت"
   },
   "guest": {
     "table": "میز {label}",
@@ -900,6 +907,52 @@
       "cancelled": "لغوشده",
       "refunded": "بازپرداخت‌شده",
       "partially_refunded": "بخشی بازپرداخت‌شده"
+    }
+  },
+  "invoice": {
+    "title": "صورتحساب فروش کالا و خدمات",
+    "number": "شماره صورتحساب",
+    "date": "تاریخ صدور",
+    "table": "میز",
+    "orders": "سفارش‌ها",
+    "seller": "مشخصات فروشنده",
+    "buyer": "مشخصات خریدار",
+    "finalConsumer": "مصرف‌کننده نهایی",
+    "nationalId": "شناسه / کد ملی",
+    "economicCode": "کد اقتصادی",
+    "registrationNumber": "شماره ثبت",
+    "postalCode": "کد پستی",
+    "phone": "تلفن",
+    "row": "ردیف",
+    "description": "شرح کالا / خدمات",
+    "quantity": "تعداد",
+    "unitPrice": "مبلغ واحد",
+    "lineTotal": "مبلغ کل",
+    "beforeTax": "جمع قبل از مالیات",
+    "vat": "مالیات بر ارزش افزوده {rate}",
+    "total": "مبلغ قابل پرداخت",
+    "rial": "ریال",
+    "paidWith": "پرداخت: {method}",
+    "reference": "شماره پیگیری",
+    "downloadPdf": "دانلود PDF",
+    "print": "چاپ",
+    "get": "دریافت فاکتور",
+    "issue": "صدور فاکتور",
+    "open": "فاکتور {number}",
+    "buyerOptional": "برای فاکتور رسمی، مشخصات خریدار را وارد کنید (اختیاری).",
+    "buyerName": "نام خریدار / شرکت",
+    "list": "فاکتورها",
+    "listSubtitle": "همه فاکتورهای صادرشده، به ترتیب شماره.",
+    "empty": "هنوز فاکتوری صادر نشده است",
+    "emptyBody": "از صفحه پرداخت‌ها یا توسط مشتری پس از پرداخت صادر می‌شود.",
+    "yourPayments": "پرداخت‌های شما",
+    "provider": {
+      "cash": "نقدی",
+      "on_site_terminal": "کارت‌خوان",
+      "zarinpal": "درگاه زرین‌پال",
+      "mock_online": "پرداخت آنلاین (آزمایشی)",
+      "stripe": "Stripe",
+      "pay_later": "پرداخت سر میز"
     }
   }
 }

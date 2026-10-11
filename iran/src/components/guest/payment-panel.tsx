@@ -5,10 +5,12 @@ import { useTranslations, useLocale } from "next-intl";
 import { useCallback, useState, useTransition } from "react";
 import {
   cancelPaymentAction,
+  getInvoiceAction,
   requestPaymentAction,
   startOnlinePaymentAction,
 } from "@/app/[locale]/table/actions";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "@/i18n/navigation";
 import { Toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 
@@ -18,6 +20,8 @@ export type GuestPaymentView = {
   paidCents: number;
   pending: { id: string; amountCents: number; redirectUrl: string | null } | null;
   methods: { online: string[]; offline: string[]; payLater: boolean };
+  /** The guest's settled payments (each can produce an invoice). */
+  history: { id: string; provider: string; status: string; amountCents: number }[];
 };
 
 const newKey = () => crypto.randomUUID().replaceAll("-", "");
@@ -44,6 +48,7 @@ export function PaymentPanel({
   const locale = useLocale();
   const money = (c: number) => formatMoney(c, currency, locale);
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
   const [key, setKey] = useState(newKey);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -67,6 +72,14 @@ export function PaymentPanel({
     startTransition(async () => {
       const res = await cancelPaymentAction(paymentId);
       if (res?.ok === false) fail(res.error);
+    });
+
+  const openInvoice = (paymentId: string) =>
+    startTransition(async () => {
+      setError(null);
+      const res = await getInvoiceAction(paymentId);
+      if (res?.ok && res.data) router.push(`/invoice/${res.data.token}`);
+      else fail(res?.ok === false ? res.error : "internal");
     });
 
   const callStaff = (method: "cash" | "card" | "any") =>
@@ -115,6 +128,23 @@ export function PaymentPanel({
           </div>
         ) : null}
       </dl>
+
+      {state.history.some((p) => p.status !== "refunded") ? (
+        <ul className="mt-3 space-y-2 border-t border-border pt-3 text-sm">
+          {state.history
+            .filter((p) => p.status !== "refunded")
+            .map((p) => (
+              <li key={p.id} className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-fg-muted">
+                  {t(`invoice.provider.${p.provider}`)} · {money(p.amountCents)}
+                </span>
+                <Button variant="secondary" size="sm" disabled={pending} onClick={() => openInvoice(p.id)}>
+                  {t("invoice.get")}
+                </Button>
+              </li>
+            ))}
+        </ul>
+      ) : null}
 
       {state.pending ? (
         <div className="mt-3 rounded-xl bg-surface-2 p-3 text-sm">

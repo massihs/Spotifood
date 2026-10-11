@@ -96,7 +96,8 @@
     "orders": "Commandes",
     "kitchen": "Cuisine",
     "floor": "Salle",
-    "payments": "Paiements"
+    "payments": "Paiements",
+    "invoices": "Factures"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -253,7 +254,12 @@
     "payment_method_required": "Activez au moins un moyen de paiement.",
     "invalid_signature": "Signature invalide.",
     "zarinpal_merchant_required": "Saisissez votre code marchand pour activer Zarinpal.",
-    "invalid_merchant_id": "Code marchand invalide (36 caractères, comme xxxxxxxx-xxxx-…)."
+    "invalid_merchant_id": "Code marchand invalide (36 caractères, comme xxxxxxxx-xxxx-…).",
+    "payment_refunded": "Ce paiement a été remboursé : pas de facture.",
+    "payment_not_settled": "Le paiement n'est pas encore terminé.",
+    "invalid_national_id": "L'identifiant national doit compter 10 ou 11 chiffres.",
+    "invalid_economic_code": "Code économique invalide.",
+    "invalid_postal_code": "Le code postal doit compter 10 chiffres."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -429,9 +435,9 @@
     "makeDefault": "Définir par défaut",
     "legal": "Informations légales",
     "legalHint": "Figurent sur les factures.",
-    "legalName": "Raison sociale",
-    "legalId": "SIRET / n° d'immatriculation",
-    "vatNumber": "N° de TVA intracommunautaire",
+    "legalName": "Raison sociale du vendeur",
+    "legalId": "Identifiant national (شناسه ملی)",
+    "vatNumber": "Code économique (کد اقتصادی)",
     "legalNotice": "Mentions complémentaires",
     "privacyPolicyUrl": "Lien vers la politique de confidentialité",
     "payments": "Paiements",
@@ -453,7 +459,8 @@
     "requirePaymentHint": "Les commandes partent en cuisine une fois réglées.",
     "zarinpalMerchant": "Code marchand Zarinpal",
     "zarinpalMerchantHint": "À copier depuis votre panel Zarinpal. Les paiements arrivent directement sur le compte du restaurant.",
-    "zarinpalMerchantHintFallback": "À copier depuis votre panel Zarinpal pour encaisser directement. Laissé vide, le compte de la plateforme est utilisé."
+    "zarinpalMerchantHintFallback": "À copier depuis votre panel Zarinpal pour encaisser directement. Laissé vide, le compte de la plateforme est utilisé.",
+    "registrationNumber": "Numéro d'immatriculation (شماره ثبت)"
   },
   "guest": {
     "table": "Table {label}",
@@ -900,6 +907,52 @@
       "cancelled": "Annulé",
       "refunded": "Remboursé",
       "partially_refunded": "Remboursé en partie"
+    }
+  },
+  "invoice": {
+    "title": "Facture de vente",
+    "number": "Numéro de facture",
+    "date": "Date d'émission",
+    "table": "Table",
+    "orders": "Commandes",
+    "seller": "Vendeur",
+    "buyer": "Acheteur",
+    "finalConsumer": "Consommateur final",
+    "nationalId": "Identifiant national",
+    "economicCode": "Code économique",
+    "registrationNumber": "Numéro d'immatriculation",
+    "postalCode": "Code postal",
+    "phone": "Téléphone",
+    "row": "N°",
+    "description": "Désignation",
+    "quantity": "Qté",
+    "unitPrice": "Prix unitaire",
+    "lineTotal": "Montant",
+    "beforeTax": "Total hors taxe",
+    "vat": "TVA {rate}",
+    "total": "Total à payer",
+    "rial": "rials",
+    "paidWith": "Payé par {method}",
+    "reference": "Référence",
+    "downloadPdf": "Télécharger le PDF",
+    "print": "Imprimer",
+    "get": "Obtenir la facture",
+    "issue": "Émettre la facture",
+    "open": "Facture {number}",
+    "buyerOptional": "Pour une facture nominative, saisissez l'acheteur (facultatif).",
+    "buyerName": "Nom de l'acheteur / société",
+    "list": "Factures",
+    "listSubtitle": "Toutes les factures émises, par numéro.",
+    "empty": "Aucune facture émise",
+    "emptyBody": "Les factures s'émettent depuis la page Paiements, ou par les clients après paiement.",
+    "yourPayments": "Vos paiements",
+    "provider": {
+      "cash": "Espèces",
+      "on_site_terminal": "Terminal CB",
+      "zarinpal": "Zarinpal",
+      "mock_online": "En ligne (test)",
+      "stripe": "Stripe",
+      "pay_later": "Payer à table"
     }
   }
 }

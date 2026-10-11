@@ -13,6 +13,7 @@ import {
   startOnlinePayment,
 } from "@/server/modules/payments/service";
 import { env } from "@/server/env";
+import { issueInvoiceAsGuest } from "@/server/modules/invoices/service";
 import { routing } from "@/i18n/routing";
 import { getLocale } from "next-intl/server";
 import {
@@ -115,5 +116,14 @@ export async function requestPaymentAction(method: "cash" | "card" | "any") {
     const g = await guest();
     await enforceRateLimit("paymentRequest", g.participant.id);
     return requestPaymentAtTable(db, g, { method });
+  });
+}
+
+/** The guest's invoice for one of their payments (issued once, then reused). */
+export async function getInvoiceAction(paymentId: string) {
+  return runAction(async () => {
+    const g = await guest();
+    const invoice = await issueInvoiceAsGuest(db, g, paymentId);
+    return { token: invoice.publicToken };
   });
 }

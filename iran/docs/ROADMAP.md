@@ -108,7 +108,7 @@ Depuis la séparation, `iran/` évolue seul. Étapes propres à l'Iran, dans l'o
 | Étape | Contenu                                                                                                                                           | État |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | I-1   | Fondations : tomans (affichage et saisie), compte Zarinpal par restaurant, menu de démo iranien en persan                                         | ✅   |
-| I-2   | Factures iraniennes : dates persanes (jalali), mentions légales iraniennes (شناسه ملی، کد اقتصادی), PDF en persan, préparation à la سامانه مودیان | ⏳   |
+| I-2   | Factures iraniennes : dates persanes (jalali), mentions légales iraniennes (شناسه ملی، کد اقتصادی), PDF en persan, préparation à la سامانه مودیان | ✅   |
 | I-3   | Avis et réclamations (Phase 9) adaptés                                                                                                            | ⏳   |
 | I-4   | Statistiques et historique (Phase 10), en calendrier persan                                                                                       | ⏳   |
 | I-5   | Finition : chiffres persans partout, mode sombre, accessibilité                                                                                   | ⏳   |
@@ -120,3 +120,15 @@ Depuis la séparation, `iran/` évolue seul. Étapes propres à l'Iran, dans l'o
 - **Zarinpal par restaurant** : le code marchand se saisit dans Paramètres → Paiements (migration `0002`). Le paiement est créé **et vérifié** avec le compte du restaurant, gardé sur le paiement. `ZARINPAL_MERCHANT_ID` n'est plus qu'un compte de secours de la plateforme. Activer Zarinpal sans aucun compte est refusé.
 - **Démo** : « رستوران نمونه », 8 catégories (پیش‌غذا، سوپ و آش، سالاد، کباب، خورش و پلو، دسر، چای و دمنوش، نوشیدنی), 24 plats, options « همراه / افزودنی / سیخ اضافه », commandes de démo en persan.
 - **Vérifié dans le navigateur, en persan** : paiement en ligne simulé de 450 000 tomans ; client qui demande à payer en espèces ; notification « میز 3 · مشتری 2 می‌خواهد ۳۶۰٬۰۰۰ تومان پرداخت کند (نقدی) » ; encaissement avec monnaie rendue (140 000 tomans) ; client mis à jour en direct ; aucune requête vers un serveur externe.
+
+### Notes I-2
+
+- **Une facture par paiement** (صورتحساب فروش کالا و خدمات), émise à la demande : le client touche « دریافت فاکتور » après avoir payé, ou l'équipe l'émet depuis la page Paiements, avec si besoin les coordonnées d'un acheteur (nom, شناسه / کد ملی، کد اقتصادی، کد پستی…). Demander deux fois la facture d'un même paiement, ou la demander en même temps côté client et côté équipe, renvoie la **même** facture (testé en concurrence).
+- **Numérotation** : `1405-000001`, sans trou, par restaurant, et remise à zéro chaque année du calendrier persan. Le numéro est attribué dans la même transaction que la facture : une erreur ne « brûle » pas de numéro.
+- **Copie figée** : vendeur (raison sociale, شناسه ملی، کد اقتصادی، شماره ثبت, adresse, code postal, téléphone), acheteur, lignes, TVA par taux, paiements (avec le n° de suivi Zarinpal). Modifier ensuite le menu ou les coordonnées du restaurant ne change jamais une facture émise. Le total est toujours égal au montant payé, et la TVA est calculée comme pour les commandes, à la rial près.
+- **Montants légaux en rials** sur la facture, avec l'équivalent en tomans. Dates en calendrier persan, au fuseau du restaurant.
+- **PDF persan** (A4, police Vazirmatn à chiffres persans, QR code vers la facture en ligne). pdfkit ne gère pas le texte de droite à gauche : le module `invoices/pdf.ts` applique lui-même l'algorithme bidirectionnel Unicode (bidi-js). Les mots persans sont placés de droite à gauche, les nombres et le latin restent lisibles (`A-1001`, `+98 21…`), les parenthèses sont inversées correctement. Vérifié visuellement.
+- **Lien public** non devinable (`/invoice/{jeton}`), page imprimable et PDF (`/api/v1/invoices/{jeton}/pdf`), jamais indexés. Le refus des paiements remboursés et l'isolation entre restaurants sont testés.
+- **Liste des factures** dans le tableau de bord (« فاکتورها »). Les serveurs (rôle staff) peuvent émettre et consulter les factures.
+- **سامانه مودیان** : pas d'envoi pour l'instant (décision du 11/10/2026). La copie figée contient déjà les champs nécessaires ; l'envoi pourra s'ajouter sans changer les factures existantes.
+- **Vérifié en production locale** (`next start`, comme sur Liara) : commande → encaissement en espèces → facture obtenue par le client (page + PDF) → facture nominative émise par l'équipe (code postal invalide refusé) → liste `1405-000001`, `1405-000002`, sans aucune requête externe.

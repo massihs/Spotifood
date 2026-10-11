@@ -96,7 +96,8 @@
     "orders": "Orders",
     "kitchen": "Kitchen",
     "floor": "Floor",
-    "payments": "Payments"
+    "payments": "Payments",
+    "invoices": "Invoices"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -253,7 +254,12 @@
     "payment_method_required": "Enable at least one payment method.",
     "invalid_signature": "Invalid signature.",
     "zarinpal_merchant_required": "Enter your merchant ID to enable Zarinpal.",
-    "invalid_merchant_id": "Invalid merchant ID (36 characters, like xxxxxxxx-xxxx-…)."
+    "invalid_merchant_id": "Invalid merchant ID (36 characters, like xxxxxxxx-xxxx-…).",
+    "payment_refunded": "This payment was refunded: no invoice.",
+    "payment_not_settled": "The payment is not completed yet.",
+    "invalid_national_id": "The national ID must have 10 or 11 digits.",
+    "invalid_economic_code": "Invalid economic code.",
+    "invalid_postal_code": "The postal code must have 10 digits."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -429,9 +435,9 @@
     "makeDefault": "Make default",
     "legal": "Legal information",
     "legalHint": "Printed on invoices.",
-    "legalName": "Legal entity name",
-    "legalId": "Company registration number",
-    "vatNumber": "VAT number",
+    "legalName": "Seller legal name",
+    "legalId": "National ID",
+    "vatNumber": "Economic code",
     "legalNotice": "Additional notices",
     "privacyPolicyUrl": "Privacy policy link",
     "payments": "Payments",
@@ -453,7 +459,8 @@
     "requirePaymentHint": "Orders go to the kitchen once paid.",
     "zarinpalMerchant": "Zarinpal merchant ID",
     "zarinpalMerchantHint": "Copy it from your Zarinpal panel. Payments go straight to your restaurant's account.",
-    "zarinpalMerchantHintFallback": "Copy it from your Zarinpal panel so payments go straight to your account. If empty, the platform account is used."
+    "zarinpalMerchantHintFallback": "Copy it from your Zarinpal panel so payments go straight to your account. If empty, the platform account is used.",
+    "registrationNumber": "Registration number"
   },
   "guest": {
     "table": "Table {label}",
@@ -900,6 +907,52 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded",
       "partially_refunded": "Partially refunded"
+    }
+  },
+  "invoice": {
+    "title": "Sales invoice",
+    "number": "Invoice number",
+    "date": "Issue date",
+    "table": "Table",
+    "orders": "Orders",
+    "seller": "Seller",
+    "buyer": "Buyer",
+    "finalConsumer": "Final consumer",
+    "nationalId": "National ID",
+    "economicCode": "Economic code",
+    "registrationNumber": "Registration number",
+    "postalCode": "Postal code",
+    "phone": "Phone",
+    "row": "#",
+    "description": "Description",
+    "quantity": "Qty",
+    "unitPrice": "Unit price",
+    "lineTotal": "Amount",
+    "beforeTax": "Total before tax",
+    "vat": "VAT {rate}",
+    "total": "Total due",
+    "rial": "rials",
+    "paidWith": "Paid by {method}",
+    "reference": "Reference",
+    "downloadPdf": "Download PDF",
+    "print": "Print",
+    "get": "Get invoice",
+    "issue": "Issue invoice",
+    "open": "Invoice {number}",
+    "buyerOptional": "For a formal invoice, enter the buyer's details (optional).",
+    "buyerName": "Buyer / company name",
+    "list": "Invoices",
+    "listSubtitle": "Every issued invoice, by number.",
+    "empty": "No invoice issued yet",
+    "emptyBody": "Invoices are issued from the Payments page, or by guests after paying.",
+    "yourPayments": "Your payments",
+    "provider": {
+      "cash": "Cash",
+      "on_site_terminal": "Card terminal",
+      "zarinpal": "Zarinpal",
+      "mock_online": "Online (test)",
+      "stripe": "Stripe",
+      "pay_later": "Pay at the table"
     }
   }
 }

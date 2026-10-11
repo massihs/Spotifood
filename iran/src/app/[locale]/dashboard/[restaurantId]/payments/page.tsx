@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import { formatMoney } from "@/lib/money";
 import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
-import { RefundDialog } from "@/components/dashboard/payment-dialogs";
+import { InvoiceButton, RefundDialog } from "@/components/dashboard/payment-dialogs";
+import { invoicesForPayments } from "@/server/modules/invoices/service";
 import { LiveRefresh } from "@/components/realtime/live";
 import { Badge } from "@/components/ui/badge";
 import { Card, StatCard } from "@/components/ui/card";
@@ -53,6 +54,14 @@ async function Payments({ params, searchParams }: Pick<Props, "params" | "search
     listPayments(db, ctx, { statuses: VIEWS[view], limit: 100 }),
   ]);
   const locale = await getLocale();
+  const canInvoice = can(ctx, "invoices.view");
+  const issued = canInvoice
+    ? await invoicesForPayments(
+        db,
+        ctx,
+        list.map((p) => p.id),
+      )
+    : new Map();
   const money = (c: number) => formatMoney(c, ctx.restaurant.currency, locale);
   const settled = list.filter((p) => ["succeeded", "partially_refunded", "refunded"].includes(p.status));
   const net = settled.reduce((s, p) => s + p.amountCents - p.refundedCents, 0);
@@ -155,7 +164,14 @@ async function Payments({ params, searchParams }: Pick<Props, "params" | "search
                         </span>
                       ))}
                     </td>
-                    <td className="px-4 py-3 text-end">
+                    <td className="space-y-1 px-4 py-3 text-end">
+                      {canInvoice && (p.status === "succeeded" || p.status === "partially_refunded") ? (
+                        <InvoiceButton
+                          restaurantId={ctx.restaurant.id}
+                          paymentId={p.id}
+                          invoice={issued.get(p.id) ?? null}
+                        />
+                      ) : null}
                       {canRefund &&
                       refundable > 0 &&
                       (p.status === "succeeded" || p.status === "partially_refunded") ? (

@@ -119,6 +119,7 @@ async function Settings({ params }: { params: Params }) {
                 legalName: s.legalName,
                 legalId: s.legalId,
                 vatNumber: s.vatNumber,
+                registrationNumber: s.registrationNumber,
                 legalNotice: s.legalNotice,
                 privacyPolicyUrl: s.privacyPolicyUrl,
               }}

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import {
   cancelPendingPaymentAction,
+  issueInvoiceAction,
   recordPaymentAction,
   refundAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/payments/actions";
@@ -232,5 +233,84 @@ export function CancelPendingButton({
         </span>
       ) : null}
     </span>
+  );
+}
+
+function InvoiceForm({ restaurantId, paymentId }: { restaurantId: string; paymentId: string }) {
+  const t = useTranslations();
+  const form = useActionForm(issueInvoiceAction.bind(null, restaurantId, paymentId));
+  const err = useFieldError(form.state);
+  useCloseOnSuccess(form.state);
+  return (
+    <ActionForm form={form} className="space-y-4">
+      <FormFeedback state={form.state} />
+      <p className="text-sm text-fg-muted">{t("invoice.buyerOptional")}</p>
+      <Field label={t("invoice.buyerName")} name="buyerName" maxLength={200} error={err("name")} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field
+          label={t("invoice.nationalId")}
+          name="buyerNationalId"
+          dir="ltr"
+          inputMode="numeric"
+          error={err("nationalId")}
+        />
+        <Field
+          label={t("invoice.economicCode")}
+          name="buyerEconomicCode"
+          dir="ltr"
+          inputMode="numeric"
+          error={err("economicCode")}
+        />
+        <Field label={t("invoice.phone")} name="buyerPhone" dir="ltr" inputMode="tel" />
+        <Field
+          label={t("invoice.postalCode")}
+          name="buyerPostalCode"
+          dir="ltr"
+          inputMode="numeric"
+          error={err("postalCode")}
+        />
+      </div>
+      <TextareaField label={t("settings.address1")} name="buyerAddress" maxLength={300} />
+      <div className="flex justify-end">
+        <SubmitButton>{t("invoice.issue")}</SubmitButton>
+      </div>
+    </ActionForm>
+  );
+}
+
+/** Opens the payment's invoice, or issues it (optionally for a named buyer). */
+export function InvoiceButton({
+  restaurantId,
+  paymentId,
+  invoice,
+}: {
+  restaurantId: string;
+  paymentId: string;
+  invoice: { number: string; publicToken: string } | null;
+}) {
+  const t = useTranslations("invoice");
+  if (invoice) {
+    return (
+      <a
+        href={`/invoice/${invoice.publicToken}`}
+        target="_blank"
+        rel="noopener"
+        className="inline-flex h-8 items-center rounded-lg px-3 text-sm font-medium text-accent hover:bg-surface-2"
+      >
+        {t("open", { number: invoice.number })}
+      </a>
+    );
+  }
+  return (
+    <Dialog
+      title={t("issue")}
+      trigger={(open) => (
+        <Button variant="ghost" size="sm" onClick={open}>
+          {t("issue")}
+        </Button>
+      )}
+    >
+      <InvoiceForm restaurantId={restaurantId} paymentId={paymentId} />
+    </Dialog>
   );
 }
