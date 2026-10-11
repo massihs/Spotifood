@@ -100,3 +100,23 @@ Légende : ✅ fait · 🚧 en cours · ⏳ à venir
 - **Plans** : le paiement en ligne nécessite la fonctionnalité `online_payments` (Starter et plus).
 - **Bugs corrigés** (Phase 6 et Phase 2) : next-intl interprète les points comme des niveaux d'imbrication, donc les libellés `order.created` de la cloche et ceux des permissions (`tables.view`…) s'affichaient en code brut. Les messages sont maintenant imbriqués. Les pages client avaient aussi un avertissement « navigation non instantanée » (cookie lu hors Suspense) : chaque page a maintenant sa propre frontière Suspense.
 - **Correction** : une commande « remboursée en partie » était comptée comme restant à payer (clôture de table, salle, sessions). Seules les commandes « non payée » et « paiement en cours » comptent désormais.
+
+## Version Iran — feuille de route
+
+Depuis la séparation, `iran/` évolue seul. Étapes propres à l'Iran, dans l'ordre :
+
+| Étape | Contenu                                                                                                                                           | État |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| I-1   | Fondations : tomans (affichage et saisie), compte Zarinpal par restaurant, menu de démo iranien en persan                                         | ✅   |
+| I-2   | Factures iraniennes : dates persanes (jalali), mentions légales iraniennes (شناسه ملی، کد اقتصادی), PDF en persan, préparation à la سامانه مودیان | ⏳   |
+| I-3   | Avis et réclamations (Phase 9) adaptés                                                                                                            | ⏳   |
+| I-4   | Statistiques et historique (Phase 10), en calendrier persan                                                                                       | ⏳   |
+| I-5   | Finition : chiffres persans partout, mode sombre, accessibilité                                                                                   | ⏳   |
+| I-6   | Production : tests E2E, sécurité, SMS iranien (connexion par code), déploiement Liara réel                                                        | ⏳   |
+
+### Notes I-1
+
+- **Tomans** : les montants restent en rials en base (unité légale, utile pour les factures). Partout ailleurs, on affiche et on saisit des tomans : un seul formateur (`formatMoney`, `useMoney`, `getMoney`). Les champs de prix acceptent « ۲۵۰۰۰۰ », « 250,000 » ou « ۲۵۰٬۰۰۰ ».
+- **Zarinpal par restaurant** : le code marchand se saisit dans Paramètres → Paiements (migration `0002`). Le paiement est créé **et vérifié** avec le compte du restaurant, gardé sur le paiement. `ZARINPAL_MERCHANT_ID` n'est plus qu'un compte de secours de la plateforme. Activer Zarinpal sans aucun compte est refusé.
+- **Démo** : « رستوران نمونه », 8 catégories (پیش‌غذا، سوپ و آش، سالاد، کباب، خورش و پلو، دسر، چای و دمنوش، نوشیدنی), 24 plats, options « همراه / افزودنی / سیخ اضافه », commandes de démo en persan.
+- **Vérifié dans le navigateur, en persan** : paiement en ligne simulé de 450 000 tomans ; client qui demande à payer en espèces ; notification « میز 3 · مشتری 2 می‌خواهد ۳۶۰٬۰۰۰ تومان پرداخت کند (نقدی) » ; encaissement avec monnaie rendue (140 000 tomans) ; client mis à jour en direct ; aucune requête vers un serveur externe.

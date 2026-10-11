@@ -27,7 +27,6 @@ import {
   subscriptions,
 } from "@/server/db/schema";
 import { hashPassword } from "@/server/auth/password";
-import { edition } from "@/config/edition";
 import { DEFAULT_CATEGORY_TEMPLATES, DEFAULT_PLANS } from "@/server/modules/catalog/defaults";
 import { createOrganization, createRestaurant } from "@/server/modules/restaurants/service";
 import { randomToken } from "@/lib/ids";
@@ -43,9 +42,13 @@ import type { OrderStatus } from "@/server/modules/orders/status";
 const DEMO_OWNER = {
   email: "owner@demo.spotifood.local",
   password: "DemoOwner!2026",
-  fullName: "Alex Martin",
+  fullName: "علی رضایی",
 };
-const DEMO_STAFF = { email: "staff@demo.spotifood.local", password: "DemoStaff!2026", fullName: "Sam Leroy" };
+const DEMO_STAFF = {
+  email: "staff@demo.spotifood.local",
+  password: "DemoStaff!2026",
+  fullName: "مریم احمدی",
+};
 
 async function upsertUser(email: string, password: string, fullName: string, isSuperAdmin = false) {
   const [existing] = await db
@@ -68,6 +71,7 @@ async function upsertUser(email: string, password: string, fullName: string, isS
 type DemoProduct = {
   name: string;
   description: string;
+  /** Price in tomans (stored ×1000: 1 toman = 10 rials = 1000 minor units). */
   price: number;
   ingredients?: string;
   allergens?: string[];
@@ -75,186 +79,180 @@ type DemoProduct = {
   weight?: number;
   featured?: boolean;
   tags?: string[];
-  options?: ("cuisson" | "supplements" | "sauce")[];
-  alcohol?: boolean;
+  options?: ("side" | "extras" | "skewer")[];
 };
 
+const toman = (t: number) => t * 1000;
+
+/** Demo menu of a typical Iranian restaurant (prices are plausible placeholders, in tomans). */
 const MENU: { key: string; name: string; items: DemoProduct[] }[] = [
   {
     key: "starters",
-    name: "Entrées",
+    name: "پیش‌غذا",
     items: [
       {
-        name: "Burrata crémeuse",
-        description: "Tomates anciennes, basilic, huile d'olive vierge.",
-        price: 1250,
-        ingredients: "Burrata, tomates, basilic, huile d'olive",
-        allergens: ["milk"],
-        kcal: 420,
-        weight: 200,
+        name: "کشک بادمجان",
+        description: "بادمجان کبابی، کشک محلی، نعناع داغ و گردو.",
+        price: 180_000,
+        ingredients: "بادمجان، کشک، نعناع، پیاز داغ، گردو",
+        allergens: ["milk", "nuts"],
+        kcal: 380,
         featured: true,
         tags: ["vegetarian"],
       },
       {
-        name: "Carpaccio de bœuf",
-        description: "Parmesan, roquette, câpres.",
-        price: 1350,
-        allergens: ["milk"],
-        kcal: 310,
+        name: "میرزا قاسمی",
+        description: "بادمجان دودی، گوجه، سیر و تخم‌مرغ به سبک گیلان.",
+        price: 170_000,
+        allergens: ["eggs"],
+        kcal: 320,
+        tags: ["vegetarian"],
       },
       {
-        name: "Soupe à l'oignon",
-        description: "Gratinée au comté.",
-        price: 900,
-        allergens: ["gluten", "milk"],
-        kcal: 380,
+        name: "ماست و خیار",
+        description: "ماست پرچرب، خیار، نعناع خشک و گل محمدی.",
+        price: 120_000,
+        allergens: ["milk"],
+        tags: ["vegetarian"],
       },
     ],
   },
   {
-    key: "salads",
-    name: "Salades",
+    key: "soups",
+    name: "سوپ و آش",
     items: [
       {
-        name: "César au poulet",
-        description: "Poulet grillé, croûtons, parmesan, sauce César.",
-        price: 1590,
-        allergens: ["gluten", "eggs", "milk", "fish"],
-        kcal: 640,
+        name: "آش رشته",
+        description: "رشته، حبوبات، سبزی معطر، کشک و پیاز داغ.",
+        price: 150_000,
+        allergens: ["gluten", "milk"],
+        kcal: 450,
+        tags: ["vegetarian"],
+      },
+      { name: "سوپ جو", description: "جو پرک، مرغ، هویج و جعفری.", price: 120_000, allergens: ["gluten"] },
+    ],
+  },
+  {
+    key: "salads",
+    name: "سالاد",
+    items: [
+      {
+        name: "سالاد شیرازی",
+        description: "خیار، گوجه، پیاز، آبغوره و نعناع.",
+        price: 90_000,
+        tags: ["vegan"],
       },
       {
-        name: "Salade de chèvre chaud",
-        description: "Toasts de chèvre, miel, noix.",
-        price: 1490,
-        allergens: ["gluten", "milk", "nuts"],
-        kcal: 580,
-        tags: ["vegetarian"],
+        name: "سالاد سزار",
+        description: "مرغ گریل، کاهو، پنیر پارمزان و نان تست.",
+        price: 260_000,
+        allergens: ["gluten", "milk", "eggs"],
+      },
+    ],
+  },
+  {
+    key: "meat",
+    name: "کباب",
+    items: [
+      {
+        name: "چلوکباب کوبیده",
+        description: "دو سیخ کوبیده گوسفندی، برنج ایرانی و گوجه کبابی.",
+        price: 450_000,
+        ingredients: "گوشت گوسفندی، پیاز، برنج، زعفران، کره",
+        allergens: ["milk"],
+        kcal: 980,
+        weight: 450,
+        featured: true,
+        options: ["side", "extras", "skewer"],
+      },
+      {
+        name: "جوجه کباب",
+        description: "سینه مرغ زعفرانی، برنج ایرانی و گوجه کبابی.",
+        price: 420_000,
+        allergens: ["milk"],
+        kcal: 820,
+        options: ["side", "extras"],
+      },
+      {
+        name: "کباب برگ",
+        description: "فیله گوساله، برنج ایرانی، کره و سماق.",
+        price: 890_000,
+        allergens: ["milk"],
+        kcal: 1050,
+        featured: true,
+        options: ["side", "extras"],
       },
     ],
   },
   {
     key: "mains",
-    name: "Plats",
+    name: "خورش و پلو",
     items: [
       {
-        name: "Burger signature",
-        description: "Bœuf 180 g, cheddar affiné, oignons confits, frites maison.",
-        price: 1990,
-        allergens: ["gluten", "milk", "mustard", "sesame"],
-        kcal: 980,
-        featured: true,
-        options: ["cuisson", "supplements"],
-      },
-      {
-        name: "Saumon rôti",
-        description: "Purée de patate douce, beurre citronné.",
-        price: 2290,
-        allergens: ["fish", "milk"],
-        kcal: 720,
-      },
-      {
-        name: "Risotto aux champignons",
-        description: "Arborio, cèpes, parmesan.",
-        price: 1890,
-        allergens: ["milk"],
-        kcal: 690,
-        tags: ["vegetarian"],
-      },
-    ],
-  },
-  {
-    key: "steak",
-    name: "Steak",
-    items: [
-      {
-        name: "Entrecôte 300 g",
-        description: "Race normande, frites maison, salade.",
-        price: 3200,
-        weight: 300,
-        kcal: 1050,
-        featured: true,
-        options: ["cuisson", "sauce", "supplements"],
-      },
-      {
-        name: "Tartare de bœuf",
-        description: "Préparé minute, frites.",
-        price: 1950,
-        allergens: ["eggs", "mustard"],
+        name: "قورمه سبزی",
+        description: "سبزی سرخ‌شده، لوبیا قرمز، گوشت گوسفندی و لیمو عمانی، با برنج.",
+        price: 360_000,
         kcal: 760,
-      },
-    ],
-  },
-  {
-    key: "pasta",
-    name: "Pâtes",
-    items: [
-      {
-        name: "Tagliatelles carbonara",
-        description: "Guanciale, pecorino, jaune d'œuf.",
-        price: 1690,
-        allergens: ["gluten", "eggs", "milk"],
-        kcal: 850,
+        featured: true,
+        options: ["extras"],
       },
       {
-        name: "Penne all'arrabbiata",
-        description: "Tomate, piment, ail.",
-        price: 1450,
-        allergens: ["gluten"],
-        kcal: 620,
-        tags: ["vegan", "spicy"],
+        name: "زرشک پلو با مرغ",
+        description: "ران مرغ زعفرانی، برنج، زرشک و خلال پسته.",
+        price: 380_000,
+        allergens: ["nuts"],
+        options: ["extras"],
+      },
+      {
+        name: "قیمه",
+        description: "لپه، گوشت گوسفندی و سیب‌زمینی سرخ‌کرده، با برنج.",
+        price: 340_000,
+        options: ["extras"],
+      },
+      {
+        name: "باقالی پلو با ماهیچه",
+        description: "ماهیچه گوسفندی، برنج با باقالی و شوید.",
+        price: 780_000,
+        options: ["extras"],
       },
     ],
   },
   {
     key: "desserts",
-    name: "Desserts",
+    name: "دسر",
     items: [
       {
-        name: "Cheesecake",
-        description: "Coulis de fruits rouges.",
-        price: 850,
-        allergens: ["gluten", "milk", "eggs"],
-        kcal: 480,
-        featured: true,
+        name: "بستنی سنتی",
+        description: "بستنی زعفرانی با گلاب و پسته.",
+        price: 130_000,
+        allergens: ["milk", "nuts"],
       },
+      { name: "فالوده شیرازی", description: "با آبلیمو تازه و شربت.", price: 110_000, tags: ["vegan"] },
       {
-        name: "Moelleux au chocolat",
-        description: "Cœur coulant, glace vanille.",
-        price: 900,
-        allergens: ["gluten", "milk", "eggs"],
-        kcal: 560,
-      },
-      {
-        name: "Café gourmand",
-        description: "Expresso et trois mignardises.",
-        price: 950,
-        allergens: ["gluten", "milk", "eggs", "nuts"],
+        name: "شله‌زرد",
+        description: "برنج، زعفران، گلاب، دارچین و خلال بادام.",
+        price: 100_000,
+        allergens: ["nuts"],
       },
     ],
   },
   {
-    key: "coffee",
-    name: "Café",
+    key: "tea",
+    name: "چای و دمنوش",
     items: [
-      { name: "Expresso", description: "", price: 250 },
-      { name: "Cappuccino", description: "", price: 450, allergens: ["milk"] },
-      { name: "Thé glacé maison", description: "Pêche, menthe.", price: 500 },
+      { name: "چای ایرانی", description: "چای دم‌کشیده با نبات.", price: 50_000 },
+      { name: "دمنوش گل‌گاوزبان", description: "با لیمو عمانی.", price: 80_000 },
+      { name: "قهوه ترک", description: "", price: 90_000 },
     ],
   },
   {
     key: "soft_drinks",
-    name: "Boissons",
+    name: "نوشیدنی",
     items: [
-      { name: "Coca-Cola 33 cl", description: "", price: 450 },
-      { name: "Eau pétillante 50 cl", description: "", price: 400 },
-      { name: "Limonade artisanale", description: "", price: 500 },
-      {
-        name: "Verre de vin rouge",
-        description: "Côtes-du-Rhône, 12 cl.",
-        price: 650,
-        allergens: ["sulphites"],
-        alcohol: true,
-      },
+      { name: "دوغ محلی", description: "دوغ گازدار با پونه.", price: 60_000, allergens: ["milk"] },
+      { name: "شربت سکنجبین", description: "با خیار رنده‌شده.", price: 80_000 },
+      { name: "نوشابه", description: "", price: 40_000 },
+      { name: "آب معدنی", description: "", price: 25_000 },
     ],
   },
 ];
@@ -304,22 +302,24 @@ async function seedDemoRestaurant() {
 
   await db.transaction(async (tx) => {
     const org = await createOrganization(tx, {
-      name: "Demo Group",
+      name: "گروه نمونه",
       ownerUserId: owner.id,
       billingEmail: owner.email,
     });
     const restaurant = await createRestaurant(tx, {
       organizationId: org.id,
       ownerUserId: owner.id,
-      name: "Restaurant Demo",
+      name: "رستوران نمونه",
     });
     await tx
       .update(restaurants)
       .set({
-        phone: "+33 1 23 45 67 89",
-        addressLine1: "12 rue de la Paix",
-        city: "Paris",
-        postalCode: "75002",
+        // Persian names produce no Latin slug: keep a stable one for the demo.
+        slug: "restaurant-demo",
+        phone: "+98 21 1234 5678",
+        addressLine1: "تهران، خیابان ولیعصر، پلاک ۱۲",
+        city: "تهران",
+        postalCode: "1234567890",
         email: "contact@demo.spotifood.local",
       })
       .where(eq(restaurants.id, restaurant.id));
@@ -327,7 +327,7 @@ async function seedDemoRestaurant() {
       .update(restaurantSettings)
       .set({
         orderPrefix: "D",
-        legalName: "Demo Restauration SAS",
+        legalName: "شرکت نمونه رستوران",
         // Online payment uses whatever this deployment offers (Stripe keys / dev simulator).
         onlinePaymentEnabled: true,
         enabledPaymentProviders: [
@@ -358,63 +358,58 @@ async function seedDemoRestaurant() {
 
     const rates = await tx.select().from(taxRates).where(eq(taxRates.restaurantId, restaurant.id));
     const rate10 = rates.find((r) => r.rateBps === 1000)!;
-    const rate20 = rates.find((r) => r.rateBps === 2000) ?? rate10;
 
     // Option groups (reusable across products).
-    const [cuisson] = await tx
+    const [side] = await tx
       .insert(optionGroups)
-      .values({ restaurantId: restaurant.id, name: "Cuisson", minSelect: 1, maxSelect: 1 })
+      .values({ restaurantId: restaurant.id, name: "همراه", minSelect: 1, maxSelect: 1 })
       .returning();
-    const [supplements] = await tx
+    const [extras] = await tx
       .insert(optionGroups)
-      .values({ restaurantId: restaurant.id, name: "Suppléments", minSelect: 0, maxSelect: 4 })
+      .values({ restaurantId: restaurant.id, name: "افزودنی", minSelect: 0, maxSelect: 4 })
       .returning();
-    const [sauce] = await tx
+    const [skewer] = await tx
       .insert(optionGroups)
-      .values({ restaurantId: restaurant.id, name: "Sauce", minSelect: 0, maxSelect: 1 })
+      .values({ restaurantId: restaurant.id, name: "سیخ اضافه", minSelect: 0, maxSelect: 1 })
       .returning();
     await tx.insert(optionValues).values([
-      ...["Bleu", "Saignant", "À point", "Bien cuit"].map((name, i) => ({
+      ...["برنج ایرانی", "نان تازه", "نیمی برنج، نیمی نان"].map((name, i) => ({
         restaurantId: restaurant.id,
-        groupId: cuisson!.id,
+        groupId: side!.id,
         name,
         sortOrder: i,
-        isDefault: name === "À point",
+        isDefault: i === 0,
       })),
-      ...[
-        ["Fromage", 200],
-        ["Bacon", 250],
-        ["Champignons", 200],
-        ["Frites", 300],
-      ].map(([name, delta], i) => ({
+      ...(
+        [
+          ["ته‌دیگ", 60_000],
+          ["گوجه کبابی اضافه", 30_000],
+          ["کره", 20_000],
+          ["سبزی خوردن", 40_000],
+        ] as const
+      ).map(([name, delta], i) => ({
         restaurantId: restaurant.id,
-        groupId: supplements!.id,
-        name: String(name),
-        priceDeltaCents: edition.demoPrice(Number(delta)),
+        groupId: extras!.id,
+        name,
+        priceDeltaCents: toman(delta),
         sortOrder: i,
       })),
-      ...[
-        ["Poivre", 150],
-        ["Béarnaise", 150],
-        ["Roquefort", 200],
-      ].map(([name, delta], i) => ({
+      {
         restaurantId: restaurant.id,
-        groupId: sauce!.id,
-        name: String(name),
-        priceDeltaCents: edition.demoPrice(Number(delta)),
-        sortOrder: i,
-      })),
+        groupId: skewer!.id,
+        name: "یک سیخ کوبیده",
+        priceDeltaCents: toman(180_000),
+        sortOrder: 0,
+      },
     ]);
-    const groupByKey = { cuisson: cuisson!.id, supplements: supplements!.id, sauce: sauce!.id };
+    const groupByKey = { side: side!.id, extras: extras!.id, skewer: skewer!.id };
 
     for (const [ci, cat] of MENU.entries()) {
       const [category] = await tx
         .insert(categories)
         .values({ restaurantId: restaurant.id, name: cat.name, templateKey: cat.key, sortOrder: ci })
         .returning();
-      // No alcohol on the Iranian edition's demo menu (prohibited there).
-      const items = edition.edition === "iran" ? cat.items.filter((i) => !i.alcohol) : cat.items;
-      for (const [pi, item] of items.entries()) {
+      for (const [pi, item] of cat.items.entries()) {
         const [product] = await tx
           .insert(products)
           .values({
@@ -422,8 +417,8 @@ async function seedDemoRestaurant() {
             categoryId: category!.id,
             name: item.name,
             description: item.description || null,
-            priceCents: edition.demoPrice(item.price),
-            taxRateId: item.alcohol ? rate20.id : rate10.id,
+            priceCents: toman(item.price),
+            taxRateId: rate10.id,
             ingredients: item.ingredients,
             allergens: item.allergens ?? [],
             caloriesKcal: item.kcal,
@@ -478,6 +473,9 @@ const PALETTE: Record<string, [string, string]> = {
   desserts: ["#ffafcc", "#cdb4db"],
   coffee: ["#7f5539", "#3e2723"],
   soft_drinks: ["#48cae4", "#0077b6"],
+  soups: ["#e9c46a", "#bc6c25"],
+  meat: ["#c1121f", "#780000"],
+  tea: ["#b5651d", "#5c2e0e"],
 };
 
 const escapeXml = (v: string) => v.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -574,37 +572,41 @@ async function seedDemoOrders() {
   // Table 8 — three guests ordering separately (spec §12).
   await guestOrders(
     "8",
-    [{ product: "Burger signature", options: [["Cuisson", "À point"]] }, { product: "Coca-Cola 33 cl" }],
+    [{ product: "چلوکباب کوبیده", options: [["همراه", "برنج ایرانی"]] }, { product: "دوغ محلی" }],
     "preparing",
-    "Léa",
+    "سارا",
   );
   await guestOrders(
     "8",
     [
       {
-        product: "Entrecôte 300 g",
+        product: "کباب برگ",
         options: [
-          ["Cuisson", "Saignant"],
-          ["Suppléments", "Frites"],
+          ["همراه", "برنج ایرانی"],
+          ["افزودنی", "ته‌دیگ"],
         ],
-        note: "Sauce à part",
+        note: "بدون پیاز",
       },
-      { product: "Expresso" },
+      { product: "چای ایرانی" },
     ],
     "accepted",
   );
-  await guestOrders("8", [{ product: "César au poulet" }, { product: "Limonade artisanale" }], "received");
+  await guestOrders("8", [{ product: "زرشک پلو با مرغ" }, { product: "شربت سکنجبین" }], "received");
   // Table 4 — already served, Table 12 — ready to go.
   const paidAtTable4 = await guestOrders(
     "4",
     [
-      { product: "Tagliatelles carbonara", quantity: 2 },
-      { product: edition.edition === "iran" ? "Limonade artisanale" : "Verre de vin rouge", quantity: 2 },
+      { product: "قورمه سبزی", quantity: 2 },
+      { product: "دوغ محلی", quantity: 2 },
     ],
     "served",
   );
-  await guestOrders("4", [{ product: "Cheesecake" }, { product: "Cappuccino" }], "served");
-  await guestOrders("12", [{ product: "Saumon rôti" }, { product: "Eau pétillante 50 cl" }], "ready");
+  await guestOrders("4", [{ product: "بستنی سنتی" }, { product: "چای ایرانی" }], "served");
+  await guestOrders(
+    "12",
+    [{ product: "جوجه کباب", options: [["همراه", "نان تازه"]] }, { product: "آب معدنی" }],
+    "ready",
+  );
   // The first guest of table 4 already paid in cash.
   await recordStaffPayment(db, ctx, {
     tableSessionId: paidAtTable4.tableSessionId!,
