@@ -92,7 +92,8 @@
     "settings": "Paramètres",
     "menu": "Menu",
     "menuEditor": "Menu & produits",
-    "toggleNav": "Ouvrir le menu de navigation"
+    "toggleNav": "Ouvrir le menu de navigation",
+    "orders": "Commandes"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -227,7 +228,11 @@
     "option_unavailable": "Une option n'est plus disponible.",
     "invalid_option": "Option invalide.",
     "duplicate_option": "Option en double.",
-    "invalid_quantity": "Quantité invalide."
+    "invalid_quantity": "Quantité invalide.",
+    "cart_empty": "Votre panier est vide.",
+    "cart_has_issues": "Certains articles ne sont plus disponibles. Corrigez votre panier.",
+    "invalid_transition": "Ce changement de statut n'est pas possible.",
+    "status_changed": "La commande vient d'être modifiée par un collègue. Rafraîchissement…"
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -443,7 +448,30 @@
       "duplicate_option": "Option en double."
     },
     "tagLabel": "Étiquettes",
-    "categoriesNav": "Catégories du menu"
+    "categoriesNav": "Catégories du menu",
+    "placeOrder": "Commander · {price}",
+    "orderNote": "Une remarque pour la cuisine ?",
+    "orderNotePlaceholder": "Ex. allergie, servir les plats ensemble…",
+    "orderPlaced": "Commande envoyée en cuisine !",
+    "myOrders": "Mes commandes",
+    "orderNumber": "Commande {number}",
+    "orderAgain": "Commander autre chose",
+    "noOrders": "Vous n'avez pas encore commandé.",
+    "placedAt": "Passée à {time}",
+    "yourTotal": "Votre total",
+    "toPay": "À régler",
+    "fixCart": "Corrigez les articles signalés avant de commander.",
+    "statusHint": {
+      "pending_payment": "Réglez votre commande pour l'envoyer en cuisine.",
+      "received": "Le restaurant a bien reçu votre commande.",
+      "accepted": "Votre commande est acceptée.",
+      "preparing": "En cuisine, c'est parti !",
+      "ready": "C'est prêt, on vous l'apporte.",
+      "served": "Bon appétit !",
+      "cancelled": "Cette commande a été annulée. Contactez l'équipe si besoin."
+    },
+    "ordersLink": "Mes commandes ({count})",
+    "liveHint": "Mise à jour automatique"
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -601,5 +629,52 @@
     "emptyBody": "Créez par exemple « Cuisson » (obligatoire, 1 choix) ou « Suppléments » (facultatif, plusieurs choix payants).",
     "deleteConfirm": "Supprimer le groupe « {name} » ? Il sera retiré de tous les produits.",
     "free": "Gratuit"
+  },
+  "orderStatus": {
+    "pending_payment": "En attente de paiement",
+    "received": "Reçue",
+    "accepted": "Acceptée",
+    "preparing": "En préparation",
+    "ready": "Prête",
+    "served": "Servie",
+    "cancelled": "Annulée"
+  },
+  "orders": {
+    "title": "Commandes",
+    "subtitle": "Commandes en cours et récentes. Mise à jour automatique.",
+    "empty": "Aucune commande en cours",
+    "emptyBody": "Les nouvelles commandes apparaîtront ici dès qu'un client commande.",
+    "table": "Table {label}",
+    "client": "Client {n}",
+    "note": "Note",
+    "total": "Total",
+    "ago": "{time}",
+    "cancel": "Annuler",
+    "cancelConfirm": "Annuler la commande {number} ?",
+    "cancelReason": "Motif d'annulation (facultatif)",
+    "filterActive": "En cours",
+    "filterDone": "Terminées",
+    "unpaid": "Non payée",
+    "paid": "Payée",
+    "next": {
+      "accepted": "Accepter",
+      "preparing": "Lancer la préparation",
+      "ready": "Marquer prête",
+      "served": "Marquer servie"
+    }
+  },
+  "tableView": {
+    "title": "Table {label}",
+    "free": "Table libre",
+    "freeBody": "Aucune session en cours sur cette table.",
+    "since": "Session ouverte {time}",
+    "tableTotal": "Total de la table",
+    "unpaid": "Reste à encaisser",
+    "people": "{count, plural, one {# personne} other {# personnes}}",
+    "orders": "{count, plural, =0 {Aucune commande} one {# commande} other {# commandes}}",
+    "view": "Voir la table",
+    "back": "Retour aux tables",
+    "clientTotal": "Total",
+    "noOrdersYet": "Pas encore de commande"
   }
 }

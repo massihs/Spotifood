@@ -92,7 +92,8 @@
     "settings": "الإعدادات",
     "menu": "القائمة",
     "menuEditor": "القائمة والمنتجات",
-    "toggleNav": "فتح قائمة التنقل"
+    "toggleNav": "فتح قائمة التنقل",
+    "orders": "الطلبات"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -227,7 +228,11 @@
     "option_unavailable": "أحد الخيارات لم يعد متوفرًا.",
     "invalid_option": "خيار غير صالح.",
     "duplicate_option": "خيار مكرر.",
-    "invalid_quantity": "كمية غير صالحة."
+    "invalid_quantity": "كمية غير صالحة.",
+    "cart_empty": "سلتك فارغة.",
+    "cart_has_issues": "بعض العناصر لم تعد متوفرة. يرجى تصحيح سلتك.",
+    "invalid_transition": "تغيير الحالة هذا غير ممكن.",
+    "status_changed": "قام زميل للتو بتحديث هذا الطلب. جارٍ التحديث…"
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -443,7 +448,30 @@
       "duplicate_option": "خيار مكرر."
     },
     "tagLabel": "الوسوم",
-    "categoriesNav": "فئات القائمة"
+    "categoriesNav": "فئات القائمة",
+    "placeOrder": "اطلب · {price}",
+    "orderNote": "ملاحظة للمطبخ؟",
+    "orderNotePlaceholder": "مثل حساسية، تقديم الأطباق معًا…",
+    "orderPlaced": "تم إرسال الطلب إلى المطبخ!",
+    "myOrders": "طلباتي",
+    "orderNumber": "الطلب {number}",
+    "orderAgain": "اطلب شيئًا آخر",
+    "noOrders": "لم تطلب بعد.",
+    "placedAt": "أُرسل في {time}",
+    "yourTotal": "مجموعك",
+    "toPay": "المستحق",
+    "fixCart": "صحّح العناصر المشار إليها قبل الطلب.",
+    "statusHint": {
+      "pending_payment": "ادفع طلبك لإرساله إلى المطبخ.",
+      "received": "استلم المطعم طلبك.",
+      "accepted": "تم قبول طلبك.",
+      "preparing": "المطبخ يعمل عليه!",
+      "ready": "جاهز، في الطريق إليك.",
+      "served": "بالهناء والشفاء!",
+      "cancelled": "تم إلغاء هذا الطلب. تواصل مع الفريق عند الحاجة."
+    },
+    "ordersLink": "طلباتي ({count})",
+    "liveHint": "تحديث تلقائي"
   },
   "categoryTemplates": {
     "starters": "المقبلات",
@@ -601,5 +629,52 @@
     "emptyBody": "أنشئ مثلًا «درجة الطهي» (إلزامي، اختيار واحد) أو «الإضافات» (اختياري، عدة اختيارات مدفوعة).",
     "deleteConfirm": "حذف المجموعة «{name}»؟ ستُزال من جميع المنتجات.",
     "free": "مجاني"
+  },
+  "orderStatus": {
+    "pending_payment": "بانتظار الدفع",
+    "received": "تم الاستلام",
+    "accepted": "مقبول",
+    "preparing": "قيد التحضير",
+    "ready": "جاهز",
+    "served": "تم التقديم",
+    "cancelled": "ملغى"
+  },
+  "orders": {
+    "title": "الطلبات",
+    "subtitle": "الطلبات الجارية والأخيرة. تحديث تلقائي.",
+    "empty": "لا توجد طلبات جارية",
+    "emptyBody": "ستظهر الطلبات الجديدة هنا فور طلب أي ضيف.",
+    "table": "طاولة {label}",
+    "client": "الضيف {n}",
+    "note": "ملاحظة",
+    "total": "الإجمالي",
+    "ago": "{time}",
+    "cancel": "إلغاء",
+    "cancelConfirm": "إلغاء الطلب {number}؟",
+    "cancelReason": "سبب الإلغاء (اختياري)",
+    "filterActive": "جارية",
+    "filterDone": "منتهية",
+    "unpaid": "غير مدفوع",
+    "paid": "مدفوع",
+    "next": {
+      "accepted": "قبول",
+      "preparing": "بدء التحضير",
+      "ready": "تعيين كجاهز",
+      "served": "تعيين كمقدَّم"
+    }
+  },
+  "tableView": {
+    "title": "طاولة {label}",
+    "free": "طاولة متاحة",
+    "freeBody": "لا توجد جلسة مفتوحة على هذه الطاولة.",
+    "since": "جلسة مفتوحة {time}",
+    "tableTotal": "إجمالي الطاولة",
+    "unpaid": "المتبقي للتحصيل",
+    "people": "{count, plural, one {شخص واحد} other {# أشخاص}}",
+    "orders": "{count, plural, =0 {لا طلبات} one {طلب واحد} other {# طلبات}}",
+    "view": "عرض الطاولة",
+    "back": "العودة إلى الطاولات",
+    "clientTotal": "الإجمالي",
+    "noOrdersYet": "لا يوجد طلب بعد"
   }
 }

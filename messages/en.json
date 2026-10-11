@@ -92,7 +92,8 @@
     "settings": "Settings",
     "menu": "Menu",
     "menuEditor": "Menu & products",
-    "toggleNav": "Toggle navigation"
+    "toggleNav": "Toggle navigation",
+    "orders": "Orders"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -227,7 +228,11 @@
     "option_unavailable": "An option is no longer available.",
     "invalid_option": "Invalid option.",
     "duplicate_option": "Duplicate option.",
-    "invalid_quantity": "Invalid quantity."
+    "invalid_quantity": "Invalid quantity.",
+    "cart_empty": "Your cart is empty.",
+    "cart_has_issues": "Some items are no longer available. Please fix your cart.",
+    "invalid_transition": "This status change is not possible.",
+    "status_changed": "A colleague just updated this order. Refreshing…"
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -443,7 +448,30 @@
       "duplicate_option": "Duplicate option."
     },
     "tagLabel": "Labels",
-    "categoriesNav": "Menu categories"
+    "categoriesNav": "Menu categories",
+    "placeOrder": "Order · {price}",
+    "orderNote": "A note for the kitchen?",
+    "orderNotePlaceholder": "E.g. allergy, serve dishes together…",
+    "orderPlaced": "Order sent to the kitchen!",
+    "myOrders": "My orders",
+    "orderNumber": "Order {number}",
+    "orderAgain": "Order something else",
+    "noOrders": "You haven't ordered yet.",
+    "placedAt": "Placed at {time}",
+    "yourTotal": "Your total",
+    "toPay": "To pay",
+    "fixCart": "Fix the flagged items before ordering.",
+    "statusHint": {
+      "pending_payment": "Pay your order to send it to the kitchen.",
+      "received": "The restaurant received your order.",
+      "accepted": "Your order was accepted.",
+      "preparing": "The kitchen is on it!",
+      "ready": "It's ready, coming your way.",
+      "served": "Enjoy your meal!",
+      "cancelled": "This order was cancelled. Ask the staff if needed."
+    },
+    "ordersLink": "My orders ({count})",
+    "liveHint": "Updates automatically"
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -601,5 +629,52 @@
     "emptyBody": "For example create “Doneness” (required, 1 choice) or “Extras” (optional, several paid choices).",
     "deleteConfirm": "Delete group “{name}”? It will be removed from all products.",
     "free": "Free"
+  },
+  "orderStatus": {
+    "pending_payment": "Awaiting payment",
+    "received": "Received",
+    "accepted": "Accepted",
+    "preparing": "Preparing",
+    "ready": "Ready",
+    "served": "Served",
+    "cancelled": "Cancelled"
+  },
+  "orders": {
+    "title": "Orders",
+    "subtitle": "Current and recent orders. Updates automatically.",
+    "empty": "No current orders",
+    "emptyBody": "New orders will appear here as soon as a guest orders.",
+    "table": "Table {label}",
+    "client": "Guest {n}",
+    "note": "Note",
+    "total": "Total",
+    "ago": "{time}",
+    "cancel": "Cancel",
+    "cancelConfirm": "Cancel order {number}?",
+    "cancelReason": "Cancellation reason (optional)",
+    "filterActive": "Active",
+    "filterDone": "Done",
+    "unpaid": "Unpaid",
+    "paid": "Paid",
+    "next": {
+      "accepted": "Accept",
+      "preparing": "Start preparing",
+      "ready": "Mark ready",
+      "served": "Mark served"
+    }
+  },
+  "tableView": {
+    "title": "Table {label}",
+    "free": "Free table",
+    "freeBody": "No open session on this table.",
+    "since": "Session opened {time}",
+    "tableTotal": "Table total",
+    "unpaid": "Left to collect",
+    "people": "{count, plural, one {# person} other {# people}}",
+    "orders": "{count, plural, =0 {No orders} one {# order} other {# orders}}",
+    "view": "View table",
+    "back": "Back to tables",
+    "clientTotal": "Total",
+    "noOrdersYet": "No order yet"
   }
 }

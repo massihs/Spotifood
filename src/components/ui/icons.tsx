@@ -61,3 +61,8 @@ export const IconMenu = () => (
     <path d="M7 3v18M4 3v5a3 3 0 0 0 6 0V3M17 21V3c-2 1-3 4-3 7s1 4 3 4" />
   </svg>
 );
+export const IconReceipt = () => (
+  <svg {...base}>
+    <path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3" />
+  </svg>
+);

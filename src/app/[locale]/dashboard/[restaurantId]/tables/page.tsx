@@ -72,7 +72,12 @@ async function Tables({ params }: { params: Params }) {
                     className={`size-22 shrink-0 rounded-lg border border-border bg-white p-1 ${table.qrEnabled ? "" : "opacity-30 grayscale"}`}
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-lg font-semibold">{table.label}</p>
+                    <Link
+                      href={`/dashboard/${rid}/tables/${table.id}`}
+                      className="block truncate text-lg font-semibold hover:underline"
+                    >
+                      {table.label}
+                    </Link>
                     <p className="truncate text-sm text-fg-muted">
                       {[table.zone, table.capacity ? t("tables.seats", { count: table.capacity }) : null]
                         .filter(Boolean)

@@ -92,7 +92,8 @@
     "settings": "تنظیمات",
     "menu": "منو",
     "menuEditor": "منو و محصولات",
-    "toggleNav": "باز کردن منوی ناوبری"
+    "toggleNav": "باز کردن منوی ناوبری",
+    "orders": "سفارش‌ها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -227,7 +228,11 @@
     "option_unavailable": "یکی از گزینه‌ها دیگر موجود نیست.",
     "invalid_option": "گزینه نامعتبر.",
     "duplicate_option": "گزینه تکراری.",
-    "invalid_quantity": "تعداد نامعتبر."
+    "invalid_quantity": "تعداد نامعتبر.",
+    "cart_empty": "سبد شما خالی است.",
+    "cart_has_issues": "برخی اقلام دیگر موجود نیستند. سبد را اصلاح کنید.",
+    "invalid_transition": "این تغییر وضعیت ممکن نیست.",
+    "status_changed": "همکار شما همین حالا این سفارش را تغییر داد. در حال به‌روزرسانی…"
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -443,7 +448,30 @@
       "duplicate_option": "گزینه تکراری."
     },
     "tagLabel": "برچسب‌ها",
-    "categoriesNav": "دسته‌های منو"
+    "categoriesNav": "دسته‌های منو",
+    "placeOrder": "سفارش · {price}",
+    "orderNote": "توضیحی برای آشپزخانه؟",
+    "orderNotePlaceholder": "مثلاً حساسیت غذایی، سرو هم‌زمان…",
+    "orderPlaced": "سفارش به آشپزخانه ارسال شد!",
+    "myOrders": "سفارش‌های من",
+    "orderNumber": "سفارش {number}",
+    "orderAgain": "سفارش چیز دیگر",
+    "noOrders": "هنوز سفارشی نداده‌اید.",
+    "placedAt": "ثبت در {time}",
+    "yourTotal": "جمع شما",
+    "toPay": "قابل پرداخت",
+    "fixCart": "پیش از سفارش، اقلام مشخص‌شده را اصلاح کنید.",
+    "statusHint": {
+      "pending_payment": "برای ارسال به آشپزخانه، سفارش را پرداخت کنید.",
+      "received": "رستوران سفارش شما را دریافت کرد.",
+      "accepted": "سفارش شما پذیرفته شد.",
+      "preparing": "آشپزخانه مشغول است!",
+      "ready": "آماده است، در راه است.",
+      "served": "نوش جان!",
+      "cancelled": "این سفارش لغو شد. در صورت نیاز با کارکنان صحبت کنید."
+    },
+    "ordersLink": "سفارش‌های من ({count})",
+    "liveHint": "به‌روزرسانی خودکار"
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",
@@ -601,5 +629,52 @@
     "emptyBody": "مثلاً «درجه پخت» (اجباری، ۱ انتخاب) یا «افزودنی‌ها» (اختیاری، چند انتخاب پولی) بسازید.",
     "deleteConfirm": "گروه «{name}» حذف شود؟ از همه محصولات برداشته می‌شود.",
     "free": "رایگان"
+  },
+  "orderStatus": {
+    "pending_payment": "در انتظار پرداخت",
+    "received": "دریافت شد",
+    "accepted": "پذیرفته شد",
+    "preparing": "در حال آماده‌سازی",
+    "ready": "آماده",
+    "served": "سرو شد",
+    "cancelled": "لغو شد"
+  },
+  "orders": {
+    "title": "سفارش‌ها",
+    "subtitle": "سفارش‌های جاری و اخیر. به‌روزرسانی خودکار.",
+    "empty": "سفارش جاری وجود ندارد",
+    "emptyBody": "سفارش‌های جدید به محض ثبت اینجا نمایش داده می‌شوند.",
+    "table": "میز {label}",
+    "client": "مشتری {n}",
+    "note": "توضیح",
+    "total": "جمع",
+    "ago": "{time}",
+    "cancel": "لغو",
+    "cancelConfirm": "سفارش {number} لغو شود؟",
+    "cancelReason": "دلیل لغو (اختیاری)",
+    "filterActive": "جاری",
+    "filterDone": "تمام‌شده",
+    "unpaid": "پرداخت‌نشده",
+    "paid": "پرداخت‌شده",
+    "next": {
+      "accepted": "پذیرش",
+      "preparing": "شروع آماده‌سازی",
+      "ready": "علامت آماده",
+      "served": "علامت سرو"
+    }
+  },
+  "tableView": {
+    "title": "میز {label}",
+    "free": "میز آزاد",
+    "freeBody": "نشست بازی روی این میز نیست.",
+    "since": "نشست باز از {time}",
+    "tableTotal": "جمع میز",
+    "unpaid": "باقی‌مانده دریافت",
+    "people": "{count, plural, other {# نفر}}",
+    "orders": "{count, plural, =0 {بدون سفارش} other {# سفارش}}",
+    "view": "مشاهده میز",
+    "back": "بازگشت به میزها",
+    "clientTotal": "جمع",
+    "noOrdersYet": "هنوز سفارشی نیست"
   }
 }
