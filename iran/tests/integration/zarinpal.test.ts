@@ -166,3 +166,63 @@ describe("Zarinpal", () => {
     expect((await getGuestPaymentState(db, guest)).dueCents).toBe(450_000_000);
   });
 });
+
+describe("Zarinpal merchant per restaurant", () => {
+  const RESTO_MERCHANT = "11111111-2222-3333-4444-555555555555";
+
+  it("pays into the restaurant's own merchant account, and verifies with the same one", async () => {
+    zarinpalApi({ code: 100 });
+    const { owner, guest, kabab } = await setup();
+    await db
+      .update(restaurantSettings)
+      .set({ zarinpalMerchantId: RESTO_MERCHANT })
+      .where(eq(restaurantSettings.restaurantId, owner.restaurant.id));
+    await addToCart(db, guest, { productId: kabab.id, optionValueIds: [], quantity: 1 });
+    await placeOrder(db, guest);
+    const start = await startOnlinePayment(
+      db,
+      guest,
+      { provider: "zarinpal", idempotencyKey: newIdempotencyKey() },
+      { returnUrl: RETURN },
+    );
+    expect(calls[0]!.body.merchant_id).toBe(RESTO_MERCHANT);
+    await handlePaymentReturn(
+      db,
+      "zarinpal",
+      new URLSearchParams({ payment: start.paymentId, Authority: AUTH, Status: "OK" }),
+    );
+    expect(calls[1]!.body.merchant_id).toBe(RESTO_MERCHANT);
+    const [p] = await db.select().from(payments).where(eq(payments.id, start.paymentId));
+    expect(p).toMatchObject({
+      status: "succeeded",
+      metadata: expect.objectContaining({ merchantAccount: RESTO_MERCHANT }),
+    });
+  });
+
+  it("requires a merchant id when there is no platform account, and validates it", async () => {
+    const { updatePaymentSettings } = await import("@/server/modules/payments/service");
+    const saved = process.env.ZARINPAL_MERCHANT_ID;
+    delete process.env.ZARINPAL_MERCHANT_ID;
+    try {
+      const { owner } = await setup();
+      const base = {
+        onlinePaymentEnabled: true,
+        enabledPaymentProviders: ["cash", "zarinpal"] as "cash"[],
+        requirePaymentBeforeOrder: false,
+      };
+      await expect(updatePaymentSettings(db, owner.ctx, base)).rejects.toMatchObject({
+        message: "zarinpal_merchant_required",
+      });
+      await expect(
+        updatePaymentSettings(db, owner.ctx, { ...base, zarinpalMerchantId: "not-a-merchant" }),
+      ).rejects.toThrow();
+      const s = await updatePaymentSettings(db, owner.ctx, {
+        ...base,
+        zarinpalMerchantId: ` ${RESTO_MERCHANT.toUpperCase()} `,
+      });
+      expect(s.zarinpalMerchantId).toBe(RESTO_MERCHANT);
+    } finally {
+      process.env.ZARINPAL_MERCHANT_ID = saved;
+    }
+  });
+});

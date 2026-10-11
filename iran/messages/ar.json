@@ -251,7 +251,9 @@
     "plan_feature_online_payments": "الدفع الإلكتروني غير مشمول في باقتك.",
     "online_provider_required": "فعّل مزود دفع إلكتروني واحدًا على الأقل.",
     "payment_method_required": "فعّل وسيلة دفع واحدة على الأقل.",
-    "invalid_signature": "توقيع غير صالح."
+    "invalid_signature": "توقيع غير صالح.",
+    "zarinpal_merchant_required": "أدخل معرّف التاجر لتفعيل Zarinpal.",
+    "invalid_merchant_id": "معرّف تاجر غير صالح (36 حرفًا، مثل xxxxxxxx-xxxx-…)."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -448,7 +450,10 @@
     "onlinePaymentPlan": "متاح بدءًا من باقة Starter.",
     "noOnlineProvider": "لم يتم إعداد أي مزود دفع إلكتروني على هذه المنصة.",
     "requirePayment": "الدفع قبل الإرسال إلى المطبخ",
-    "requirePaymentHint": "تُرسل الطلبات إلى المطبخ بعد دفعها."
+    "requirePaymentHint": "تُرسل الطلبات إلى المطبخ بعد دفعها.",
+    "zarinpalMerchant": "معرّف التاجر في Zarinpal",
+    "zarinpalMerchantHint": "انسخه من لوحة Zarinpal. تُودَع المدفوعات مباشرة في حساب مطعمك.",
+    "zarinpalMerchantHintFallback": "انسخه من لوحة Zarinpal لتُودَع المدفوعات مباشرة في حسابك. إذا ترك فارغًا، يُستخدم حساب المنصة."
   },
   "guest": {
     "table": "طاولة {label}",

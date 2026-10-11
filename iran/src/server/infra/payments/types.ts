@@ -64,7 +64,14 @@ export interface PaymentProvider {
    */
   verifyReturn?(input: {
     query: URLSearchParams;
-    payment: { id: string; amountCents: number; currency: string; providerRef: string | null };
+    payment: {
+      id: string;
+      amountCents: number;
+      currency: string;
+      providerRef: string | null;
+      /** Merchant account used when the payment was created (must be reused to verify it). */
+      merchantAccount: string | null;
+    };
   }): Promise<PaymentWebhookEvent>;
   /** Verifies the signature and parses a webhook. Throws on an invalid signature. */
   parseWebhook?(rawBody: string, headers: Headers): Promise<PaymentWebhookEvent>;

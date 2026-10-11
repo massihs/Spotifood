@@ -18,7 +18,12 @@ import { recordAudit } from "@/server/audit";
 import { getEntitlements, hasFeature } from "@/server/entitlements";
 import { AppError, conflict, forbidden, notFound, validation } from "@/server/errors";
 import { emit, topics } from "@/server/infra/realtime";
-import { availableOnlineProviders, getProvider, type ProviderCode } from "@/server/infra/payments/registry";
+import {
+  availableOnlineProviders,
+  getProvider,
+  offerableOnlineProviders,
+  type ProviderCode,
+} from "@/server/infra/payments/registry";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { isUuid, randomToken } from "@/lib/ids";
 import type { GuestContext } from "@/server/modules/guest/sessions";
@@ -219,12 +224,13 @@ async function paymentConfig(db: DbOrTx, restaurantId: string) {
       onlinePaymentEnabled: restaurantSettings.onlinePaymentEnabled,
       enabledPaymentProviders: restaurantSettings.enabledPaymentProviders,
       requirePaymentBeforeOrder: restaurantSettings.requirePaymentBeforeOrder,
+      zarinpalMerchantId: restaurantSettings.zarinpalMerchantId,
     })
     .from(restaurantSettings)
     .where(eq(restaurantSettings.restaurantId, restaurantId));
   const entitlements = await getEntitlements(db, restaurantId);
   const enabled = settings?.enabledPaymentProviders ?? ["cash", "on_site_terminal"];
-  const deployment = availableOnlineProviders();
+  const deployment = availableOnlineProviders({ zarinpalMerchantId: settings?.zarinpalMerchantId });
   const onlineAllowed =
     Boolean(settings?.onlinePaymentEnabled) && hasFeature(entitlements, "online_payments");
   const online = onlineAllowed
@@ -235,6 +241,10 @@ async function paymentConfig(db: DbOrTx, restaurantId: string) {
     offline: OFFLINE_CODES.filter((c) => enabled.includes(c)) as OfflineCode[],
     payLater: enabled.includes("pay_later"),
     requirePaymentBeforeOrder: settings?.requirePaymentBeforeOrder ?? false,
+    /** Restaurant accounts at each PSP (null = platform fallback). */
+    merchantAccounts: { zarinpal: settings?.zarinpalMerchantId ?? null } as Partial<
+      Record<OnlineCode, string | null>
+    >,
   };
 }
 
@@ -357,6 +367,7 @@ export async function startOnlinePayment(
   if (!config.online.includes(input.provider)) throw forbidden("online_payment_unavailable");
   const provider = getProvider(input.provider);
   if (!provider || provider.kind !== "online") throw forbidden("online_payment_unavailable");
+  const merchantAccount = config.merchantAccounts[input.provider] ?? null;
 
   // Same key again (double tap, refresh): hand back the existing checkout.
   const [existing] = await db
@@ -388,7 +399,7 @@ export async function startOnlinePayment(
         amountCents,
         currency: guest.restaurant.currency,
         idempotencyKey: input.idempotencyKey,
-        metadata: { merchantAccount: null },
+        metadata: { merchantAccount },
       })
       .returning();
     await tx.insert(paymentAllocations).values(
@@ -433,7 +444,7 @@ export async function startOnlinePayment(
       returnUrl: returnUrl.toString(),
       callbackUrl: callbackUrl.toString(),
       idempotencyKey: `create_${payment.id}`,
-      merchantAccount: null,
+      merchantAccount,
     });
     if (result.status === "succeeded") {
       await confirmPayment(db, {
@@ -613,7 +624,13 @@ export async function handlePaymentReturn(db: Database, providerCode: string, qu
   if (p.status === "pending" || p.status === "requires_action") {
     const event = await provider.verifyReturn({
       query,
-      payment: { id: p.id, amountCents: p.amountCents, currency: p.currency, providerRef: p.providerRef },
+      payment: {
+        id: p.id,
+        amountCents: p.amountCents,
+        currency: p.currency,
+        providerRef: p.providerRef,
+        merchantAccount: typeof p.metadata.merchantAccount === "string" ? p.metadata.merchantAccount : null,
+      },
     });
     if (event.type === "payment.succeeded") {
       await confirmPayment(db, {
@@ -993,6 +1010,20 @@ export const paymentSettingsSchema = z.object({
   /** Providers the restaurant accepts. Unknown codes are rejected. */
   enabledPaymentProviders: z.array(z.enum(["cash", "on_site_terminal", "pay_later", ...ONLINE_CODES])).max(8),
   requirePaymentBeforeOrder: z.boolean(),
+  /** Zarinpal merchant ids are UUIDs (36 characters), shown in the Zarinpal panel. */
+  zarinpalMerchantId: z
+    .string()
+    .trim()
+    .transform((v) => (v === "" ? null : v.toLowerCase()))
+    // Not z.uuid(): merchant ids look like UUIDs but need not follow RFC 4122 versions.
+    .pipe(
+      z
+        .string()
+        .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, "invalid_merchant_id")
+        .nullable(),
+    )
+    .nullable()
+    .optional(),
 });
 
 /** Settings view: what the restaurant enabled + what the plan and the deployment allow. */
@@ -1003,6 +1034,7 @@ export async function getPaymentSettingsView(db: Database, ctx: RestaurantContex
       onlinePaymentEnabled: restaurantSettings.onlinePaymentEnabled,
       enabledPaymentProviders: restaurantSettings.enabledPaymentProviders,
       requirePaymentBeforeOrder: restaurantSettings.requirePaymentBeforeOrder,
+      zarinpalMerchantId: restaurantSettings.zarinpalMerchantId,
     })
     .from(restaurantSettings)
     .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
@@ -1010,9 +1042,11 @@ export async function getPaymentSettingsView(db: Database, ctx: RestaurantContex
   return {
     ...settings!,
     planAllowsOnline: hasFeature(entitlements, "online_payments"),
-    availableOnline: availableOnlineProviders().filter((c): c is OnlineCode =>
+    // Zarinpal is listed even before a merchant id is entered: the form asks for it.
+    availableOnline: offerableOnlineProviders().filter((c): c is OnlineCode =>
       (ONLINE_CODES as readonly string[]).includes(c),
     ),
+    platformZarinpal: Boolean(process.env.ZARINPAL_MERCHANT_ID),
   };
 }
 
@@ -1028,7 +1062,9 @@ export async function updatePaymentSettings(
     const entitlements = await getEntitlements(db, ctx.restaurant.id);
     if (!hasFeature(entitlements, "online_payments"))
       throw new AppError("PLAN_LIMIT", "plan_feature_online_payments");
-    const deployment = availableOnlineProviders();
+    const deployment = availableOnlineProviders({ zarinpalMerchantId: input.zarinpalMerchantId });
+    if (providers.includes("zarinpal") && !deployment.includes("zarinpal"))
+      throw validation("zarinpal_merchant_required", { field: "zarinpalMerchantId" });
     if (
       !providers.some(
         (c) => (ONLINE_CODES as readonly string[]).includes(c) && deployment.includes(c as OnlineCode),

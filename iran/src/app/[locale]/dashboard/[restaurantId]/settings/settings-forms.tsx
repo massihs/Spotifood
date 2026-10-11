@@ -512,6 +512,9 @@ export type PaymentValues = {
   requirePaymentBeforeOrder: boolean;
   planAllowsOnline: boolean;
   availableOnline: string[];
+  zarinpalMerchantId: string | null;
+  /** A platform-wide Zarinpal account exists (used when the restaurant has none). */
+  platformZarinpal: boolean;
 };
 
 export function PaymentSettingsForm({
@@ -565,14 +568,34 @@ export function PaymentSettingsForm({
                 <p className="text-sm text-fg-muted">{t("settings.noOnlineProvider")}</p>
               ) : (
                 values.availableOnline.map((c) => (
-                  <Checkbox
-                    key={c}
-                    name="providers"
-                    value={c}
-                    defaultChecked={has(c)}
-                    label={t(`payments.provider.${c}`)}
-                    description={t(`settings.providerHint.${c}`)}
-                  />
+                  <div key={c} className="space-y-3">
+                    <Checkbox
+                      name="providers"
+                      value={c}
+                      defaultChecked={has(c)}
+                      label={t(`payments.provider.${c}`)}
+                      description={t(`settings.providerHint.${c}`)}
+                    />
+                    {c === "zarinpal" ? (
+                      <div className="ps-7">
+                        <Field
+                          label={t("settings.zarinpalMerchant")}
+                          name="zarinpalMerchantId"
+                          dir="ltr"
+                          autoComplete="off"
+                          spellCheck={false}
+                          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                          defaultValue={values.zarinpalMerchantId ?? ""}
+                          error={err("zarinpalMerchantId")}
+                          hint={
+                            values.platformZarinpal
+                              ? t("settings.zarinpalMerchantHintFallback")
+                              : t("settings.zarinpalMerchantHint")
+                          }
+                        />
+                      </div>
+                    ) : null}
+                  </div>
                 ))
               )}
             </div>

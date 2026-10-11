@@ -11,8 +11,9 @@ import type { PaymentProvider, PaymentWebhookEvent } from "./types";
  * request shapes follow Zarinpal's v4 documentation; the logic is covered with a mocked API.
  *
  * Amounts: Zarinpal expects whole rials (currency "IRR"); our amounts are minor units (×100).
- * Multi-tenant note: payments go to ZARINPAL_MERCHANT_ID (platform account) unless a
- * per-restaurant merchant id is passed as `merchantAccount`.
+ * Multi-tenant: each restaurant enters its own Zarinpal merchant id (restaurant settings), passed
+ * as `merchantAccount`, so money lands on its account. ZARINPAL_MERCHANT_ID is an optional
+ * platform-wide fallback.
  */
 const host = () =>
   process.env.ZARINPAL_SANDBOX === "true" || process.env.ZARINPAL_SANDBOX === "1"
@@ -92,7 +93,7 @@ export const zarinpalProvider: PaymentProvider = {
       };
     }
     const r = await call("verify.json", {
-      merchant_id: merchant(null),
+      merchant_id: merchant(payment.merchantAccount),
       amount: toRials(payment.amountCents, payment.currency),
       authority,
     });

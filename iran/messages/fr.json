@@ -251,7 +251,9 @@
     "plan_feature_online_payments": "Le paiement en ligne n'est pas inclus dans votre offre.",
     "online_provider_required": "Activez au moins un prestataire de paiement en ligne.",
     "payment_method_required": "Activez au moins un moyen de paiement.",
-    "invalid_signature": "Signature invalide."
+    "invalid_signature": "Signature invalide.",
+    "zarinpal_merchant_required": "Saisissez votre code marchand pour activer Zarinpal.",
+    "invalid_merchant_id": "Code marchand invalide (36 caractères, comme xxxxxxxx-xxxx-…)."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -448,7 +450,10 @@
     "onlinePaymentPlan": "Disponible à partir de l'offre Starter.",
     "noOnlineProvider": "Aucun prestataire de paiement en ligne n'est configuré sur cette plateforme.",
     "requirePayment": "Paiement avant envoi en cuisine",
-    "requirePaymentHint": "Les commandes partent en cuisine une fois réglées."
+    "requirePaymentHint": "Les commandes partent en cuisine une fois réglées.",
+    "zarinpalMerchant": "Code marchand Zarinpal",
+    "zarinpalMerchantHint": "À copier depuis votre panel Zarinpal. Les paiements arrivent directement sur le compte du restaurant.",
+    "zarinpalMerchantHintFallback": "À copier depuis votre panel Zarinpal pour encaisser directement. Laissé vide, le compte de la plateforme est utilisé."
   },
   "guest": {
     "table": "Table {label}",

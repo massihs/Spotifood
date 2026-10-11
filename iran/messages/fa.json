@@ -251,7 +251,9 @@
     "plan_feature_online_payments": "پرداخت آنلاین در طرح شما وجود ندارد.",
     "online_provider_required": "دست‌کم یک درگاه پرداخت آنلاین را فعال کنید.",
     "payment_method_required": "دست‌کم یک روش پرداخت را فعال کنید.",
-    "invalid_signature": "امضای نامعتبر."
+    "invalid_signature": "امضای نامعتبر.",
+    "zarinpal_merchant_required": "برای فعال‌سازی زرین‌پال، کد مرچنت را وارد کنید.",
+    "invalid_merchant_id": "کد مرچنت نامعتبر است (۳۶ کاراکتر، مثل xxxxxxxx-xxxx-…)."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -448,7 +450,10 @@
     "onlinePaymentPlan": "از طرح Starter به بعد در دسترس است.",
     "noOnlineProvider": "هیچ درگاه پرداخت آنلاینی روی این پلتفرم پیکربندی نشده است.",
     "requirePayment": "پرداخت پیش از ارسال به آشپزخانه",
-    "requirePaymentHint": "سفارش‌ها پس از پرداخت به آشپزخانه می‌روند."
+    "requirePaymentHint": "سفارش‌ها پس از پرداخت به آشپزخانه می‌روند.",
+    "zarinpalMerchant": "کد مرچنت زرین‌پال",
+    "zarinpalMerchantHint": "از پنل زرین‌پال خود کپی کنید. پرداخت‌ها مستقیم به حساب رستوران شما واریز می‌شود.",
+    "zarinpalMerchantHintFallback": "از پنل زرین‌پال خود کپی کنید تا پرداخت‌ها مستقیم به حساب شما واریز شود. اگر خالی بماند، از حساب پلتفرم استفاده می‌شود."
   },
   "guest": {
     "table": "میز {label}",

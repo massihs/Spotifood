@@ -15,6 +15,13 @@
       "when": 1791728788519,
       "tag": "0001_money_bigint",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791759064440,
+      "tag": "0002_zarinpal_merchant",
+      "breakpoints": true
     }
   ]
 }

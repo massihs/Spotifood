@@ -124,6 +124,7 @@ export async function updatePaymentSettingsAction(restaurantId: string, _prev: u
       onlinePaymentEnabled: fd.get("onlinePaymentEnabled") === "on",
       enabledPaymentProviders: fd.getAll("providers").map(String) as "cash"[],
       requirePaymentBeforeOrder: fd.get("requirePaymentBeforeOrder") === "on",
+      zarinpalMerchantId: fd.has("zarinpalMerchantId") ? String(fd.get("zarinpalMerchantId")) : undefined,
     });
     refresh();
   });

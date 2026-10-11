@@ -251,7 +251,9 @@
     "plan_feature_online_payments": "Online payment is not included in your plan.",
     "online_provider_required": "Enable at least one online payment provider.",
     "payment_method_required": "Enable at least one payment method.",
-    "invalid_signature": "Invalid signature."
+    "invalid_signature": "Invalid signature.",
+    "zarinpal_merchant_required": "Enter your merchant ID to enable Zarinpal.",
+    "invalid_merchant_id": "Invalid merchant ID (36 characters, like xxxxxxxx-xxxx-…)."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -448,7 +450,10 @@
     "onlinePaymentPlan": "Available from the Starter plan.",
     "noOnlineProvider": "No online payment provider is configured on this platform.",
     "requirePayment": "Payment before sending to the kitchen",
-    "requirePaymentHint": "Orders go to the kitchen once paid."
+    "requirePaymentHint": "Orders go to the kitchen once paid.",
+    "zarinpalMerchant": "Zarinpal merchant ID",
+    "zarinpalMerchantHint": "Copy it from your Zarinpal panel. Payments go straight to your restaurant's account.",
+    "zarinpalMerchantHintFallback": "Copy it from your Zarinpal panel so payments go straight to your account. If empty, the platform account is used."
   },
   "guest": {
     "table": "Table {label}",
