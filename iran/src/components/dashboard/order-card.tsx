@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { formatMoney } from "@/lib/money";
+import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -56,7 +57,7 @@ export function OrderCard({
   timeZone: string;
 }) {
   const t = useTranslations();
-  const format = useFormatter();
+  const locale = useLocale();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -110,9 +111,7 @@ export function OrderCard({
       ) : null}
       <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-3">
         <p className="text-sm">
-          <span className="font-semibold tabular-nums">
-            {format.number(o.totalCents / 100, { style: "currency", currency: o.currency })}
-          </span>{" "}
+          <span className="font-semibold tabular-nums">{formatMoney(o.totalCents, o.currency, locale)}</span>{" "}
           <span className="text-xs text-fg-subtle">
             · {o.paymentStatus === "paid" ? t("orders.paid") : t("orders.unpaid")}
           </span>

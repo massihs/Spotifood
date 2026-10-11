@@ -37,7 +37,11 @@ async function Options({ params }: { params: Params }) {
         <PageHeader
           title={t("title")}
           description={t("subtitle")}
-          actions={manage ? <NewGroupDialog restaurantId={ctx.restaurant.id} /> : null}
+          actions={
+            manage ? (
+              <NewGroupDialog restaurantId={ctx.restaurant.id} currency={ctx.restaurant.currency} />
+            ) : null
+          }
         />
       </div>
       {groups.length === 0 ? (

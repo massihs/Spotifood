@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { formatMoney } from "@/lib/money";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { db } from "@/server/db/client";
 import { mockEnabled, verifyMockSignature } from "@/server/infra/payments/mock";
 import { getPaymentForCheckout } from "@/server/modules/payments/service";
@@ -29,11 +30,8 @@ async function MockCheckout({ params, searchParams }: PageProps<"/[locale]/pay/m
   const sig = typeof sp.sig === "string" ? sp.sig : "";
   const ret = typeof sp.return === "string" ? sp.return : "";
   if (!mockEnabled() || !verifyMockSignature(paymentId, sig)) notFound();
-  const [payment, t, format] = await Promise.all([
-    getPaymentForCheckout(db, paymentId),
-    getTranslations("mockPay"),
-    getFormatter(),
-  ]);
+  const [payment, t] = await Promise.all([getPaymentForCheckout(db, paymentId), getTranslations("mockPay")]);
+  const locale = await getLocale();
   if (!payment || payment.provider !== "mock_online") notFound();
   const pending = payment.status === "pending" || payment.status === "requires_action";
 
@@ -48,7 +46,7 @@ async function MockCheckout({ params, searchParams }: PageProps<"/[locale]/pay/m
       <div className="mt-6 rounded-2xl border border-border bg-surface p-6 text-center">
         <p className="text-sm text-fg-muted">{payment.restaurantName}</p>
         <p className="mt-2 text-4xl font-semibold tabular-nums">
-          {format.number(payment.amountCents / 100, { style: "currency", currency: payment.currency })}
+          {formatMoney(payment.amountCents, payment.currency, locale)}
         </p>
         <p className="mt-2 text-sm text-fg-muted">{t("explain")}</p>
         {pending ? (

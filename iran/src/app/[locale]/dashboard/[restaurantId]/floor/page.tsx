@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { formatMoney } from "@/lib/money";
+import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { CloseTableButton } from "@/components/dashboard/close-table-button";
 import { LiveIndicator, LiveRefresh } from "@/components/realtime/live";
@@ -31,8 +32,8 @@ async function Floor({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "tables.view");
   const [t, format, floor] = await Promise.all([getTranslations("floor"), getFormatter(), getFloor(db, ctx)]);
-  const money = (c: number) =>
-    format.number(c / 100, { style: "currency", currency: ctx.restaurant.currency });
+  const locale = await getLocale();
+  const money = (c: number) => formatMoney(c, ctx.restaurant.currency, locale);
   const count = (s: TableState) => floor.filter((x) => x.state === s).length;
   const canClose = can(ctx, "sessions.close");
   const canForce = can(ctx, "restaurant.manage");

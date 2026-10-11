@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ import {
   useActionForm,
   useFieldError,
 } from "@/components/ui/form";
-import { centsToInput } from "@/lib/money";
+import { centsToInput, formatMoney, unitLabel } from "@/lib/money";
 import { cn } from "@/lib/cn";
 import {
   createProductAction,
@@ -74,7 +74,6 @@ export function ProductForm({
 }) {
   const t = useTranslations();
   const locale = useLocale();
-  const format = useFormatter();
   const editing = Boolean(values.id);
   const form = useActionForm(
     editing
@@ -83,7 +82,7 @@ export function ProductForm({
   );
   const err = useFieldError(form.state);
   const customTags = values.tags.filter((tag) => !suggestedTags.includes(tag));
-  const money = (c: number) => format.number(c / 100, { style: "currency", currency });
+  const money = (c: number) => formatMoney(c, currency, locale);
 
   return (
     <ActionForm form={form} className="grid gap-6 xl:grid-cols-[1fr_340px]">
@@ -125,12 +124,12 @@ export function ProductForm({
           <CardHeader title={t("product.pricing")} />
           <div className="grid gap-4 p-5 sm:grid-cols-3">
             <Field
-              label={`${t("product.price")} (${currency})`}
+              label={`${t("product.price")} (${unitLabel(currency, locale)})`}
               name="price"
               required
               inputMode="decimal"
               placeholder="0,00"
-              defaultValue={centsToInput(values.priceCents, locale)}
+              defaultValue={centsToInput(values.priceCents, locale, currency)}
               hint={t("product.priceHint")}
               error={err("price") ?? err("priceCents")}
             />
@@ -138,7 +137,7 @@ export function ProductForm({
               label={t("product.compareAt")}
               name="compareAt"
               inputMode="decimal"
-              defaultValue={centsToInput(values.compareAtPriceCents, locale)}
+              defaultValue={centsToInput(values.compareAtPriceCents, locale, currency)}
               hint={t("product.compareAtHint")}
               error={err("compareAt") ?? err("compareAtPriceCents")}
             />

@@ -1,6 +1,8 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useMoney } from "@/components/ui/use-money";
+
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
@@ -12,13 +14,7 @@ export type CartSummary = { itemCount: number; totalCents: number };
 
 const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-export function useMoney(currency: string) {
-  const format = useFormatter();
-  return useCallback(
-    (cents: number) => format.number(cents / 100, { style: "currency", currency }),
-    [format, currency],
-  );
-}
+export { useMoney };
 
 export function MenuApp({
   menu,

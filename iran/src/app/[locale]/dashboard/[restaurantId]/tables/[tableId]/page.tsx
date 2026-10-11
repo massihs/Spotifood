@@ -1,6 +1,7 @@
 import { Suspense } from "react";
+import { formatMoney } from "@/lib/money";
 import { notFound } from "next/navigation";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { OrderCard } from "@/components/dashboard/order-card";
 import { CloseTableButton } from "@/components/dashboard/close-table-button";
@@ -42,6 +43,7 @@ async function TableDetail({ params }: { params: Params }) {
     getPaymentMethods(db, ctx.restaurant.id),
     view.session && can(ctx, "payments.view") ? listSessionPayments(db, ctx, view.session.id) : [],
   ]);
+  const locale = await getLocale();
   const payable = (orders: (typeof view.participants)[number]["orders"]) =>
     orders
       .filter((o) => o.status !== "cancelled" && o.paymentStatus === "unpaid")
@@ -51,8 +53,7 @@ async function TableDetail({ params }: { params: Params }) {
   const collected = sessionPayments
     .filter((p) => p.status === "succeeded" || p.status === "partially_refunded")
     .reduce((s, p) => s + p.amountCents - p.refundedCents, 0);
-  const money = (c: number) =>
-    format.number(c / 100, { style: "currency", currency: ctx.restaurant.currency });
+  const money = (c: number) => formatMoney(c, ctx.restaurant.currency, locale);
   const orderCount = view.participants.reduce((n, p) => n + p.orders.length, 0);
 
   return (

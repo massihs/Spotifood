@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { formatMoney } from "@/lib/money";
+import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { db } from "@/server/db/client";
 import { getGuest } from "@/server/modules/guest/current";
 import { listGuestOrders } from "@/server/modules/orders/service";
@@ -31,9 +32,9 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
     searchParams,
     getGuestPaymentState(db, guest),
   ]);
+  const locale = await getLocale();
   const returned = typeof sp.payment === "string" ? await getGuestPaymentStatus(db, guest, sp.payment) : null;
-  const money = (c: number) =>
-    format.number(c / 100, { style: "currency", currency: guest.restaurant.currency });
+  const money = (c: number) => formatMoney(c, guest.restaurant.currency, locale);
   const total = orders.filter((o) => o.status !== "cancelled").reduce((s, o) => s + o.totalCents, 0);
 
   return (

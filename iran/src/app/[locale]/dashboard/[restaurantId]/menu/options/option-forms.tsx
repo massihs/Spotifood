@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,7 +14,7 @@ import {
   useCloseOnSuccess,
   useFieldError,
 } from "@/components/ui/form";
-import { centsToInput } from "@/lib/money";
+import { centsToInput, formatMoney } from "@/lib/money";
 import { deleteOptionGroupAction, saveOptionGroupAction } from "../actions";
 
 export type GroupView = {
@@ -39,7 +39,15 @@ type Row = {
 let rowSeq = 0;
 const newKey = () => `row-${++rowSeq}`;
 
-function GroupForm({ restaurantId, group }: { restaurantId: string; group?: GroupView }) {
+function GroupForm({
+  restaurantId,
+  group,
+  currency,
+}: {
+  restaurantId: string;
+  group?: GroupView;
+  currency: string;
+}) {
   const t = useTranslations();
   const locale = useLocale();
   const form = useActionForm(saveOptionGroupAction.bind(null, restaurantId, group?.id ?? null));
@@ -51,7 +59,7 @@ function GroupForm({ restaurantId, group }: { restaurantId: string; group?: Grou
           key: newKey(),
           id: v.id,
           name: v.name,
-          delta: v.priceDeltaCents ? centsToInput(v.priceDeltaCents, locale) : "",
+          delta: v.priceDeltaCents ? centsToInput(v.priceDeltaCents, locale, currency) : "",
           isDefault: v.isDefault,
           isAvailable: v.isAvailable,
         }))
@@ -184,11 +192,11 @@ function GroupForm({ restaurantId, group }: { restaurantId: string; group?: Grou
   );
 }
 
-export function NewGroupDialog({ restaurantId }: { restaurantId: string }) {
+export function NewGroupDialog({ restaurantId, currency }: { restaurantId: string; currency: string }) {
   const t = useTranslations("options");
   return (
     <Dialog size="lg" title={t("add")} trigger={(open) => <Button onClick={open}>+ {t("add")}</Button>}>
-      <GroupForm restaurantId={restaurantId} />
+      <GroupForm restaurantId={restaurantId} currency={currency} />
     </Dialog>
   );
 }
@@ -205,7 +213,7 @@ export function GroupCard({
   canManage: boolean;
 }) {
   const t = useTranslations();
-  const format = useFormatter();
+  const locale = useLocale();
   const [error, setError] = useState<string | null>(null);
   return (
     <Card className="flex h-full flex-col">
@@ -230,7 +238,7 @@ export function GroupCard({
               </span>
               <span className="text-fg-muted tabular-nums">
                 {v.priceDeltaCents
-                  ? `+${format.number(v.priceDeltaCents / 100, { style: "currency", currency })}`
+                  ? `+${formatMoney(v.priceDeltaCents, currency, locale)}`
                   : t("options.free")}
               </span>
             </li>
@@ -253,7 +261,7 @@ export function GroupCard({
               </Button>
             )}
           >
-            <GroupForm restaurantId={restaurantId} group={group} />
+            <GroupForm restaurantId={restaurantId} group={group} currency={currency} />
           </Dialog>
           <form
             action={async () => {

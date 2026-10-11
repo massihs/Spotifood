@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { formatMoney } from "@/lib/money";
+import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { RefundDialog } from "@/components/dashboard/payment-dialogs";
 import { LiveRefresh } from "@/components/realtime/live";
@@ -51,8 +52,8 @@ async function Payments({ params, searchParams }: Pick<Props, "params" | "search
     getFormatter(),
     listPayments(db, ctx, { statuses: VIEWS[view], limit: 100 }),
   ]);
-  const money = (c: number) =>
-    format.number(c / 100, { style: "currency", currency: ctx.restaurant.currency });
+  const locale = await getLocale();
+  const money = (c: number) => formatMoney(c, ctx.restaurant.currency, locale);
   const settled = list.filter((p) => ["succeeded", "partially_refunded", "refunded"].includes(p.status));
   const net = settled.reduce((s, p) => s + p.amountCents - p.refundedCents, 0);
   const refunded = settled.reduce((s, p) => s + p.refundedCents, 0);

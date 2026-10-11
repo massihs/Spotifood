@@ -1,6 +1,7 @@
 import { edition } from "@/config/edition";
+import { formatMoney } from "@/lib/money";
 import { Suspense } from "react";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { Card, CardHeader, StatCard } from "@/components/ui/card";
 import { requireSuperAdmin } from "@/server/auth/current";
@@ -17,11 +18,8 @@ export default function AdminOverviewPage() {
 
 async function AdminOverview() {
   await requireSuperAdmin();
-  const [t, format, stats] = await Promise.all([
-    getTranslations("admin"),
-    getFormatter(),
-    getPlatformStats(db),
-  ]);
+  const [t, stats] = await Promise.all([getTranslations("admin"), getPlatformStats(db)]);
+  const locale = await getLocale();
   const plans = Object.entries(stats.subscriptionsByPlan);
 
   return (
@@ -35,10 +33,7 @@ async function AdminOverview() {
         <StatCard label={t("stats.orders")} value={stats.orders} />
         <StatCard
           label={t("stats.revenue")}
-          value={format.number(stats.revenueCents / 100, {
-            style: "currency",
-            currency: edition.platformCurrency,
-          })}
+          value={formatMoney(stats.revenueCents, edition.platformCurrency, locale)}
         />
       </div>
       <Card className="mt-6">

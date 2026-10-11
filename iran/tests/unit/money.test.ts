@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { divRound, formatMoney, parseMoney, sumCents, taxFromGross, taxFromNet } from "@/lib/money";
+import {
+  centsToInput,
+  divRound,
+  formatMoney,
+  parseMoney,
+  parseMoneyInput,
+  sumCents,
+  taxFromGross,
+  taxFromNet,
+  unitLabel,
+} from "@/lib/money";
 
 describe("money", () => {
   it("parses user input into integer cents", () => {
@@ -60,5 +70,29 @@ describe("large amounts (Rial)", () => {
     const gross = 50_000_000_000 * 100;
     expect(taxFromGross(gross, 1000)).toBe(454_545_454_545);
     expect(taxFromNet(gross, 1000)).toBe(500_000_000_000);
+  });
+});
+
+describe("tomans (IRR display unit)", () => {
+  // 120,000 tomans = 1,200,000 rials = 120,000,000 stored minor units.
+  it("formats IRR amounts in tomans with the UI language's digits", () => {
+    expect(formatMoney(120_000_000, "IRR", "fa")).toBe("۱۲۰٬۰۰۰ تومان");
+    expect(formatMoney(120_000_000, "IRR", "en")).toBe("120,000 Toman");
+    expect(formatMoney(1990, "EUR", "en")).toBe("€19.90");
+  });
+
+  it("parses typed tomans (Persian digits, separators) into minor units", () => {
+    expect(parseMoneyInput("120000", "IRR")).toBe(120_000_000);
+    expect(parseMoneyInput("۱۲۰٬۰۰۰", "IRR")).toBe(120_000_000);
+    expect(parseMoneyInput("120,000", "IRR")).toBe(120_000_000);
+    expect(parseMoneyInput("12.5", "IRR")).toBe(125_000); // "." is a thousands separator for tomans
+    expect(parseMoneyInput("abc", "IRR")).toBeNull();
+    expect(parseMoneyInput("19,90", "EUR")).toBe(1990);
+  });
+
+  it("round-trips inputs", () => {
+    expect(centsToInput(120_000_000, "fa", "IRR")).toBe("120000");
+    expect(parseMoneyInput(centsToInput(450_000_000, "fa", "IRR"), "IRR")).toBe(450_000_000);
+    expect(unitLabel("IRR", "fa")).toBe("تومان");
   });
 });

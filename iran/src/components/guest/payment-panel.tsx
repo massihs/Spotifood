@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { formatMoney } from "@/lib/money";
+import { useTranslations, useLocale } from "next-intl";
 import { useCallback, useState, useTransition } from "react";
 import {
   cancelPaymentAction,
@@ -40,8 +41,8 @@ export function PaymentPanel({
   returned: string | null;
 }) {
   const t = useTranslations();
-  const format = useFormatter();
-  const money = (c: number) => format.number(c / 100, { style: "currency", currency });
+  const locale = useLocale();
+  const money = (c: number) => formatMoney(c, currency, locale);
   const [pending, startTransition] = useTransition();
   const [key, setKey] = useState(newKey);
   const [error, setError] = useState<string | null>(null);

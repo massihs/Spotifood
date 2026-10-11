@@ -8,7 +8,7 @@ import { actionContext, runAction } from "@/server/actions";
 import { AppError } from "@/server/errors";
 import { MAX_UPLOAD_BYTES } from "@/server/infra/images";
 import { enforceRateLimit } from "@/server/infra/rate-limit";
-import { parseMoney } from "@/lib/money";
+import { parseMoneyInput } from "@/lib/money";
 import type { RestaurantContext } from "@/server/tenancy";
 import { menuTag } from "@/server/modules/menu/cache";
 import {
@@ -34,13 +34,14 @@ const optInt = (fd: FormData, k: string) => {
   const v = str(fd, k).trim();
   return v === "" ? null : Number.isInteger(Number(v)) ? Number(v) : NaN;
 };
-const money = (fd: FormData, k: string, required: boolean) => {
+/** Prices are typed in the display unit (tomans for IRR) and stored in minor units. */
+const money = (fd: FormData, k: string, required: boolean, currency: string) => {
   const v = str(fd, k).trim();
   if (v === "") {
     if (required) throw new AppError("VALIDATION", "invalid_price", { field: k });
     return null;
   }
-  const c = parseMoney(v);
+  const c = parseMoneyInput(v, currency);
   if (c === null) throw new AppError("VALIDATION", "invalid_price", { field: k });
   return c;
 };
@@ -115,7 +116,7 @@ export async function reorderCategoriesAction(restaurantId: string, ids: string[
 
 // ─── Products ────────────────────────────────────────────────────────────────
 
-function productFields(fd: FormData) {
+function productFields(fd: FormData, currency: string) {
   const customTags = str(fd, "customTags")
     .split(",")
     .map((t) => t.trim().toLowerCase().replace(/\s+/g, "_"))
@@ -124,8 +125,8 @@ function productFields(fd: FormData) {
     categoryId: str(fd, "categoryId"),
     name: str(fd, "name"),
     description: str(fd, "description"),
-    priceCents: money(fd, "price", true)!,
-    compareAtPriceCents: money(fd, "compareAt", false),
+    priceCents: money(fd, "price", true, currency)!,
+    compareAtPriceCents: money(fd, "compareAt", false, currency),
     taxRateId: str(fd, "taxRateId") || null,
     ingredients: str(fd, "ingredients"),
     allergens: fd.getAll("allergens").map(String) as Allergen[],
@@ -142,7 +143,7 @@ function productFields(fd: FormData) {
 export async function createProductAction(restaurantId: string, _prev: unknown, fd: FormData) {
   const res = await runAction(async () => {
     const ctx = await actionContext(restaurantId, "menu.manage");
-    const p = await createProduct(db, ctx, productFields(fd));
+    const p = await createProduct(db, ctx, productFields(fd, ctx.restaurant.currency));
     updateTag(menuTag(ctx.restaurant.id));
     return { id: p.id };
   });
@@ -159,7 +160,7 @@ export async function updateProductAction(
 ) {
   return runAction(async () => {
     const ctx = await actionContext(restaurantId, "menu.manage");
-    await updateProduct(db, ctx, productId, productFields(fd));
+    await updateProduct(db, ctx, productId, productFields(fd, ctx.restaurant.currency));
     menuChanged(ctx);
   });
 }
@@ -228,7 +229,7 @@ export async function productImageCommandAction(
 // ─── Option groups ───────────────────────────────────────────────────────────
 
 /** Values arrive as parallel arrays: values.id[], values.name[], values.delta[] … */
-function optionGroupFields(fd: FormData) {
+function optionGroupFields(fd: FormData, currency: string) {
   const ids = fd.getAll("values.id").map(String);
   const names = fd.getAll("values.name").map(String);
   const deltas = fd.getAll("values.delta").map(String);
@@ -242,7 +243,7 @@ function optionGroupFields(fd: FormData) {
     maxSelect: optInt(fd, "maxSelect") ?? 1,
     values: names
       .map((name, i) => {
-        const delta = deltas[i]?.trim() ? parseMoney(deltas[i]!) : 0;
+        const delta = deltas[i]?.trim() ? parseMoneyInput(deltas[i]!, currency) : 0;
         if (delta === null)
           throw new AppError("VALIDATION", "invalid_price", { field: `values.${i}.priceDeltaCents` });
         return {
@@ -265,7 +266,7 @@ export async function saveOptionGroupAction(
 ) {
   return runAction(async () => {
     const ctx = await actionContext(restaurantId, "menu.manage");
-    const input = optionGroupFields(fd);
+    const input = optionGroupFields(fd, ctx.restaurant.currency);
     if (groupId) await updateOptionGroup(db, ctx, groupId, input);
     else await createOptionGroup(db, ctx, input);
     menuChanged(ctx);

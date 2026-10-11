@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { formatMoney } from "@/lib/money";
+import { useTranslations, useLocale } from "next-intl";
 import { useCallback, useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Link } from "@/i18n/navigation";
@@ -384,8 +385,8 @@ function ProductItem({
   onError: (code: string) => void;
 }) {
   const t = useTranslations("menu");
-  const format = useFormatter();
-  const price = (c: number) => format.number(c / 100, { style: "currency", currency });
+  const locale = useLocale();
+  const price = (c: number) => formatMoney(c, currency, locale);
   return (
     <div className="flex items-center gap-2 rounded-lg bg-surface px-1 py-2">
       {handle}

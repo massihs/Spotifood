@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import {
   cancelPendingPaymentAction,
@@ -8,6 +8,7 @@ import {
   refundAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/payments/actions";
 import { Button } from "@/components/ui/button";
+import { useMoney } from "@/components/ui/use-money";
 import { Dialog } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/input";
 import {
@@ -19,15 +20,10 @@ import {
   useCloseOnSuccess,
   useFieldError,
 } from "@/components/ui/form";
-import { parseMoney } from "@/lib/money";
+import { centsToInput, parseMoneyInput } from "@/lib/money";
 import { cn } from "@/lib/cn";
 
 const newKey = () => crypto.randomUUID().replaceAll("-", "");
-
-function useMoney(currency: string) {
-  const format = useFormatter();
-  return (c: number) => format.number(c / 100, { style: "currency", currency });
-}
 
 /** Staff collects cash or a card-terminal payment for one guest or the whole table. */
 function CollectForm({
@@ -53,7 +49,7 @@ function CollectForm({
   const form = useActionForm(recordPaymentAction.bind(null, restaurantId));
   const err = useFieldError(form.state);
   useCloseOnSuccess(form.state);
-  const tenderedCents = tendered ? parseMoney(tendered) : null;
+  const tenderedCents = tendered ? parseMoneyInput(tendered, currency) : null;
   const change = tenderedCents !== null ? tenderedCents - amountCents : null;
 
   return (
@@ -169,7 +165,7 @@ function RefundForm({
         name="amount"
         inputMode="decimal"
         required
-        defaultValue={(refundableCents / 100).toFixed(2)}
+        defaultValue={centsToInput(refundableCents, "fa", currency)}
         error={err("amount")}
       />
       <TextareaField label={t("payments.refundReason")} name="reason" maxLength={500} />

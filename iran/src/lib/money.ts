@@ -78,13 +78,48 @@ export function sumCents(values: readonly Cents[]): Cents {
   return total;
 }
 
-export function formatMoney(cents: Cents, currency: string, locale = "fr-FR"): string {
+/**
+ * Display unit. Amounts are always stored in minor units of the currency (× 100). Iranian rials
+ * are shown and typed in **tomans** (1 toman = 10 rials), as Iranian menus and receipts do;
+ * legal documents (invoices) keep rials.
+ */
+export const isToman = (currency: string) => currency === "IRR";
+/** Stored minor units per displayed unit: 1 toman = 10 rials = 1000 minor units. */
+export const displayFactor = (currency: string) => (isToman(currency) ? 1000 : 100);
+
+const TOMAN_LABEL: Record<string, string> = { fa: "تومان", ar: "تومان", en: "Toman" };
+const lang = (locale: string) => locale.slice(0, 2);
+
+/** Name of the unit prices are typed in: "تومان" for IRR, otherwise the currency code. */
+export const unitLabel = (currency: string, locale: string) =>
+  isToman(currency) ? (TOMAN_LABEL[lang(locale)] ?? TOMAN_LABEL.fa) : currency;
+
+export function formatMoney(cents: Cents, currency: string, locale = "fa"): string {
+  if (isToman(currency)) {
+    const tomans = Math.round(cents / 1000);
+    const n = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(tomans);
+    return `${n} ${TOMAN_LABEL[lang(locale)] ?? TOMAN_LABEL.fa}`;
+  }
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(cents / 100);
 }
 
-/** Value for a money <input>: 1990 → "19,90" (fr/fa/ar) or "19.90" (en). */
-export function centsToInput(cents: number | null | undefined, locale: string): string {
+/** Value for a money <input>: 12000000 IRR minor units → "12000" (tomans); 1990 EUR → "19,90". */
+export function centsToInput(cents: number | null | undefined, locale: string, currency = "IRR"): string {
   if (cents == null) return "";
+  if (isToman(currency)) return String(Math.round(cents / 1000));
   const s = (cents / 100).toFixed(2);
   return locale === "en" ? s : s.replace(".", ",");
+}
+
+/**
+ * Parses a typed amount in the currency's display unit into stored minor units.
+ * Tomans are whole numbers and may contain thousands separators ("120,000", "۱۲۰٬۰۰۰").
+ */
+export function parseMoneyInput(input: string, currency: string): Cents | null {
+  if (!isToman(currency)) return parseMoney(input);
+  const digits = normalizeDigits(input)
+    .trim()
+    .replace(/[\s,٬.']/g, "");
+  if (!/^\d{1,10}$/.test(digits)) return null;
+  return Number(digits) * 1000;
 }

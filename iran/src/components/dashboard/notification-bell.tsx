@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { formatMoney } from "@/lib/money";
+import { useTranslations, useLocale } from "next-intl";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { cn } from "@/lib/cn";
 import { useLiveEvent } from "@/components/realtime/live";
@@ -22,7 +23,7 @@ export function NotificationBell({
   initialUnread: number;
 }) {
   const t = useTranslations("notifications");
-  const format = useFormatter();
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(initialUnread);
   const [items, setItems] = useState<Item[] | null>(null);
@@ -69,10 +70,7 @@ export function NotificationBell({
           method: String(n.payload.method ?? "any"),
           amount:
             typeof n.payload.amountCents === "number" && typeof n.payload.currency === "string"
-              ? format.number(n.payload.amountCents / 100, {
-                  style: "currency",
-                  currency: n.payload.currency,
-                })
+              ? formatMoney(n.payload.amountCents, n.payload.currency, locale)
               : "",
         })
       : n.type;
