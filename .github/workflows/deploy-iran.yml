@@ -1,4 +1,4 @@
-name: Deploy — Iran (Liara)
+name: Deploy — Iran (Liara, iran/)
 
 # Manual on purpose: production deploys are a decision, not a side effect of a push.
 # Requires the repository secret LIARA_API_TOKEN (Liara panel → API → token).
@@ -14,12 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: iran-production
+    defaults:
+      run:
+        working-directory: iran
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Deploy to Liara
-        run: npx --yes @liara/cli@9 deploy --liara-json deploy/iran/liara.json --api-token "$LIARA_API_TOKEN" --detach
+        run: npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" --detach
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}

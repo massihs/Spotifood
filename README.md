@@ -1,62 +1,37 @@
 # Spotifood
 
-Plateforme SaaS multi-tenant de commande en salle par QR code : les clients scannent le QR de leur table, consultent le menu, commandent, paient leur part et laissent un avis ; le restaurant pilote tables, menu, cuisine en temps réel, ventes et feedbacks.
+Plateforme SaaS de commande en salle par QR code, en **deux versions indépendantes** :
 
-- Architecture, schéma de données, flux, risques et roadmap : [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-- Avancement par phase : [`docs/ROADMAP.md`](docs/ROADMAP.md)
+| Dossier              | Version                     | Langues         | Devise | Paiement en ligne | Hébergement                    |
+| -------------------- | --------------------------- | --------------- | ------ | ----------------- | ------------------------------ |
+| [`global/`](global/) | **Spotifood International** | fr*, en, fa, ar | EUR…   | Stripe            | Docker (Railway, Render, VPS…) |
+| [`iran/`](iran/)     | **Spotifood Iran**          | fa*, en, ar     | IRR    | Zarinpal          | Liara                          |
 
-## Deux éditions
+\* langue par défaut
 
-Un seul code, deux déploiements : **International** (`deploy/global/`, fr/en/fa/ar, EUR, Stripe) et **Iran** (`deploy/iran/`, persan, IRR, Zarinpal, hébergé sur Liara). Voir [docs/EDITIONS.md](docs/EDITIONS.md).
+Chaque dossier est une application complète (code, base de données, tests, Dockerfile, déploiement). Les deux partent du même code à la date de séparation, puis **évoluent séparément** : une modification dans `iran/` n'a aucun effet sur `global/`, et inversement.
 
-## Stack
-
-Next.js 16 (App Router, Cache Components) · React 19 · TypeScript strict · Tailwind CSS 4 · PostgreSQL 16 · Drizzle ORM · Zod · next-intl (fr / en / fa / ar, RTL) · Argon2id · Vitest.
-
-## Démarrage
+## Travailler sur une version
 
 ```bash
-cp .env.example .env              # puis renseigner APP_SECRET
-docker compose up -d              # Postgres (+ base de test), MinIO, Mailpit
+cd iran        # ou: cd global
 npm install
-npm run db:migrate                # applique les migrations SQL de ./drizzle
-npm run db:seed                   # plans, super admin, "Restaurant Demo"
-npm run dev                       # http://localhost:3000
+npm run dev
 ```
 
-Comptes de démonstration (seed) :
+Chaque version a son propre `README.md` (démarrage local) et `DEPLOY.md` (mise en production).
 
-| Rôle         | Email                        | Mot de passe                                    |
-| ------------ | ---------------------------- | ----------------------------------------------- |
-| Super admin  | `admin@spotifood.local`      | `ChangeMe!2026` (variables `SEED_SUPERADMIN_*`) |
-| Propriétaire | `owner@demo.spotifood.local` | `DemoOwner!2026`                                |
-| Équipe       | `staff@demo.spotifood.local` | `DemoStaff!2026`                                |
+## Reporter un correctif d'une version à l'autre
 
-## Scripts
+Les corrections de sécurité ou de bugs communs méritent souvent d'aller dans les deux versions. Rien n'est automatique : vous choisissez ce que vous reportez.
 
-| Commande                                       | Rôle                                                                  |
-| ---------------------------------------------- | --------------------------------------------------------------------- |
-| `npm run dev` / `build` / `start`              | Next.js                                                               |
-| `npm test`                                     | Tests unitaires + intégration (recrée la base `TEST_DATABASE_URL`)    |
-| `npm run typecheck` · `lint` · `format`        | Qualité                                                               |
-| `npm run db:generate`                          | Génère une migration SQL après modification de `src/server/db/schema` |
-| `npm run db:migrate` · `db:seed` · `db:studio` | Base de données                                                       |
-
-## Organisation du code
-
-```
-src/app/[locale]/        routes (landing, auth, dashboard restaurant, admin)
-src/components/          design system (ui/) et composants d'écran
-src/i18n/  messages/     internationalisation
-src/lib/                 utilitaires purs (argent en centimes, ids, slug)
-src/server/              couche métier — aucune dépendance à React
-  auth/                  mots de passe, sessions, permissions, guards
-  db/                    client + schéma Drizzle
-  modules/<domaine>/     schémas Zod + services
-  infra/                 rate limit (puis storage, email, paiements, realtime)
-  tenancy.ts audit.ts    isolation multi-tenant, journal d'audit
-tests/                   unit/ et integration/ (vraie base Postgres)
-drizzle/                 migrations SQL versionnées
+```bash
+# Rejoue le commit <sha>, fait dans global/, sur iran/ (puis relisez, testez, committez)
+scripts/port.sh <sha> global iran
 ```
 
-Règles : la logique métier vit dans `src/server`, jamais dans les pages ; chaque service reçoit un `RestaurantContext` authentifié et ne lit jamais l'identifiant du restaurant depuis l'entrée utilisateur ; les montants sont des entiers en centimes.
+S'il y a un conflit parce que les deux versions ont trop divergé à cet endroit, le script s'arrête et laisse les parties à résoudre à la main (fichiers `.rej`).
+
+## CI
+
+`.github/workflows/ci.yml` teste et construit chaque dossier séparément. Le job d'un dossier ne tourne que si ce dossier a changé. `deploy-iran.yml` déploie `iran/` sur Liara, à la main depuis l'onglet Actions.

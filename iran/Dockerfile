@@ -1,7 +1,5 @@
-# One image recipe for both editions. The edition is a BUILD argument because it changes the
-# URL structure (locales) and default language:
-#   docker build --build-arg NEXT_PUBLIC_EDITION=global -t spotifood-global .
-#   docker build --build-arg NEXT_PUBLIC_EDITION=iran   -t spotifood-iran   .
+# Spotifood Iran — production image.
+#   docker build -t spotifood-iran .
 ARG NODE_IMAGE=node:22-bookworm-slim
 
 FROM ${NODE_IMAGE} AS deps
@@ -12,7 +10,7 @@ RUN npm ci --no-audit --no-fund
 
 FROM ${NODE_IMAGE} AS build
 WORKDIR /app
-ARG NEXT_PUBLIC_EDITION=global
+ARG NEXT_PUBLIC_EDITION=iran
 ENV NEXT_PUBLIC_EDITION=${NEXT_PUBLIC_EDITION} \
     NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production \
@@ -37,7 +35,7 @@ RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
 # proxy on rewritten URLs, which breaks the unprefixed default-locale routes).
 FROM ${NODE_IMAGE} AS runner
 WORKDIR /app
-ARG NEXT_PUBLIC_EDITION=global
+ARG NEXT_PUBLIC_EDITION=iran
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     NEXT_PUBLIC_EDITION=${NEXT_PUBLIC_EDITION} \

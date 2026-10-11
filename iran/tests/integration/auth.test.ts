@@ -43,7 +43,8 @@ describe("restaurant signup", () => {
     expect(settings?.orderPrefix).toBe("B");
 
     const rates = await db.select().from(taxRates).where(eq(taxRates.restaurantId, restaurant.id));
-    expect(rates.map((r) => r.rateBps).sort()).toEqual([1000, 2000, 550].sort());
+    // Iran: 10 % VAT (default) and a 0 % rate.
+    expect(rates.map((r) => r.rateBps).sort((a, b) => a - b)).toEqual([0, 1000]);
     expect(rates.filter((r) => r.isDefault)).toHaveLength(1);
 
     const audit = await db.select().from(auditLogs).where(eq(auditLogs.restaurantId, restaurant.id));

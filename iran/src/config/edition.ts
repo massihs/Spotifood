@@ -91,7 +91,8 @@ const CONFIGS: Record<Edition, EditionConfig> = {
 };
 
 export function parseEdition(value: string | undefined): Edition {
-  if (value === undefined || value === "") return "global";
+  // This folder is the Iran application: it builds the Iran edition unless told otherwise.
+  if (value === undefined || value === "") return "iran";
   if ((EDITIONS as readonly string[]).includes(value)) return value as Edition;
   throw new Error(`Unknown NEXT_PUBLIC_EDITION "${value}" (expected: ${EDITIONS.join(", ")})`);
 }

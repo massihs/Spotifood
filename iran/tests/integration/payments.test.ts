@@ -1,6 +1,14 @@
 import { createHmac, randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+
+// The payment core (amounts, idempotency, refunds, webhooks) is exercised here with the Stripe
+// code still present in this folder, so this file runs in "global" mode. Iran-specific payment
+// behaviour (Zarinpal, IRR, large amounts) is covered by zarinpal.test.ts.
+vi.mock("@/config/edition", async (orig) => {
+  const mod = await orig<typeof import("@/config/edition")>();
+  return { ...mod, EDITION: "global", edition: mod.editionConfig("global") };
+});
 import { db } from "@/server/db/client";
 import { notifications, orders, payments, refunds, restaurantSettings } from "@/server/db/schema";
 import { createCategory } from "@/server/modules/menu/categories";

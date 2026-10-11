@@ -1,29 +1,29 @@
 # Spotifood International — déploiement
 
-Édition `global` : français par défaut (en, fa, ar), euro, Stripe. Voir aussi [docs/EDITIONS.md](../../docs/EDITIONS.md).
+Édition `global` : français par défaut (en, fa, ar), euro, Stripe. Voir aussi [README.md](./README.md).
 
 L'application est une image Docker classique. Il faut un hébergeur capable de faire tourner **un conteneur en continu**, car le temps réel garde des connexions ouvertes (SSE) et écoute PostgreSQL (`LISTEN/NOTIFY`).
 
 | Option                                   | Adapté ?       | Remarque                                                                 |
 | ---------------------------------------- | -------------- | ------------------------------------------------------------------------ |
 | Railway, Render, Fly.io, Koyeb, Scaleway | ✅ recommandé  | Déploiement du `Dockerfile` + PostgreSQL managé                          |
-| VPS (Hetzner, OVH, Scaleway…)            | ✅             | `docker-compose.yml` de ce dossier, avec un reverse proxy TLS devant     |
+| VPS (Hetzner, OVH, Scaleway…)            | ✅             | `deploy/docker-compose.yml`, avec un reverse proxy TLS devant            |
 | Vercel, Netlify (serverless)             | ⚠️ déconseillé | Fonctions courtes : le temps réel et l'écoute PostgreSQL ne tiennent pas |
 
 ## Plateforme managée (Railway, Render, Fly…)
 
-1. Créez un service à partir du dépôt GitHub, de type **Dockerfile** (à la racine du dépôt).
+1. Créez un service à partir du dépôt GitHub, de type **Dockerfile**, avec `global/` comme dossier racine (root directory).
 2. Argument de build : `NEXT_PUBLIC_EDITION=global` (c'est déjà la valeur par défaut).
 3. Ajoutez une base **PostgreSQL 16+**. `DATABASE_URL_DIRECT` doit être une connexion **directe**, pas un pooler en mode transaction.
-4. Renseignez les variables de [`.env.example`](./.env.example). Pour les photos, utilisez un stockage S3 (R2, S3, Scaleway…) : le disque d'un conteneur est souvent effacé à chaque déploiement.
+4. Renseignez les variables de [`deploy/.env.production.example`](./deploy/.env.production.example). Pour les photos, utilisez un stockage S3 (R2, S3, Scaleway…) : le disque d'un conteneur est souvent effacé à chaque déploiement.
 5. Health check : `GET /api/health`, port `3000`.
 
 ## VPS avec docker compose
 
 ```bash
-cp deploy/global/.env.example deploy/global/.env      # puis remplissez-le
+cp deploy/.env.production.example deploy/.env      # puis remplissez-le
 export POSTGRES_PASSWORD=$(openssl rand -hex 24)
-docker compose -f deploy/global/docker-compose.yml up -d --build
+docker compose -f deploy/docker-compose.yml up -d --build
 ```
 
 Placez Caddy, Traefik ou nginx devant `127.0.0.1:3000` pour le HTTPS.

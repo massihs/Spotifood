@@ -1,7 +1,5 @@
-# One image recipe for both editions. The edition is a BUILD argument because it changes the
-# URL structure (locales) and default language:
-#   docker build --build-arg NEXT_PUBLIC_EDITION=global -t spotifood-global .
-#   docker build --build-arg NEXT_PUBLIC_EDITION=iran   -t spotifood-iran   .
+# Spotifood International — production image.
+#   docker build -t spotifood-global .
 ARG NODE_IMAGE=node:22-bookworm-slim
 
 FROM ${NODE_IMAGE} AS deps

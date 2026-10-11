@@ -1,18 +1,18 @@
 # Spotifood Iran — déploiement sur Liara
 
-Édition `iran` : persan par défaut, rial, Zarinpal, serveurs en Iran. Voir aussi [docs/EDITIONS.md](../../docs/EDITIONS.md).
+Édition `iran` : persan par défaut, rial, Zarinpal, serveurs en Iran. Voir aussi [README.md](./README.md).
 
 ## 1. Créer les ressources dans le panel Liara
 
 1. **Application** : plateforme **Docker**, nom `spotifood-iran` (ou modifiez `"app"` dans `liara.json`), au moins 1 Go de RAM.
 2. **Base de données PostgreSQL** (version 16 ou plus).
-3. **Disque** nommé `uploads` pour les photos (déjà monté sur `/app/.storage` par `liara.json`). Plus tard, vous pourrez passer au stockage objet de Liara (compatible S3) : voir `.env.example`.
+3. **Disque** nommé `uploads` pour les photos (déjà monté sur `/app/.storage` par `liara.json`). Plus tard, vous pourrez passer au stockage objet de Liara (compatible S3) : voir `deploy/.env.production.example`.
 4. **Domaine** : rattachez votre domaine `.ir` à l'application et activez le SSL.
 5. _(Facultatif)_ **Serveur mail** pour les emails (factures, invitations).
 
 ## 2. Variables d'environnement
 
-Dans l'application → Paramètres → Variables d'environnement, renseignez celles de [`.env.example`](./.env.example). Les variables indispensables :
+Dans l'application → Paramètres → Variables d'environnement, renseignez celles de [`deploy/.env.production.example`](./deploy/.env.production.example). Les variables indispensables :
 
 - `APP_URL` : l'adresse publique exacte (`https://votre-domaine.ir`). Les QR codes et les retours de paiement l'utilisent.
 - `APP_SECRET` : `openssl rand -base64 48`. **Ne jamais la changer ensuite** : elle signe les sessions et les cookies des clients.
@@ -22,12 +22,12 @@ Dans l'application → Paramètres → Variables d'environnement, renseignez cel
 
 ## 3. Déployer
 
-Depuis la racine du dépôt (pas depuis ce dossier) :
+Depuis ce dossier `iran/` (il contient `liara.json`) :
 
 ```bash
 npm i -g @liara/cli
 liara login
-liara deploy --liara-json deploy/iran/liara.json
+liara deploy
 ```
 
 Ou depuis GitHub : onglet **Actions → « Deploy — Iran (Liara) » → Run workflow**. Ajoutez d'abord le secret `LIARA_API_TOKEN` (panel Liara → API) dans les réglages du dépôt.

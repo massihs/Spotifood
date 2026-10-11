@@ -43,10 +43,10 @@ const profile = {
   addressLine2: "",
   city: "Paris",
   postalCode: "75001",
-  country: "fr",
-  currency: "eur",
-  timezone: "Europe/Paris",
-  defaultLocale: "fr" as const,
+  country: "ir",
+  currency: "irr",
+  timezone: "Asia/Tehran",
+  defaultLocale: "fa" as const,
 };
 
 const photo = (w = 2000, h = 1500) =>
@@ -61,8 +61,8 @@ describe("restaurant settings", () => {
     const r = await updateProfile(db, ctx, profile);
     expect(r).toMatchObject({
       email: "contact@brielle.fr",
-      country: "FR",
-      currency: "EUR",
+      country: "IR",
+      currency: "IRR",
       addressLine2: null,
     });
   });
@@ -81,7 +81,7 @@ describe("restaurant settings", () => {
       number: "B-1000",
       seq: 1000,
       status: "received",
-      currency: "EUR",
+      currency: "IRR",
       subtotalCents: 1000,
       taxCents: 91,
       totalCents: 1000,
@@ -102,12 +102,12 @@ describe("restaurant settings", () => {
       openingHours: { mon: [{ open: "12:00", close: "14:30" }], sun: [] },
     });
     expect(s.orderPrefix).toBe("BR");
-    expect(s.enabledLocales.sort()).toEqual(["ar", "en", "fr"]);
+    expect(s.enabledLocales.sort()).toEqual(["ar", "en", "fa"]);
     await expect(
       updateServiceSettings(db, ctx, {
         orderPrefix: "B-1",
         pricesIncludeTax: true,
-        enabledLocales: ["fr"],
+        enabledLocales: ["fa"],
         openingHours: null,
         sessionAutoCloseMinutes: null,
       }),
@@ -152,21 +152,21 @@ describe("tax rates", () => {
     expect(rates.filter((r) => r.isDefault).map((r) => r.id)).toEqual([custom.id]);
     await expect(deleteTaxRate(db, ctx, custom.id)).rejects.toMatchObject({ message: "tax_rate_default" });
 
-    const used = rates.find((r) => r.rateBps === 2000)!;
+    const used = rates.find((r) => r.rateBps === 1000)!;
     const [cat] = await db
       .insert(categories)
-      .values({ restaurantId: restaurant.id, name: "Vins" })
+      .values({ restaurantId: restaurant.id, name: "نوشیدنی" })
       .returning();
     await db.insert(products).values({
       restaurantId: restaurant.id,
       categoryId: cat!.id,
-      name: "Rouge",
+      name: "دوغ",
       priceCents: 600,
       taxRateId: used.id,
     });
     await expect(deleteTaxRate(db, ctx, used.id)).rejects.toMatchObject({ message: "tax_rate_in_use" });
 
-    const unused = rates.find((r) => r.rateBps === 550)!;
+    const unused = rates.find((r) => r.rateBps === 0)!;
     await deleteTaxRate(db, ctx, unused.id);
     expect((await listTaxRates(db, ctx)).map((r) => r.id)).not.toContain(unused.id);
   });
