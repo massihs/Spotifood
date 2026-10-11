@@ -22,6 +22,7 @@ export type PublicProduct = PricedProduct & {
   caloriesKcal: number | null;
   weightGrams: number | null;
   categoryId: string;
+  categoryName: string;
   images: { sm: string; md: string; lg: string; placeholder: string | null }[];
 };
 
@@ -86,6 +87,7 @@ export async function loadPricedProducts(
         p: products,
         rateBps: taxRates.rateBps,
         categoryActive: categories.isActive,
+        categoryName: categories.name,
         categoryDeleted: categories.deletedAt,
       })
       .from(products)
@@ -155,9 +157,10 @@ export async function loadPricedProducts(
     }),
   );
 
-  return visible.map(({ p, rateBps }) => ({
+  return visible.map(({ p, rateBps, categoryName }) => ({
     id: p.id,
     categoryId: p.categoryId,
+    categoryName,
     name: p.name,
     description: p.description,
     priceCents: p.priceCents,
