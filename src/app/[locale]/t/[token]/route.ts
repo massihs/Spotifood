@@ -15,7 +15,8 @@ import {
 } from "@/server/modules/guest/cookies";
 import { enterTableByQr } from "@/server/modules/guest/sessions";
 import { getPathname } from "@/i18n/navigation";
-import { isLocale, type AppLocale } from "@/i18n/config";
+import { DEFAULT_LOCALE, isLocale, type AppLocale } from "@/i18n/config";
+import { env } from "@/server/env";
 
 /**
  * Entry point of every printed QR code: GET /t/{qrToken}
@@ -26,8 +27,10 @@ import { isLocale, type AppLocale } from "@/i18n/config";
  */
 export async function GET(req: NextRequest, { params }: RouteContext<"/[locale]/t/[token]">) {
   const { locale, token } = await params;
-  const requested: AppLocale = isLocale(locale) ? locale : "fr";
-  const to = (path: string, l: AppLocale) => new URL(getPathname({ href: path, locale: l }), req.url);
+  const requested: AppLocale = isLocale(locale) ? locale : DEFAULT_LOCALE;
+  // Absolute URL from APP_URL, never from req.url: behind a proxy or with `-H 0.0.0.0`, the
+  // request URL carries the internal host and the browser would lose its cookies.
+  const to = (path: string, l: AppLocale) => new URL(getPathname({ href: path, locale: l }), env().APP_URL);
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   try {
@@ -50,7 +53,7 @@ export async function GET(req: NextRequest, { params }: RouteContext<"/[locale]/
   const allowed = settings?.enabledLocales ?? [entry.restaurant.defaultLocale];
   const fallback: AppLocale = isLocale(entry.restaurant.defaultLocale)
     ? entry.restaurant.defaultLocale
-    : "fr";
+    : DEFAULT_LOCALE;
   const target: AppLocale = allowed.includes(requested) ? requested : fallback;
 
   const res = NextResponse.redirect(to("/table", target), 303);
