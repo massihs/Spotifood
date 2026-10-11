@@ -15,6 +15,8 @@ export default getRequestConfig(async ({ locale }) => {
   const resolved = isLocale(candidate) ? candidate : DEFAULT_LOCALE;
   return {
     locale: resolved,
+    // Never format with the server's zone (UTC in production). Restaurant pages pass their own zone.
+    timeZone: process.env.DEFAULT_TIME_ZONE ?? "Europe/Paris",
     messages: (await import(`../../messages/${resolved}.json`)).default,
   };
 });

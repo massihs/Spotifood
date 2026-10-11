@@ -63,7 +63,11 @@ async function Team({ params }: { params: Params }) {
                   </td>
                   <td className="px-5 py-3 text-fg-muted">
                     {m.lastLoginAt
-                      ? format.dateTime(m.lastLoginAt, { dateStyle: "medium", timeStyle: "short" })
+                      ? format.dateTime(m.lastLoginAt, {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                          timeZone: ctx.restaurant.timezone,
+                        })
                       : t("team.never")}
                   </td>
                   <td className="px-5 py-3">

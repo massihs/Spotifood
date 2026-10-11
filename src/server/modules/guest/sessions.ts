@@ -136,6 +136,7 @@ export type GuestContext = {
     slug: string;
     logoKey: string | null;
     currency: string;
+    timezone: string;
     defaultLocale: string;
     pricesIncludeTax: boolean;
     enabledLocales: string[];
@@ -174,6 +175,7 @@ export async function loadGuestContext(
         slug: restaurants.slug,
         logoKey: restaurants.logoKey,
         currency: restaurants.currency,
+        timezone: restaurants.timezone,
         defaultLocale: restaurants.defaultLocale,
         status: restaurants.status,
         pricesIncludeTax: restaurantSettings.pricesIncludeTax,
