@@ -14,6 +14,7 @@ import {
   tableSessions,
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
+import { emit, topics } from "@/server/infra/realtime";
 import { AppError, conflict, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { isUuid } from "@/lib/ids";
@@ -169,6 +170,17 @@ export async function placeOrder(
         seq: guest.participant.seq,
       },
     });
+    await emit(tx, { topic: topics.restaurant(rid), type: "notification.created" });
+    await emit(tx, {
+      topic: topics.restaurant(rid),
+      type: "order.created",
+      data: { orderId: created!.id, number, tableId: guest.table.id },
+    });
+    await emit(tx, {
+      topic: topics.participant(guest.participant.id),
+      type: "order.updated",
+      data: { orderId: created!.id },
+    });
     await recordAudit(tx, {
       action: "order.placed",
       actorType: "guest",
@@ -298,12 +310,25 @@ export async function updateOrderStatus(
       toStatus: to,
       actorUserId: ctx.user.id,
     });
+    await emit(tx, {
+      topic: topics.restaurant(ctx.restaurant.id),
+      type: "order.updated",
+      data: { orderId, status: to, tableId: current.tableId },
+    });
+    if (current.participantId) {
+      await emit(tx, {
+        topic: topics.participant(current.participantId),
+        type: "order.updated",
+        data: { orderId, status: to },
+      });
+    }
     if (to === "ready") {
       await tx.insert(notifications).values({
         restaurantId: ctx.restaurant.id,
         type: "order.ready",
         payload: { orderId, number: current.number, tableLabel: current.tableLabel },
       });
+      await emit(tx, { topic: topics.restaurant(ctx.restaurant.id), type: "notification.created" });
     }
     if (to === "cancelled") {
       await recordAudit(tx, {

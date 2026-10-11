@@ -11,6 +11,7 @@ import {
 } from "@/server/db/schema";
 import { isUniqueViolation } from "@/server/db/errors";
 import { recordAudit } from "@/server/audit";
+import { emit, topics } from "@/server/infra/realtime";
 import { isUuid } from "@/lib/ids";
 import { resolveQrToken } from "@/server/modules/tables/service";
 
@@ -66,6 +67,7 @@ export async function openOrJoinTableSession(db: Database, restaurantId: string,
           });
         }
         const [created] = await tx.insert(tableSessions).values({ restaurantId, tableId }).returning();
+        await emit(tx, { topic: topics.restaurant(restaurantId), type: "session.opened", data: { tableId } });
         return created!;
       });
     } catch (e) {
@@ -101,6 +103,12 @@ export async function joinSession(
           seq: sql`(select coalesce(max(seq), 0) + 1 from session_participants where table_session_id = ${session.id})`,
         })
         .returning();
+      // Floor view shows the number of people per table.
+      await emit(db, {
+        topic: topics.restaurant(session.restaurantId),
+        type: "session.opened",
+        data: { sessionId: session.id },
+      });
       return p!;
     } catch (e) {
       // Two devices joining at the same instant may compute the same seq: retry.
