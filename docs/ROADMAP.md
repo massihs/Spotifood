@@ -59,3 +59,15 @@ Légende : ✅ fait · 🚧 en cours · ⏳ à venir
 - **TVA** : calculée par taux sur les montants cumulés (un arrondi par taux), comme sur une facture.
 - **PWA** : manifest + icônes (dont maskable) — « Ajouter à l'écran d'accueil » sur iOS et Android. Pas de service worker hors-ligne : une commande nécessite de toute façon le réseau.
 - Le bouton « Commander » arrive en Phase 5 (création de commande, envoi en cuisine).
+
+## Notes Phase 5
+
+- **Création de commande** (`placeOrder`) en une transaction : verrou sur le panier (un double appui ou deux onglets = une seule commande, testé en navigateur), session revérifiée, **tous les prix recalculés depuis la base**, copie figée des lignes (nom, prix unitaire, options, taux et montant de TVA, note), numéro atomique par restaurant (`D-1001`…), panier vidé, notification `order.created`, audit.
+- **Statut initial** : `received`, ou `pending_payment` si le restaurant exige le paiement avant envoi en cuisine (réglage existant, utilisé en Phase 7).
+- **Workflow** : reçue → acceptée → en préparation → prête → servie, uniquement vers l'avant (des étapes peuvent être sautées : une boisson passe directement à « servie »), annulation possible avant service avec motif (permission `orders.cancel`, auditée). Mises à jour conditionnelles : si deux équipiers tapent en même temps, un seul changement s'applique (testé). Les étapes sautées reçoivent un horodatage, pour que les durées restent cohérentes (analytics Phase 10).
+- **Paiement** : suivi séparément (`payment_status`), car une commande payée sur place peut être servie avant d'être réglée. Toutes les commandes sont « Non payée » jusqu'à la Phase 7.
+- **Vue Table** : total de la table, reste à encaisser et détail par client. Les commandes annulées ne comptent pas.
+- **Confidentialité** : un client ne voit que ses propres commandes, pas celles des autres personnes de la table.
+- **Fuseaux horaires** : toutes les heures sont formatées dans le fuseau du restaurant (jamais celui du serveur, UTC en production). Le « il y a 3 min » s'affiche sans écart d'hydratation (heure absolue au rendu serveur, relative après hydratation).
+- **Rafraîchissement** : suivi client (8 s) et pages staff (10 s) se rafraîchissent automatiquement, uniquement quand l'onglet est visible. Remplacé par du temps réel (SSE) en Phase 6.
+- **Seed** : 6 commandes de démo (table 8 avec 3 clients, tables 4 et 12) créées via le vrai parcours.

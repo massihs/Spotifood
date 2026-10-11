@@ -4,12 +4,14 @@
  * Creates plans, global category templates, a super admin and "Restaurant Demo" (20 tables, menu).
  */
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import sharp from "sharp";
 import { db } from "@/server/db/client";
 import {
   categories,
   diningTables,
+  orders,
   globalCategoryTemplates,
   optionGroups,
   optionValues,
@@ -30,6 +32,11 @@ import { createOrganization, createRestaurant } from "@/server/modules/restauran
 import { randomToken } from "@/lib/ids";
 import { loadRestaurantContext } from "@/server/tenancy";
 import { addProductImage } from "@/server/modules/menu/images";
+import { loadPublicMenu } from "@/server/modules/menu/public";
+import { enterTableByQr, loadGuestContext, renameParticipant } from "@/server/modules/guest/sessions";
+import { addToCart } from "@/server/modules/cart/service";
+import { placeOrder, updateOrderStatus } from "@/server/modules/orders/service";
+import type { OrderStatus } from "@/server/modules/orders/status";
 
 const DEMO_OWNER = {
   email: "owner@demo.spotifood.local",
@@ -491,11 +498,98 @@ async function seedDemoImages() {
   console.log(`✓ demo product photos: ${added} generated (${rows.length - added} already present)`);
 }
 
+/**
+ * Demo service in progress, created through the real flow (scan → cart → order → kitchen),
+ * so amounts come from the same pricing code as production.
+ */
+async function seedDemoOrders() {
+  const [demo] = await db.select().from(restaurants).where(eq(restaurants.slug, "restaurant-demo"));
+  if (!demo) return;
+  const [existing] = await db
+    .select({ id: orders.id })
+    .from(orders)
+    .where(eq(orders.restaurantId, demo.id))
+    .limit(1);
+  if (existing) {
+    console.log("✓ demo orders already present — skipping");
+    return;
+  }
+  const [owner] = await db
+    .select()
+    .from(users)
+    .where(sql`lower(${users.email}) = ${DEMO_OWNER.email}`);
+  const ctx = await loadRestaurantContext(db, owner!, demo.id);
+  const menu = await loadPublicMenu(db, demo.id);
+  const byName = (name: string) => Object.values(menu.products).find((p) => p.name === name)!;
+  const opt = (product: string, group: string, value: string) =>
+    byName(product)
+      .optionGroups.find((g) => g.name === group)!
+      .values.find((v) => v.name === value)!.id;
+  const tables = await db.select().from(diningTables).where(eq(diningTables.restaurantId, demo.id));
+  const tableToken = (label: string) => tables.find((t) => t.label === label)!.qrToken;
+
+  type Line = { product: string; options?: [string, string][]; quantity?: number; note?: string };
+  async function guestOrders(table: string, lines: Line[], status: OrderStatus, name?: string) {
+    const guestId = randomUUID();
+    const entry = await enterTableByQr(db, tableToken(table), guestId);
+    const guest = (await loadGuestContext(db, guestId, entry!.participant.id))!;
+    if (name) await renameParticipant(db, guest, name);
+    for (const l of lines) {
+      await addToCart(db, guest, {
+        productId: byName(l.product).id,
+        optionValueIds: (l.options ?? []).map(([g, v]) => opt(l.product, g, v)),
+        quantity: l.quantity ?? 1,
+        note: l.note,
+      });
+    }
+    const order = await placeOrder(db, guest);
+    if (status !== "received") await updateOrderStatus(db, ctx, order.id, status);
+    return order;
+  }
+
+  // Table 8 — three guests ordering separately (spec §12).
+  await guestOrders(
+    "8",
+    [{ product: "Burger signature", options: [["Cuisson", "À point"]] }, { product: "Coca-Cola 33 cl" }],
+    "preparing",
+    "Léa",
+  );
+  await guestOrders(
+    "8",
+    [
+      {
+        product: "Entrecôte 300 g",
+        options: [
+          ["Cuisson", "Saignant"],
+          ["Suppléments", "Frites"],
+        ],
+        note: "Sauce à part",
+      },
+      { product: "Expresso" },
+    ],
+    "accepted",
+  );
+  await guestOrders("8", [{ product: "César au poulet" }, { product: "Limonade artisanale" }], "received");
+  // Table 4 — already served, Table 12 — ready to go.
+  await guestOrders(
+    "4",
+    [
+      { product: "Tagliatelles carbonara", quantity: 2 },
+      { product: "Verre de vin rouge", quantity: 2 },
+    ],
+    "served",
+  );
+  await guestOrders("4", [{ product: "Cheesecake" }, { product: "Cappuccino" }], "served");
+  await guestOrders("12", [{ product: "Saumon rôti" }, { product: "Eau pétillante 50 cl" }], "ready");
+  console.log("✓ demo orders: 6 orders on tables 4, 8 (3 guests) and 12");
+}
+
 async function main() {
   await seedPlatform();
   await seedDemoRestaurant();
   await ensureDemoPlan();
   await seedDemoImages();
+  await seedDemoOrders();
 }
 
 main()
