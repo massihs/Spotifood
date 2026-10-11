@@ -1,4 +1,4 @@
-import { timestamp, uuid } from "drizzle-orm/pg-core";
+import { bigint, timestamp, uuid } from "drizzle-orm/pg-core";
 import { uuidv7 } from "uuidv7";
 
 /** Primary key: UUID v7 (time-ordered, index-friendly, not guessable). */
@@ -20,3 +20,9 @@ export const timestamps = {
 export const softDelete = {
   deletedAt: tstz(),
 };
+
+/**
+ * Money in minor units (cents). 64-bit: Rial amounts (IRR) overflow a 32-bit integer
+ * after ~21 million rials. Read back as a JS number (exact up to 2^53).
+ */
+export const money = () => bigint({ mode: "number" });

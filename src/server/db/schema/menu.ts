@@ -10,7 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { pk, softDelete, timestamps } from "./_helpers";
+import { pk, softDelete, timestamps, money } from "./_helpers";
 import { restaurants, taxRates } from "./restaurant";
 
 export const categories = pgTable(
@@ -45,9 +45,9 @@ export const products = pgTable(
       .references(() => categories.id, { onDelete: "restrict" }),
     name: varchar({ length: 120 }).notNull(),
     description: text(),
-    priceCents: integer().notNull(),
+    priceCents: money().notNull(),
     /** Original price shown struck-through when a promo price is active. */
-    compareAtPriceCents: integer(),
+    compareAtPriceCents: money(),
     taxRateId: uuid().references(() => taxRates.id, { onDelete: "set null" }),
     ingredients: text(),
     /** EU 14 allergens codes: gluten, crustaceans, eggs, fish, peanuts, soy, milk, nuts, celery, mustard, sesame, sulphites, lupin, molluscs. */
@@ -133,7 +133,7 @@ export const optionValues = pgTable(
       .notNull()
       .references(() => optionGroups.id, { onDelete: "cascade" }),
     name: varchar({ length: 80 }).notNull(),
-    priceDeltaCents: integer().notNull().default(0),
+    priceDeltaCents: money().notNull().default(0),
     isDefault: boolean().notNull().default(false),
     isAvailable: boolean().notNull().default(true),
     sortOrder: integer().notNull().default(0),

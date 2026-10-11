@@ -45,3 +45,20 @@ describe("money", () => {
     expect(formatMoney(1990, "EUR", "fr-FR").replace(/\s/g, " ")).toBe("19,90 €");
   });
 });
+
+describe("large amounts (Rial)", () => {
+  it("parses Persian digits and separators", () => {
+    expect(parseMoney("۱۲۰۰۰۰")).toBe(12_000_000);
+    expect(parseMoney("۱۲۰٬۰۰۰")).toBe(12_000_000);
+    expect(parseMoney("٢٥٫٥")).toBe(2550);
+    expect(parseMoney("99999999999")).toBe(9_999_999_999_900);
+    expect(parseMoney("999999999999")).toBeNull();
+  });
+
+  it("computes exact VAT beyond 2^53 intermediate products", () => {
+    // 50 billion rials, 10 % VAT included: 50e9 × 100 cents × 1000 bps overflows a double's exact range.
+    const gross = 50_000_000_000 * 100;
+    expect(taxFromGross(gross, 1000)).toBe(454_545_454_545);
+    expect(taxFromNet(gross, 1000)).toBe(500_000_000_000);
+  });
+});

@@ -1,3 +1,4 @@
+import { MAX_AMOUNT_CENTS } from "@/lib/money";
 import { z } from "zod";
 
 /** The 14 allergens that must be declared in the EU (Regulation 1169/2011, Annex II). */
@@ -40,7 +41,7 @@ const text = (max: number) =>
     .nullable()
     .optional();
 
-const cents = z.number().int().min(0).max(10_000_000);
+const cents = z.number().int().min(0).max(MAX_AMOUNT_CENTS);
 const optionalInt = (max: number) => z.number().int().min(0).max(max).nullable().optional();
 
 export const categorySchema = z.object({

@@ -8,6 +8,13 @@
       "when": 1791667770242,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791728788519,
+      "tag": "0001_money_bigint",
+      "breakpoints": true
     }
   ]
 }

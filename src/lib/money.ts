@@ -9,10 +9,26 @@ export function assertCents(value: number, label = "amount"): asserts value is C
   if (!Number.isSafeInteger(value)) throw new RangeError(`${label} must be an integer number of cents`);
 }
 
-/** Parses user input such as "19,90", "19.9", "19" into cents. Returns null when invalid. */
+/**
+ * Largest amount accepted anywhere (cents): 100 billion currency units. Large enough for Rial
+ * amounts, small enough that quantity × price sums stay exact JS integers.
+ */
+export const MAX_AMOUNT_CENTS = 10_000_000_000_000;
+
+/** Persian (۰-۹) and Arabic-Indic (٠-٩) digits → ASCII, so Iranian keyboards work everywhere. */
+export function normalizeDigits(input: string): string {
+  return input
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660));
+}
+
+/** Parses user input such as "19,90", "19.9", "19", "۱۲۰۰۰۰" into cents. Returns null when invalid. */
 export function parseMoney(input: string): Cents | null {
-  const normalized = input.trim().replace(/\s/g, "").replace(",", ".");
-  if (!/^\d{1,9}(\.\d{1,2})?$/.test(normalized)) return null;
+  const normalized = normalizeDigits(input)
+    .trim()
+    .replace(/[\s٬]/g, "") // spaces and the Arabic thousands separator
+    .replace(/[,٫]/, ".");
+  if (!/^\d{1,11}(\.\d{1,2})?$/.test(normalized)) return null;
   const [whole, frac = ""] = normalized.split(".");
   return Number(whole) * 100 + Number(frac.padEnd(2, "0"));
 }
@@ -26,17 +42,30 @@ export function divRound(numerator: number, denominator: number): number {
   return sign * Math.floor((n * 2 + d) / (2 * d));
 }
 
+/** amount × rate / denominator, rounded half-up, exact even when amount × rate exceeds 2^53 (Rial). */
+function mulDivRound(amount: number, rate: number, denominator: number): number {
+  if (Number.isSafeInteger(amount * rate)) return divRound(amount * rate, denominator);
+  const n = BigInt(amount) * BigInt(rate);
+  const d = BigInt(denominator);
+  const zero = BigInt(0);
+  const two = BigInt(2);
+  const neg = n < zero;
+  const abs = neg ? -n : n;
+  const q = (abs * two + d) / (two * d);
+  return Number(neg ? -q : q);
+}
+
 /** Tax contained in a tax-inclusive amount: gross × rate / (1 + rate). */
 export function taxFromGross(grossCents: Cents, rateBps: number): Cents {
   assertCents(grossCents);
   if (rateBps === 0) return 0;
-  return divRound(grossCents * rateBps, 10_000 + rateBps);
+  return mulDivRound(grossCents, rateBps, 10_000 + rateBps);
 }
 
 /** Tax to add on top of a tax-exclusive amount: net × rate. */
 export function taxFromNet(netCents: Cents, rateBps: number): Cents {
   assertCents(netCents);
-  return divRound(netCents * rateBps, 10_000);
+  return mulDivRound(netCents, rateBps, 10_000);
 }
 
 export function sumCents(values: readonly Cents[]): Cents {

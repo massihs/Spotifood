@@ -10,7 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { pk, softDelete, timestamps, tstz } from "./_helpers";
+import { pk, softDelete, timestamps, tstz, money } from "./_helpers";
 import { orgRole, subscriptionStatus, userStatus } from "./enums";
 
 /** Platform accounts: restaurant owners, staff and super admins. Customers are anonymous guests. */
@@ -60,7 +60,7 @@ export const plans = pgTable(
     id: pk(),
     code: varchar({ length: 32 }).notNull(),
     name: varchar({ length: 64 }).notNull(),
-    priceMonthlyCents: integer().notNull().default(0),
+    priceMonthlyCents: money().notNull().default(0),
     currency: varchar({ length: 3 }).notNull().default("EUR"),
     limits: jsonb().$type<PlanLimits>().notNull(),
     isPublic: boolean().notNull().default(true),

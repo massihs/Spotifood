@@ -11,7 +11,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { pk, timestamps, tstz } from "./_helpers";
+import { pk, timestamps, tstz, money } from "./_helpers";
 import { orderChannel, orderPaymentStatus, orderStatus, paymentStatus, refundStatus } from "./enums";
 import { products } from "./menu";
 import { users } from "./platform";
@@ -84,10 +84,10 @@ export const orders = pgTable(
     status: orderStatus().notNull(),
     paymentStatus: orderPaymentStatus().notNull().default("unpaid"),
     currency: varchar({ length: 3 }).notNull(),
-    subtotalCents: integer().notNull(),
-    discountCents: integer().notNull().default(0),
-    taxCents: integer().notNull(),
-    totalCents: integer().notNull(),
+    subtotalCents: money().notNull(),
+    discountCents: money().notNull().default(0),
+    taxCents: money().notNull(),
+    totalCents: money().notNull(),
     pricesIncludeTax: boolean().notNull().default(true),
     note: text(),
     customerEmail: varchar({ length: 320 }),
@@ -137,12 +137,12 @@ export const orderItems = pgTable(
     categoryId: uuid(),
     productName: varchar({ length: 120 }).notNull(),
     categoryName: varchar({ length: 80 }),
-    unitPriceCents: integer().notNull(),
-    optionsTotalCents: integer().notNull().default(0),
+    unitPriceCents: money().notNull(),
+    optionsTotalCents: money().notNull().default(0),
     quantity: integer().notNull(),
-    lineTotalCents: integer().notNull(),
+    lineTotalCents: money().notNull(),
     taxRateBps: integer().notNull().default(0),
-    taxCents: integer().notNull().default(0),
+    taxCents: money().notNull().default(0),
     options: jsonb().$type<OrderItemOptionSnapshot[]>().notNull().default([]),
     note: varchar({ length: 280 }),
     createdAt: timestamps.createdAt,
@@ -185,8 +185,8 @@ export const payments = pgTable(
     provider: varchar({ length: 32 }).notNull(),
     providerRef: varchar({ length: 191 }),
     status: paymentStatus().notNull().default("pending"),
-    amountCents: integer().notNull(),
-    refundedCents: integer().notNull().default(0),
+    amountCents: money().notNull(),
+    refundedCents: money().notNull().default(0),
     currency: varchar({ length: 3 }).notNull(),
     idempotencyKey: varchar({ length: 64 }).notNull(),
     failureReason: text(),
@@ -223,7 +223,7 @@ export const paymentAllocations = pgTable(
     orderId: uuid()
       .notNull()
       .references(() => orders.id, { onDelete: "cascade" }),
-    amountCents: integer().notNull(),
+    amountCents: money().notNull(),
     createdAt: timestamps.createdAt,
   },
   (t) => [
@@ -243,7 +243,7 @@ export const refunds = pgTable(
     paymentId: uuid()
       .notNull()
       .references(() => payments.id, { onDelete: "cascade" }),
-    amountCents: integer().notNull(),
+    amountCents: money().notNull(),
     status: refundStatus().notNull().default("pending"),
     reason: text(),
     providerRef: varchar({ length: 191 }),
@@ -297,8 +297,8 @@ export const invoices = pgTable(
     tableSessionId: uuid().references(() => tableSessions.id, { onDelete: "set null" }),
     paymentId: uuid().references(() => payments.id, { onDelete: "set null" }),
     currency: varchar({ length: 3 }).notNull(),
-    totalCents: integer().notNull(),
-    taxCents: integer().notNull(),
+    totalCents: money().notNull(),
+    taxCents: money().notNull(),
     snapshot: jsonb().$type<InvoiceSnapshot>().notNull(),
     pdfStorageKey: text(),
     /** Token for the customer-facing link (/invoices/{publicToken}). */
