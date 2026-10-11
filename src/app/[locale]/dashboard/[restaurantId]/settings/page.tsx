@@ -6,7 +6,15 @@ import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { can } from "@/server/tenancy";
 import { getRestaurantSettingsView } from "@/server/modules/restaurants/settings";
-import { LegalForm, LogoForm, ProfileForm, ServiceForm, TaxRates } from "./settings-forms";
+import { getPaymentSettingsView } from "@/server/modules/payments/service";
+import {
+  LegalForm,
+  LogoForm,
+  PaymentSettingsForm,
+  ProfileForm,
+  ServiceForm,
+  TaxRates,
+} from "./settings-forms";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
 
@@ -39,7 +47,11 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view] = await Promise.all([getTranslations("settings"), getRestaurantSettingsView(db, ctx)]);
+  const [t, view, payment] = await Promise.all([
+    getTranslations("settings"),
+    getRestaurantSettingsView(db, ctx),
+    getPaymentSettingsView(db, ctx),
+  ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
   const rid = ctx.restaurant.id;
@@ -89,6 +101,12 @@ async function Settings({ params }: { params: Params }) {
                 openingHours: s.openingHours,
               }}
             />
+          </div>
+        </Card>
+        <Card>
+          <CardHeader title={t("payments")} description={t("paymentsHint")} />
+          <div className="p-5">
+            <PaymentSettingsForm restaurantId={rid} disabled={readOnly} values={payment} />
           </div>
         </Card>
         <Card>

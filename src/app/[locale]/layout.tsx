@@ -37,7 +37,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={localeDirection(locale)} className={sans.variable}>
+    <html lang={locale} dir={localeDirection(locale)} className={sans.variable} data-scroll-behavior="smooth">
       <body className="min-h-dvh">
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}

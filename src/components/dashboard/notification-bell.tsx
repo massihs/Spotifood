@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { cn } from "@/lib/cn";
 import { useLiveEvent } from "@/components/realtime/live";
@@ -22,6 +22,7 @@ export function NotificationBell({
   initialUnread: number;
 }) {
   const t = useTranslations("notifications");
+  const format = useFormatter();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(initialUnread);
   const [items, setItems] = useState<Item[] | null>(null);
@@ -61,7 +62,19 @@ export function NotificationBell({
   const label = (n: Item) => {
     const key = `types.${n.type}`;
     return t.has(key)
-      ? t(key, { number: String(n.payload.number ?? ""), table: String(n.payload.tableLabel ?? "") })
+      ? t(key, {
+          number: String(n.payload.number ?? ""),
+          table: String(n.payload.tableLabel ?? ""),
+          client: String(n.payload.seq ?? ""),
+          method: String(n.payload.method ?? "any"),
+          amount:
+            typeof n.payload.amountCents === "number" && typeof n.payload.currency === "string"
+              ? format.number(n.payload.amountCents / 100, {
+                  style: "currency",
+                  currency: n.payload.currency,
+                })
+              : "",
+        })
       : n.type;
   };
 

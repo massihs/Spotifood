@@ -95,7 +95,8 @@
     "toggleNav": "Ouvrir le menu de navigation",
     "orders": "Commandes",
     "kitchen": "Cuisine",
-    "floor": "Salle"
+    "floor": "Salle",
+    "payments": "Paiements"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -237,7 +238,20 @@
     "status_changed": "La commande vient d'être modifiée par un collègue. Rafraîchissement…",
     "session_has_unpaid": "Il reste un montant à encaisser sur cette table.",
     "session_has_active_orders": "Des commandes sont encore en cours sur cette table.",
-    "no_open_session": "Cette table est déjà libre."
+    "no_open_session": "Cette table est déjà libre.",
+    "online_payment_unavailable": "Le paiement en ligne n'est pas disponible ici.",
+    "payment_already_processed": "Ce paiement a déjà été traité.",
+    "nothing_to_pay": "Il n'y a rien à payer.",
+    "payment_provider_error": "Le prestataire de paiement n'a pas répondu. Réessayez.",
+    "payment_method_disabled": "Ce moyen de paiement n'est pas activé.",
+    "tendered_too_low": "Le montant remis est inférieur au total.",
+    "payment_not_refundable": "Ce paiement ne peut pas être remboursé.",
+    "refund_exceeds_balance": "Le montant dépasse ce qui reste remboursable.",
+    "refund_provider_error": "Le remboursement a échoué chez le prestataire. Rien n'a été débité.",
+    "plan_feature_online_payments": "Le paiement en ligne n'est pas inclus dans votre offre.",
+    "online_provider_required": "Activez au moins un prestataire de paiement en ligne.",
+    "payment_method_required": "Activez au moins un moyen de paiement.",
+    "invalid_signature": "Signature invalide."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -315,25 +329,49 @@
     }
   },
   "permissions": {
-    "restaurant.view": "Voir le restaurant",
-    "restaurant.manage": "Modifier les paramètres",
-    "members.manage": "Gérer l'équipe",
-    "tables.view": "Voir les tables",
-    "tables.manage": "Gérer tables & QR",
-    "sessions.close": "Clôturer les tables",
-    "menu.view": "Voir le menu",
-    "menu.manage": "Gérer le menu",
-    "orders.view": "Voir les commandes",
-    "orders.update_status": "Changer le statut des commandes",
-    "orders.cancel": "Annuler des commandes",
-    "payments.view": "Voir les paiements",
-    "payments.record": "Encaisser",
-    "payments.refund": "Rembourser",
-    "invoices.view": "Voir les factures",
-    "analytics.view": "Voir les statistiques",
-    "feedback.view": "Voir les avis",
-    "complaints.manage": "Traiter les plaintes",
-    "audit.view": "Voir le journal d'audit"
+    "restaurant": {
+      "view": "Voir le restaurant",
+      "manage": "Modifier les paramètres"
+    },
+    "members": {
+      "manage": "Gérer l'équipe"
+    },
+    "tables": {
+      "view": "Voir les tables",
+      "manage": "Gérer tables & QR"
+    },
+    "sessions": {
+      "close": "Clôturer les tables"
+    },
+    "menu": {
+      "view": "Voir le menu",
+      "manage": "Gérer le menu"
+    },
+    "orders": {
+      "view": "Voir les commandes",
+      "update_status": "Changer le statut des commandes",
+      "cancel": "Annuler des commandes"
+    },
+    "payments": {
+      "view": "Voir les paiements",
+      "record": "Encaisser",
+      "refund": "Rembourser"
+    },
+    "invoices": {
+      "view": "Voir les factures"
+    },
+    "analytics": {
+      "view": "Voir les statistiques"
+    },
+    "feedback": {
+      "view": "Voir les avis"
+    },
+    "complaints": {
+      "manage": "Traiter les plaintes"
+    },
+    "audit": {
+      "view": "Voir le journal d'audit"
+    }
   },
   "settings": {
     "title": "Paramètres",
@@ -393,7 +431,23 @@
     "legalId": "SIRET / n° d'immatriculation",
     "vatNumber": "N° de TVA intracommunautaire",
     "legalNotice": "Mentions complémentaires",
-    "privacyPolicyUrl": "Lien vers la politique de confidentialité"
+    "privacyPolicyUrl": "Lien vers la politique de confidentialité",
+    "payments": "Paiements",
+    "paymentsHint": "Choisissez comment vos clients peuvent régler.",
+    "paymentAtTable": "À table, avec l'équipe",
+    "providerHint": {
+      "cash": "L'équipe encaisse et enregistre le paiement.",
+      "on_site_terminal": "Paiement par carte sur votre terminal.",
+      "pay_later": "Le client appelle l'équipe depuis son téléphone pour régler.",
+      "mock_online": "Simulation pour les tests — jamais disponible en production.",
+      "stripe": "Carte bancaire, Apple Pay, Google Pay via Stripe."
+    },
+    "onlinePayment": "Paiement en ligne",
+    "onlinePaymentHint": "Vos clients paient leur part depuis leur téléphone.",
+    "onlinePaymentPlan": "Disponible à partir de l'offre Starter.",
+    "noOnlineProvider": "Aucun prestataire de paiement en ligne n'est configuré sur cette plateforme.",
+    "requirePayment": "Paiement avant envoi en cuisine",
+    "requirePaymentHint": "Les commandes partent en cuisine une fois réglées."
   },
   "guest": {
     "table": "Table {label}",
@@ -728,8 +782,117 @@
     "markRead": "Tout marquer comme lu",
     "open": "Notifications ({count} non lues)",
     "types": {
-      "order.created": "Nouvelle commande {number} · Table {table}",
-      "order.ready": "Commande {number} prête · Table {table}"
+      "order": {
+        "created": "Nouvelle commande {number} · Table {table}",
+        "ready": "Commande {number} prête · Table {table}"
+      },
+      "payment": {
+        "received": "Paiement reçu {amount} · Table {table}",
+        "requested": "Table {table} · Client {client} veut payer {amount} ({method, select, cash {espèces} card {carte} other {à table}})",
+        "needs_review": "Paiement à vérifier · Table {table}"
+      }
+    }
+  },
+  "mockPay": {
+    "banner": "PAIEMENT SIMULÉ — environnement de test, aucun argent n'est débité",
+    "explain": "Choisissez le résultat du paiement à simuler.",
+    "success": "Simuler un paiement réussi",
+    "failure": "Simuler un refus",
+    "alreadyProcessed": "Ce paiement a déjà été traité."
+  },
+  "pay": {
+    "title": "Paiement",
+    "returned": {
+      "succeeded": "Paiement reçu, merci !",
+      "pending": "Confirmation du paiement en cours…",
+      "failed": "Le paiement n'a pas abouti. Vous pouvez réessayer.",
+      "cancelled": "Paiement annulé."
+    },
+    "due": "Reste à payer",
+    "alreadyPaid": "Déjà payé",
+    "inProgress": "Paiement en ligne de {amount} en cours.",
+    "resume": "Reprendre le paiement",
+    "cancel": "Annuler ce paiement",
+    "allSettled": "Tout est réglé, merci !",
+    "payOnline": "Payer {amount} en ligne",
+    "payOnlineSimulated": "Payer {amount} en ligne (simulé)",
+    "howAtTable": "Comment souhaitez-vous payer ?",
+    "card": "Carte",
+    "cash": "Espèces",
+    "payAtTable": "Payer à table",
+    "staffNotified": "C'est noté, un membre de l'équipe arrive."
+  },
+  "paymentStatus": {
+    "unpaid": "Non payée",
+    "pending": "Paiement en cours",
+    "paid": "Payée",
+    "partially_refunded": "Remboursée en partie",
+    "refunded": "Remboursée"
+  },
+  "payments": {
+    "title": "Paiements",
+    "subtitle": "Encaissements, paiements en ligne et remboursements.",
+    "method": "Moyen de paiement",
+    "provider": {
+      "cash": "Espèces",
+      "on_site_terminal": "Terminal CB",
+      "pay_later": "Payer à table",
+      "mock_online": "En ligne (simulé)",
+      "stripe": "En ligne (Stripe)"
+    },
+    "tendered": "Montant remis",
+    "tenderedHint": "Facultatif, pour calculer la monnaie.",
+    "change": "Monnaie à rendre : {amount}",
+    "confirmCollected": "Confirmer l'encaissement",
+    "collect": "Encaisser",
+    "collectTable": "Encaisser toute la table {label}",
+    "collectFor": "Encaisser · {name}",
+    "collectedSoFar": "Déjà encaissé : {amount}",
+    "onlineInProgress": "Paiement en ligne en cours : {amount}",
+    "cancelPending": "Annuler",
+    "cancelPendingConfirm": "Annuler ce paiement en ligne ? Les commandes redeviendront à payer.",
+    "refund": "Rembourser",
+    "refundTitle": "Remboursement",
+    "refundable": "Remboursable : {amount}",
+    "refundAmount": "Montant à rembourser",
+    "refundReason": "Motif (facultatif)",
+    "refundLine": "Remboursé {amount}",
+    "refundStatus": {
+      "pending": "en cours",
+      "succeeded": "effectué",
+      "failed": "échoué"
+    },
+    "statNet": "Encaissé (net)",
+    "statHint": "Sur les paiements affichés",
+    "statRefunded": "Remboursé",
+    "statCount": "Paiements",
+    "view": {
+      "all": "Tous",
+      "succeeded": "Réussis",
+      "refunded": "Remboursés",
+      "failed": "Échoués",
+      "pending": "En cours"
+    },
+    "empty": "Aucun paiement",
+    "emptyBody": "Les encaissements et paiements en ligne apparaîtront ici.",
+    "col": {
+      "date": "Date",
+      "table": "Table",
+      "method": "Moyen",
+      "orders": "Commandes",
+      "amount": "Montant",
+      "status": "Statut"
+    },
+    "tableLabel": "Table {label}",
+    "wholeTable": "Toute la table",
+    "status": {
+      "pending": "En attente",
+      "requires_action": "En cours",
+      "succeeded": "Réussi",
+      "failed": "Échoué",
+      "cancelled": "Annulé",
+      "refunded": "Remboursé",
+      "partially_refunded": "Remboursé en partie"
     }
   }
 }

@@ -8,6 +8,14 @@ import { requireGuest } from "@/server/modules/guest/current";
 import { renameParticipant } from "@/server/modules/guest/sessions";
 import { placeOrder } from "@/server/modules/orders/service";
 import {
+  cancelGuestPayment,
+  requestPaymentAtTable,
+  startOnlinePayment,
+} from "@/server/modules/payments/service";
+import { env } from "@/server/env";
+import { routing } from "@/i18n/routing";
+import { getLocale } from "next-intl/server";
+import {
   addToCart,
   getCartView,
   removeCartItem,
@@ -71,5 +79,41 @@ export async function placeOrderAction(note: string) {
     const g = await guest();
     const order = await placeOrder(db, g, { note });
     return { number: order.number };
+  });
+}
+
+/**
+ * Starts an online checkout for what this guest owes (amount computed server-side) and
+ * returns the PSP URL to redirect to.
+ */
+export async function startOnlinePaymentAction(provider: string, idempotencyKey: string) {
+  return runAction(async () => {
+    const g = await guest();
+    const locale = await getLocale();
+    const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;
+    const result = await startOnlinePayment(
+      db,
+      g,
+      { provider: provider as "stripe", idempotencyKey },
+      { returnUrl: `${env().APP_URL}${prefix}/table/orders` },
+    );
+    return { redirectUrl: result.redirectUrl };
+  });
+}
+
+export async function cancelPaymentAction(paymentId: string) {
+  return runAction(async () => {
+    const g = await guest();
+    await cancelGuestPayment(db, g, paymentId);
+    refresh();
+  });
+}
+
+/** "Pay at the table": the team is notified with the amount and preferred method. */
+export async function requestPaymentAction(method: "cash" | "card" | "any") {
+  return runAction(async () => {
+    const g = await guest();
+    await enforceRateLimit("paymentRequest", g.participant.id);
+    return requestPaymentAtTable(db, g, { method });
   });
 }

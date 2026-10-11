@@ -36,6 +36,7 @@ import { loadPublicMenu } from "@/server/modules/menu/public";
 import { enterTableByQr, loadGuestContext, renameParticipant } from "@/server/modules/guest/sessions";
 import { addToCart } from "@/server/modules/cart/service";
 import { placeOrder, updateOrderStatus } from "@/server/modules/orders/service";
+import { newIdempotencyKey, recordStaffPayment } from "@/server/modules/payments/service";
 import type { OrderStatus } from "@/server/modules/orders/status";
 
 const DEMO_OWNER = {
@@ -316,7 +317,13 @@ async function seedDemoRestaurant() {
       .where(eq(restaurants.id, restaurant.id));
     await tx
       .update(restaurantSettings)
-      .set({ orderPrefix: "D", legalName: "Demo Restauration SAS" })
+      .set({
+        orderPrefix: "D",
+        legalName: "Demo Restauration SAS",
+        // Online payment uses whatever this deployment offers (Stripe keys / dev simulator).
+        onlinePaymentEnabled: true,
+        enabledPaymentProviders: ["cash", "on_site_terminal", "pay_later", "stripe", "mock_online"],
+      })
       .where(eq(restaurantSettings.restaurantId, restaurant.id));
     await tx
       .insert(restaurantMembers)
@@ -571,7 +578,7 @@ async function seedDemoOrders() {
   );
   await guestOrders("8", [{ product: "César au poulet" }, { product: "Limonade artisanale" }], "received");
   // Table 4 — already served, Table 12 — ready to go.
-  await guestOrders(
+  const paidAtTable4 = await guestOrders(
     "4",
     [
       { product: "Tagliatelles carbonara", quantity: 2 },
@@ -581,7 +588,14 @@ async function seedDemoOrders() {
   );
   await guestOrders("4", [{ product: "Cheesecake" }, { product: "Cappuccino" }], "served");
   await guestOrders("12", [{ product: "Saumon rôti" }, { product: "Eau pétillante 50 cl" }], "ready");
-  console.log("✓ demo orders: 6 orders on tables 4, 8 (3 guests) and 12");
+  // The first guest of table 4 already paid in cash.
+  await recordStaffPayment(db, ctx, {
+    tableSessionId: paidAtTable4.tableSessionId!,
+    participantId: paidAtTable4.participantId!,
+    provider: "cash",
+    idempotencyKey: newIdempotencyKey(),
+  });
+  console.log("✓ demo orders: 6 orders on tables 4, 8 (3 guests) and 12, one cash payment");
 }
 
 async function main() {

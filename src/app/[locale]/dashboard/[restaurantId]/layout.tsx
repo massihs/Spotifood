@@ -11,6 +11,7 @@ import {
   IconSettings,
   IconTable,
   IconUsers,
+  IconWallet,
 } from "@/components/ui/icons";
 import { can } from "@/server/tenancy";
 import { requireRestaurant } from "@/server/auth/current";
@@ -49,6 +50,7 @@ async function RestaurantShell({
     can(ctx, "tables.view") && { href: `${base}/floor`, label: t("nav.floor"), icon: <IconFloor /> },
     can(ctx, "orders.view") && { href: `${base}/kitchen`, label: t("nav.kitchen"), icon: <IconFlame /> },
     can(ctx, "orders.view") && { href: `${base}/orders`, label: t("nav.orders"), icon: <IconReceipt /> },
+    can(ctx, "payments.view") && { href: `${base}/payments`, label: t("nav.payments"), icon: <IconWallet /> },
     can(ctx, "menu.view") && { href: `${base}/menu`, label: t("nav.menu"), icon: <IconMenu /> },
     can(ctx, "tables.view") && { href: `${base}/tables`, label: t("nav.tables"), icon: <IconTable /> },
     can(ctx, "members.manage") && { href: `${base}/team`, label: t("nav.team"), icon: <IconUsers /> },

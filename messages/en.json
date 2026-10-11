@@ -95,7 +95,8 @@
     "toggleNav": "Toggle navigation",
     "orders": "Orders",
     "kitchen": "Kitchen",
-    "floor": "Floor"
+    "floor": "Floor",
+    "payments": "Payments"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -237,7 +238,20 @@
     "status_changed": "A colleague just updated this order. Refreshing…",
     "session_has_unpaid": "There is still an amount to collect on this table.",
     "session_has_active_orders": "Orders are still in progress on this table.",
-    "no_open_session": "This table is already free."
+    "no_open_session": "This table is already free.",
+    "online_payment_unavailable": "Online payment is not available here.",
+    "payment_already_processed": "This payment has already been processed.",
+    "nothing_to_pay": "There is nothing to pay.",
+    "payment_provider_error": "The payment provider did not respond. Please try again.",
+    "payment_method_disabled": "This payment method is not enabled.",
+    "tendered_too_low": "The amount given is lower than the total.",
+    "payment_not_refundable": "This payment cannot be refunded.",
+    "refund_exceeds_balance": "The amount exceeds what is left to refund.",
+    "refund_provider_error": "The refund failed at the provider. Nothing was charged.",
+    "plan_feature_online_payments": "Online payment is not included in your plan.",
+    "online_provider_required": "Enable at least one online payment provider.",
+    "payment_method_required": "Enable at least one payment method.",
+    "invalid_signature": "Invalid signature."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -315,25 +329,49 @@
     }
   },
   "permissions": {
-    "restaurant.view": "View restaurant",
-    "restaurant.manage": "Edit settings",
-    "members.manage": "Manage team",
-    "tables.view": "View tables",
-    "tables.manage": "Manage tables & QR",
-    "sessions.close": "Close tables",
-    "menu.view": "View menu",
-    "menu.manage": "Manage menu",
-    "orders.view": "View orders",
-    "orders.update_status": "Update order status",
-    "orders.cancel": "Cancel orders",
-    "payments.view": "View payments",
-    "payments.record": "Take payments",
-    "payments.refund": "Refund",
-    "invoices.view": "View invoices",
-    "analytics.view": "View analytics",
-    "feedback.view": "View reviews",
-    "complaints.manage": "Handle complaints",
-    "audit.view": "View audit log"
+    "restaurant": {
+      "view": "View restaurant",
+      "manage": "Edit settings"
+    },
+    "members": {
+      "manage": "Manage team"
+    },
+    "tables": {
+      "view": "View tables",
+      "manage": "Manage tables & QR"
+    },
+    "sessions": {
+      "close": "Close tables"
+    },
+    "menu": {
+      "view": "View menu",
+      "manage": "Manage menu"
+    },
+    "orders": {
+      "view": "View orders",
+      "update_status": "Update order status",
+      "cancel": "Cancel orders"
+    },
+    "payments": {
+      "view": "View payments",
+      "record": "Take payments",
+      "refund": "Refund"
+    },
+    "invoices": {
+      "view": "View invoices"
+    },
+    "analytics": {
+      "view": "View analytics"
+    },
+    "feedback": {
+      "view": "View reviews"
+    },
+    "complaints": {
+      "manage": "Handle complaints"
+    },
+    "audit": {
+      "view": "View audit log"
+    }
   },
   "settings": {
     "title": "Settings",
@@ -393,7 +431,23 @@
     "legalId": "Company registration number",
     "vatNumber": "VAT number",
     "legalNotice": "Additional notices",
-    "privacyPolicyUrl": "Privacy policy link"
+    "privacyPolicyUrl": "Privacy policy link",
+    "payments": "Payments",
+    "paymentsHint": "Choose how your guests can pay.",
+    "paymentAtTable": "At the table, with the team",
+    "providerHint": {
+      "cash": "The team collects and records the payment.",
+      "on_site_terminal": "Card payment on your terminal.",
+      "pay_later": "Guests call the team from their phone to pay.",
+      "mock_online": "Simulation for testing — never available in production.",
+      "stripe": "Cards, Apple Pay, Google Pay through Stripe."
+    },
+    "onlinePayment": "Online payment",
+    "onlinePaymentHint": "Guests pay their share from their phone.",
+    "onlinePaymentPlan": "Available from the Starter plan.",
+    "noOnlineProvider": "No online payment provider is configured on this platform.",
+    "requirePayment": "Payment before sending to the kitchen",
+    "requirePaymentHint": "Orders go to the kitchen once paid."
   },
   "guest": {
     "table": "Table {label}",
@@ -728,8 +782,117 @@
     "markRead": "Mark all as read",
     "open": "Notifications ({count} unread)",
     "types": {
-      "order.created": "New order {number} · Table {table}",
-      "order.ready": "Order {number} ready · Table {table}"
+      "order": {
+        "created": "New order {number} · Table {table}",
+        "ready": "Order {number} ready · Table {table}"
+      },
+      "payment": {
+        "received": "Payment received {amount} · Table {table}",
+        "requested": "Table {table} · Guest {client} wants to pay {amount} ({method, select, cash {cash} card {card} other {at the table}})",
+        "needs_review": "Payment to review · Table {table}"
+      }
+    }
+  },
+  "mockPay": {
+    "banner": "SIMULATED PAYMENT — test environment, no money is charged",
+    "explain": "Choose the payment outcome to simulate.",
+    "success": "Simulate a successful payment",
+    "failure": "Simulate a decline",
+    "alreadyProcessed": "This payment has already been processed."
+  },
+  "pay": {
+    "title": "Payment",
+    "returned": {
+      "succeeded": "Payment received, thank you!",
+      "pending": "Confirming your payment…",
+      "failed": "The payment did not go through. You can try again.",
+      "cancelled": "Payment cancelled."
+    },
+    "due": "Left to pay",
+    "alreadyPaid": "Already paid",
+    "inProgress": "Online payment of {amount} in progress.",
+    "resume": "Resume payment",
+    "cancel": "Cancel this payment",
+    "allSettled": "All settled, thank you!",
+    "payOnline": "Pay {amount} online",
+    "payOnlineSimulated": "Pay {amount} online (simulated)",
+    "howAtTable": "How would you like to pay?",
+    "card": "Card",
+    "cash": "Cash",
+    "payAtTable": "Pay at the table",
+    "staffNotified": "Got it, a team member is on the way."
+  },
+  "paymentStatus": {
+    "unpaid": "Unpaid",
+    "pending": "Payment in progress",
+    "paid": "Paid",
+    "partially_refunded": "Partially refunded",
+    "refunded": "Refunded"
+  },
+  "payments": {
+    "title": "Payments",
+    "subtitle": "Collections, online payments and refunds.",
+    "method": "Payment method",
+    "provider": {
+      "cash": "Cash",
+      "on_site_terminal": "Card terminal",
+      "pay_later": "Pay at the table",
+      "mock_online": "Online (simulated)",
+      "stripe": "Online (Stripe)"
+    },
+    "tendered": "Amount given",
+    "tenderedHint": "Optional, to compute the change.",
+    "change": "Change due: {amount}",
+    "confirmCollected": "Confirm payment collected",
+    "collect": "Collect",
+    "collectTable": "Collect the whole table {label}",
+    "collectFor": "Collect · {name}",
+    "collectedSoFar": "Collected so far: {amount}",
+    "onlineInProgress": "Online payment in progress: {amount}",
+    "cancelPending": "Cancel",
+    "cancelPendingConfirm": "Cancel this online payment? The orders will be payable again.",
+    "refund": "Refund",
+    "refundTitle": "Refund",
+    "refundable": "Refundable: {amount}",
+    "refundAmount": "Amount to refund",
+    "refundReason": "Reason (optional)",
+    "refundLine": "Refunded {amount}",
+    "refundStatus": {
+      "pending": "pending",
+      "succeeded": "done",
+      "failed": "failed"
+    },
+    "statNet": "Collected (net)",
+    "statHint": "For the payments shown",
+    "statRefunded": "Refunded",
+    "statCount": "Payments",
+    "view": {
+      "all": "All",
+      "succeeded": "Succeeded",
+      "refunded": "Refunded",
+      "failed": "Failed",
+      "pending": "In progress"
+    },
+    "empty": "No payments",
+    "emptyBody": "Collections and online payments will show up here.",
+    "col": {
+      "date": "Date",
+      "table": "Table",
+      "method": "Method",
+      "orders": "Orders",
+      "amount": "Amount",
+      "status": "Status"
+    },
+    "tableLabel": "Table {label}",
+    "wholeTable": "Whole table",
+    "status": {
+      "pending": "Pending",
+      "requires_action": "In progress",
+      "succeeded": "Succeeded",
+      "failed": "Failed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded",
+      "partially_refunded": "Partially refunded"
     }
   }
 }

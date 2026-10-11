@@ -79,3 +79,8 @@ export const IconFloor = () => (
     <rect x="14" y="14" width="7" height="7" rx="2" />
   </svg>
 );
+export const IconWallet = () => (
+  <svg {...base}>
+    <path d="M3 7a2 2 0 0 1 2-2h13v4M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2zM16.5 14.5h.01" />
+  </svg>
+);

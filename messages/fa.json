@@ -95,7 +95,8 @@
     "toggleNav": "باز کردن منوی ناوبری",
     "orders": "سفارش‌ها",
     "kitchen": "آشپزخانه",
-    "floor": "سالن"
+    "floor": "سالن",
+    "payments": "پرداخت‌ها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -237,7 +238,20 @@
     "status_changed": "همکار شما همین حالا این سفارش را تغییر داد. در حال به‌روزرسانی…",
     "session_has_unpaid": "هنوز مبلغی برای دریافت روی این میز باقی است.",
     "session_has_active_orders": "هنوز سفارش‌هایی روی این میز در جریان است.",
-    "no_open_session": "این میز از قبل آزاد است."
+    "no_open_session": "این میز از قبل آزاد است.",
+    "online_payment_unavailable": "پرداخت آنلاین اینجا در دسترس نیست.",
+    "payment_already_processed": "این پرداخت قبلاً پردازش شده است.",
+    "nothing_to_pay": "چیزی برای پرداخت وجود ندارد.",
+    "payment_provider_error": "درگاه پرداخت پاسخ نداد. دوباره تلاش کنید.",
+    "payment_method_disabled": "این روش پرداخت فعال نیست.",
+    "tendered_too_low": "مبلغ دریافتی کمتر از جمع کل است.",
+    "payment_not_refundable": "این پرداخت قابل بازپرداخت نیست.",
+    "refund_exceeds_balance": "مبلغ از مانده قابل بازپرداخت بیشتر است.",
+    "refund_provider_error": "بازپرداخت در درگاه ناموفق بود. مبلغی کسر نشد.",
+    "plan_feature_online_payments": "پرداخت آنلاین در طرح شما وجود ندارد.",
+    "online_provider_required": "دست‌کم یک درگاه پرداخت آنلاین را فعال کنید.",
+    "payment_method_required": "دست‌کم یک روش پرداخت را فعال کنید.",
+    "invalid_signature": "امضای نامعتبر."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -315,25 +329,49 @@
     }
   },
   "permissions": {
-    "restaurant.view": "مشاهده رستوران",
-    "restaurant.manage": "ویرایش تنظیمات",
-    "members.manage": "مدیریت تیم",
-    "tables.view": "مشاهده میزها",
-    "tables.manage": "مدیریت میزها و QR",
-    "sessions.close": "بستن میزها",
-    "menu.view": "مشاهده منو",
-    "menu.manage": "مدیریت منو",
-    "orders.view": "مشاهده سفارش‌ها",
-    "orders.update_status": "تغییر وضعیت سفارش",
-    "orders.cancel": "لغو سفارش",
-    "payments.view": "مشاهده پرداخت‌ها",
-    "payments.record": "دریافت وجه",
-    "payments.refund": "بازپرداخت",
-    "invoices.view": "مشاهده فاکتورها",
-    "analytics.view": "مشاهده آمار",
-    "feedback.view": "مشاهده نظرات",
-    "complaints.manage": "رسیدگی به شکایات",
-    "audit.view": "مشاهده گزارش ممیزی"
+    "restaurant": {
+      "view": "مشاهده رستوران",
+      "manage": "ویرایش تنظیمات"
+    },
+    "members": {
+      "manage": "مدیریت تیم"
+    },
+    "tables": {
+      "view": "مشاهده میزها",
+      "manage": "مدیریت میزها و QR"
+    },
+    "sessions": {
+      "close": "بستن میزها"
+    },
+    "menu": {
+      "view": "مشاهده منو",
+      "manage": "مدیریت منو"
+    },
+    "orders": {
+      "view": "مشاهده سفارش‌ها",
+      "update_status": "تغییر وضعیت سفارش",
+      "cancel": "لغو سفارش"
+    },
+    "payments": {
+      "view": "مشاهده پرداخت‌ها",
+      "record": "دریافت وجه",
+      "refund": "بازپرداخت"
+    },
+    "invoices": {
+      "view": "مشاهده فاکتورها"
+    },
+    "analytics": {
+      "view": "مشاهده آمار"
+    },
+    "feedback": {
+      "view": "مشاهده نظرات"
+    },
+    "complaints": {
+      "manage": "رسیدگی به شکایات"
+    },
+    "audit": {
+      "view": "مشاهده گزارش ممیزی"
+    }
   },
   "settings": {
     "title": "تنظیمات",
@@ -393,7 +431,23 @@
     "legalId": "شماره ثبت",
     "vatNumber": "شماره مالیاتی",
     "legalNotice": "توضیحات تکمیلی",
-    "privacyPolicyUrl": "لینک سیاست حریم خصوصی"
+    "privacyPolicyUrl": "لینک سیاست حریم خصوصی",
+    "payments": "پرداخت‌ها",
+    "paymentsHint": "انتخاب کنید مشتریان چگونه پرداخت کنند.",
+    "paymentAtTable": "سر میز، با همکاران",
+    "providerHint": {
+      "cash": "همکاران وجه را دریافت و ثبت می‌کنند.",
+      "on_site_terminal": "پرداخت با کارت روی کارت‌خوان شما.",
+      "pay_later": "مشتری از گوشی خود همکاران را برای پرداخت صدا می‌زند.",
+      "mock_online": "شبیه‌سازی برای آزمایش — هرگز در محیط اصلی فعال نیست.",
+      "stripe": "کارت بانکی، Apple Pay، Google Pay از طریق Stripe."
+    },
+    "onlinePayment": "پرداخت آنلاین",
+    "onlinePaymentHint": "مشتریان سهم خود را با گوشی پرداخت می‌کنند.",
+    "onlinePaymentPlan": "از طرح Starter به بعد در دسترس است.",
+    "noOnlineProvider": "هیچ درگاه پرداخت آنلاینی روی این پلتفرم پیکربندی نشده است.",
+    "requirePayment": "پرداخت پیش از ارسال به آشپزخانه",
+    "requirePaymentHint": "سفارش‌ها پس از پرداخت به آشپزخانه می‌روند."
   },
   "guest": {
     "table": "میز {label}",
@@ -728,8 +782,117 @@
     "markRead": "علامت‌گذاری همه به‌عنوان خوانده‌شده",
     "open": "اعلان‌ها ({count} خوانده‌نشده)",
     "types": {
-      "order.created": "سفارش جدید {number} · میز {table}",
-      "order.ready": "سفارش {number} آماده است · میز {table}"
+      "order": {
+        "created": "سفارش جدید {number} · میز {table}",
+        "ready": "سفارش {number} آماده است · میز {table}"
+      },
+      "payment": {
+        "received": "پرداخت دریافت شد {amount} · میز {table}",
+        "requested": "میز {table} · مشتری {client} می‌خواهد {amount} پرداخت کند ({method, select, cash {نقدی} card {کارت} other {سر میز}})",
+        "needs_review": "پرداخت نیازمند بررسی · میز {table}"
+      }
+    }
+  },
+  "mockPay": {
+    "banner": "پرداخت شبیه‌سازی‌شده — محیط آزمایشی، هیچ مبلغی کسر نمی‌شود",
+    "explain": "نتیجهٔ پرداختی را که می‌خواهید شبیه‌سازی کنید انتخاب کنید.",
+    "success": "شبیه‌سازی پرداخت موفق",
+    "failure": "شبیه‌سازی رد پرداخت",
+    "alreadyProcessed": "این پرداخت قبلاً پردازش شده است."
+  },
+  "pay": {
+    "title": "پرداخت",
+    "returned": {
+      "succeeded": "پرداخت دریافت شد، سپاسگزاریم!",
+      "pending": "در حال تأیید پرداخت…",
+      "failed": "پرداخت انجام نشد. می‌توانید دوباره تلاش کنید.",
+      "cancelled": "پرداخت لغو شد."
+    },
+    "due": "مانده برای پرداخت",
+    "alreadyPaid": "پرداخت‌شده",
+    "inProgress": "پرداخت آنلاین {amount} در جریان است.",
+    "resume": "ادامهٔ پرداخت",
+    "cancel": "لغو این پرداخت",
+    "allSettled": "همه چیز تسویه شد، سپاسگزاریم!",
+    "payOnline": "پرداخت آنلاین {amount}",
+    "payOnlineSimulated": "پرداخت آنلاین {amount} (شبیه‌سازی)",
+    "howAtTable": "چگونه می‌خواهید پرداخت کنید؟",
+    "card": "کارت",
+    "cash": "نقدی",
+    "payAtTable": "پرداخت سر میز",
+    "staffNotified": "ثبت شد، یکی از همکاران ما می‌آید."
+  },
+  "paymentStatus": {
+    "unpaid": "پرداخت‌نشده",
+    "pending": "در حال پرداخت",
+    "paid": "پرداخت‌شده",
+    "partially_refunded": "بخشی بازپرداخت شد",
+    "refunded": "بازپرداخت شد"
+  },
+  "payments": {
+    "title": "پرداخت‌ها",
+    "subtitle": "دریافت‌ها، پرداخت‌های آنلاین و بازپرداخت‌ها.",
+    "method": "روش پرداخت",
+    "provider": {
+      "cash": "نقدی",
+      "on_site_terminal": "کارت‌خوان",
+      "pay_later": "پرداخت سر میز",
+      "mock_online": "آنلاین (شبیه‌سازی)",
+      "stripe": "آنلاین (Stripe)"
+    },
+    "tendered": "مبلغ دریافتی",
+    "tenderedHint": "اختیاری، برای محاسبهٔ باقی‌مانده.",
+    "change": "باقی‌مانده برای پس دادن: {amount}",
+    "confirmCollected": "تأیید دریافت",
+    "collect": "دریافت وجه",
+    "collectTable": "دریافت وجه کل میز {label}",
+    "collectFor": "دریافت وجه · {name}",
+    "collectedSoFar": "دریافت‌شده تاکنون: {amount}",
+    "onlineInProgress": "پرداخت آنلاین در جریان: {amount}",
+    "cancelPending": "لغو",
+    "cancelPendingConfirm": "این پرداخت آنلاین لغو شود؟ سفارش‌ها دوباره قابل پرداخت می‌شوند.",
+    "refund": "بازپرداخت",
+    "refundTitle": "بازپرداخت",
+    "refundable": "قابل بازپرداخت: {amount}",
+    "refundAmount": "مبلغ بازپرداخت",
+    "refundReason": "دلیل (اختیاری)",
+    "refundLine": "بازپرداخت {amount}",
+    "refundStatus": {
+      "pending": "در جریان",
+      "succeeded": "انجام شد",
+      "failed": "ناموفق"
+    },
+    "statNet": "دریافتی (خالص)",
+    "statHint": "برای پرداخت‌های نمایش‌داده‌شده",
+    "statRefunded": "بازپرداخت‌شده",
+    "statCount": "پرداخت‌ها",
+    "view": {
+      "all": "همه",
+      "succeeded": "موفق",
+      "refunded": "بازپرداخت‌شده",
+      "failed": "ناموفق",
+      "pending": "در جریان"
+    },
+    "empty": "پرداختی وجود ندارد",
+    "emptyBody": "دریافت‌ها و پرداخت‌های آنلاین اینجا نمایش داده می‌شوند.",
+    "col": {
+      "date": "تاریخ",
+      "table": "میز",
+      "method": "روش",
+      "orders": "سفارش‌ها",
+      "amount": "مبلغ",
+      "status": "وضعیت"
+    },
+    "tableLabel": "میز {label}",
+    "wholeTable": "کل میز",
+    "status": {
+      "pending": "در انتظار",
+      "requires_action": "در جریان",
+      "succeeded": "موفق",
+      "failed": "ناموفق",
+      "cancelled": "لغوشده",
+      "refunded": "بازپرداخت‌شده",
+      "partially_refunded": "بخشی بازپرداخت‌شده"
     }
   }
 }

@@ -1,13 +1,23 @@
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/server/db/client";
 import { getGuest } from "@/server/modules/guest/current";
 import { getCartView } from "@/server/modules/cart/service";
 import { listGuestOrders } from "@/server/modules/orders/service";
 import { CartView } from "@/components/guest/cart-view";
-import { SessionExpired } from "@/components/guest/states";
+import { SessionExpired, GuestSkeleton } from "@/components/guest/states";
 import { LiveProvider, LiveRefresh } from "@/components/realtime/live";
 
-export default async function GuestCartPage() {
+/** The guest cookie is per request: the page streams behind its own boundary (instant navigations). */
+export default function GuestCartPage() {
+  return (
+    <Suspense fallback={<GuestSkeleton />}>
+      <GuestCart />
+    </Suspense>
+  );
+}
+
+async function GuestCart() {
   const guest = await getGuest();
   if (!guest) return <SessionExpired />;
   const [t, cart, orders] = await Promise.all([

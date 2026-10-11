@@ -18,6 +18,7 @@ import {
   uploadLogo,
 } from "@/server/modules/restaurants/settings";
 import type { AppLocale } from "@/i18n/config";
+import { updatePaymentSettings } from "@/server/modules/payments/service";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "");
 
@@ -112,6 +113,18 @@ export async function taxRateCommandAction(restaurantId: string, fd: FormData) {
     const id = str(fd, "id");
     if (fd.get("command") === "default") await setDefaultTaxRate(db, ctx, id);
     else if (fd.get("command") === "delete") await deleteTaxRate(db, ctx, id);
+    refresh();
+  });
+}
+
+export async function updatePaymentSettingsAction(restaurantId: string, _prev: unknown, fd: FormData) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    await updatePaymentSettings(db, ctx, {
+      onlinePaymentEnabled: fd.get("onlinePaymentEnabled") === "on",
+      enabledPaymentProviders: fd.getAll("providers").map(String) as "cash"[],
+      requirePaymentBeforeOrder: fd.get("requirePaymentBeforeOrder") === "on",
+    });
     refresh();
   });
 }

@@ -20,6 +20,7 @@ import {
   removeLogoAction,
   taxRateCommandAction,
   updateLegalAction,
+  updatePaymentSettingsAction,
   updateProfileAction,
   updateServiceAction,
   uploadLogoAction,
@@ -502,5 +503,101 @@ export function TaxRates({
         </ActionForm>
       ) : null}
     </div>
+  );
+}
+
+export type PaymentValues = {
+  onlinePaymentEnabled: boolean;
+  enabledPaymentProviders: string[];
+  requirePaymentBeforeOrder: boolean;
+  planAllowsOnline: boolean;
+  availableOnline: string[];
+};
+
+export function PaymentSettingsForm({
+  restaurantId,
+  values,
+  disabled,
+}: {
+  restaurantId: string;
+  values: PaymentValues;
+  disabled: boolean;
+}) {
+  const t = useTranslations();
+  const form = useActionForm(updatePaymentSettingsAction.bind(null, restaurantId));
+  const state = form.state;
+  const err = useFieldError(state);
+  const [online, setOnline] = useState(values.onlinePaymentEnabled);
+  const has = (c: string) => values.enabledPaymentProviders.includes(c);
+  return (
+    <ActionForm form={form} className="space-y-5">
+      <fieldset disabled={disabled} className="space-y-5">
+        <div className="space-y-3">
+          <p className="text-sm font-medium">{t("settings.paymentAtTable")}</p>
+          {(["cash", "on_site_terminal", "pay_later"] as const).map((c) => (
+            <Checkbox
+              key={c}
+              name="providers"
+              value={c}
+              defaultChecked={has(c)}
+              label={t(`payments.provider.${c}`)}
+              description={t(`settings.providerHint.${c}`)}
+            />
+          ))}
+        </div>
+        <div className="space-y-3 border-t border-border pt-5">
+          <Checkbox
+            name="onlinePaymentEnabled"
+            checked={online}
+            onChange={(e) => setOnline(e.target.checked)}
+            disabled={!values.planAllowsOnline}
+            label={t("settings.onlinePayment")}
+            description={
+              values.planAllowsOnline ? t("settings.onlinePaymentHint") : t("settings.onlinePaymentPlan")
+            }
+          />
+          {err("onlinePaymentEnabled") ? (
+            <p className="text-sm text-danger">{err("onlinePaymentEnabled")}</p>
+          ) : null}
+          {online ? (
+            <div className="space-y-3 ps-7">
+              {values.availableOnline.length === 0 ? (
+                <p className="text-sm text-fg-muted">{t("settings.noOnlineProvider")}</p>
+              ) : (
+                values.availableOnline.map((c) => (
+                  <Checkbox
+                    key={c}
+                    name="providers"
+                    value={c}
+                    defaultChecked={has(c)}
+                    label={t(`payments.provider.${c}`)}
+                    description={t(`settings.providerHint.${c}`)}
+                  />
+                ))
+              )}
+            </div>
+          ) : (
+            // Keep the online choices when the toggle is off, so turning it back on restores them.
+            values.enabledPaymentProviders
+              .filter((c) => values.availableOnline.includes(c))
+              .map((c) => <input key={c} type="hidden" name="providers" value={c} />)
+          )}
+        </div>
+        <div className="border-t border-border pt-5">
+          <Checkbox
+            name="requirePaymentBeforeOrder"
+            defaultChecked={values.requirePaymentBeforeOrder}
+            label={t("settings.requirePayment")}
+            description={t("settings.requirePaymentHint")}
+          />
+        </div>
+      </fieldset>
+      <FormFeedback state={state} success={t("common.saved")} />
+      {!disabled ? (
+        <div className="flex justify-end">
+          <SubmitButton>{t("common.save")}</SubmitButton>
+        </div>
+      ) : null}
+    </ActionForm>
   );
 }

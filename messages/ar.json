@@ -95,7 +95,8 @@
     "toggleNav": "فتح قائمة التنقل",
     "orders": "الطلبات",
     "kitchen": "المطبخ",
-    "floor": "الصالة"
+    "floor": "الصالة",
+    "payments": "المدفوعات"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -237,7 +238,20 @@
     "status_changed": "قام زميل للتو بتحديث هذا الطلب. جارٍ التحديث…",
     "session_has_unpaid": "لا يزال هناك مبلغ للتحصيل على هذه الطاولة.",
     "session_has_active_orders": "لا تزال هناك طلبات قيد التنفيذ على هذه الطاولة.",
-    "no_open_session": "هذه الطاولة متاحة بالفعل."
+    "no_open_session": "هذه الطاولة متاحة بالفعل.",
+    "online_payment_unavailable": "الدفع الإلكتروني غير متاح هنا.",
+    "payment_already_processed": "تمت معالجة هذا الدفع بالفعل.",
+    "nothing_to_pay": "لا يوجد ما يُدفع.",
+    "payment_provider_error": "لم يستجب مزود الدفع. حاول مجددًا.",
+    "payment_method_disabled": "وسيلة الدفع هذه غير مفعّلة.",
+    "tendered_too_low": "المبلغ المستلم أقل من الإجمالي.",
+    "payment_not_refundable": "لا يمكن استرداد هذا الدفع.",
+    "refund_exceeds_balance": "المبلغ يتجاوز المتبقي القابل للاسترداد.",
+    "refund_provider_error": "فشل الاسترداد لدى المزود. لم يتم خصم أي مبلغ.",
+    "plan_feature_online_payments": "الدفع الإلكتروني غير مشمول في باقتك.",
+    "online_provider_required": "فعّل مزود دفع إلكتروني واحدًا على الأقل.",
+    "payment_method_required": "فعّل وسيلة دفع واحدة على الأقل.",
+    "invalid_signature": "توقيع غير صالح."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -315,25 +329,49 @@
     }
   },
   "permissions": {
-    "restaurant.view": "عرض المطعم",
-    "restaurant.manage": "تعديل الإعدادات",
-    "members.manage": "إدارة الفريق",
-    "tables.view": "عرض الطاولات",
-    "tables.manage": "إدارة الطاولات وQR",
-    "sessions.close": "إغلاق الطاولات",
-    "menu.view": "عرض القائمة",
-    "menu.manage": "إدارة القائمة",
-    "orders.view": "عرض الطلبات",
-    "orders.update_status": "تغيير حالة الطلب",
-    "orders.cancel": "إلغاء الطلبات",
-    "payments.view": "عرض المدفوعات",
-    "payments.record": "تحصيل المدفوعات",
-    "payments.refund": "استرداد",
-    "invoices.view": "عرض الفواتير",
-    "analytics.view": "عرض الإحصاءات",
-    "feedback.view": "عرض التقييمات",
-    "complaints.manage": "معالجة الشكاوى",
-    "audit.view": "عرض سجل التدقيق"
+    "restaurant": {
+      "view": "عرض المطعم",
+      "manage": "تعديل الإعدادات"
+    },
+    "members": {
+      "manage": "إدارة الفريق"
+    },
+    "tables": {
+      "view": "عرض الطاولات",
+      "manage": "إدارة الطاولات وQR"
+    },
+    "sessions": {
+      "close": "إغلاق الطاولات"
+    },
+    "menu": {
+      "view": "عرض القائمة",
+      "manage": "إدارة القائمة"
+    },
+    "orders": {
+      "view": "عرض الطلبات",
+      "update_status": "تغيير حالة الطلب",
+      "cancel": "إلغاء الطلبات"
+    },
+    "payments": {
+      "view": "عرض المدفوعات",
+      "record": "تحصيل المدفوعات",
+      "refund": "استرداد"
+    },
+    "invoices": {
+      "view": "عرض الفواتير"
+    },
+    "analytics": {
+      "view": "عرض الإحصاءات"
+    },
+    "feedback": {
+      "view": "عرض التقييمات"
+    },
+    "complaints": {
+      "manage": "معالجة الشكاوى"
+    },
+    "audit": {
+      "view": "عرض سجل التدقيق"
+    }
   },
   "settings": {
     "title": "الإعدادات",
@@ -393,7 +431,23 @@
     "legalId": "رقم السجل التجاري",
     "vatNumber": "الرقم الضريبي",
     "legalNotice": "ملاحظات إضافية",
-    "privacyPolicyUrl": "رابط سياسة الخصوصية"
+    "privacyPolicyUrl": "رابط سياسة الخصوصية",
+    "payments": "المدفوعات",
+    "paymentsHint": "اختر كيف يمكن لعملائك الدفع.",
+    "paymentAtTable": "على الطاولة، مع الفريق",
+    "providerHint": {
+      "cash": "يحصّل الفريق المبلغ ويسجّل الدفع.",
+      "on_site_terminal": "الدفع بالبطاقة على جهازك.",
+      "pay_later": "يستدعي العميل الفريق من هاتفه للدفع.",
+      "mock_online": "محاكاة للاختبار — غير متاحة أبدًا في بيئة الإنتاج.",
+      "stripe": "البطاقات البنكية وApple Pay وGoogle Pay عبر Stripe."
+    },
+    "onlinePayment": "الدفع الإلكتروني",
+    "onlinePaymentHint": "يدفع العملاء حصتهم من هواتفهم.",
+    "onlinePaymentPlan": "متاح بدءًا من باقة Starter.",
+    "noOnlineProvider": "لم يتم إعداد أي مزود دفع إلكتروني على هذه المنصة.",
+    "requirePayment": "الدفع قبل الإرسال إلى المطبخ",
+    "requirePaymentHint": "تُرسل الطلبات إلى المطبخ بعد دفعها."
   },
   "guest": {
     "table": "طاولة {label}",
@@ -728,8 +782,117 @@
     "markRead": "تعيين الكل كمقروء",
     "open": "الإشعارات ({count} غير مقروءة)",
     "types": {
-      "order.created": "طلب جديد {number} · طاولة {table}",
-      "order.ready": "الطلب {number} جاهز · طاولة {table}"
+      "order": {
+        "created": "طلب جديد {number} · طاولة {table}",
+        "ready": "الطلب {number} جاهز · طاولة {table}"
+      },
+      "payment": {
+        "received": "تم استلام دفع {amount} · طاولة {table}",
+        "requested": "طاولة {table} · العميل {client} يريد دفع {amount} ({method, select, cash {نقدًا} card {بطاقة} other {على الطاولة}})",
+        "needs_review": "دفع يحتاج إلى مراجعة · طاولة {table}"
+      }
+    }
+  },
+  "mockPay": {
+    "banner": "دفع تجريبي — بيئة اختبار، لا يتم خصم أي مبلغ",
+    "explain": "اختر نتيجة الدفع التي تريد محاكاتها.",
+    "success": "محاكاة دفع ناجح",
+    "failure": "محاكاة رفض الدفع",
+    "alreadyProcessed": "تمت معالجة هذا الدفع بالفعل."
+  },
+  "pay": {
+    "title": "الدفع",
+    "returned": {
+      "succeeded": "تم استلام الدفع، شكرًا لك!",
+      "pending": "جارٍ تأكيد الدفع…",
+      "failed": "لم يكتمل الدفع. يمكنك المحاولة مجددًا.",
+      "cancelled": "تم إلغاء الدفع."
+    },
+    "due": "المتبقي للدفع",
+    "alreadyPaid": "مدفوع مسبقًا",
+    "inProgress": "دفع إلكتروني بقيمة {amount} قيد التنفيذ.",
+    "resume": "متابعة الدفع",
+    "cancel": "إلغاء هذا الدفع",
+    "allSettled": "تمت التسوية بالكامل، شكرًا لك!",
+    "payOnline": "ادفع {amount} عبر الإنترنت",
+    "payOnlineSimulated": "ادفع {amount} عبر الإنترنت (تجريبي)",
+    "howAtTable": "كيف تود أن تدفع؟",
+    "card": "بطاقة",
+    "cash": "نقدًا",
+    "payAtTable": "الدفع على الطاولة",
+    "staffNotified": "تم، أحد أفراد الفريق في الطريق إليك."
+  },
+  "paymentStatus": {
+    "unpaid": "غير مدفوع",
+    "pending": "الدفع قيد التنفيذ",
+    "paid": "مدفوع",
+    "partially_refunded": "مسترد جزئيًا",
+    "refunded": "مسترد"
+  },
+  "payments": {
+    "title": "المدفوعات",
+    "subtitle": "التحصيلات والمدفوعات الإلكترونية والاستردادات.",
+    "method": "وسيلة الدفع",
+    "provider": {
+      "cash": "نقدًا",
+      "on_site_terminal": "جهاز البطاقات",
+      "pay_later": "الدفع على الطاولة",
+      "mock_online": "إلكتروني (تجريبي)",
+      "stripe": "إلكتروني (Stripe)"
+    },
+    "tendered": "المبلغ المستلم",
+    "tenderedHint": "اختياري، لحساب الباقي.",
+    "change": "الباقي المستحق: {amount}",
+    "confirmCollected": "تأكيد التحصيل",
+    "collect": "تحصيل",
+    "collectTable": "تحصيل الطاولة {label} بالكامل",
+    "collectFor": "تحصيل · {name}",
+    "collectedSoFar": "المحصّل حتى الآن: {amount}",
+    "onlineInProgress": "دفع إلكتروني قيد التنفيذ: {amount}",
+    "cancelPending": "إلغاء",
+    "cancelPendingConfirm": "إلغاء هذا الدفع الإلكتروني؟ ستصبح الطلبات مستحقة الدفع مجددًا.",
+    "refund": "استرداد",
+    "refundTitle": "استرداد",
+    "refundable": "قابل للاسترداد: {amount}",
+    "refundAmount": "المبلغ المراد استرداده",
+    "refundReason": "السبب (اختياري)",
+    "refundLine": "تم استرداد {amount}",
+    "refundStatus": {
+      "pending": "قيد التنفيذ",
+      "succeeded": "تم",
+      "failed": "فشل"
+    },
+    "statNet": "المحصّل (الصافي)",
+    "statHint": "للمدفوعات المعروضة",
+    "statRefunded": "المسترد",
+    "statCount": "المدفوعات",
+    "view": {
+      "all": "الكل",
+      "succeeded": "ناجحة",
+      "refunded": "مستردة",
+      "failed": "فاشلة",
+      "pending": "قيد التنفيذ"
+    },
+    "empty": "لا توجد مدفوعات",
+    "emptyBody": "ستظهر التحصيلات والمدفوعات الإلكترونية هنا.",
+    "col": {
+      "date": "التاريخ",
+      "table": "الطاولة",
+      "method": "الوسيلة",
+      "orders": "الطلبات",
+      "amount": "المبلغ",
+      "status": "الحالة"
+    },
+    "tableLabel": "طاولة {label}",
+    "wholeTable": "الطاولة كاملة",
+    "status": {
+      "pending": "في الانتظار",
+      "requires_action": "قيد التنفيذ",
+      "succeeded": "ناجح",
+      "failed": "فاشل",
+      "cancelled": "ملغى",
+      "refunded": "مسترد",
+      "partially_refunded": "مسترد جزئيًا"
     }
   }
 }

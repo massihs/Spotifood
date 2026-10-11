@@ -1,33 +1,44 @@
+import { Suspense } from "react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/server/db/client";
 import { getGuest } from "@/server/modules/guest/current";
 import { listGuestOrders } from "@/server/modules/orders/service";
-import { SessionExpired } from "@/components/guest/states";
+import { getGuestPaymentState, getGuestPaymentStatus } from "@/server/modules/payments/service";
+import { PaymentPanel } from "@/components/guest/payment-panel";
+import { SessionExpired, GuestSkeleton } from "@/components/guest/states";
 import { LiveIndicator, LiveProvider, LiveRefresh } from "@/components/realtime/live";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 
 const STEPS = ["received", "accepted", "preparing", "ready", "served"] as const;
 
-export default async function GuestOrdersPage({ searchParams }: PageProps<"/[locale]/table/orders">) {
+/** The guest cookie is per request: the page streams behind its own boundary (instant navigations). */
+export default function GuestOrdersPage({ searchParams }: PageProps<"/[locale]/table/orders">) {
+  return (
+    <Suspense fallback={<GuestSkeleton />}>
+      <GuestOrders searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/orders">, "searchParams">) {
   const guest = await getGuest();
   if (!guest) return <SessionExpired />;
-  const [t, format, orders, sp] = await Promise.all([
+  const [t, format, orders, sp, payState] = await Promise.all([
     getTranslations(),
     getFormatter(),
     listGuestOrders(db, guest),
     searchParams,
+    getGuestPaymentState(db, guest),
   ]);
+  const returned = typeof sp.payment === "string" ? await getGuestPaymentStatus(db, guest, sp.payment) : null;
   const money = (c: number) =>
     format.number(c / 100, { style: "currency", currency: guest.restaurant.currency });
   const total = orders.filter((o) => o.status !== "cancelled").reduce((s, o) => s + o.totalCents, 0);
-  const unpaid = orders
-    .filter((o) => o.status !== "cancelled" && o.paymentStatus !== "paid")
-    .reduce((s, o) => s + o.totalCents, 0);
 
   return (
     <LiveProvider url="/api/v1/realtime/guest">
-      <LiveRefresh types={["order.updated", "session.closed"]} />
+      <LiveRefresh types={["order.updated", "session.closed", "payment.updated"]} />
       <main className="px-4 pb-24">
         <div className="flex items-center gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
           <Link
@@ -122,7 +133,14 @@ export default async function GuestOrdersPage({ searchParams }: PageProps<"/[loc
                     ))}
                   </ul>
                   <p className="mt-3 flex justify-between border-t border-border pt-3 font-semibold">
-                    <span>{t("guest.total")}</span>
+                    <span>
+                      {t("guest.total")}
+                      {o.paymentStatus !== "unpaid" && o.status !== "cancelled" ? (
+                        <span className="ms-2 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-fg-muted">
+                          {t(`paymentStatus.${o.paymentStatus}`)}
+                        </span>
+                      ) : null}
+                    </span>
                     <span
                       className={cn("tabular-nums", o.status === "cancelled" && "line-through opacity-60")}
                     >
@@ -141,11 +159,15 @@ export default async function GuestOrdersPage({ searchParams }: PageProps<"/[loc
               <dt>{t("guest.yourTotal")}</dt>
               <dd className="font-semibold tabular-nums">{money(total)}</dd>
             </div>
-            <div className="flex justify-between text-fg-muted">
-              <dt>{t("guest.toPay")}</dt>
-              <dd className="tabular-nums">{money(unpaid)}</dd>
-            </div>
           </dl>
+        ) : null}
+
+        {orders.length > 0 ? (
+          <PaymentPanel
+            state={payState}
+            currency={guest.restaurant.currency}
+            returned={returned?.status ?? null}
+          />
         ) : null}
 
         <div className="fixed inset-x-0 bottom-0 mx-auto max-w-2xl px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
