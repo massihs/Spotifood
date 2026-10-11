@@ -40,4 +40,43 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm test
+      - name: Build (global edition)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_EDITION: global
+
+  # The Iran edition is a separate build (different locales and default language).
+  build-iran:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_SECRET: ci-only-secret-value-that-is-long-enough-123456
+      DATABASE_URL: postgres://build:build@127.0.0.1:1/build
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_EDITION: iran
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        edition: [global, iran]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image (${{ matrix.edition }})
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          build-args: NEXT_PUBLIC_EDITION=${{ matrix.edition }}
+          cache-from: type=gha,scope=${{ matrix.edition }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.edition }}

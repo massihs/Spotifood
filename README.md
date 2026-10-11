@@ -5,6 +5,10 @@ Plateforme SaaS multi-tenant de commande en salle par QR code : les clients scan
 - Architecture, schéma de données, flux, risques et roadmap : [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - Avancement par phase : [`docs/ROADMAP.md`](docs/ROADMAP.md)
 
+## Deux éditions
+
+Un seul code, deux déploiements : **International** (`deploy/global/`, fr/en/fa/ar, EUR, Stripe) et **Iran** (`deploy/iran/`, persan, IRR, Zarinpal, hébergé sur Liara). Voir [docs/EDITIONS.md](docs/EDITIONS.md).
+
 ## Stack
 
 Next.js 16 (App Router, Cache Components) · React 19 · TypeScript strict · Tailwind CSS 4 · PostgreSQL 16 · Drizzle ORM · Zod · next-intl (fr / en / fa / ar, RTL) · Argon2id · Vitest.
