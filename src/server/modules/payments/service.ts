@@ -1,3 +1,4 @@
+import { MAX_AMOUNT_CENTS } from "@/lib/money";
 import { and, asc, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
@@ -25,7 +26,7 @@ import type { GuestContext } from "@/server/modules/guest/sessions";
 /** An online checkout left unfinished for longer than this is abandoned (orders become payable again). */
 export const PENDING_TTL_MINUTES = 35;
 
-const ONLINE_CODES = ["stripe", "mock_online"] as const;
+const ONLINE_CODES = ["stripe", "zarinpal", "mock_online"] as const;
 const OFFLINE_CODES = ["cash", "on_site_terminal"] as const;
 type OnlineCode = (typeof ONLINE_CODES)[number];
 type OfflineCode = (typeof OFFLINE_CODES)[number];
@@ -420,6 +421,8 @@ export async function startOnlinePayment(
 
   const returnUrl = new URL(opts.returnUrl);
   returnUrl.searchParams.set("payment", payment.id);
+  const callbackUrl = new URL(`/api/v1/payments/return/${input.provider}`, returnUrl.origin);
+  callbackUrl.searchParams.set("payment", payment.id);
   try {
     const result = await provider.createPayment({
       paymentId: payment.id,
@@ -428,6 +431,7 @@ export async function startOnlinePayment(
       description:
         `${guest.restaurant.name} · ${guest.table.label} · ${payment.orderNumbers.join(", ")}`.slice(0, 250),
       returnUrl: returnUrl.toString(),
+      callbackUrl: callbackUrl.toString(),
       idempotencyKey: `create_${payment.id}`,
       merchantAccount: null,
     });
@@ -444,7 +448,7 @@ export async function startOnlinePayment(
       .set({
         status: "requires_action",
         providerRef: result.providerRef,
-        metadata: { ...payment.metadata, redirectUrl: result.redirectUrl },
+        metadata: { ...payment.metadata, redirectUrl: result.redirectUrl, returnUrl: returnUrl.toString() },
       })
       .where(and(eq(payments.id, payment.id), eq(payments.status, "pending")));
     return { paymentId: payment.id, redirectUrl: result.redirectUrl };
@@ -594,6 +598,38 @@ export async function failPayment(
   });
 }
 
+/**
+ * Redirect-based PSPs (Zarinpal): the guest comes back to our callback; the provider confirms
+ * the outcome server-to-server, then we apply it. Returns where to send the guest.
+ * Safe to hit twice (refresh): confirmation is idempotent and a settled payment is not re-verified.
+ */
+export async function handlePaymentReturn(db: Database, providerCode: string, query: URLSearchParams) {
+  const provider = getProvider(providerCode);
+  const paymentId = query.get("payment") ?? "";
+  if (!provider?.verifyReturn || !isUuid(paymentId)) throw notFound();
+  const [p] = await db.select().from(payments).where(eq(payments.id, paymentId));
+  if (!p || p.provider !== providerCode) throw notFound();
+  const returnUrl = typeof p.metadata.returnUrl === "string" ? p.metadata.returnUrl : null;
+  if (p.status === "pending" || p.status === "requires_action") {
+    const event = await provider.verifyReturn({
+      query,
+      payment: { id: p.id, amountCents: p.amountCents, currency: p.currency, providerRef: p.providerRef },
+    });
+    if (event.type === "payment.succeeded") {
+      await confirmPayment(db, {
+        paymentId: p.id,
+        provider: providerCode,
+        providerRef: event.providerRef,
+        amountCents: event.amountCents,
+        extra: event.extra,
+      });
+    } else if (event.type === "payment.failed") {
+      await failPayment(db, { paymentId: p.id, provider: providerCode, reason: event.reason });
+    }
+  }
+  return { paymentId: p.id, returnUrl };
+}
+
 /** Normalized webhook handling for any provider: verify → parse → apply. */
 export async function handleWebhook(db: Database, providerCode: string, rawBody: string, headers: Headers) {
   const provider = getProvider(providerCode);
@@ -633,7 +669,7 @@ export const recordPaymentSchema = z.object({
   participantId: z.uuid().nullable().optional(),
   provider: z.enum(OFFLINE_CODES),
   /** Cash handed over, for the change shown on screen. Informational. */
-  tenderedCents: z.coerce.number().int().min(0).max(10_000_000).nullable().optional(),
+  tenderedCents: z.coerce.number().int().min(0).max(MAX_AMOUNT_CENTS).nullable().optional(),
   idempotencyKey: z.string().regex(/^[A-Za-z0-9_-]{16,64}$/),
 });
 
@@ -747,7 +783,7 @@ export async function cancelPendingPayment(db: Database, ctx: RestaurantContext,
 }
 
 export const refundSchema = z.object({
-  amountCents: z.coerce.number().int().min(1).max(10_000_000),
+  amountCents: z.coerce.number().int().min(1).max(MAX_AMOUNT_CENTS),
   reason: z.string().trim().max(500).optional(),
 });
 

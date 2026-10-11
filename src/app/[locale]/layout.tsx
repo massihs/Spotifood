@@ -1,12 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { isLocale, localeDirection, LOCALES } from "@/i18n/config";
 import "@/styles/globals.css";
 
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans-loaded", display: "swap" });
+// Fonts are self-hosted (no request to Google at build or run time: unreachable from Iran,
+// and avoids sending visitors' IPs to a third party). Inter for Latin, Vazirmatn for Persian/Arabic.
+const sans = localFont({
+  src: "../../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
+  weight: "100 900",
+  variable: "--font-sans-loaded",
+  display: "swap",
+});
+const persian = localFont({
+  src: "../../../node_modules/@fontsource-variable/vazirmatn/files/vazirmatn-arabic-wght-normal.woff2",
+  weight: "100 900",
+  variable: "--font-fa-loaded",
+  display: "swap",
+  // Font loader options must be literals: not preloaded (≈ 60 KB), fetched as soon as Persian/Arabic
+  // text is rendered, with `swap` so text is never invisible.
+  preload: false,
+});
 
 export const metadata: Metadata = {
   title: { default: "Spotifood", template: "%s · Spotifood" },
@@ -37,7 +53,12 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={localeDirection(locale)} className={sans.variable} data-scroll-behavior="smooth">
+    <html
+      lang={locale}
+      dir={localeDirection(locale)}
+      className={`${sans.variable} ${persian.variable}`}
+      data-scroll-behavior="smooth"
+    >
       <body className="min-h-dvh">
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}

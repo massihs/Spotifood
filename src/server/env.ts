@@ -17,6 +17,11 @@ const schema = z.object({
   EMAIL_PROVIDER: z.enum(["console", "smtp", "resend"]).default("console"),
   EMAIL_FROM: z.string().default("Spotifood <no-reply@spotifood.local>"),
   ENABLE_MOCK_PAYMENTS: bool,
+  NEXT_PUBLIC_EDITION: z.enum(["global", "iran"]).default("global"),
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  ZARINPAL_MERCHANT_ID: z.string().optional(),
+  ZARINPAL_SANDBOX: bool,
 });
 
 export type Env = z.infer<typeof schema>;

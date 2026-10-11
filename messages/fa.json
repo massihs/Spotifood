@@ -440,7 +440,8 @@
       "on_site_terminal": "پرداخت با کارت روی کارت‌خوان شما.",
       "pay_later": "مشتری از گوشی خود همکاران را برای پرداخت صدا می‌زند.",
       "mock_online": "شبیه‌سازی برای آزمایش — هرگز در محیط اصلی فعال نیست.",
-      "stripe": "کارت بانکی، Apple Pay، Google Pay از طریق Stripe."
+      "stripe": "کارت بانکی، Apple Pay، Google Pay از طریق Stripe.",
+      "zarinpal": "کارت‌های بانکی عضو شتاب از طریق زرین‌پال."
     },
     "onlinePayment": "پرداخت آنلاین",
     "onlinePaymentHint": "مشتریان سهم خود را با گوشی پرداخت می‌کنند.",
@@ -838,7 +839,8 @@
       "on_site_terminal": "کارت‌خوان",
       "pay_later": "پرداخت سر میز",
       "mock_online": "آنلاین (شبیه‌سازی)",
-      "stripe": "آنلاین (Stripe)"
+      "stripe": "آنلاین (Stripe)",
+      "zarinpal": "آنلاین (زرین‌پال)"
     },
     "tendered": "مبلغ دریافتی",
     "tenderedHint": "اختیاری، برای محاسبهٔ باقی‌مانده.",

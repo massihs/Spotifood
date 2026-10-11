@@ -440,7 +440,8 @@
       "on_site_terminal": "Card payment on your terminal.",
       "pay_later": "Guests call the team from their phone to pay.",
       "mock_online": "Simulation for testing — never available in production.",
-      "stripe": "Cards, Apple Pay, Google Pay through Stripe."
+      "stripe": "Cards, Apple Pay, Google Pay through Stripe.",
+      "zarinpal": "Iranian bank cards (Shetab) through Zarinpal."
     },
     "onlinePayment": "Online payment",
     "onlinePaymentHint": "Guests pay their share from their phone.",
@@ -838,7 +839,8 @@
       "on_site_terminal": "Card terminal",
       "pay_later": "Pay at the table",
       "mock_online": "Online (simulated)",
-      "stripe": "Online (Stripe)"
+      "stripe": "Online (Stripe)",
+      "zarinpal": "Online (Zarinpal)"
     },
     "tendered": "Amount given",
     "tenderedHint": "Optional, to compute the change.",

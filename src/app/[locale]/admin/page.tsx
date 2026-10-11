@@ -1,3 +1,4 @@
+import { edition } from "@/config/edition";
 import { Suspense } from "react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -34,7 +35,10 @@ async function AdminOverview() {
         <StatCard label={t("stats.orders")} value={stats.orders} />
         <StatCard
           label={t("stats.revenue")}
-          value={format.number(stats.revenueCents / 100, { style: "currency", currency: "EUR" })}
+          value={format.number(stats.revenueCents / 100, {
+            style: "currency",
+            currency: edition.platformCurrency,
+          })}
         />
       </div>
       <Card className="mt-6">

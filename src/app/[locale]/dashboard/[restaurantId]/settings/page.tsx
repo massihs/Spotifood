@@ -1,3 +1,4 @@
+import { edition } from "@/config/edition";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -18,23 +19,7 @@ import {
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
 
-const COMMON_CURRENCIES = [
-  "EUR",
-  "USD",
-  "GBP",
-  "CHF",
-  "CAD",
-  "MAD",
-  "TND",
-  "DZD",
-  "AED",
-  "SAR",
-  "QAR",
-  "KWD",
-  "TRY",
-  "IRR",
-  "XOF",
-];
+const COMMON_CURRENCIES = edition.currencies;
 
 export default function SettingsPage({ params }: { params: Params }) {
   return (

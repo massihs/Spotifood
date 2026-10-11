@@ -440,7 +440,8 @@
       "on_site_terminal": "الدفع بالبطاقة على جهازك.",
       "pay_later": "يستدعي العميل الفريق من هاتفه للدفع.",
       "mock_online": "محاكاة للاختبار — غير متاحة أبدًا في بيئة الإنتاج.",
-      "stripe": "البطاقات البنكية وApple Pay وGoogle Pay عبر Stripe."
+      "stripe": "البطاقات البنكية وApple Pay وGoogle Pay عبر Stripe.",
+      "zarinpal": "البطاقات المصرفية الإيرانية (شتاب) عبر Zarinpal."
     },
     "onlinePayment": "الدفع الإلكتروني",
     "onlinePaymentHint": "يدفع العملاء حصتهم من هواتفهم.",
@@ -838,7 +839,8 @@
       "on_site_terminal": "جهاز البطاقات",
       "pay_later": "الدفع على الطاولة",
       "mock_online": "إلكتروني (تجريبي)",
-      "stripe": "إلكتروني (Stripe)"
+      "stripe": "إلكتروني (Stripe)",
+      "zarinpal": "إلكتروني (Zarinpal)"
     },
     "tendered": "المبلغ المستلم",
     "tenderedHint": "اختياري، لحساب الباقي.",

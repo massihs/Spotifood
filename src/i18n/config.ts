@@ -1,6 +1,11 @@
-export const LOCALES = ["fr", "en", "fa", "ar"] as const;
-export type AppLocale = (typeof LOCALES)[number];
-export const DEFAULT_LOCALE: AppLocale = "fr";
+import { edition } from "@/config/edition";
+
+/** Every locale the code base has messages for. */
+export const ALL_LOCALES = ["fr", "en", "fa", "ar"] as const;
+export type AppLocale = (typeof ALL_LOCALES)[number];
+/** Locales offered by this deployment (depends on the edition, see src/config/edition.ts). */
+export const LOCALES = edition.locales as readonly [AppLocale, ...AppLocale[]];
+export const DEFAULT_LOCALE: AppLocale = edition.defaultLocale;
 
 export const RTL_LOCALES: ReadonlySet<AppLocale> = new Set(["fa", "ar"]);
 export const localeDirection = (l: AppLocale) => (RTL_LOCALES.has(l) ? "rtl" : "ltr");

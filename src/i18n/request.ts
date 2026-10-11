@@ -1,5 +1,6 @@
 import { getRequestConfig } from "next-intl/server";
 import { locale as rootLocale } from "next/root-params";
+import { edition } from "@/config/edition";
 import { DEFAULT_LOCALE, isLocale } from "./config";
 
 export default getRequestConfig(async ({ locale }) => {
@@ -16,7 +17,7 @@ export default getRequestConfig(async ({ locale }) => {
   return {
     locale: resolved,
     // Never format with the server's zone (UTC in production). Restaurant pages pass their own zone.
-    timeZone: process.env.DEFAULT_TIME_ZONE ?? "Europe/Paris",
+    timeZone: process.env.DEFAULT_TIME_ZONE ?? edition.restaurantDefaults.timezone,
     messages: (await import(`../../messages/${resolved}.json`)).default,
   };
 });

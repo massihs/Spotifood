@@ -1,6 +1,7 @@
+import { edition } from "@/config/edition";
 import type { PlanLimits } from "@/server/db/schema";
 
-/** Platform plan catalog. Prices in cents. */
+/** Platform plan catalog. Prices in minor units of the edition's platform currency. */
 export const DEFAULT_PLANS: {
   code: string;
   name: string;
@@ -11,14 +12,14 @@ export const DEFAULT_PLANS: {
   {
     code: "free",
     name: "Free",
-    priceMonthlyCents: 0,
+    priceMonthlyCents: edition.planPrices.free,
     sortOrder: 0,
     limits: { maxRestaurants: 1, maxTables: 5, maxOrdersPerMonth: 300, maxStaff: 2, features: [] },
   },
   {
     code: "starter",
     name: "Starter",
-    priceMonthlyCents: 2900,
+    priceMonthlyCents: edition.planPrices.starter,
     sortOrder: 1,
     limits: {
       maxRestaurants: 1,
@@ -31,7 +32,7 @@ export const DEFAULT_PLANS: {
   {
     code: "professional",
     name: "Professional",
-    priceMonthlyCents: 7900,
+    priceMonthlyCents: edition.planPrices.professional,
     sortOrder: 2,
     limits: {
       maxRestaurants: 3,
@@ -44,7 +45,7 @@ export const DEFAULT_PLANS: {
   {
     code: "enterprise",
     name: "Enterprise",
-    priceMonthlyCents: 0,
+    priceMonthlyCents: edition.planPrices.enterprise,
     sortOrder: 3,
     limits: {
       maxRestaurants: null,

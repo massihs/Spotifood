@@ -27,6 +27,7 @@ import {
   subscriptions,
 } from "@/server/db/schema";
 import { hashPassword } from "@/server/auth/password";
+import { edition } from "@/config/edition";
 import { DEFAULT_CATEGORY_TEMPLATES, DEFAULT_PLANS } from "@/server/modules/catalog/defaults";
 import { createOrganization, createRestaurant } from "@/server/modules/restaurants/service";
 import { randomToken } from "@/lib/ids";
@@ -277,10 +278,17 @@ async function seedPlatform() {
     await db.insert(globalCategoryTemplates).values({ key, sortOrder: i }).onConflictDoNothing();
   }
   const email = process.env.SEED_SUPERADMIN_EMAIL ?? "admin@spotifood.local";
-  const password = process.env.SEED_SUPERADMIN_PASSWORD ?? "ChangeMe!2026";
-  await upsertUser(email, password, "Platform Admin", true);
+  const password = process.env.SEED_SUPERADMIN_PASSWORD;
+  if (!password && process.env.NODE_ENV === "production") {
+    // Never create a production admin with a well-known password.
+    console.warn("! SEED_SUPERADMIN_PASSWORD not set: super admin not created");
+  } else {
+    // Only creates the account; an existing account (and its changed password) is left untouched.
+    await upsertUser(email, password ?? "ChangeMe!2026", "Platform Admin", true);
+    console.log(`✓ super admin ${email}`);
+  }
   console.log(
-    `✓ platform: ${DEFAULT_PLANS.length} plans, ${DEFAULT_CATEGORY_TEMPLATES.length} category templates, super admin ${email}`,
+    `✓ platform: ${DEFAULT_PLANS.length} plans, ${DEFAULT_CATEGORY_TEMPLATES.length} category templates`,
   );
 }
 
@@ -322,7 +330,14 @@ async function seedDemoRestaurant() {
         legalName: "Demo Restauration SAS",
         // Online payment uses whatever this deployment offers (Stripe keys / dev simulator).
         onlinePaymentEnabled: true,
-        enabledPaymentProviders: ["cash", "on_site_terminal", "pay_later", "stripe", "mock_online"],
+        enabledPaymentProviders: [
+          "cash",
+          "on_site_terminal",
+          "pay_later",
+          "stripe",
+          "zarinpal",
+          "mock_online",
+        ],
       })
       .where(eq(restaurantSettings.restaurantId, restaurant.id));
     await tx
@@ -343,7 +358,7 @@ async function seedDemoRestaurant() {
 
     const rates = await tx.select().from(taxRates).where(eq(taxRates.restaurantId, restaurant.id));
     const rate10 = rates.find((r) => r.rateBps === 1000)!;
-    const rate20 = rates.find((r) => r.rateBps === 2000)!;
+    const rate20 = rates.find((r) => r.rateBps === 2000) ?? rate10;
 
     // Option groups (reusable across products).
     const [cuisson] = await tx
@@ -375,7 +390,7 @@ async function seedDemoRestaurant() {
         restaurantId: restaurant.id,
         groupId: supplements!.id,
         name: String(name),
-        priceDeltaCents: Number(delta),
+        priceDeltaCents: edition.demoPrice(Number(delta)),
         sortOrder: i,
       })),
       ...[
@@ -386,7 +401,7 @@ async function seedDemoRestaurant() {
         restaurantId: restaurant.id,
         groupId: sauce!.id,
         name: String(name),
-        priceDeltaCents: Number(delta),
+        priceDeltaCents: edition.demoPrice(Number(delta)),
         sortOrder: i,
       })),
     ]);
@@ -397,7 +412,9 @@ async function seedDemoRestaurant() {
         .insert(categories)
         .values({ restaurantId: restaurant.id, name: cat.name, templateKey: cat.key, sortOrder: ci })
         .returning();
-      for (const [pi, item] of cat.items.entries()) {
+      // No alcohol on the Iranian edition's demo menu (prohibited there).
+      const items = edition.edition === "iran" ? cat.items.filter((i) => !i.alcohol) : cat.items;
+      for (const [pi, item] of items.entries()) {
         const [product] = await tx
           .insert(products)
           .values({
@@ -405,7 +422,7 @@ async function seedDemoRestaurant() {
             categoryId: category!.id,
             name: item.name,
             description: item.description || null,
-            priceCents: item.price,
+            priceCents: edition.demoPrice(item.price),
             taxRateId: item.alcohol ? rate20.id : rate10.id,
             ingredients: item.ingredients,
             allergens: item.allergens ?? [],
@@ -582,7 +599,7 @@ async function seedDemoOrders() {
     "4",
     [
       { product: "Tagliatelles carbonara", quantity: 2 },
-      { product: "Verre de vin rouge", quantity: 2 },
+      { product: edition.edition === "iran" ? "Limonade artisanale" : "Verre de vin rouge", quantity: 2 },
     ],
     "served",
   );
@@ -600,6 +617,9 @@ async function seedDemoOrders() {
 
 async function main() {
   await seedPlatform();
+  // Production containers run this on every start with SEED_DEMO unset: platform data only.
+  const demo = process.env.SEED_DEMO ?? (process.env.NODE_ENV === "production" ? "false" : "true");
+  if (demo !== "true") return;
   await seedDemoRestaurant();
   await ensureDemoPlan();
   await seedDemoImages();

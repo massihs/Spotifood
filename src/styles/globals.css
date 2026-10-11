@@ -88,8 +88,8 @@
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --font-sans:
-    var(--font-sans-loaded), ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Vazirmatn",
-    "Noto Sans Arabic", sans-serif;
+    var(--font-sans-loaded), var(--font-fa-loaded), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    "Vazirmatn", "Noto Sans Arabic", sans-serif;
   --font-mono: var(--font-mono-loaded), ui-monospace, monospace;
   --radius-card: 1rem;
   --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 4px 16px -4px hsl(var(--shadow-color) / 0.08);

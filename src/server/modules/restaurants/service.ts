@@ -1,3 +1,4 @@
+import { edition } from "@/config/edition";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { DbOrTx } from "@/server/db/client";
 import {
@@ -14,11 +15,7 @@ import { slugify } from "@/lib/slug";
 import { randomToken } from "@/lib/ids";
 
 /** Default French VAT rates for restaurants. Editable per restaurant. */
-export const DEFAULT_TAX_RATES = [
-  { name: "TVA 10 % (sur place)", rateBps: 1000, isDefault: true },
-  { name: "TVA 20 % (alcool)", rateBps: 2000, isDefault: false },
-  { name: "TVA 5,5 %", rateBps: 550, isDefault: false },
-] as const;
+export const DEFAULT_TAX_RATES = edition.defaultTaxRates;
 
 export async function uniqueRestaurantSlug(db: DbOrTx, name: string): Promise<string> {
   const base = slugify(name) || "restaurant";
@@ -57,15 +54,19 @@ export async function createRestaurant(
       organizationId: input.organizationId,
       name: input.name,
       slug,
-      currency: input.currency ?? "EUR",
-      timezone: input.timezone ?? "Europe/Paris",
-      country: input.country ?? "FR",
-      defaultLocale: input.defaultLocale ?? "fr",
+      currency: input.currency ?? edition.restaurantDefaults.currency,
+      timezone: input.timezone ?? edition.restaurantDefaults.timezone,
+      country: input.country ?? edition.restaurantDefaults.country,
+      defaultLocale: input.defaultLocale ?? edition.defaultLocale,
     })
     .returning();
 
   const prefix = (slugify(input.name).replace(/[^a-z]/g, "")[0] ?? "a").toUpperCase();
-  await tx.insert(restaurantSettings).values({ restaurantId: restaurant!.id, orderPrefix: prefix });
+  await tx.insert(restaurantSettings).values({
+    restaurantId: restaurant!.id,
+    orderPrefix: prefix,
+    enabledLocales: [...edition.restaurantLocales],
+  });
   await tx.insert(taxRates).values(DEFAULT_TAX_RATES.map((r) => ({ ...r, restaurantId: restaurant!.id })));
   await tx.insert(restaurantMembers).values({
     restaurantId: restaurant!.id,
