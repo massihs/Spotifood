@@ -2,11 +2,12 @@
 
 import { useFormatter, useTranslations } from "next-intl";
 import { useActionState, useOptimistic, useState, useTransition } from "react";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import type { CartLineView } from "@/server/modules/cart/service";
 import type { Totals } from "@/server/modules/pricing";
 import {
+  placeOrderAction,
   removeItemAction,
   renameAction,
   setNoteAction,
@@ -22,6 +23,8 @@ export function CartView({
   pricesIncludeTax,
   seatLabel,
   displayName,
+  hasIssues,
+  orderCount,
 }: {
   lines: CartLineView[];
   totals: Totals;
@@ -29,6 +32,8 @@ export function CartView({
   pricesIncludeTax: boolean;
   seatLabel: string;
   displayName: string | null;
+  hasIssues: boolean;
+  orderCount: number;
 }) {
   const t = useTranslations();
   const money = useMoney(currency);
@@ -102,9 +107,78 @@ export function CartView({
               <dd className="tabular-nums">{money(totals.totalCents)}</dd>
             </div>
           </dl>
+          <OrderPanel
+            totalLabel={money(totals.totalCents)}
+            disabled={hasIssues || totals.totalCents === 0}
+            hasIssues={hasIssues}
+          />
         </>
       )}
+      {orderCount > 0 ? (
+        <Link href="/table/orders" className="mt-6 block text-center text-sm font-medium text-accent">
+          {t("guest.ordersLink", { count: orderCount })}
+        </Link>
+      ) : null}
     </main>
+  );
+}
+
+function OrderPanel({
+  totalLabel,
+  disabled,
+  hasIssues,
+}: {
+  totalLabel: string;
+  disabled: boolean;
+  hasIssues: boolean;
+}) {
+  const t = useTranslations();
+  const router = useRouter();
+  const [note, setNote] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  return (
+    <div className="mt-5 space-y-3">
+      <label className="block space-y-1.5">
+        <span className="text-sm font-medium">{t("guest.orderNote")}</span>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          maxLength={500}
+          rows={2}
+          placeholder={t("guest.orderNotePlaceholder")}
+          className="w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[16px] placeholder:text-fg-subtle"
+        />
+      </label>
+      {hasIssues ? <p className="text-sm text-danger">{t("guest.fixCart")}</p> : null}
+      {error ? (
+        <p role="alert" className="text-sm text-danger">
+          {error}
+        </p>
+      ) : null}
+      <div className="sticky bottom-0 bg-bg pt-1 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <button
+          type="button"
+          disabled={disabled || pending}
+          onClick={() =>
+            startTransition(async () => {
+              setError(null);
+              const res = await placeOrderAction(note);
+              if (res?.ok) router.push("/table/orders?placed=1");
+              else if (res) {
+                setError(
+                  t.has(`errorCodes.${res.error}`) ? t(`errorCodes.${res.error}`) : t("errorCodes.internal"),
+                );
+                router.refresh();
+              }
+            })
+          }
+          className="h-14 w-full rounded-2xl bg-accent text-lg font-semibold text-accent-fg shadow-xl disabled:opacity-50"
+        >
+          {pending ? "…" : t("guest.placeOrder", { price: totalLabel })}
+        </button>
+      </div>
+    </div>
   );
 }
 

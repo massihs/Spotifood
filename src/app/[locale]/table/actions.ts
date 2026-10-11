@@ -6,6 +6,7 @@ import { runAction } from "@/server/actions";
 import { enforceRateLimit } from "@/server/infra/rate-limit";
 import { requireGuest } from "@/server/modules/guest/current";
 import { renameParticipant } from "@/server/modules/guest/sessions";
+import { placeOrder } from "@/server/modules/orders/service";
 import {
   addToCart,
   getCartView,
@@ -61,5 +62,14 @@ export async function renameAction(_prev: unknown, fd: FormData) {
     const name = await renameParticipant(db, g, String(fd.get("displayName") ?? ""));
     refresh();
     return { name };
+  });
+}
+
+/** Sends the cart to the kitchen. Prices are recomputed server-side inside placeOrder. */
+export async function placeOrderAction(note: string) {
+  return runAction(async () => {
+    const g = await guest();
+    const order = await placeOrder(db, g, { note });
+    return { number: order.number };
   });
 }
