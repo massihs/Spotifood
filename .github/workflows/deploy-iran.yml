@@ -23,12 +23,14 @@ jobs:
         with:
           node-version: 22
       - name: Deploy to Liara
-        run: npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN"
+        # --detach: without a container health check the CLI otherwise keeps waiting after the
+        # release is live (until the job times out). The next step shows the start-up logs.
+        run: npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" --detach
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
       # Container start-up output (migrations, seed, server), even when the release is rejected.
       - name: Liara app logs
         if: always()
-        run: npx --yes @liara/cli@9 logs --app spotifood --since "15 minutes ago" --timestamps --api-token "$LIARA_API_TOKEN" || true
+        run: sleep 150 && npx --yes @liara/cli@9 logs --app spotifood --since "15 minutes ago" --timestamps --api-token "$LIARA_API_TOKEN" || true
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
