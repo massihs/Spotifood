@@ -45,18 +45,20 @@ jobs:
             --banner:js="import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);" \
             --outfile=dist/seed.mjs --log-level=warning
           rm -rf .next/cache
+          # The Liara CLI always skips a folder named .next: ship it under another name.
+          mv .next next-build
       - name: Package for Liara
         run: |
           cp deploy/prebuilt.ignore .liaraignore
           cp deploy/prebuilt.ignore .dockerignore
-          du -sh .next dist
+          du -sh next-build dist
       - name: Deploy to Liara
         # Streams the (short) Liara build. The CLI may keep waiting once the release is live:
-        # stop after 15 min and judge the deploy by the build result it printed.
+        # stop after 25 min and judge the deploy by the build result it printed.
         run: |
           set +e
           # Written to a file, not a pipe: a lingering CLI child would keep a pipe open forever.
-          timeout -k 20 900 npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" \
+          timeout -k 20 1500 npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" \
             --liara-json liara.prebuilt.json --no-app-logs > deploy.log 2>&1
           cat deploy.log
           grep -q "Image pushed" deploy.log || { echo "::error::Liara build failed"; exit 1; }

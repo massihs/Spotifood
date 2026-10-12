@@ -9,8 +9,13 @@ ENV NODE_ENV=production \
     PORT=3000 \
     STORAGE_LOCAL_DIR=/app/.storage
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && npm cache clean --force
-COPY --chown=node:node .next ./.next
+# Runtime-unneeded parts pruned in the same layer (keeps the image ~150 MB lighter):
+# the musl SWC binary (the image is glibc), build-only font packages, bundled docs.
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
+ && rm -rf node_modules/@next/swc-linux-x64-musl node_modules/@fontsource-variable node_modules/next/dist/docs \
+ && npm cache clean --force
+# Uploaded as next-build/: the Liara CLI never uploads a folder named .next.
+COPY --chown=node:node next-build ./.next
 COPY --chown=node:node public ./public
 COPY --chown=node:node drizzle ./drizzle
 COPY --chown=node:node messages ./messages
