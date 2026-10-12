@@ -1,17 +1,25 @@
+import { Check, ChefHat, CircleCheck, ConciergeBell, Plus, ReceiptText, Utensils } from "lucide-react";
 import { Suspense } from "react";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { GuestTopBar } from "@/components/guest/cart-view";
+import { PaymentPanel } from "@/components/guest/payment-panel";
+import { GuestSkeleton, SessionExpired } from "@/components/guest/states";
+import { LiveIndicator, LiveProvider, LiveRefresh } from "@/components/realtime/live";
+import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
-import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { db } from "@/server/db/client";
 import { getGuest } from "@/server/modules/guest/current";
 import { listGuestOrders } from "@/server/modules/orders/service";
 import { getGuestPaymentState, getGuestPaymentStatus } from "@/server/modules/payments/service";
-import { PaymentPanel } from "@/components/guest/payment-panel";
-import { SessionExpired, GuestSkeleton } from "@/components/guest/states";
-import { LiveIndicator, LiveProvider, LiveRefresh } from "@/components/realtime/live";
-import { Link } from "@/i18n/navigation";
-import { cn } from "@/lib/cn";
 
-const STEPS = ["received", "accepted", "preparing", "ready", "served"] as const;
+const STEPS = [
+  { key: "received", Icon: ReceiptText },
+  { key: "accepted", Icon: Check },
+  { key: "preparing", Icon: ChefHat },
+  { key: "ready", Icon: ConciergeBell },
+  { key: "served", Icon: Utensils },
+] as const;
 
 /** The guest cookie is per request: the page streams behind its own boundary (instant navigations). */
 export default function GuestOrdersPage({ searchParams }: PageProps<"/[locale]/table/orders">) {
@@ -25,14 +33,14 @@ export default function GuestOrdersPage({ searchParams }: PageProps<"/[locale]/t
 async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/orders">, "searchParams">) {
   const guest = await getGuest();
   if (!guest) return <SessionExpired />;
-  const [t, format, orders, sp, payState] = await Promise.all([
+  const [t, format, orders, sp, payState, locale] = await Promise.all([
     getTranslations(),
     getFormatter(),
     listGuestOrders(db, guest),
     searchParams,
     getGuestPaymentState(db, guest),
+    getLocale(),
   ]);
-  const locale = await getLocale();
   const returned = typeof sp.payment === "string" ? await getGuestPaymentStatus(db, guest, sp.payment) : null;
   const money = (c: number) => formatMoney(c, guest.restaurant.currency, locale);
   const total = orders.filter((o) => o.status !== "cancelled").reduce((s, o) => s + o.totalCents, 0);
@@ -40,47 +48,49 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
   return (
     <LiveProvider url="/api/v1/realtime/guest">
       <LiveRefresh types={["order.updated", "session.closed", "payment.updated"]} />
-      <main className="px-4 pb-24">
-        <div className="flex items-center gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
-          <Link
-            href="/table"
-            className="grid size-10 place-items-center rounded-full bg-surface-2"
-            aria-label={t("guest.backToMenu")}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="size-5 rtl:rotate-180"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </Link>
-          <div>
-            <h1 className="text-xl font-semibold">{t("guest.myOrders")}</h1>
-            <LiveIndicator />
-          </div>
-        </div>
-
+      <GuestTopBar
+        title={t("guest.myOrders")}
+        subtitle={`${guest.restaurant.name} · ${t("guest.tableBadge", { table: guest.table.label })}`}
+        extra={<LiveIndicator className="rounded-full bg-surface-2 px-3 py-1.5" />}
+      />
+      <main className="px-4 pt-4 pb-32">
         {sp.placed ? (
-          <p role="status" className="mb-4 rounded-2xl bg-success-soft px-4 py-3 font-medium text-success">
-            ✓ {t("guest.orderPlaced")}
-          </p>
+          <div
+            role="status"
+            className="animate-pop-in mb-4 flex items-center gap-3 rounded-3xl bg-[#0b0b0b] p-4 text-white"
+          >
+            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-accent text-accent-fg">
+              <CircleCheck className="size-7" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-lg font-extrabold">{t("guest.sentTitle")}</p>
+              <p className="text-sm text-white/70">{t("guest.sentBody")}</p>
+            </div>
+          </div>
         ) : null}
 
         {orders.length === 0 ? (
-          <p className="py-16 text-center text-fg-muted">{t("guest.noOrders")}</p>
+          <div className="py-16 text-center">
+            <div className="mx-auto grid size-20 place-items-center rounded-full bg-surface-2">
+              <ReceiptText className="size-9 text-fg-muted" aria-hidden="true" />
+            </div>
+            <p className="mt-5 text-lg font-bold">{t("guest.noOrders")}</p>
+            <Link
+              href="/table"
+              className="mt-7 inline-flex h-12 items-center rounded-full bg-ink px-7 font-bold text-ink-fg"
+            >
+              {t("guest.backToMenu")}
+            </Link>
+          </div>
         ) : (
           <ul className="space-y-4">
             {orders.map((o) => {
-              const stepIndex = STEPS.indexOf(o.status as (typeof STEPS)[number]);
+              const stepIndex = STEPS.findIndex((s) => s.key === o.status);
               return (
-                <li key={o.id} className="rounded-2xl border border-border bg-surface p-4">
+                <li key={o.id} className="rounded-3xl border border-border bg-surface p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-semibold">{t("guest.orderNumber", { number: o.number })}</p>
+                      <p className="text-lg font-extrabold">{t("guest.orderNumber", { number: o.number })}</p>
                       <p className="text-sm text-fg-muted">
                         {t("guest.placedAt", {
                           time: format.dateTime(o.placedAt, {
@@ -92,52 +102,95 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                     </div>
                     <span
                       className={cn(
-                        "shrink-0 rounded-full px-3 py-1 text-sm font-medium",
-                        o.status === "ready"
-                          ? "bg-success text-white"
+                        "shrink-0 rounded-full px-3 py-1.5 text-sm font-bold",
+                        o.status === "ready" || o.status === "served"
+                          ? "bg-accent text-accent-fg"
                           : o.status === "cancelled"
                             ? "bg-danger-soft text-danger"
-                            : "bg-accent-soft text-accent",
+                            : "bg-ink text-ink-fg",
                       )}
                     >
                       {t(`orderStatus.${o.status}`)}
                     </span>
                   </div>
+
                   {stepIndex >= 0 ? (
-                    <ol className="mt-4 grid grid-cols-5 gap-1" aria-label={t(`orderStatus.${o.status}`)}>
-                      {STEPS.map((s, i) => (
-                        <li
-                          key={s}
-                          className={cn("h-1.5 rounded-full", i <= stepIndex ? "bg-accent" : "bg-surface-2")}
-                        >
-                          <span className="sr-only">{t(`orderStatus.${s}`)}</span>
-                        </li>
-                      ))}
+                    <ol className="mt-5 flex items-start" aria-label={t("guest.trackTitle")}>
+                      {STEPS.map(({ key, Icon }, i) => {
+                        const done = i < stepIndex;
+                        const current = i === stepIndex;
+                        return (
+                          <li
+                            key={key}
+                            aria-current={current ? "step" : undefined}
+                            className="relative flex flex-1 flex-col items-center text-center"
+                          >
+                            {i > 0 ? (
+                              <span
+                                aria-hidden="true"
+                                className={cn(
+                                  "absolute end-1/2 top-[18px] h-1 w-full -translate-y-1/2 rounded-full",
+                                  i <= stepIndex ? "bg-accent" : "bg-surface-2",
+                                )}
+                              />
+                            ) : null}
+                            <span
+                              className={cn(
+                                "relative z-10 grid size-9 place-items-center rounded-full",
+                                current
+                                  ? "bg-ink text-ink-fg ring-4 ring-accent/35"
+                                  : done
+                                    ? "bg-accent text-accent-fg"
+                                    : "bg-surface-2 text-fg-subtle",
+                              )}
+                            >
+                              <Icon className="size-[18px]" aria-hidden="true" />
+                            </span>
+                            <span
+                              className={cn(
+                                "mt-1.5 text-[11px] leading-tight",
+                                current ? "font-bold text-fg" : "text-fg-muted",
+                              )}
+                            >
+                              {t(`guest.stepShort.${key}`)}
+                            </span>
+                          </li>
+                        );
+                      })}
                     </ol>
                   ) : null}
-                  <p className="mt-2 text-sm text-fg-muted">{t(`guest.statusHint.${o.status}`)}</p>
-                  <ul className="mt-3 space-y-1.5 border-t border-border pt-3 text-sm">
+                  <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-sm font-medium">
+                    {t(`guest.statusHint.${o.status}`)}
+                  </p>
+
+                  <ul className="mt-4 space-y-2.5 text-[15px]">
                     {o.items.map((i) => (
                       <li key={i.id} className="flex justify-between gap-3">
-                        <span>
-                          <span className="font-medium tabular-nums">{i.quantity}×</span> {i.productName}
-                          {i.options.length ? (
-                            <span className="text-fg-muted">
-                              {" "}
-                              · {i.options.map((x) => x.valueName).join(", ")}
-                            </span>
-                          ) : null}
-                          {i.note ? <span className="block text-xs text-fg-subtle">« {i.note} »</span> : null}
+                        <span className="flex gap-2">
+                          <span className="grid h-6 min-w-6 place-items-center rounded-md bg-surface-2 px-1 text-xs font-bold tabular-nums">
+                            {i.quantity}
+                          </span>
+                          <span>
+                            <span className="font-medium">{i.productName}</span>
+                            {i.options.length ? (
+                              <span className="block text-sm text-fg-muted">
+                                {i.options.map((x) => x.valueName).join("، ")}
+                              </span>
+                            ) : null}
+                            {i.note ? (
+                              <span className="block text-xs text-fg-subtle">« {i.note} »</span>
+                            ) : null}
+                          </span>
                         </span>
                         <span className="shrink-0 tabular-nums">{money(i.lineTotalCents)}</span>
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-3 flex justify-between border-t border-border pt-3 font-semibold">
-                    <span>
+                  <p className="mt-4 flex items-center justify-between border-t border-border pt-3 font-extrabold">
+                    <span className="flex items-center gap-2">
                       {t("guest.total")}
                       {o.paymentStatus !== "unpaid" && o.status !== "cancelled" ? (
-                        <span className="ms-2 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-fg-muted">
+                        <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text">
                           {t(`paymentStatus.${o.paymentStatus}`)}
                         </span>
                       ) : null}
@@ -155,30 +208,30 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
         )}
 
         {orders.length > 0 ? (
-          <dl className="mt-5 space-y-1 rounded-2xl bg-surface-2 p-4 text-sm">
-            <div className="flex justify-between">
-              <dt>{t("guest.yourTotal")}</dt>
-              <dd className="font-semibold tabular-nums">{money(total)}</dd>
+          <>
+            <div className="mt-4 flex items-center justify-between rounded-3xl bg-surface-2 px-5 py-4">
+              <span className="font-semibold">{t("guest.yourTotal")}</span>
+              <span className="text-lg font-extrabold tabular-nums">{money(total)}</span>
             </div>
-          </dl>
+            <PaymentPanel
+              state={payState}
+              currency={guest.restaurant.currency}
+              returned={returned?.status ?? null}
+            />
+          </>
         ) : null}
 
         {orders.length > 0 ? (
-          <PaymentPanel
-            state={payState}
-            currency={guest.restaurant.currency}
-            returned={returned?.status ?? null}
-          />
+          <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl border-t border-border bg-bg/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
+            <Link
+              href="/table"
+              className="flex h-14 items-center justify-center gap-2 rounded-full bg-surface-2 text-base font-bold active:bg-surface-3"
+            >
+              <Plus className="size-5" strokeWidth={2.5} aria-hidden="true" />
+              {t("guest.orderMore")}
+            </Link>
+          </div>
         ) : null}
-
-        <div className="fixed inset-x-0 bottom-0 mx-auto max-w-2xl px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <Link
-            href="/table"
-            className="flex h-14 items-center justify-center rounded-2xl bg-fg font-semibold text-bg shadow-2xl"
-          >
-            {t("guest.orderAgain")}
-          </Link>
-        </div>
       </main>
     </LiveProvider>
   );

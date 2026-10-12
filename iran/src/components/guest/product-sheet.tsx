@@ -1,22 +1,18 @@
 "use client";
 
+import { Check, Flame, Scale, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { cn } from "@/lib/cn";
-import { priceLine, type PricedOptionGroup } from "@/server/modules/pricing";
-import type { PublicProduct } from "@/server/modules/menu/public";
 import { addToCartAction } from "@/app/[locale]/table/actions";
-import { ProductImage, useMoney, type CartSummary } from "./menu-app";
+import { useMoney } from "@/components/ui/use-money";
+import { cn } from "@/lib/cn";
+import type { PublicProduct } from "@/server/modules/menu/public";
+import { priceLine, type PricedOptionGroup } from "@/server/modules/pricing";
+import { discountPct, initialSelection, ProductImage, QuantityStepper, type CartSummary } from "./parts";
 
-function initialSelection(groups: PricedOptionGroup[]) {
-  const m = new Map<string, Set<string>>();
-  for (const g of groups) {
-    const defaults = g.values.filter((v) => v.isDefault && v.isAvailable).slice(0, g.maxSelect);
-    m.set(g.id, new Set(defaults.map((v) => v.id)));
-  }
-  return m;
-}
+export { QuantityStepper };
 
+/** Product details as a bottom sheet (native <dialog>: focus trap, Escape, inert page). */
 export function ProductSheet({
   product: p,
   currency,
@@ -48,6 +44,7 @@ export function ProductSheet({
     !priced.ok && priced.error.code === "too_few_options"
       ? p.optionGroups.find((g) => g.id === (priced.error as { groupId: string }).groupId)
       : undefined;
+  const pct = discountPct(p);
 
   const toggle = (g: PricedOptionGroup, valueId: string) =>
     setSelected((prev) => {
@@ -88,168 +85,198 @@ export function ProductSheet({
       onClose={onClose}
       onClick={(e) => e.target === ref.current && ref.current?.close()}
       aria-labelledby="sheet-title"
-      className="m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-hidden rounded-t-3xl bg-surface p-0 text-fg backdrop:bg-black/50 sm:m-auto sm:max-w-lg sm:rounded-3xl"
+      className="animate-sheet-up m-0 mt-auto max-h-[94dvh] w-full max-w-none overflow-hidden rounded-t-[1.75rem] bg-surface p-0 text-fg backdrop:bg-black/60 sm:m-auto sm:max-w-lg sm:rounded-[1.75rem]"
     >
-      <div className="flex max-h-[92dvh] flex-col">
+      <div className="flex max-h-[94dvh] flex-col">
         <div className="relative overflow-y-auto overscroll-contain">
-          {p.images[0] ? <ProductImage product={p} size="lg" className="aspect-[4/3] w-full" eager /> : null}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-2 z-10 mx-auto h-1.5 w-10 rounded-full bg-white/80 shadow sm:hidden"
+          />
+          {p.images[0] ? (
+            <ProductImage product={p} size="lg" className="aspect-[4/3] w-full" eager />
+          ) : (
+            <div className="h-14" />
+          )}
           <button
             type="button"
             onClick={() => ref.current?.close()}
             aria-label={t("guest.close")}
-            className="absolute end-3 top-3 grid size-10 place-items-center rounded-full bg-surface/90 text-fg shadow"
+            className="absolute end-3 top-3 z-10 grid size-10 place-items-center rounded-full bg-surface text-fg shadow-[var(--shadow-float)]"
           >
-            <svg
-              viewBox="0 0 24 24"
-              className="size-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
-              <path d="M6 6l12 12M18 6 6 18" />
-            </svg>
+            <X className="size-5" aria-hidden="true" />
           </button>
 
-          <div className="space-y-5 p-5">
+          <div className="px-5 pt-5 pb-6">
             <header>
-              <h2 id="sheet-title" className="text-xl font-semibold">
+              <h2 id="sheet-title" className="text-2xl leading-tight font-extrabold tracking-tight">
                 {p.name}
               </h2>
-              <p className="mt-1 flex items-center gap-2">
-                <span className="font-semibold tabular-nums">{money(p.priceCents)}</span>
-                {p.compareAtPriceCents ? (
-                  <s className="text-fg-subtle tabular-nums">{money(p.compareAtPriceCents)}</s>
+              <p className="mt-2 flex flex-wrap items-center gap-2 text-lg">
+                <span className="font-bold tabular-nums">{money(p.priceCents)}</span>
+                {pct ? (
+                  <>
+                    <s className="text-base text-fg-subtle tabular-nums">{money(p.compareAtPriceCents!)}</s>
+                    <span className="rounded-md bg-accent px-1.5 py-0.5 text-xs font-bold text-accent-fg">
+                      {t("guest.discount", { pct })}
+                    </span>
+                  </>
                 ) : null}
               </p>
-              {p.description ? <p className="mt-2 text-fg-muted">{p.description}</p> : null}
+              {p.description ? <p className="mt-2 leading-7 text-fg-muted">{p.description}</p> : null}
             </header>
 
-            {p.ingredients || p.allergens.length || p.caloriesKcal || p.weightGrams || p.tags.length ? (
-              <div className="space-y-2 text-sm">
+            {p.tags.length || p.caloriesKcal || p.weightGrams ? (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {p.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent-text"
+                  >
+                    {t.has(`tags.${tag}`) ? t(`tags.${tag}`) : tag.replace(/_/g, " ")}
+                  </span>
+                ))}
+                {p.caloriesKcal ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium">
+                    <Flame className="size-3.5" aria-hidden="true" />
+                    {t("guest.kcal", { n: p.caloriesKcal })}
+                  </span>
+                ) : null}
+                {p.weightGrams ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium">
+                    <Scale className="size-3.5" aria-hidden="true" />
+                    {t("guest.grams", { n: p.weightGrams })}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+
+            {p.ingredients || p.allergens.length ? (
+              <div className="mt-4 space-y-2 rounded-2xl bg-surface-2 p-4 text-sm">
                 {p.ingredients ? (
                   <p>
-                    <span className="font-medium">{t("guest.ingredients")} : </span>
+                    <span className="font-semibold">{t("guest.ingredients")}: </span>
                     <span className="text-fg-muted">{p.ingredients}</span>
                   </p>
                 ) : null}
                 {p.allergens.length ? (
-                  <div>
-                    <span className="font-medium">{t("guest.allergens")} : </span>
-                    <span className="inline-flex flex-wrap gap-1 align-middle">
-                      {p.allergens.map((a) => (
-                        <span key={a} className="rounded-full bg-warning-soft px-2 py-0.5 text-xs">
-                          {t(`allergens.${a}`)}
-                        </span>
-                      ))}
-                    </span>
-                  </div>
+                  <p className="flex flex-wrap items-center gap-1.5">
+                    <span className="font-semibold">{t("guest.allergens")}:</span>
+                    {p.allergens.map((a) => (
+                      <span key={a} className="rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium">
+                        {t(`allergens.${a}`)}
+                      </span>
+                    ))}
+                  </p>
                 ) : null}
-                <div className="flex flex-wrap gap-1.5">
-                  {p.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent"
-                    >
-                      {t.has(`tags.${tag}`) ? t(`tags.${tag}`) : tag.replace(/_/g, " ")}
-                    </span>
-                  ))}
-                  {p.caloriesKcal ? (
-                    <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs">
-                      {t("guest.kcal", { n: p.caloriesKcal })}
-                    </span>
-                  ) : null}
-                  {p.weightGrams ? (
-                    <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs">
-                      {t("guest.grams", { n: p.weightGrams })}
-                    </span>
-                  ) : null}
-                </div>
               </div>
             ) : null}
+          </div>
 
-            {p.optionGroups.map((g) => {
-              const set = selected.get(g.id) ?? new Set<string>();
-              const radio = g.maxSelect === 1;
-              const unmet = missing?.id === g.id;
-              return (
-                <fieldset key={g.id} className="space-y-2">
-                  <legend className="flex w-full items-center justify-between gap-2">
-                    <span className="font-semibold">{g.name}</span>
-                    <span
-                      className={cn(
-                        "rounded-full px-2.5 py-0.5 text-xs font-medium",
-                        g.minSelect > 0
-                          ? unmet
-                            ? "bg-accent text-accent-fg"
-                            : "bg-surface-2 text-fg"
-                          : "text-fg-subtle",
-                      )}
-                    >
-                      {g.minSelect > 0 ? t("guest.required") : t("guest.optionalChoice")}
-                    </span>
-                  </legend>
-                  <p className="text-sm text-fg-muted">{rule(g)}</p>
-                  <div className="divide-y divide-border rounded-2xl border border-border">
-                    {g.values.map((v) => {
-                      const checked = set.has(v.id);
-                      const disabled = !v.isAvailable || (!radio && !checked && set.size >= g.maxSelect);
-                      return (
-                        <label
-                          key={v.id}
-                          className={cn(
-                            "flex min-h-12 cursor-pointer items-center gap-3 px-4 py-2",
-                            disabled && !checked && "cursor-not-allowed opacity-50",
-                          )}
-                        >
-                          <input
-                            type={radio ? "radio" : "checkbox"}
-                            name={`g-${g.id}`}
-                            checked={checked}
-                            disabled={disabled && !checked}
-                            onChange={() => toggle(g, v.id)}
-                            onClick={(e) => {
-                              // Allow un-selecting an optional radio.
-                              if (radio && checked && g.minSelect === 0) {
-                                e.preventDefault();
-                                toggle(g, v.id);
-                              }
-                            }}
-                            className="size-5 accent-[var(--accent)]"
-                          />
-                          <span className="flex-1">{v.name}</span>
+          {p.optionGroups.map((g) => {
+            const set = selected.get(g.id) ?? new Set<string>();
+            const radio = g.maxSelect === 1;
+            const unmet = missing?.id === g.id;
+            return (
+              <fieldset key={g.id} className="border-t-8 border-surface-2">
+                <legend className="sr-only">{g.name}</legend>
+                <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-2">
+                  <div>
+                    <p aria-hidden="true" className="text-lg font-bold">
+                      {g.name}
+                    </p>
+                    <p className="text-sm text-fg-muted">{rule(g)}</p>
+                  </div>
+                  <span
+                    className={cn(
+                      "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
+                      g.minSelect > 0
+                        ? unmet
+                          ? "bg-ink text-ink-fg"
+                          : "bg-surface-2 text-fg"
+                        : "bg-surface-2 text-fg-muted",
+                    )}
+                  >
+                    {g.minSelect > 0 ? t("guest.required") : t("guest.optionalChoice")}
+                  </span>
+                </div>
+                <div className="px-5 pb-3">
+                  {g.values.map((v) => {
+                    const checked = set.has(v.id);
+                    const disabled = !v.isAvailable || (!radio && !checked && set.size >= g.maxSelect);
+                    return (
+                      <label
+                        key={v.id}
+                        className={cn(
+                          "flex min-h-14 cursor-pointer items-center gap-3 border-b border-border last:border-0",
+                          disabled && !checked && "cursor-not-allowed opacity-45",
+                        )}
+                      >
+                        <input
+                          type={radio ? "radio" : "checkbox"}
+                          name={`g-${g.id}`}
+                          checked={checked}
+                          disabled={disabled && !checked}
+                          onChange={() => toggle(g, v.id)}
+                          onClick={(e) => {
+                            // Allow un-selecting an optional radio.
+                            if (radio && checked && g.minSelect === 0) {
+                              e.preventDefault();
+                              toggle(g, v.id);
+                            }
+                          }}
+                          className="peer sr-only"
+                        />
+                        <span className="flex-1 py-3">
+                          <span className="block font-medium">{v.name}</span>
                           {!v.isAvailable ? (
-                            <span className="text-xs text-fg-subtle">{t("guest.soldOut")}</span>
+                            <span className="block text-xs text-fg-subtle">{t("guest.soldOut")}</span>
                           ) : v.priceDeltaCents ? (
-                            <span className="text-sm text-fg-muted tabular-nums">
+                            <span className="block text-sm text-fg-muted tabular-nums">
                               +{money(v.priceDeltaCents)}
                             </span>
                           ) : null}
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
-              );
-            })}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "grid size-6 shrink-0 place-items-center border-2 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--ring)]",
+                            radio ? "rounded-full" : "rounded-md",
+                            checked ? "border-ink bg-ink text-ink-fg" : "border-border-strong",
+                          )}
+                        >
+                          {checked ? (
+                            radio ? (
+                              <span className="size-2.5 rounded-full bg-ink-fg" />
+                            ) : (
+                              <Check className="size-4" strokeWidth={3} />
+                            )
+                          ) : null}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            );
+          })}
 
-            <label className="block space-y-1.5">
-              <span className="font-semibold">{t("guest.note")}</span>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                maxLength={280}
-                rows={2}
-                placeholder={t("guest.notePlaceholder")}
-                className="w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[16px] placeholder:text-fg-subtle focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none"
-              />
-            </label>
-          </div>
+          <label className="block border-t-8 border-surface-2 px-5 pt-5 pb-6">
+            <span className="text-lg font-bold">{t("guest.note")}</span>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              maxLength={280}
+              rows={2}
+              placeholder={t("guest.notePlaceholder")}
+              className="mt-2 w-full resize-none rounded-2xl bg-surface-2 px-4 py-3 text-[16px] placeholder:text-fg-muted focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
+            />
+          </label>
         </div>
 
-        <footer className="border-t border-border bg-surface px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <footer className="border-t border-border bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {error ? (
-            <p role="alert" className="mb-2 text-sm text-danger">
+            <p role="alert" className="mb-2 text-sm font-medium text-danger">
               {error}
             </p>
           ) : null}
@@ -259,64 +286,25 @@ export function ProductSheet({
               type="button"
               onClick={add}
               disabled={!priced.ok || pending}
-              className="h-12 flex-1 rounded-2xl bg-accent px-4 font-semibold text-accent-fg disabled:opacity-50"
+              aria-busy={pending}
+              className="flex h-12 min-w-0 flex-1 items-center justify-between gap-2 rounded-full bg-ink px-5 font-bold text-ink-fg transition-transform active:scale-[0.98] disabled:opacity-40"
             >
-              {!p.isAvailable
-                ? t("guest.soldOut")
-                : missing
-                  ? `${missing.name} · ${t("guest.required").toLowerCase()}`
-                  : t("guest.add", {
-                      price: money(priced.ok ? priced.line.lineTotalCents : p.priceCents * quantity),
-                    })}
+              {!p.isAvailable ? (
+                <span className="mx-auto">{t("guest.soldOut")}</span>
+              ) : missing ? (
+                <span className="mx-auto truncate">{`${missing.name} · ${t("guest.required")}`}</span>
+              ) : (
+                <>
+                  <span>{t("common.add")}</span>
+                  <span className="truncate tabular-nums">
+                    {money(priced.ok ? priced.line.lineTotalCents : p.priceCents * quantity)}
+                  </span>
+                </>
+              )}
             </button>
           </div>
         </footer>
       </div>
     </dialog>
-  );
-}
-
-export function QuantityStepper({
-  value,
-  onChange,
-  min = 1,
-  max = 99,
-  disabled,
-}: {
-  value: number;
-  onChange: (n: number) => void;
-  min?: number;
-  max?: number;
-  disabled?: boolean;
-}) {
-  const t = useTranslations("guest");
-  return (
-    <div
-      className="flex h-12 items-center rounded-2xl border border-border"
-      role="group"
-      aria-label={t("quantity")}
-    >
-      <button
-        type="button"
-        aria-label={t("decrease")}
-        disabled={disabled || value <= min}
-        onClick={() => onChange(value - 1)}
-        className="grid size-12 place-items-center text-xl disabled:opacity-30"
-      >
-        −
-      </button>
-      <span className="w-6 text-center font-semibold tabular-nums" aria-live="polite">
-        {value}
-      </span>
-      <button
-        type="button"
-        aria-label={t("increase")}
-        disabled={disabled || value >= max}
-        onClick={() => onChange(value + 1)}
-        className="grid size-12 place-items-center text-xl disabled:opacity-30"
-      >
-        +
-      </button>
-    </div>
   );
 }

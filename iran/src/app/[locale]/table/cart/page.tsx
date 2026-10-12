@@ -33,7 +33,8 @@ async function GuestCart() {
         totals={cart.totals}
         currency={guest.restaurant.currency}
         pricesIncludeTax={guest.restaurant.pricesIncludeTax}
-        seatLabel={t("you", { n: guest.participant.seq })}
+        seatLabel={t("tableBadge", { table: guest.table.label })}
+        restaurantName={guest.restaurant.name}
         displayName={guest.participant.displayName}
         hasIssues={cart.hasIssues}
         orderCount={orders.length}

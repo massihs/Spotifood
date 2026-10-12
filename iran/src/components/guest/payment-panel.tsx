@@ -1,5 +1,6 @@
 "use client";
 
+import { Banknote, CreditCard, Wallet } from "lucide-react";
 import { formatMoney } from "@/lib/money";
 import { useTranslations, useLocale } from "next-intl";
 import { useCallback, useState, useTransition } from "react";
@@ -95,8 +96,9 @@ export function PaymentPanel({
   const nothingDue = state.dueCents === 0 && !state.pending;
 
   return (
-    <section aria-labelledby="pay-title" className="mt-5 rounded-2xl border border-border bg-surface p-4">
-      <h2 id="pay-title" className="font-semibold">
+    <section aria-labelledby="pay-title" className="mt-4 rounded-3xl border border-border bg-surface p-5">
+      <h2 id="pay-title" className="flex items-center gap-2 text-lg font-extrabold">
+        <Wallet className="size-5" aria-hidden="true" />
         {t("pay.title")}
       </h2>
 
@@ -104,12 +106,12 @@ export function PaymentPanel({
         <p
           role="status"
           className={cn(
-            "mt-3 rounded-xl px-3.5 py-2.5 text-sm font-medium",
+            "mt-3 rounded-2xl px-4 py-3 text-sm font-semibold",
             returnedKey(returned) === "succeeded"
               ? "bg-success-soft text-success"
               : returnedKey(returned) !== "pending"
                 ? "bg-danger-soft text-danger"
-                : "bg-accent-soft text-accent",
+                : "bg-surface-2 text-fg",
           )}
         >
           {t(`pay.returned.${returnedKey(returned)}`)}
@@ -117,9 +119,9 @@ export function PaymentPanel({
       ) : null}
 
       <dl className="mt-3 space-y-1 text-sm">
-        <div className="flex justify-between">
-          <dt>{t("pay.due")}</dt>
-          <dd className="text-lg font-semibold tabular-nums">{money(state.dueCents)}</dd>
+        <div className="flex items-baseline justify-between">
+          <dt className="font-medium">{t("pay.due")}</dt>
+          <dd className="text-2xl font-extrabold tabular-nums">{money(state.dueCents)}</dd>
         </div>
         {state.paidCents > 0 ? (
           <div className="flex justify-between text-fg-muted">
@@ -147,13 +149,13 @@ export function PaymentPanel({
       ) : null}
 
       {state.pending ? (
-        <div className="mt-3 rounded-xl bg-surface-2 p-3 text-sm">
+        <div className="mt-3 rounded-2xl bg-surface-2 p-4 text-sm">
           <p className="font-medium">{t("pay.inProgress", { amount: money(state.pending.amountCents) })}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {state.pending.redirectUrl ? (
               <a
                 href={state.pending.redirectUrl}
-                className="inline-flex h-9 items-center rounded-lg bg-accent px-3 font-medium text-accent-fg"
+                className="inline-flex h-9 items-center rounded-full bg-ink px-4 font-bold text-ink-fg"
               >
                 {t("pay.resume")}
               </a>
@@ -165,14 +167,18 @@ export function PaymentPanel({
         </div>
       ) : null}
 
-      {nothingDue ? <p className="mt-3 text-sm font-medium text-success">✓ {t("pay.allSettled")}</p> : null}
+      {nothingDue ? (
+        <p className="mt-3 rounded-2xl bg-accent-soft px-4 py-3 text-sm font-bold text-accent-text">
+          ✓ {t("pay.allSettled")}
+        </p>
+      ) : null}
 
       {state.dueCents > 0 ? (
-        <div className="mt-4 grid gap-2">
+        <div className="mt-5 grid gap-2.5">
           {state.methods.online.map((provider) => (
             <Button
               key={provider}
-              size="lg"
+              size="xl"
               disabled={pending}
               aria-busy={pending}
               onClick={() => payOnline(provider)}
@@ -184,16 +190,18 @@ export function PaymentPanel({
           ))}
           {offlineAvailable ? (
             asking ? (
-              <div className="rounded-xl border border-border p-3">
-                <p className="text-sm font-medium">{t("pay.howAtTable")}</p>
-                <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="rounded-3xl bg-surface-2 p-4">
+                <p className="text-sm font-bold">{t("pay.howAtTable")}</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
                   {state.methods.offline.includes("on_site_terminal") ? (
-                    <Button variant="secondary" disabled={pending} onClick={() => callStaff("card")}>
+                    <Button variant="outline" size="lg" disabled={pending} onClick={() => callStaff("card")}>
+                      <CreditCard className="size-5" aria-hidden="true" />
                       {t("pay.card")}
                     </Button>
                   ) : null}
                   {state.methods.offline.includes("cash") ? (
-                    <Button variant="secondary" disabled={pending} onClick={() => callStaff("cash")}>
+                    <Button variant="outline" size="lg" disabled={pending} onClick={() => callStaff("cash")}>
+                      <Banknote className="size-5" aria-hidden="true" />
                       {t("pay.cash")}
                     </Button>
                   ) : null}
@@ -204,8 +212,8 @@ export function PaymentPanel({
               </div>
             ) : (
               <Button
-                variant="secondary"
-                size="lg"
+                variant="outline"
+                size="xl"
                 disabled={pending}
                 onClick={() => (state.methods.offline.length > 0 ? setAsking(true) : callStaff("any"))}
               >
@@ -217,11 +225,11 @@ export function PaymentPanel({
       ) : null}
 
       {error ? (
-        <p role="alert" className="mt-3 rounded-xl bg-danger-soft px-3.5 py-2.5 text-sm text-danger">
+        <p role="alert" className="mt-3 rounded-2xl bg-danger-soft px-4 py-3 text-sm font-medium text-danger">
           {error}
         </p>
       ) : null}
-      <Toast message={toast} onDone={clearToast} className="bottom-24" />
+      <Toast message={toast} onDone={clearToast} className="bottom-28" />
     </section>
   );
 }
