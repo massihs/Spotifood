@@ -67,3 +67,12 @@ Ou depuis GitHub Actions : onglet **Actions → « Deploy — Iran (Liara) » �
 - Connectez-vous en super admin, créez un restaurant, imprimez un QR, scannez-le avec un téléphone.
 
 Testé avant livraison : l'image Iran a été construite et lancée en local (migrations, seed, persan en RTL, `/fr` en 404, prix en rials, aucune requête externe). Le déploiement réel sur Liara et l'appel réel à Zarinpal n'ont pas pu être faits d'ici (pas de compte).
+
+## Recommended: deploy a ready-made image (GitHub Actions → ghcr.io → Liara)
+
+Liara's builder is slow (15-minute build limit, frequent queueing). The workflow
+**Deploy — Iran via ready image** (`.github/workflows/deploy-iran-image.yml`) builds the full
+image on GitHub, pushes it to `ghcr.io/massihs/spotifood-iran:<commit>` and asks Liara to run
+it: nothing is built on Liara, a release takes ~4 minutes. The ghcr.io package must stay
+**public** (it contains no secret: all credentials are Liara environment variables).
+Runtime logs: workflow **Liara — app logs (Iran)**.
