@@ -16,6 +16,7 @@ RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
  && npm cache clean --force
 # Uploaded as next-build/: the Liara CLI never uploads a folder named .next.
 COPY --chown=node:node next-build ./.next
+RUN tar -xf .next/externals.tar -C .next && rm .next/externals.tar && chown -R node:node .next/node_modules
 COPY --chown=node:node public ./public
 COPY --chown=node:node drizzle ./drizzle
 COPY --chown=node:node messages ./messages

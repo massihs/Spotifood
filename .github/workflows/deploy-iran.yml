@@ -47,6 +47,10 @@ jobs:
           rm -rf .next/cache
           # The Liara CLI always skips a folder named .next: ship it under another name.
           mv .next next-build
+          # .next/node_modules holds Turbopack's links to external packages (pg, sharp, argon2…);
+          # the CLI also skips every folder named node_modules: ship it as an archive.
+          tar -C next-build -cf next-build/externals.tar node_modules
+          rm -rf next-build/node_modules
       - name: Package for Liara
         run: |
           cp deploy/prebuilt.ignore .liaraignore

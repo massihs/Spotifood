@@ -625,11 +625,6 @@ async function seedDemoOrders() {
  * Owned by the platform super admin, so it appears in that account's dashboard.
  */
 async function seedBrielle() {
-  const [existing] = await db.select().from(restaurants).where(eq(restaurants.slug, "brielle"));
-  if (existing) {
-    console.log("✓ Brielle already present — skipping");
-    return;
-  }
   const email = (process.env.SEED_SUPERADMIN_EMAIL ?? "admin@spotifood.local").toLowerCase();
   const [owner] = await db
     .select()
@@ -637,6 +632,16 @@ async function seedBrielle() {
     .where(sql`lower(${users.email}) = ${email}`);
   if (!owner) {
     console.warn("! Brielle not seeded: no super admin account to own it");
+    return;
+  }
+  const [existing] = await db.select().from(restaurants).where(eq(restaurants.slug, "brielle"));
+  if (existing) {
+    // The super admin may have changed (new SEED_SUPERADMIN_EMAIL): make sure it owns Brielle too.
+    await db
+      .insert(restaurantMembers)
+      .values({ restaurantId: existing.id, userId: owner.id, role: "owner" })
+      .onConflictDoNothing();
+    console.log(`✓ Brielle already present — owned by ${owner.email}`);
     return;
   }
   const assets = new URL("./demo-assets/brielle/", `file://${process.cwd()}/scripts/`);
