@@ -25,7 +25,8 @@
     "enabled": "فعال",
     "disabled": "غیرفعال",
     "selectAll": "انتخاب همه",
-    "selectNone": "لغو انتخاب همه"
+    "selectNone": "لغو انتخاب همه",
+    "clear": "پاک کردن"
   },
   "landing": {
     "metaTitle": "Spotifood — سفارش سر میز با کد QR برای رستوران‌ها",
@@ -542,7 +543,31 @@
       "served": "نوش جان!",
       "cancelled": "این سفارش لغو شد. در صورت نیاز با کارکنان صحبت کنید."
     },
-    "ordersLink": "سفارش‌های من ({count})"
+    "ordersLink": "سفارش‌های من ({count})",
+    "tableBadge": "میز {table}",
+    "quickAdd": "افزودن {name} به سبد",
+    "addMore": "افزودن آیتم دیگر",
+    "items": "{count, plural, other {# آیتم}}",
+    "discount": "{pct}٪ تخفیف",
+    "addToOrder": "افزودن به سفارش · {price}",
+    "removeItem": "حذف {name}",
+    "trackTitle": "وضعیت سفارش",
+    "menuTab": "منو",
+    "yourCartAt": "سبد شما در {restaurant}",
+    "checkout": "ثبت سفارش",
+    "nameShort": "نام شما",
+    "namePlaceholder": "مثلاً سارا",
+    "forKitchen": "توضیح برای آشپزخانه",
+    "orderMore": "افزودن به سفارش",
+    "sentTitle": "سفارش شما ارسال شد",
+    "sentBody": "وضعیت را همین‌جا به‌صورت زنده دنبال کنید.",
+    "stepShort": {
+      "received": "ثبت شد",
+      "accepted": "پذیرفته",
+      "preparing": "در حال پخت",
+      "ready": "آماده",
+      "served": "سرو شد"
+    }
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",

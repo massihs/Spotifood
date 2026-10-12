@@ -79,12 +79,12 @@ async function Invoices({ params }: { params: Params }) {
                       href={`/invoice/${i.publicToken}`}
                       target="_blank"
                       rel="noopener"
-                      className="text-accent hover:underline"
+                      className="text-accent-text hover:underline"
                     >
                       {t("invoice.print")}
                     </a>
                     {" · "}
-                    <a href={`/api/v1/invoices/${i.publicToken}/pdf`} className="text-accent hover:underline">
+                    <a href={`/api/v1/invoices/${i.publicToken}/pdf`} className="text-accent-text hover:underline">
                       PDF
                     </a>
                   </td>

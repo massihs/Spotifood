@@ -449,7 +449,7 @@ export function TaxRates({
               <span className="text-fg-muted tabular-nums">· {fmt(r.rateBps)}</span>
             </span>
             {r.isDefault ? (
-              <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent">
+              <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent-text">
                 {t("settings.default")}
               </span>
             ) : null}

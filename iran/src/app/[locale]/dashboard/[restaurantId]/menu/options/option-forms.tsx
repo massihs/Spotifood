@@ -233,7 +233,7 @@ export function GroupCard({
               <span className={v.isAvailable ? "" : "text-fg-subtle line-through"}>
                 {v.name}
                 {v.isDefault ? (
-                  <span className="ms-1.5 text-xs text-accent">· {t("options.default")}</span>
+                  <span className="ms-1.5 text-xs text-accent-text">· {t("options.default")}</span>
                 ) : null}
               </span>
               <span className="text-fg-muted tabular-nums">

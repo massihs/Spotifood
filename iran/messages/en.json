@@ -25,7 +25,8 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "selectAll": "Select all",
-    "selectNone": "Select none"
+    "selectNone": "Select none",
+    "clear": "Clear"
   },
   "landing": {
     "metaTitle": "Spotifood — QR code table ordering for restaurants",
@@ -542,7 +543,31 @@
       "served": "Enjoy your meal!",
       "cancelled": "This order was cancelled. Ask the staff if needed."
     },
-    "ordersLink": "My orders ({count})"
+    "ordersLink": "My orders ({count})",
+    "tableBadge": "Table {table}",
+    "quickAdd": "Add {name} to cart",
+    "addMore": "Add more items",
+    "items": "{count, plural, one {# item} other {# items}}",
+    "discount": "{pct}% off",
+    "addToOrder": "Add to order · {price}",
+    "removeItem": "Remove {name}",
+    "trackTitle": "Order status",
+    "menuTab": "Menu",
+    "yourCartAt": "Your cart at {restaurant}",
+    "checkout": "Place order",
+    "nameShort": "Your name",
+    "namePlaceholder": "e.g. Sara",
+    "forKitchen": "Note for the kitchen",
+    "orderMore": "Add to order",
+    "sentTitle": "Your order is in",
+    "sentBody": "Follow its status live, right here.",
+    "stepShort": {
+      "received": "Placed",
+      "accepted": "Accepted",
+      "preparing": "Cooking",
+      "ready": "Ready",
+      "served": "Served"
+    }
   },
   "categoryTemplates": {
     "starters": "Starters",

@@ -111,7 +111,7 @@ export function NotificationBell({
             {unread > 0 ? (
               <button
                 type="button"
-                className="text-xs font-medium text-accent"
+                className="text-xs font-medium text-accent-text"
                 onClick={() =>
                   startTransition(async () => {
                     await markNotificationsReadAction(restaurantId);

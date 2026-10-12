@@ -31,7 +31,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
       </header>
 
       <main className="flex flex-1 flex-col justify-center py-16">
-        <span className="w-fit rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent">
+        <span className="w-fit rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent-text">
           {t("badge")}
         </span>
         <h1 className="mt-5 max-w-3xl text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl">

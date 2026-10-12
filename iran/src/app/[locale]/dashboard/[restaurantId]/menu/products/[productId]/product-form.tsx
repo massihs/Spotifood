@@ -280,7 +280,7 @@ export function ProductForm({
                     defaultChecked={values.tags.includes(tag)}
                     className="peer sr-only"
                   />
-                  <span className="inline-flex h-8 items-center rounded-full border border-border px-3 text-sm peer-checked:border-accent peer-checked:bg-accent-soft peer-checked:text-accent peer-focus-visible:ring-4 peer-focus-visible:ring-[var(--ring)]">
+                  <span className="inline-flex h-8 items-center rounded-full border border-border px-3 text-sm peer-checked:border-accent peer-checked:bg-accent-soft peer-checked:text-accent-text peer-focus-visible:ring-4 peer-focus-visible:ring-[var(--ring)]">
                     {t(`tags.${tag}`)}
                   </span>
                 </label>
@@ -393,7 +393,7 @@ export function ProductPhotos({
               <ActionForm form={upload} className="h-full">
                 <label
                   className={cn(
-                    "grid aspect-[4/3] h-full w-full cursor-pointer place-items-center rounded-xl border-2 border-dashed border-border text-center text-sm text-fg-muted focus-within:ring-4 focus-within:ring-[var(--ring)] hover:border-accent hover:text-accent",
+                    "grid aspect-[4/3] h-full w-full cursor-pointer place-items-center rounded-xl border-2 border-dashed border-border text-center text-sm text-fg-muted focus-within:ring-4 focus-within:ring-[var(--ring)] hover:border-accent hover:text-accent-text",
                     upload.pending && "animate-pulse",
                   )}
                 >

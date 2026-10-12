@@ -25,7 +25,8 @@
     "enabled": "مفعّل",
     "disabled": "معطّل",
     "selectAll": "تحديد الكل",
-    "selectNone": "إلغاء تحديد الكل"
+    "selectNone": "إلغاء تحديد الكل",
+    "clear": "مسح"
   },
   "landing": {
     "metaTitle": "Spotifood — الطلب من الطاولة عبر رمز QR للمطاعم",
@@ -542,7 +543,31 @@
       "served": "بالهناء والشفاء!",
       "cancelled": "تم إلغاء هذا الطلب. تواصل مع الفريق عند الحاجة."
     },
-    "ordersLink": "طلباتي ({count})"
+    "ordersLink": "طلباتي ({count})",
+    "tableBadge": "طاولة {table}",
+    "quickAdd": "أضف {name} إلى السلة",
+    "addMore": "إضافة أصناف أخرى",
+    "items": "{count, plural, other {# صنف}}",
+    "discount": "خصم {pct}٪",
+    "addToOrder": "أضف إلى الطلب · {price}",
+    "removeItem": "حذف {name}",
+    "trackTitle": "حالة الطلب",
+    "menuTab": "القائمة",
+    "yourCartAt": "سلتك في {restaurant}",
+    "checkout": "تأكيد الطلب",
+    "nameShort": "اسمك",
+    "namePlaceholder": "مثلاً سارة",
+    "forKitchen": "ملاحظة للمطبخ",
+    "orderMore": "أضف إلى الطلب",
+    "sentTitle": "تم إرسال طلبك",
+    "sentBody": "تابع حالته مباشرة من هنا.",
+    "stepShort": {
+      "received": "تم الاستلام",
+      "accepted": "مقبول",
+      "preparing": "قيد التحضير",
+      "ready": "جاهز",
+      "served": "تم التقديم"
+    }
   },
   "categoryTemplates": {
     "starters": "المقبلات",

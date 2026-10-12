@@ -124,7 +124,7 @@ async function TableDetail({ params }: { params: Params }) {
               {inFlight.map((p) => (
                 <li
                   key={p.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-accent-soft px-4 py-2.5 text-sm text-accent"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-accent-soft px-4 py-2.5 text-sm text-accent-text"
                 >
                   <span>
                     {t("payments.onlineInProgress", { amount: money(p.amountCents) })}

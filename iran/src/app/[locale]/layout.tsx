@@ -23,6 +23,35 @@ const persian = localFont({
   // text is rendered, with `swap` so text is never invisible.
   preload: false,
 });
+// Persian UI font with Persian digits (non-Latin subset, ≈ 22 KB per weight): any number on a Persian
+// page renders as ۰-۹ — prices, table labels, quantities, order numbers — whatever produced it.
+const persianDigits = localFont({
+  src: [
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-Regular.woff2",
+      weight: "400",
+    },
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-Medium.woff2",
+      weight: "500",
+    },
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-SemiBold.woff2",
+      weight: "600",
+    },
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-Bold.woff2",
+      weight: "700",
+    },
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-ExtraBold.woff2",
+      weight: "800",
+    },
+  ],
+  variable: "--font-fa-digits",
+  display: "swap",
+  preload: false,
+});
 
 export const metadata: Metadata = {
   title: { default: "Spotifood", template: "%s · Spotifood" },
@@ -37,8 +66,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfaf8" },
-    { media: "(prefers-color-scheme: dark)", color: "#1c1916" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
 };
 
@@ -56,7 +85,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <html
       lang={locale}
       dir={localeDirection(locale)}
-      className={`${sans.variable} ${persian.variable}`}
+      className={`${sans.variable} ${persian.variable} ${persianDigits.variable}`}
       data-scroll-behavior="smooth"
     >
       <body className="min-h-dvh">

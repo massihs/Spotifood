@@ -68,7 +68,7 @@ function CollectForm({
               key={m}
               className={cn(
                 "flex h-12 cursor-pointer items-center justify-center rounded-xl border text-sm font-medium",
-                provider === m ? "border-accent bg-accent-soft text-accent" : "border-border",
+                provider === m ? "border-accent bg-accent-soft text-accent-text" : "border-border",
               )}
             >
               <input
@@ -295,7 +295,7 @@ export function InvoiceButton({
         href={`/invoice/${invoice.publicToken}`}
         target="_blank"
         rel="noopener"
-        className="inline-flex h-8 items-center rounded-lg px-3 text-sm font-medium text-accent hover:bg-surface-2"
+        className="inline-flex h-8 items-center rounded-lg px-3 text-sm font-medium text-accent-text hover:bg-surface-2"
       >
         {t("open", { number: invoice.number })}
       </a>

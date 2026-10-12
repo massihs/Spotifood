@@ -1,5 +1,6 @@
 "use client";
 
+import { CircleCheck } from "lucide-react";
 import { useEffect } from "react";
 import { cn } from "@/lib/cn";
 
@@ -32,8 +33,9 @@ export function Toast({
       {message ? (
         <p
           role="status"
-          className="pointer-events-auto rounded-xl bg-fg px-4 py-3 text-sm font-medium text-bg shadow-2xl"
+          className="animate-pop-in pointer-events-auto inline-flex items-center gap-2 rounded-full bg-ink py-3 ps-3.5 pe-5 text-sm font-semibold text-ink-fg shadow-[var(--shadow-float)]"
         >
+          <CircleCheck className="size-5 shrink-0 text-accent" aria-hidden="true" />
           {message}
         </p>
       ) : null}

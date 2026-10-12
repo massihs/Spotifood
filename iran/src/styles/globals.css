@@ -1,70 +1,89 @@
 @import "tailwindcss";
 
 /*
- * Spotifood design tokens.
- * Warm neutral "linen" surfaces, deep "ink" text, a "paprika" accent.
- * All colors are tokens → dark mode and per-restaurant theming swap values, not classes.
+ * Spotifood design tokens: "ink & leaf".
+ * Pure white / deep black surfaces, black "ink" for primary actions, one fresh green "leaf" accent
+ * for brand moments, success and highlights. All colors are tokens → dark mode swaps values.
  */
 :root {
-  --bg: oklch(0.985 0.004 80);
+  --bg: oklch(1 0 0);
   --surface: oklch(1 0 0);
-  --surface-2: oklch(0.965 0.006 80);
-  --border: oklch(0.91 0.008 80);
-  --border-strong: oklch(0.84 0.01 80);
-  --fg: oklch(0.22 0.015 60);
-  --fg-muted: oklch(0.5 0.015 60);
-  --fg-subtle: oklch(0.64 0.012 60);
-  --accent: oklch(0.62 0.19 38);
-  --accent-hover: oklch(0.57 0.19 38);
-  --accent-fg: oklch(0.99 0.005 80);
-  --accent-soft: oklch(0.95 0.04 45);
-  --success: oklch(0.6 0.13 155);
-  --success-soft: oklch(0.95 0.04 155);
-  --warning: oklch(0.75 0.15 80);
+  --surface-2: oklch(0.965 0 0);
+  --surface-3: oklch(0.925 0 0);
+  --border: oklch(0.925 0 0);
+  --border-strong: oklch(0.86 0 0);
+  --fg: oklch(0.16 0 0);
+  --fg-muted: oklch(0.47 0 0);
+  --fg-subtle: oklch(0.6 0 0);
+  --ink: oklch(0.16 0 0);
+  --ink-hover: oklch(0.3 0 0);
+  --ink-fg: oklch(1 0 0);
+  --accent: oklch(0.74 0.19 150);
+  --accent-hover: oklch(0.69 0.19 150);
+  --accent-fg: oklch(0.16 0.02 150);
+  --accent-text: oklch(0.52 0.15 150);
+  --accent-soft: oklch(0.96 0.04 150);
+  --success: oklch(0.55 0.15 150);
+  --success-soft: oklch(0.96 0.04 150);
+  --warning: oklch(0.78 0.16 75);
   --warning-soft: oklch(0.96 0.05 85);
-  --danger: oklch(0.58 0.2 25);
-  --danger-soft: oklch(0.95 0.04 25);
-  --ring: oklch(0.62 0.19 38 / 0.45);
-  --shadow-color: 30 20% 20%;
+  --danger: oklch(0.58 0.21 27);
+  --danger-soft: oklch(0.96 0.03 25);
+  --ring: oklch(0.74 0.19 150 / 0.45);
+  --shadow-color: 0 0% 0%;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: oklch(0.17 0.008 60);
-    --surface: oklch(0.205 0.009 60);
-    --surface-2: oklch(0.24 0.01 60);
-    --border: oklch(0.3 0.01 60);
-    --border-strong: oklch(0.38 0.012 60);
-    --fg: oklch(0.95 0.006 80);
-    --fg-muted: oklch(0.72 0.01 70);
-    --fg-subtle: oklch(0.6 0.01 70);
-    --accent: oklch(0.7 0.17 42);
-    --accent-hover: oklch(0.75 0.16 42);
-    --accent-fg: oklch(0.18 0.01 60);
-    --accent-soft: oklch(0.3 0.06 40);
-    --success-soft: oklch(0.3 0.05 155);
+    --bg: oklch(0.13 0 0);
+    --surface: oklch(0.18 0 0);
+    --surface-2: oklch(0.22 0 0);
+    --surface-3: oklch(0.27 0 0);
+    --border: oklch(0.26 0 0);
+    --border-strong: oklch(0.34 0 0);
+    --fg: oklch(0.97 0 0);
+    --fg-muted: oklch(0.72 0 0);
+    --fg-subtle: oklch(0.58 0 0);
+    --ink: oklch(0.97 0 0);
+    --ink-hover: oklch(0.87 0 0);
+    --ink-fg: oklch(0.13 0 0);
+    --accent: oklch(0.78 0.19 150);
+    --accent-hover: oklch(0.83 0.18 150);
+    --accent-fg: oklch(0.16 0.02 150);
+    --accent-text: oklch(0.8 0.17 150);
+    --accent-soft: oklch(0.28 0.06 150);
+    --success: oklch(0.75 0.17 150);
+    --success-soft: oklch(0.28 0.06 150);
     --warning-soft: oklch(0.32 0.06 80);
-    --danger-soft: oklch(0.3 0.07 25);
+    --danger: oklch(0.7 0.19 27);
+    --danger-soft: oklch(0.3 0.08 25);
     --shadow-color: 0 0% 0%;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: oklch(0.17 0.008 60);
-  --surface: oklch(0.205 0.009 60);
-  --surface-2: oklch(0.24 0.01 60);
-  --border: oklch(0.3 0.01 60);
-  --border-strong: oklch(0.38 0.012 60);
-  --fg: oklch(0.95 0.006 80);
-  --fg-muted: oklch(0.72 0.01 70);
-  --fg-subtle: oklch(0.6 0.01 70);
-  --accent: oklch(0.7 0.17 42);
-  --accent-hover: oklch(0.75 0.16 42);
-  --accent-fg: oklch(0.18 0.01 60);
-  --accent-soft: oklch(0.3 0.06 40);
-  --success-soft: oklch(0.3 0.05 155);
+  --bg: oklch(0.13 0 0);
+  --surface: oklch(0.18 0 0);
+  --surface-2: oklch(0.22 0 0);
+  --surface-3: oklch(0.27 0 0);
+  --border: oklch(0.26 0 0);
+  --border-strong: oklch(0.34 0 0);
+  --fg: oklch(0.97 0 0);
+  --fg-muted: oklch(0.72 0 0);
+  --fg-subtle: oklch(0.58 0 0);
+  --ink: oklch(0.97 0 0);
+  --ink-hover: oklch(0.87 0 0);
+  --ink-fg: oklch(0.13 0 0);
+  --accent: oklch(0.78 0.19 150);
+  --accent-hover: oklch(0.83 0.18 150);
+  --accent-fg: oklch(0.16 0.02 150);
+  --accent-text: oklch(0.8 0.17 150);
+  --accent-soft: oklch(0.28 0.06 150);
+  --success: oklch(0.75 0.17 150);
+  --success-soft: oklch(0.28 0.06 150);
   --warning-soft: oklch(0.32 0.06 80);
-  --danger-soft: oklch(0.3 0.07 25);
+  --danger: oklch(0.7 0.19 27);
+  --danger-soft: oklch(0.3 0.08 25);
   --shadow-color: 0 0% 0%;
 }
 
@@ -72,12 +91,17 @@
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-fg-subtle: var(--fg-subtle);
+  --color-ink: var(--ink);
+  --color-ink-hover: var(--ink-hover);
+  --color-ink-fg: var(--ink-fg);
   --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
   --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
@@ -87,16 +111,33 @@
   --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
-  --font-sans:
+  --font-sans: var(--app-font);
+  --font-mono: var(--font-mono-loaded), ui-monospace, monospace;
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 4px 16px -4px hsl(var(--shadow-color) / 0.08);
+  --shadow-float: 0 8px 30px -6px hsl(var(--shadow-color) / 0.3);
+}
+
+/* Persian: Vazirmatn "Farsi digits" first, so every number (prices, table labels, counts, codes)
+   renders with Persian digits whatever its source; Latin letters fall through to Inter. */
+:root {
+  --app-font:
     var(--font-sans-loaded), var(--font-fa-loaded), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     "Vazirmatn", "Noto Sans Arabic", sans-serif;
-  --font-mono: var(--font-mono-loaded), ui-monospace, monospace;
-  --radius-card: 1rem;
-  --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 4px 16px -4px hsl(var(--shadow-color) / 0.08);
+}
+:root:lang(fa) {
+  --app-font:
+    var(--font-fa-digits), var(--font-sans-loaded), var(--font-fa-loaded), ui-sans-serif, system-ui,
+    "Vazirmatn", sans-serif;
+}
+/* Machine values (IDs, merchant codes, URLs) keep Latin digits. */
+.latin-digits {
+  font-family: var(--font-sans-loaded), ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
 }
 
@@ -136,4 +177,34 @@ html {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* Bottom sheets and pop-ins */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+.animate-sheet-up {
+  animation: sheet-up 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+.animate-pop-in {
+  animation: pop-in 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+dialog[open]::backdrop {
+  animation: fade-in 0.2s ease-out;
 }

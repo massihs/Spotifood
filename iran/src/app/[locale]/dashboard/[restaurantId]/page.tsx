@@ -66,7 +66,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
                 )}
               </span>
               {s.href && !s.done ? (
-                <Link href={s.href} className="text-sm font-medium text-accent hover:underline">
+                <Link href={s.href} className="text-sm font-medium text-accent-text hover:underline">
                   {t(`setup.${s.key}`)} →
                 </Link>
               ) : (

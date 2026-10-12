@@ -18,7 +18,7 @@ export default async function SignupPage({ params }: PageProps<"/[locale]/signup
       </div>
       <p className="mt-6 text-center text-sm text-fg-muted">
         {t("hasAccount")}{" "}
-        <Link href="/login" className="font-medium text-accent hover:underline">
+        <Link href="/login" className="font-medium text-accent-text hover:underline">
           {t("goLogin")}
         </Link>
       </p>
