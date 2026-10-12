@@ -8,7 +8,11 @@ const bool = z
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  APP_URL: z.url().default("http://localhost:3000"),
+  // No trailing slash: callers append paths ("https://spotifood.ir/" would give "//table/...").
+  APP_URL: z
+    .url()
+    .default("http://localhost:3000")
+    .transform((u) => u.replace(/\/+$/, "")),
   APP_SECRET: z.string().min(32, "APP_SECRET must be at least 32 characters"),
   DATABASE_URL: z.string().min(1),
   DATABASE_URL_DIRECT: z.string().optional(),
