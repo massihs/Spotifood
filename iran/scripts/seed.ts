@@ -38,6 +38,9 @@ import { addToCart } from "@/server/modules/cart/service";
 import { placeOrder, updateOrderStatus } from "@/server/modules/orders/service";
 import { newIdempotencyKey, recordStaffPayment } from "@/server/modules/payments/service";
 import type { OrderStatus } from "@/server/modules/orders/status";
+import { uploadLogo } from "@/server/modules/restaurants/settings";
+import { readFile } from "node:fs/promises";
+import { BRIELLE_MENU } from "./brielle";
 
 const DEMO_OWNER = {
   email: "owner@demo.spotifood.local",
@@ -617,8 +620,113 @@ async function seedDemoOrders() {
   console.log("✓ demo orders: 6 orders on tables 4, 8 (3 guests) and 12, one cash payment");
 }
 
+/**
+ * Brielle (real menu, real photos): the showcase restaurant, also seeded in production.
+ * Owned by the platform super admin, so it appears in that account's dashboard.
+ */
+async function seedBrielle() {
+  const [existing] = await db.select().from(restaurants).where(eq(restaurants.slug, "brielle"));
+  if (existing) {
+    console.log("✓ Brielle already present — skipping");
+    return;
+  }
+  const email = (process.env.SEED_SUPERADMIN_EMAIL ?? "admin@spotifood.local").toLowerCase();
+  const [owner] = await db
+    .select()
+    .from(users)
+    .where(sql`lower(${users.email}) = ${email}`);
+  if (!owner) {
+    console.warn("! Brielle not seeded: no super admin account to own it");
+    return;
+  }
+  const assets = new URL("./demo-assets/brielle/", `file://${process.cwd()}/scripts/`);
+  const restaurantId = await db.transaction(async (tx) => {
+    const org = await createOrganization(tx, {
+      name: "Brielle",
+      ownerUserId: owner.id,
+      billingEmail: owner.email,
+    });
+    const restaurant = await createRestaurant(tx, {
+      organizationId: org.id,
+      ownerUserId: owner.id,
+      name: "Brielle",
+    });
+    await tx
+      .update(restaurants)
+      .set({ slug: "brielle", city: "تهران" })
+      .where(eq(restaurants.id, restaurant.id));
+    await tx
+      .update(restaurantSettings)
+      .set({
+        orderPrefix: "B",
+        legalName: "رستوران بریل",
+        enabledPaymentProviders: ["cash", "on_site_terminal", "pay_later"],
+      })
+      .where(eq(restaurantSettings.restaurantId, restaurant.id));
+    await tx.insert(diningTables).values(
+      Array.from({ length: 12 }, (_, i) => ({
+        restaurantId: restaurant.id,
+        label: String(i + 1),
+        number: i + 1,
+        capacity: 4,
+        qrToken: randomToken(),
+        sortOrder: i,
+      })),
+    );
+    const [pro] = await tx.select().from(plans).where(eq(plans.code, "professional"));
+    if (pro) {
+      const updated = await tx
+        .update(subscriptions)
+        .set({ planId: pro.id, status: "active" })
+        .where(eq(subscriptions.organizationId, org.id))
+        .returning({ id: subscriptions.id });
+      if (updated.length === 0)
+        await tx.insert(subscriptions).values({ organizationId: org.id, planId: pro.id, status: "active" });
+    }
+    const rates = await tx.select().from(taxRates).where(eq(taxRates.restaurantId, restaurant.id));
+    const rate = rates.find((r) => r.rateBps === 1000) ?? rates[0];
+    for (const [ci, cat] of BRIELLE_MENU.entries()) {
+      const [category] = await tx
+        .insert(categories)
+        .values({ restaurantId: restaurant.id, name: cat.name, templateKey: cat.key, sortOrder: ci })
+        .returning();
+      for (const [pi, item] of cat.items.entries()) {
+        await tx.insert(products).values({
+          restaurantId: restaurant.id,
+          categoryId: category!.id,
+          name: item.name,
+          // The restaurant's menu shows the English name with each dish: keep it as the first line.
+          description: item.description ? `${item.en} · ${item.description}` : item.en,
+          priceCents: toman(item.price * 1000),
+          taxRateId: rate?.id,
+          isFeatured: item.featured ?? false,
+          tags: item.tags ?? [],
+          sortOrder: pi,
+        });
+      }
+    }
+    return restaurant.id;
+  });
+
+  const ctx = await loadRestaurantContext(db, owner, restaurantId);
+  await uploadLogo(db, ctx, await readFile(new URL("logo.png", assets)));
+  const rows = await db.select().from(products).where(eq(products.restaurantId, restaurantId));
+  let photos = 0;
+  for (const item of BRIELLE_MENU.flatMap((c) => c.items)) {
+    const product = rows.find((r) => r.name === item.name);
+    if (!product || !item.photo) continue;
+    await addProductImage(db, ctx, product.id, await readFile(new URL(`${item.photo}.jpg`, assets)));
+    photos++;
+  }
+  console.log(
+    `✓ Brielle ${restaurantId}: 12 tables, ${BRIELLE_MENU.length} categories, ${rows.length} products, ${photos} photos (owner ${owner.email})`,
+  );
+}
+
 async function main() {
   await seedPlatform();
+  // The showcase restaurant: on by default, SEED_BRIELLE=false to skip.
+  if (process.env.SEED_BRIELLE !== "false") await seedBrielle();
   // Production containers run this on every start with SEED_DEMO unset: platform data only.
   const demo = process.env.SEED_DEMO ?? (process.env.NODE_ENV === "production" ? "false" : "true");
   if (demo !== "true") return;

@@ -56,6 +56,8 @@ COPY --from=build --chown=node:node /app/messages ./messages
 COPY --from=build --chown=node:node /app/dist/seed.mjs ./dist/seed.mjs
 COPY --chown=node:node ${APP_DIR}/package.json ${APP_DIR}/next.config.ts ./
 COPY --chown=node:node ${APP_DIR}/scripts/migrate.mjs ./scripts/migrate.mjs
+# Showcase restaurant assets (Brielle logo and dish photos) read by the seed.
+COPY --chown=node:node ${APP_DIR}/scripts/demo-assets ./scripts/demo-assets
 RUN mkdir -p /app/.storage && chown node:node /app/.storage && rm -rf .next/cache
 USER node
 EXPOSE 3000
