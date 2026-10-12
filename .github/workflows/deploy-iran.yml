@@ -16,7 +16,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     environment: iran-production
     defaults:
       run:
@@ -58,9 +58,15 @@ jobs:
         run: |
           set +e
           # Written to a file, not a pipe: a lingering CLI child would keep a pipe open forever.
-          timeout -k 20 1500 npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" \
-            --liara-json liara.prebuilt.json --no-app-logs --debug > deploy.log 2>&1
-          cat deploy.log
+          # Liara's API is sometimes unreachable from abroad for a while: retry those attempts.
+          for attempt in 1 2 3 4 5; do
+            timeout -k 20 1500 npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" \
+              --liara-json liara.prebuilt.json --no-app-logs --debug > deploy.log 2>&1
+            cat deploy.log
+            grep -q "Timeout awaiting 'request'" deploy.log || break
+            echo "::warning::Liara API unreachable (attempt $attempt), retrying in 2 min"
+            sleep 120
+          done
           grep -q "Image pushed" deploy.log || { echo "::error::Liara build failed"; exit 1; }
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
