@@ -36,7 +36,10 @@ jobs:
           context: iran
           file: iran/Dockerfile
           build-args: NEXT_PUBLIC_EDITION=iran
-          push: true
+          # Plain single-platform Docker manifest (no attestation index): what Liara can inspect.
+          provenance: false
+          sbom: false
+          outputs: type=registry,oci-mediatypes=false
           tags: ${{ steps.img.outputs.ref }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

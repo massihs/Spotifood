@@ -29,17 +29,69 @@
     "clear": "Clear"
   },
   "landing": {
-    "metaTitle": "Spotifood — QR code table ordering for restaurants",
-    "metaDescription": "Digitize your menu and ordering: guests scan, order and pay from their table. Real-time kitchen, split payments, invoices and reviews.",
-    "badge": "Restaurant platform",
+    "metaTitle": "Spotifood — QR menus, table ordering and payment for restaurants",
+    "metaDescription": "Digital menu, table ordering, live kitchen, Zarinpal payments and official invoices — no app to install.",
+    "nav": {
+      "features": "Features",
+      "how": "How it works",
+      "faq": "FAQ"
+    },
+    "badge": "Built for restaurants and cafés in Iran",
     "title": "Guests scan. Order. Pay.",
-    "subtitle": "Spotifood turns every table into an ordering point. Online menu, real-time kitchen orders, individual payments and invoices — no app to install.",
+    "subtitle": "Spotifood turns every table into an ordering point: a beautiful photo menu, orders straight to the kitchen, split payments with Zarinpal and official invoices — no app to install.",
     "ctaPrimary": "Create my restaurant",
-    "ctaSecondary": "Sign in",
+    "ctaSecondary": "Log in",
+    "trust": {
+      "noApp": "No app to install",
+      "zarinpal": "Zarinpal payments",
+      "invoice": "Official invoices"
+    },
+    "mock": {
+      "table": "Table 4",
+      "cart": "View cart",
+      "featured": "Featured"
+    },
+    "showcase": "The real menu of Brielle, Tehran, on Spotifood",
+    "stats": {
+      "setup": {
+        "value": "10 min",
+        "label": "to your first order"
+      },
+      "app": {
+        "value": "0",
+        "label": "apps to install"
+      },
+      "langs": {
+        "value": "3 languages",
+        "label": "Persian, English, Arabic"
+      },
+      "live": {
+        "value": "Live",
+        "label": "orders in the kitchen"
+      }
+    },
+    "howTitle": "Three steps. That's it.",
+    "howSubtitle": "No hardware, no long staff training.",
+    "steps": {
+      "menu": {
+        "title": "Build your menu",
+        "body": "Categories, dishes, photos, options and prices in tomans in minutes."
+      },
+      "qr": {
+        "title": "Print table QR codes",
+        "body": "A unique QR code per table, ready to print."
+      },
+      "serve": {
+        "title": "Take orders",
+        "body": "Guests scan and order; the kitchen sees it instantly."
+      }
+    },
+    "featuresTitle": "Everything a modern restaurant needs",
+    "featuresSubtitle": "From menu to invoice, in one platform.",
     "features": {
       "qr": {
         "title": "One QR per table",
-        "body": "Generate and print QR codes for all your tables in one click."
+        "body": "Generate and print every table's QR code in one click."
       },
       "split": {
         "title": "Everyone pays their share",
@@ -47,12 +99,74 @@
       },
       "live": {
         "title": "Live kitchen",
-        "body": "Orders reach the kitchen and floor instantly."
+        "body": "Orders appear instantly on the kitchen and floor screens."
+      },
+      "pay": {
+        "title": "Zarinpal online payment",
+        "body": "Pay from the table through the restaurant's own Zarinpal gateway, or cash and card."
+      },
+      "invoice": {
+        "title": "Official invoices",
+        "body": "Persian invoices numbered by Jalali year, with VAT and a printable PDF."
+      },
+      "langs": {
+        "title": "Multilingual menu",
+        "body": "Menu in Persian, English and Arabic for locals and visitors."
+      },
+      "team": {
+        "title": "Team & roles",
+        "body": "Manager, cashier, waiter: everyone sees only what they need."
       },
       "insights": {
-        "title": "Sales & reviews",
-        "body": "Revenue, best sellers, reviews and complaints in one place."
+        "title": "Sales & reports",
+        "body": "Today's revenue, best sellers and payments at a glance."
       }
+    },
+    "split": {
+      "guestTitle": "For guests",
+      "guest": [
+        "A beautiful photo menu, no download",
+        "Order and pay without waiting for staff",
+        "Live tracking: placed, cooking, ready",
+        "The invoice on their own phone"
+      ],
+      "ownerTitle": "For restaurants",
+      "owner": [
+        "Faster table turns, bigger orders",
+        "Fewer mistakes between floor and kitchen",
+        "Change prices and stock in a second",
+        "Staff freed from taking orders"
+      ]
+    },
+    "faqTitle": "Frequently asked questions",
+    "faq": {
+      "app": {
+        "q": "Do guests need to install an app?",
+        "a": "No. They scan the table's QR code with their camera and the menu opens in the browser."
+      },
+      "pay": {
+        "q": "Where does online payment money go?",
+        "a": "Straight to the restaurant: you enter your own Zarinpal merchant ID in the settings."
+      },
+      "cash": {
+        "q": "What if a guest wants to pay cash or by card?",
+        "a": "No problem: they request payment from the table and the waiter is notified."
+      },
+      "hardware": {
+        "q": "Do I need special hardware?",
+        "a": "No. A tablet or phone for the kitchen is enough; everything runs in the browser."
+      },
+      "menu": {
+        "q": "How fast are menu changes?",
+        "a": "Instant. Change a price, a photo or mark a dish sold out; guests see it right away."
+      }
+    },
+    "finalTitle": "Take your restaurant digital today",
+    "finalBody": "Creating an account takes minutes. Build your menu and take your first order today.",
+    "footer": {
+      "rights": "© Spotifood — made for restaurants in Iran",
+      "login": "Log in",
+      "signup": "Sign up"
     }
   },
   "auth": {
