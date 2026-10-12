@@ -26,3 +26,9 @@ jobs:
         run: npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN"
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
+      # Container start-up output (migrations, seed, server), even when the release is rejected.
+      - name: Liara app logs
+        if: always()
+        run: npx --yes @liara/cli@9 logs --app spotifood --since "15 minutes ago" --timestamps --api-token "$LIARA_API_TOKEN" || true
+        env:
+          LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}

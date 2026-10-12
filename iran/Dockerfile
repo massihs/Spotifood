@@ -59,7 +59,7 @@ COPY --chown=node:node ${APP_DIR}/scripts/migrate.mjs ./scripts/migrate.mjs
 RUN mkdir -p /app/.storage && chown node:node /app/.storage && rm -rf .next/cache
 USER node
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+# No HEALTHCHECK: Liara judges a release ~30 s after start, before Docker's first probe
+# (which runs only after one interval) could ever report healthy. /api/health stays available.
 # 1. migrations  2. platform data (plans, templates, admin if SEED_SUPERADMIN_PASSWORD)  3. server
 CMD ["sh", "-c", "node scripts/migrate.mjs && node dist/seed.mjs && exec node_modules/.bin/next start -H 0.0.0.0 -p ${PORT}"]
