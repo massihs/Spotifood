@@ -55,8 +55,10 @@ jobs:
         # stop after 15 min and judge the deploy by the build result it printed.
         run: |
           set +e
-          timeout 900 npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" \
-            --liara-json liara.prebuilt.json --no-app-logs 2>&1 | tee deploy.log
+          # Written to a file, not a pipe: a lingering CLI child would keep a pipe open forever.
+          timeout -k 20 900 npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" \
+            --liara-json liara.prebuilt.json --no-app-logs > deploy.log 2>&1
+          cat deploy.log
           grep -q "Image pushed" deploy.log || { echo "::error::Liara build failed"; exit 1; }
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
