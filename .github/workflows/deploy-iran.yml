@@ -2,6 +2,10 @@ name: Deploy — Iran (Liara, iran/)
 
 # Manual on purpose: production deploys are a decision, not a side effect of a push.
 # Requires the repository secret LIARA_API_TOKEN (Liara panel → API → token).
+#
+# The app is built here (GitHub runner: fast, cached npm) and uploaded ready to run: a full
+# `next build` on Liara's builder exceeds its 20-minute limit. Liara only installs production
+# dependencies around it (Dockerfile.prebuilt).
 on:
   workflow_dispatch:
 
@@ -12,25 +16,52 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     environment: iran-production
     defaults:
       run:
         working-directory: iran
+    env:
+      NEXT_PUBLIC_EDITION: iran
+      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: iran/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Build
+        env:
+          NODE_ENV: production
+          # Build-time placeholders only: real values are injected by Liara at run time.
+          APP_SECRET: build-time-placeholder-not-used-at-runtime-000000
+          DATABASE_URL: postgres://build:build@127.0.0.1:1/build
+        run: |
+          npm run build
+          node_modules/.bin/esbuild scripts/seed.ts --bundle --platform=node --format=esm --target=node22 \
+            --conditions=react-server --external:pg --external:@node-rs/argon2 --external:sharp \
+            --banner:js="import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);" \
+            --outfile=dist/seed.mjs --log-level=warning
+          rm -rf .next/cache
+      - name: Package for Liara
+        run: |
+          cp deploy/prebuilt.ignore .liaraignore
+          cp deploy/prebuilt.ignore .dockerignore
+          du -sh .next dist
       - name: Deploy to Liara
-        # --detach: without a container health check the CLI otherwise keeps waiting after the
-        # release is live (until the job times out). The next step shows the start-up logs.
-        run: npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" --detach
+        # Streams the (short) Liara build. The CLI may keep waiting once the release is live:
+        # stop after 15 min and judge the deploy by the build result it printed.
+        run: |
+          set +e
+          timeout 900 npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" \
+            --liara-json liara.prebuilt.json --no-app-logs 2>&1 | tee deploy.log
+          grep -q "Image pushed" deploy.log || { echo "::error::Liara build failed"; exit 1; }
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
-      # Container start-up output (migrations, seed, server), even when the release is rejected.
       - name: Liara app logs
         if: always()
-        run: sleep 150 && timeout 90 npx --yes @liara/cli@9 logs --app spotifood --since "15 minutes ago" --timestamps --api-token "$LIARA_API_TOKEN" || true
+        run: sleep 90 && timeout 90 npx --yes @liara/cli@9 logs --app spotifood --since "10 minutes ago" --timestamps --api-token "$LIARA_API_TOKEN" || true
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
