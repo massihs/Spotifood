@@ -31,6 +31,6 @@ jobs:
       # Container start-up output (migrations, seed, server), even when the release is rejected.
       - name: Liara app logs
         if: always()
-        run: sleep 150 && npx --yes @liara/cli@9 logs --app spotifood --since "15 minutes ago" --timestamps --api-token "$LIARA_API_TOKEN" || true
+        run: sleep 150 && timeout 90 npx --yes @liara/cli@9 logs --app spotifood --since "15 minutes ago" --timestamps --api-token "$LIARA_API_TOKEN" || true
         env:
           LIARA_API_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
