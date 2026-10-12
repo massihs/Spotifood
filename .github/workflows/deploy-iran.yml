@@ -59,7 +59,7 @@ jobs:
           set +e
           # Written to a file, not a pipe: a lingering CLI child would keep a pipe open forever.
           timeout -k 20 1500 npx --yes @liara/cli@9 deploy --api-token "$LIARA_API_TOKEN" \
-            --liara-json liara.prebuilt.json --no-app-logs > deploy.log 2>&1
+            --liara-json liara.prebuilt.json --no-app-logs --debug > deploy.log 2>&1
           cat deploy.log
           grep -q "Image pushed" deploy.log || { echo "::error::Liara build failed"; exit 1; }
         env:
