@@ -135,7 +135,7 @@ export function EditTableDialog({ restaurantId, table }: { restaurantId: string;
     <Dialog
       title={t("edit")}
       trigger={(open) => (
-        <Button variant="secondary" size="sm" onClick={open}>
+        <Button variant="ghost" size="sm" onClick={open}>
           {t("edit")}
         </Button>
       )}
@@ -261,8 +261,8 @@ export function TableCommand({
         type="submit"
         className={
           danger
-            ? "w-full rounded-lg px-3 py-2 text-start text-sm text-danger hover:bg-danger-soft"
-            : "w-full rounded-lg px-3 py-2 text-start text-sm hover:bg-surface-2"
+            ? "w-full rounded-xl px-3 py-2.5 text-start text-sm font-medium text-danger hover:bg-danger-soft"
+            : "w-full rounded-xl px-3 py-2.5 text-start text-sm font-medium hover:bg-surface-2"
         }
       >
         {children}
