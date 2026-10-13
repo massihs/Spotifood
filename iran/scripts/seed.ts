@@ -7,7 +7,7 @@ import "dotenv/config";
 import { randomUUID } from "node:crypto";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import sharp from "sharp";
-import { db } from "@/server/db/client";
+import { db, type DbOrTx } from "@/server/db/client";
 import {
   categories,
   diningTables,
@@ -643,6 +643,10 @@ async function seedBrielle() {
       .values({ restaurantId: existing.id, userId: owner.id, role: "owner" })
       .onConflictDoNothing();
     console.log(`✓ Brielle already present — owned by ${owner.email}`);
+    // An earlier boot may have created only part of the menu: add what is missing.
+    const added = await db.transaction((tx) => syncBrielleMenu(tx, existing.id));
+    if (added.categories || added.products)
+      console.log(`✓ Brielle menu: ${added.categories} categories, ${added.products} dishes added`);
     // Photos/logo may be missing (earlier boot interrupted, or storage reset): fill the gaps.
     await seedBrielleMedia(existing.id, owner);
     return;
@@ -690,28 +694,7 @@ async function seedBrielle() {
       if (updated.length === 0)
         await tx.insert(subscriptions).values({ organizationId: org.id, planId: pro.id, status: "active" });
     }
-    const rates = await tx.select().from(taxRates).where(eq(taxRates.restaurantId, restaurant.id));
-    const rate = rates.find((r) => r.rateBps === 1000) ?? rates[0];
-    for (const [ci, cat] of BRIELLE_MENU.entries()) {
-      const [category] = await tx
-        .insert(categories)
-        .values({ restaurantId: restaurant.id, name: cat.name, templateKey: cat.key, sortOrder: ci })
-        .returning();
-      for (const [pi, item] of cat.items.entries()) {
-        await tx.insert(products).values({
-          restaurantId: restaurant.id,
-          categoryId: category!.id,
-          name: item.name,
-          // The restaurant's menu shows the English name with each dish: keep it as the first line.
-          description: item.description ? `${item.en} · ${item.description}` : item.en,
-          priceCents: toman(item.price * 1000),
-          taxRateId: rate?.id,
-          isFeatured: item.featured ?? false,
-          tags: item.tags ?? [],
-          sortOrder: pi,
-        });
-      }
-    }
+    await syncBrielleMenu(tx, restaurant.id);
     return restaurant.id;
   });
 
@@ -719,6 +702,50 @@ async function seedBrielle() {
     `✓ Brielle ${restaurantId}: 12 tables, ${BRIELLE_MENU.length} categories (owner ${owner.email})`,
   );
   await seedBrielleMedia(restaurantId, owner);
+}
+
+/**
+ * Creates the Brielle categories and dishes that do not exist yet (matched by name).
+ * Soft-deleted rows count as existing, so what the owner removed is never brought back.
+ */
+async function syncBrielleMenu(tx: DbOrTx, restaurantId: string) {
+  const rates = await tx.select().from(taxRates).where(eq(taxRates.restaurantId, restaurantId));
+  const rate = rates.find((r) => r.rateBps === 1000) ?? rates[0];
+  const cats = await tx.select().from(categories).where(eq(categories.restaurantId, restaurantId));
+  const existing = await tx
+    .select({ name: products.name })
+    .from(products)
+    .where(eq(products.restaurantId, restaurantId));
+  const names = new Set(existing.map((p) => p.name));
+  const added = { categories: 0, products: 0 };
+  for (const [ci, cat] of BRIELLE_MENU.entries()) {
+    let category = cats.find((c) => c.name === cat.name || c.templateKey === cat.key);
+    if (category?.deletedAt) continue;
+    if (!category) {
+      [category] = await tx
+        .insert(categories)
+        .values({ restaurantId, name: cat.name, templateKey: cat.key, sortOrder: ci })
+        .returning();
+      added.categories++;
+    }
+    for (const [pi, item] of cat.items.entries()) {
+      if (names.has(item.name)) continue;
+      await tx.insert(products).values({
+        restaurantId,
+        categoryId: category!.id,
+        name: item.name,
+        // The restaurant's menu shows the English name with each dish: keep it as the first line.
+        description: item.description ? `${item.en} · ${item.description}` : item.en,
+        priceCents: toman(item.price * 1000),
+        taxRateId: rate?.id,
+        isFeatured: item.featured ?? false,
+        tags: item.tags ?? [],
+        sortOrder: pi,
+      });
+      added.products++;
+    }
+  }
+  return added;
 }
 
 /** Logo and dish photos, only where missing; a failing image never blocks the start-up. */
