@@ -749,11 +749,20 @@ async function seedBrielleMedia(restaurantId: string, owner: typeof users.$infer
     .where(and(eq(products.restaurantId, restaurantId), isNull(products.deletedAt)));
   let added = 0;
   let failed = 0;
+  let present = 0;
+  const unmatched: string[] = [];
   for (const item of BRIELLE_MENU.flatMap((c) => c.items)) {
+    if (!item.photo) continue;
     const product = rows.find((r) => r.name === item.name);
-    if (!product || !item.photo) continue;
+    if (!product) {
+      unmatched.push(item.name);
+      continue;
+    }
     if (product.image && product.key) {
-      if (await store.get(`${product.key}-sm.webp`).catch(() => null)) continue;
+      if (await store.get(`${product.key}-sm.webp`).catch(() => null)) {
+        present++;
+        continue;
+      }
       await db.delete(productImages).where(eq(productImages.id, product.image)); // orphan row
     }
     try {
@@ -765,7 +774,8 @@ async function seedBrielleMedia(restaurantId: string, owner: typeof users.$infer
     }
   }
   console.log(
-    `✓ Brielle media: logo ${restaurant?.logoKey ? "present" : "added"}, ${added} photos added, ${failed} failed`,
+    `✓ Brielle media: logo ${restaurant?.logoKey ? "present" : "added"}, photos ${present} present, ${added} added, ${failed} failed` +
+      (unmatched.length ? `, ${unmatched.length} without product (${unmatched.join(", ")})` : ""),
   );
 }
 

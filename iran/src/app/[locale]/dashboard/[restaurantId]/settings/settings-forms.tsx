@@ -184,7 +184,7 @@ export function LogoForm({
 
   return (
     <div className="flex flex-wrap items-center gap-5">
-      <div className="grid size-24 shrink-0 place-items-center overflow-hidden rounded-2xl border border-border bg-surface-2">
+      <div className="grid size-24 shrink-0 place-items-center overflow-hidden rounded-3xl bg-surface-2 ring-1 ring-border">
         {shown ? (
           <img src={shown} alt={t("settings.logo")} className="size-full object-contain" />
         ) : (
@@ -196,7 +196,7 @@ export function LogoForm({
         {!disabled ? (
           <div className="flex flex-wrap gap-2">
             <ActionForm form={form}>
-              <label className="inline-flex h-10 cursor-pointer items-center rounded-xl border border-border bg-surface px-4 text-sm font-medium focus-within:ring-4 focus-within:ring-[var(--ring)] hover:bg-surface-2">
+              <label className="inline-flex h-10 cursor-pointer items-center rounded-full border border-border bg-surface px-4 text-sm font-medium focus-within:ring-4 focus-within:ring-[var(--ring)] hover:bg-surface-2">
                 {t("settings.logoUpload")}
                 <input
                   type="file"
@@ -299,7 +299,7 @@ export function ServiceForm({
         </fieldset>
         <fieldset>
           <legend className="mb-2 text-sm font-medium">{t("settings.hours_title")}</legend>
-          <div className="divide-y divide-border rounded-xl border border-border">
+          <div className="divide-y divide-border rounded-2xl border border-border">
             {DAYS.map((d) => {
               const slot = values.openingHours?.[d]?.[0];
               const closed = closedDays.has(d);
@@ -312,7 +312,7 @@ export function ServiceForm({
                     aria-label={`${t(`settings.days.${d}`)} — ${t("settings.open")}`}
                     defaultValue={slot?.open ?? "12:00"}
                     disabled={closed}
-                    className="h-9 rounded-lg border border-border bg-surface px-2 text-sm disabled:opacity-40"
+                    className="h-10 rounded-xl border border-border bg-surface px-2.5 text-sm disabled:opacity-40"
                   />
                   <span className="text-fg-subtle">–</span>
                   <input
@@ -321,7 +321,7 @@ export function ServiceForm({
                     aria-label={`${t(`settings.days.${d}`)} — ${t("settings.close")}`}
                     defaultValue={slot?.close ?? "23:00"}
                     disabled={closed}
-                    className="h-9 rounded-lg border border-border bg-surface px-2 text-sm disabled:opacity-40"
+                    className="h-10 rounded-xl border border-border bg-surface px-2.5 text-sm disabled:opacity-40"
                   />
                   <Checkbox
                     name={`${d}.closed`}
@@ -441,7 +441,7 @@ export function TaxRates({
 
   return (
     <div className="space-y-4">
-      <ul className="divide-y divide-border rounded-xl border border-border">
+      <ul className="divide-y divide-border rounded-2xl border border-border">
         {rates.map((r) => (
           <li key={r.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5">
             <span className="min-w-0 flex-1 text-sm">
