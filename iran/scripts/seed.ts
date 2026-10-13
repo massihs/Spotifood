@@ -642,9 +642,10 @@ async function seedBrielle() {
       .values({ restaurantId: existing.id, userId: owner.id, role: "owner" })
       .onConflictDoNothing();
     console.log(`✓ Brielle already present — owned by ${owner.email}`);
+    // Photos/logo may be missing (earlier boot interrupted, or storage reset): fill the gaps.
+    await seedBrielleMedia(existing.id, owner);
     return;
   }
-  const assets = new URL("./demo-assets/brielle/", `file://${process.cwd()}/scripts/`);
   const restaurantId = await db.transaction(async (tx) => {
     const org = await createOrganization(tx, {
       name: "Brielle",
@@ -713,18 +714,44 @@ async function seedBrielle() {
     return restaurant.id;
   });
 
+  console.log(
+    `✓ Brielle ${restaurantId}: 12 tables, ${BRIELLE_MENU.length} categories (owner ${owner.email})`,
+  );
+  await seedBrielleMedia(restaurantId, owner);
+}
+
+/** Logo and dish photos, only where missing; a failing image never blocks the start-up. */
+async function seedBrielleMedia(restaurantId: string, owner: typeof users.$inferSelect) {
+  const assets = new URL("./demo-assets/brielle/", `file://${process.cwd()}/scripts/`);
   const ctx = await loadRestaurantContext(db, owner, restaurantId);
-  await uploadLogo(db, ctx, await readFile(new URL("logo.png", assets)));
-  const rows = await db.select().from(products).where(eq(products.restaurantId, restaurantId));
-  let photos = 0;
+  const [restaurant] = await db.select().from(restaurants).where(eq(restaurants.id, restaurantId));
+  if (!restaurant?.logoKey) {
+    try {
+      await uploadLogo(db, ctx, await readFile(new URL("logo.png", assets)));
+    } catch (e) {
+      console.warn("! Brielle logo not uploaded:", e);
+    }
+  }
+  const rows = await db
+    .select({ id: products.id, name: products.name, image: productImages.id })
+    .from(products)
+    .leftJoin(productImages, eq(productImages.productId, products.id))
+    .where(and(eq(products.restaurantId, restaurantId), isNull(products.deletedAt)));
+  let added = 0;
+  let failed = 0;
   for (const item of BRIELLE_MENU.flatMap((c) => c.items)) {
     const product = rows.find((r) => r.name === item.name);
-    if (!product || !item.photo) continue;
-    await addProductImage(db, ctx, product.id, await readFile(new URL(`${item.photo}.jpg`, assets)));
-    photos++;
+    if (!product || !item.photo || product.image) continue;
+    try {
+      await addProductImage(db, ctx, product.id, await readFile(new URL(`${item.photo}.jpg`, assets)));
+      added++;
+    } catch (e) {
+      failed++;
+      console.warn(`! Brielle photo ${item.photo} not uploaded:`, e);
+    }
   }
   console.log(
-    `✓ Brielle ${restaurantId}: 12 tables, ${BRIELLE_MENU.length} categories, ${rows.length} products, ${photos} photos (owner ${owner.email})`,
+    `✓ Brielle media: logo ${restaurant?.logoKey ? "present" : "added"}, ${added} photos added, ${failed} failed`,
   );
 }
 
