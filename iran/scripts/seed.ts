@@ -39,6 +39,7 @@ import { placeOrder, updateOrderStatus } from "@/server/modules/orders/service";
 import { newIdempotencyKey, recordStaffPayment } from "@/server/modules/payments/service";
 import type { OrderStatus } from "@/server/modules/orders/status";
 import { uploadLogo } from "@/server/modules/restaurants/settings";
+import { storage } from "@/server/infra/storage";
 import { readFile } from "node:fs/promises";
 import { BRIELLE_MENU } from "./brielle";
 
@@ -725,7 +726,11 @@ async function seedBrielleMedia(restaurantId: string, owner: typeof users.$infer
   const assets = new URL("./demo-assets/brielle/", `file://${process.cwd()}/scripts/`);
   const ctx = await loadRestaurantContext(db, owner, restaurantId);
   const [restaurant] = await db.select().from(restaurants).where(eq(restaurants.id, restaurantId));
-  if (!restaurant?.logoKey) {
+  // Rows can outlive their files (e.g. written before the storage disk was mounted): check files.
+  const store = storage();
+  const logoMissing =
+    !restaurant?.logoKey || !(await store.get(`${restaurant.logoKey}-256.webp`).catch(() => null));
+  if (logoMissing) {
     try {
       await uploadLogo(db, ctx, await readFile(new URL("logo.png", assets)));
     } catch (e) {
@@ -733,7 +738,12 @@ async function seedBrielleMedia(restaurantId: string, owner: typeof users.$infer
     }
   }
   const rows = await db
-    .select({ id: products.id, name: products.name, image: productImages.id })
+    .select({
+      id: products.id,
+      name: products.name,
+      image: productImages.id,
+      key: productImages.storageKey,
+    })
     .from(products)
     .leftJoin(productImages, eq(productImages.productId, products.id))
     .where(and(eq(products.restaurantId, restaurantId), isNull(products.deletedAt)));
@@ -741,7 +751,11 @@ async function seedBrielleMedia(restaurantId: string, owner: typeof users.$infer
   let failed = 0;
   for (const item of BRIELLE_MENU.flatMap((c) => c.items)) {
     const product = rows.find((r) => r.name === item.name);
-    if (!product || !item.photo || product.image) continue;
+    if (!product || !item.photo) continue;
+    if (product.image && product.key) {
+      if (await store.get(`${product.key}-sm.webp`).catch(() => null)) continue;
+      await db.delete(productImages).where(eq(productImages.id, product.image)); // orphan row
+    }
     try {
       await addProductImage(db, ctx, product.id, await readFile(new URL(`${item.photo}.jpg`, assets)));
       added++;
