@@ -212,7 +212,10 @@
     "kitchen": "آشپزخانه",
     "floor": "سالن",
     "payments": "پرداخت‌ها",
-    "invoices": "فاکتورها"
+    "invoices": "فاکتورها",
+    "more": "بیشتر",
+    "close": "بستن",
+    "mainNav": "ناوبری اصلی"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -236,7 +239,23 @@
     "suspendedBody": "این رستوران موقتاً معلق شده است. با پشتیبانی Spotifood تماس بگیرید.",
     "noRestaurantTitle": "رستورانی وجود ندارد",
     "noRestaurantBody": "حساب شما به هیچ رستوران فعالی متصل نیست.",
-    "pickRestaurant": "یک رستوران انتخاب کنید"
+    "pickRestaurant": "یک رستوران انتخاب کنید",
+    "today": "امروز",
+    "revenueToday": "درآمد امروز",
+    "ordersToday": "سفارش‌های امروز",
+    "openTables": "میزهای باز",
+    "inKitchen": "در آشپزخانه",
+    "last7": "درآمد ۷ روز اخیر",
+    "quick": "دسترسی سریع",
+    "quickActions": {
+      "kitchen": "صفحه آشپزخانه",
+      "floor": "نقشه سالن",
+      "menu": "ویرایش منو",
+      "qr": "چاپ QR میزها",
+      "guestView": "دیدن منوی مشتری"
+    },
+    "catalog": "منو و تیم",
+    "setupDone": "همه چیز آماده است! 🎉"
   },
   "roles": {
     "owner": "مالک",

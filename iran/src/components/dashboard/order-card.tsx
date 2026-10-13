@@ -99,7 +99,9 @@ export function OrderCard({
             {i.options.length ? (
               <span className="text-fg-muted"> · {i.options.map((x) => x.valueName).join(", ")}</span>
             ) : null}
-            {i.note ? <span className="block ps-6 text-xs font-medium text-accent-text">↳ {i.note}</span> : null}
+            {i.note ? (
+              <span className="block ps-6 text-xs font-medium text-accent-text">↳ {i.note}</span>
+            ) : null}
           </li>
         ))}
       </ul>

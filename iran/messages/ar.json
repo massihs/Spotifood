@@ -212,7 +212,10 @@
     "kitchen": "المطبخ",
     "floor": "الصالة",
     "payments": "المدفوعات",
-    "invoices": "الفواتير"
+    "invoices": "الفواتير",
+    "more": "المزيد",
+    "close": "إغلاق",
+    "mainNav": "التنقل الرئيسي"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -236,7 +239,23 @@
     "suspendedBody": "هذا المطعم معلّق مؤقتًا. يرجى التواصل مع دعم Spotifood.",
     "noRestaurantTitle": "لا يوجد مطعم",
     "noRestaurantBody": "حسابك غير مرتبط بأي مطعم نشط.",
-    "pickRestaurant": "اختر مطعمًا"
+    "pickRestaurant": "اختر مطعمًا",
+    "today": "اليوم",
+    "revenueToday": "إيرادات اليوم",
+    "ordersToday": "طلبات اليوم",
+    "openTables": "طاولات مفتوحة",
+    "inKitchen": "في المطبخ",
+    "last7": "الإيرادات آخر ٧ أيام",
+    "quick": "وصول سريع",
+    "quickActions": {
+      "kitchen": "شاشة المطبخ",
+      "floor": "مخطط الصالة",
+      "menu": "تعديل القائمة",
+      "qr": "طباعة رموز QR",
+      "guestView": "عرض قائمة الزبون"
+    },
+    "catalog": "القائمة والفريق",
+    "setupDone": "كل شيء جاهز! 🎉"
   },
   "roles": {
     "owner": "المالك",

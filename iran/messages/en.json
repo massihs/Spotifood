@@ -212,7 +212,10 @@
     "kitchen": "Kitchen",
     "floor": "Floor",
     "payments": "Payments",
-    "invoices": "Invoices"
+    "invoices": "Invoices",
+    "more": "More",
+    "close": "Close",
+    "mainNav": "Main navigation"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -236,7 +239,23 @@
     "suspendedBody": "This restaurant is temporarily suspended. Please contact Spotifood support.",
     "noRestaurantTitle": "No restaurant",
     "noRestaurantBody": "Your account is not linked to any active restaurant.",
-    "pickRestaurant": "Choose a restaurant"
+    "pickRestaurant": "Choose a restaurant",
+    "today": "Today",
+    "revenueToday": "Revenue today",
+    "ordersToday": "Orders today",
+    "openTables": "Open tables",
+    "inKitchen": "In the kitchen",
+    "last7": "Revenue, last 7 days",
+    "quick": "Quick access",
+    "quickActions": {
+      "kitchen": "Kitchen screen",
+      "floor": "Floor plan",
+      "menu": "Edit menu",
+      "qr": "Print table QR codes",
+      "guestView": "See the guest menu"
+    },
+    "catalog": "Menu & team",
+    "setupDone": "You are all set! 🎉"
   },
   "roles": {
     "owner": "Owner",

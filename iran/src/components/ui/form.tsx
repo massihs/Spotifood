@@ -99,7 +99,7 @@ export function FormFeedback({ state, success }: { state: ActionState; success?:
   if (!state) return null;
   if (state.ok) {
     return success ? (
-      <p role="status" className="rounded-xl bg-success-soft px-3.5 py-2.5 text-sm text-success">
+      <p role="status" className="rounded-2xl bg-success-soft px-4 py-3 text-sm font-medium text-success">
         {success}
       </p>
     ) : null;
@@ -108,7 +108,7 @@ export function FormFeedback({ state, success }: { state: ActionState; success?:
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
   const key = hasFieldErrors ? "errorCodes.validation" : `errorCodes.${state.error}`;
   return (
-    <p role="alert" className="rounded-xl bg-danger-soft px-3.5 py-2.5 text-sm text-danger">
+    <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm font-medium text-danger">
       {t.has(key) ? t(key) : t("errorCodes.internal")}
     </p>
   );
@@ -134,7 +134,7 @@ export function useCloseOnSuccess(state: ActionState) {
 }
 
 const controlClasses =
-  "w-full rounded-xl border border-border bg-surface px-3.5 text-[15px] text-fg transition-colors hover:border-border-strong focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none aria-invalid:border-danger";
+  "w-full rounded-2xl border border-transparent bg-surface-2 px-4 text-[15px] text-fg transition-colors placeholder:text-fg-subtle hover:bg-surface-3 focus-visible:border-ink focus-visible:bg-surface focus-visible:outline-none aria-invalid:border-danger";
 
 function Wrapper({
   id,
@@ -151,7 +151,7 @@ function Wrapper({
 }) {
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium">
+      <label htmlFor={id} className="block text-sm font-semibold">
         {label}
       </label>
       {children}
@@ -183,7 +183,7 @@ export function SelectField({
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className={cn(controlClasses, "h-11", className)}
+        className={cn(controlClasses, "h-12", className)}
         {...props}
       >
         {children}
@@ -221,7 +221,7 @@ export function Checkbox({
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: ReactNode; description?: ReactNode }) {
   return (
     <label className={cn("flex cursor-pointer items-start gap-2.5 text-sm", className)}>
-      <input type="checkbox" className="mt-0.5 size-4 shrink-0 accent-[var(--accent)]" {...props} />
+      <input type="checkbox" className="mt-0.5 size-5 shrink-0 accent-[var(--ink)]" {...props} />
       <span>
         <span className="font-medium">{label}</span>
         {description ? <span className="block text-fg-muted">{description}</span> : null}

@@ -49,22 +49,23 @@ export function Dialog({
           if (e.target === ref.current) close(); // backdrop click
         }}
         className={cn(
-          "m-auto w-[calc(100%-2rem)] rounded-2xl border border-border bg-surface p-0 text-fg shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-[2px]",
-          size === "lg" ? "max-w-2xl" : "max-w-md",
+          "animate-sheet-up m-0 mt-auto w-full max-w-none rounded-t-[1.75rem] bg-surface p-0 text-fg shadow-2xl backdrop:bg-black/60",
+          "sm:m-auto sm:w-[calc(100%-2rem)] sm:rounded-3xl",
+          size === "lg" ? "sm:max-w-2xl" : "sm:max-w-md",
         )}
       >
         {open ? (
           <DialogContext value={{ close }}>
-            <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
+            <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
               <div>
-                <h2 className="text-base font-semibold">{title}</h2>
+                <h2 className="text-lg font-extrabold">{title}</h2>
                 {description ? <p className="mt-0.5 text-sm text-fg-muted">{description}</p> : null}
               </div>
               <button
                 type="button"
                 onClick={close}
                 aria-label="×"
-                className="-me-1 grid size-8 place-items-center rounded-lg text-fg-muted hover:bg-surface-2 hover:text-fg"
+                className="-me-1 grid size-9 place-items-center rounded-full bg-surface-2 text-fg hover:bg-surface-3"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -78,7 +79,9 @@ export function Dialog({
                 </svg>
               </button>
             </div>
-            <div className="max-h-[75dvh] overflow-y-auto px-5 py-5">{children}</div>
+            <div className="max-h-[80dvh] overflow-y-auto px-5 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6">
+              {children}
+            </div>
           </DialogContext>
         ) : null}
       </dialog>

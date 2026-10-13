@@ -86,7 +86,7 @@ export function NotificationBell({
           setOpen((v) => !v);
           if (!open) load();
         }}
-        className="relative grid size-10 place-items-center rounded-lg text-fg-muted hover:bg-surface-2 hover:text-fg"
+        className="relative grid size-11 place-items-center rounded-full bg-surface-2 text-fg hover:bg-surface-3"
       >
         <svg
           viewBox="0 0 24 24"
@@ -99,13 +99,13 @@ export function NotificationBell({
           <path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0" />
         </svg>
         {unread > 0 ? (
-          <span className="absolute end-1 top-1 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-[11px] leading-5 font-semibold text-accent-fg tabular-nums">
+          <span className="absolute -end-1 -top-1 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-[11px] leading-5 font-bold text-accent-fg tabular-nums ring-2 ring-bg">
             {unread > 99 ? "99+" : unread}
           </span>
         ) : null}
       </button>
       {open ? (
-        <div className="absolute start-0 z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-surface shadow-2xl">
+        <div className="absolute end-0 z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-3xl border border-border bg-surface shadow-2xl">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <p className="font-semibold">{t("title")}</p>
             {unread > 0 ? (

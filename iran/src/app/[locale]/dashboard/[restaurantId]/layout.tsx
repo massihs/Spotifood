@@ -2,17 +2,19 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import {
-  IconChart,
-  IconFlame,
-  IconFloor,
-  IconHome,
-  IconMenu,
-  IconReceipt,
-  IconSettings,
-  IconTable,
-  IconUsers,
-  IconWallet,
-} from "@/components/ui/icons";
+  ChefHat,
+  FileText,
+  LayoutDashboard,
+  LayoutGrid,
+  QrCode,
+  ReceiptText,
+  Settings,
+  Shield,
+  UtensilsCrossed,
+  Users,
+  Wallet,
+} from "lucide-react";
+import { logoUrl } from "@/server/modules/restaurants/settings";
 import { can } from "@/server/tenancy";
 import { requireRestaurant } from "@/server/auth/current";
 import { Link } from "@/i18n/navigation";
@@ -46,23 +48,38 @@ async function RestaurantShell({
 
   const { unread } = await listNotifications(db, ctx, 1);
   const nav = [
-    { href: base, label: t("nav.overview"), icon: <IconHome />, exact: true },
-    can(ctx, "tables.view") && { href: `${base}/floor`, label: t("nav.floor"), icon: <IconFloor /> },
-    can(ctx, "orders.view") && { href: `${base}/kitchen`, label: t("nav.kitchen"), icon: <IconFlame /> },
-    can(ctx, "orders.view") && { href: `${base}/orders`, label: t("nav.orders"), icon: <IconReceipt /> },
-    can(ctx, "payments.view") && { href: `${base}/payments`, label: t("nav.payments"), icon: <IconWallet /> },
+    { href: base, label: t("nav.overview"), icon: <LayoutDashboard />, exact: true, primary: true },
+    can(ctx, "orders.view") && {
+      href: `${base}/kitchen`,
+      label: t("nav.kitchen"),
+      icon: <ChefHat />,
+      primary: true,
+    },
+    can(ctx, "orders.view") && {
+      href: `${base}/orders`,
+      label: t("nav.orders"),
+      icon: <ReceiptText />,
+      primary: true,
+    },
+    can(ctx, "tables.view") && { href: `${base}/floor`, label: t("nav.floor"), icon: <LayoutGrid /> },
+    can(ctx, "menu.view") && {
+      href: `${base}/menu`,
+      label: t("nav.menu"),
+      icon: <UtensilsCrossed />,
+      primary: true,
+    },
+    can(ctx, "payments.view") && { href: `${base}/payments`, label: t("nav.payments"), icon: <Wallet /> },
     can(ctx, "invoices.view") && {
       href: `${base}/invoices`,
       label: t("nav.invoices"),
-      icon: <IconReceipt />,
+      icon: <FileText />,
     },
-    can(ctx, "menu.view") && { href: `${base}/menu`, label: t("nav.menu"), icon: <IconMenu /> },
-    can(ctx, "tables.view") && { href: `${base}/tables`, label: t("nav.tables"), icon: <IconTable /> },
-    can(ctx, "members.manage") && { href: `${base}/team`, label: t("nav.team"), icon: <IconUsers /> },
+    can(ctx, "tables.view") && { href: `${base}/tables`, label: t("nav.tables"), icon: <QrCode /> },
+    can(ctx, "members.manage") && { href: `${base}/team`, label: t("nav.team"), icon: <Users /> },
     can(ctx, "restaurant.view") && {
       href: `${base}/settings`,
       label: t("nav.settings"),
-      icon: <IconSettings />,
+      icon: <Settings />,
     },
   ].filter((x) => !!x);
 
@@ -71,6 +88,7 @@ async function RestaurantShell({
       <AppShell
         title={ctx.restaurant.name}
         subtitle={t(`roles.${ctx.role}`)}
+        avatar={logoUrl(ctx.restaurant.logoKey)}
         nav={nav}
         user={ctx.user}
         headerExtra={
@@ -86,18 +104,17 @@ async function RestaurantShell({
           <div className="space-y-1">
             <Link
               href="/dashboard"
-              className="block rounded-lg px-2.5 py-2 text-sm text-fg-muted hover:bg-surface-2 hover:text-fg"
+              className="flex h-10 items-center gap-3 rounded-2xl px-3 text-sm text-white/60 hover:bg-white/6 hover:text-white"
             >
+              <LayoutGrid className="size-4" aria-hidden="true" />
               {t("nav.switchRestaurant")}
             </Link>
             {ctx.user.isSuperAdmin ? (
               <Link
                 href="/admin"
-                className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-fg-muted hover:bg-surface-2 hover:text-fg"
+                className="flex h-10 items-center gap-3 rounded-2xl px-3 text-sm text-white/60 hover:bg-white/6 hover:text-white"
               >
-                <span className="size-4" aria-hidden="true">
-                  <IconChart />
-                </span>
+                <Shield className="size-4" aria-hidden="true" />
                 {t("nav.admin")}
               </Link>
             ) : null}

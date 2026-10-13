@@ -6,9 +6,9 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
   return (
     <input
       className={cn(
-        "h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-[15px] text-fg",
+        "h-12 w-full rounded-2xl border border-transparent bg-surface-2 px-4 text-[15px] text-fg",
         "transition-colors placeholder:text-fg-subtle",
-        "hover:border-border-strong focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none",
+        "hover:bg-surface-3 focus-visible:border-ink focus-visible:bg-surface focus-visible:outline-none",
         "aria-invalid:border-danger",
         className,
       )}
@@ -28,7 +28,7 @@ export function Field({
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium text-fg">
+      <label htmlFor={id} className="block text-sm font-semibold text-fg">
         {label}
       </label>
       <Input id={id} aria-invalid={error ? true : undefined} aria-describedby={describedBy} {...inputProps} />

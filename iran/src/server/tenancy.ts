@@ -15,6 +15,7 @@ export type RestaurantSummary = {
   currency: string;
   timezone: string;
   defaultLocale: string;
+  logoKey: string | null;
 };
 
 /**
@@ -39,6 +40,7 @@ const restaurantColumns = {
   currency: restaurants.currency,
   timezone: restaurants.timezone,
   defaultLocale: restaurants.defaultLocale,
+  logoKey: restaurants.logoKey,
 };
 
 export async function loadRestaurantContext(
