@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Clock, MessageSquareText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
@@ -33,14 +33,15 @@ export type OrderCardData = {
   }[];
 };
 
-const TONE: Record<OrderStatus, string> = {
-  pending_payment: "border-s-fg-subtle",
-  received: "border-s-accent",
-  accepted: "border-s-warning",
-  preparing: "border-s-warning",
-  ready: "border-s-success",
-  served: "border-s-border-strong",
-  cancelled: "border-s-danger",
+/** Status → dot colour + soft chip background. */
+const TONE: Record<OrderStatus, { dot: string; chip: string }> = {
+  pending_payment: { dot: "bg-fg-subtle", chip: "bg-surface-2 text-fg-muted" },
+  received: { dot: "bg-accent", chip: "bg-accent-soft text-accent-text" },
+  accepted: { dot: "bg-warning", chip: "bg-warning-soft text-fg" },
+  preparing: { dot: "bg-warning", chip: "bg-warning-soft text-fg" },
+  ready: { dot: "bg-success", chip: "bg-success-soft text-success" },
+  served: { dot: "bg-fg-subtle", chip: "bg-surface-2 text-fg-muted" },
+  cancelled: { dot: "bg-danger", chip: "bg-danger-soft text-danger" },
 };
 
 export function OrderCard({
@@ -49,12 +50,15 @@ export function OrderCard({
   canUpdate,
   canCancel,
   timeZone,
+  compact = false,
 }: {
   restaurantId: string;
   order: OrderCardData;
   canUpdate: boolean;
   canCancel: boolean;
   timeZone: string;
+  /** Kitchen columns: the column already names the status, so drop the chip. */
+  compact?: boolean;
 }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -73,72 +77,120 @@ export function OrderCard({
       } else setError(null);
     });
 
+  const tone = TONE[o.status];
+  const paid = o.paymentStatus === "paid";
+
   return (
-    <Card className={cn("flex flex-col border-s-4", TONE[o.status], pending && "opacity-60")}>
-      <div className="flex items-start justify-between gap-3 px-4 pt-4">
-        <div>
-          <p className="text-lg font-semibold tabular-nums">#{o.number}</p>
-          <p className="text-sm text-fg-muted">
-            {o.tableLabel ? t("orders.table", { label: o.tableLabel }) : "—"}
-            {who ? ` · ${who}` : ""}
-          </p>
+    <Card className={cn("flex flex-col overflow-hidden transition-opacity", pending && "opacity-60")}>
+      <div className="flex items-start justify-between gap-3 p-4 pb-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span
+            className={cn(
+              "grid size-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-ink px-1 font-black text-ink-fg tabular-nums",
+              (o.tableLabel?.length ?? 0) > 3 ? "text-[10px] leading-tight break-all" : "text-base",
+            )}
+            aria-hidden="true"
+          >
+            {o.tableLabel ?? "—"}
+          </span>
+          <div className="min-w-0">
+            <p className="text-lg leading-tight font-black whitespace-nowrap tabular-nums">
+              <bdi dir="ltr">#{o.number}</bdi>
+            </p>
+            <p className="truncate text-xs text-fg-muted">
+              {o.tableLabel ? t("orders.table", { label: o.tableLabel }) : "—"}
+              {who ? ` · ${who}` : ""}
+            </p>
+          </div>
         </div>
-        <div className="text-end">
-          <Badge tone={o.status === "ready" ? "success" : o.status === "cancelled" ? "danger" : "accent"}>
-            {t(`orderStatus.${o.status}`)}
-          </Badge>
-          <p className="mt-1 text-xs text-fg-subtle">
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          {compact ? null : (
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold",
+                tone.chip,
+              )}
+            >
+              <span className={cn("size-1.5 rounded-full", tone.dot)} aria-hidden="true" />
+              {t(`orderStatus.${o.status}`)}
+            </span>
+          )}
+          <span className="flex items-center gap-1 text-xs whitespace-nowrap text-fg-subtle">
+            <Clock className="size-3" aria-hidden="true" />
             <TimeAgo date={o.placedAt} timeZone={timeZone} />
-          </p>
+          </span>
         </div>
       </div>
-      <ul className="space-y-1 px-4 py-3 text-sm">
+      <ul className="mx-4 divide-y divide-border rounded-2xl bg-surface-2/70 text-sm">
         {o.items.map((i) => (
-          <li key={i.id}>
-            <span className="font-semibold tabular-nums">{i.quantity}×</span> {i.productName}
-            {i.options.length ? (
-              <span className="text-fg-muted"> · {i.options.map((x) => x.valueName).join(", ")}</span>
-            ) : null}
-            {i.note ? (
-              <span className="block ps-6 text-xs font-medium text-accent-text">↳ {i.note}</span>
-            ) : null}
+          <li key={i.id} className="flex gap-3 px-3 py-2.5">
+            <span className="grid h-6 min-w-6 shrink-0 place-items-center rounded-lg bg-surface px-1 text-xs font-black tabular-nums shadow-[var(--shadow-soft)]">
+              {i.quantity}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="font-semibold">{i.productName}</span>
+              {i.options.length ? (
+                <span className="block text-xs text-fg-muted">
+                  {i.options.map((x) => x.valueName).join(" · ")}
+                </span>
+              ) : null}
+              {i.note ? (
+                <span className="mt-0.5 block text-xs font-semibold text-accent-text">↳ {i.note}</span>
+              ) : null}
+            </span>
           </li>
         ))}
       </ul>
       {o.note ? (
-        <p className="mx-4 mb-3 rounded-lg bg-warning-soft px-3 py-2 text-sm">
-          <span className="font-medium">{t("orders.note")} : </span>
-          {o.note}
-        </p>
-      ) : null}
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-3">
-        <p className="text-sm">
-          <span className="font-semibold tabular-nums">{formatMoney(o.totalCents, o.currency, locale)}</span>{" "}
-          <span className="text-xs text-fg-subtle">
-            · {o.paymentStatus === "paid" ? t("orders.paid") : t("orders.unpaid")}
+        <p className="mx-4 mt-2 flex gap-2 rounded-2xl bg-warning-soft px-3 py-2 text-sm">
+          <MessageSquareText className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          <span>
+            <span className="font-bold">{t("orders.note")} : </span>
+            {o.note}
           </span>
         </p>
-        <div className="flex gap-2">
-          {canCancel && o.status !== "served" && o.status !== "cancelled" ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={pending}
-              onClick={() => {
-                if (!window.confirm(t("orders.cancelConfirm", { number: o.number }))) return;
-                const reason = window.prompt(t("orders.cancelReason")) ?? undefined;
-                move("cancelled", reason || undefined);
-              }}
-            >
-              {t("orders.cancel")}
-            </Button>
-          ) : null}
-          {canUpdate && next ? (
-            <Button size="sm" disabled={pending} onClick={() => move(next)}>
-              {t(`orders.next.${next}`)}
-            </Button>
-          ) : null}
-        </div>
+      ) : null}
+      <div className="mt-auto flex items-center justify-between gap-2 px-4 pt-3">
+        <p className="font-black tabular-nums">{formatMoney(o.totalCents, o.currency, locale)}</p>
+        <span
+          className={cn(
+            "rounded-full px-2.5 py-0.5 text-xs font-bold",
+            paid ? "bg-success-soft text-success" : "bg-surface-2 text-fg-muted",
+          )}
+        >
+          {paid ? t("orders.paid") : t("orders.unpaid")}
+        </span>
+      </div>
+      <div className="flex gap-2 p-4 pt-3">
+        {canCancel && o.status !== "served" && o.status !== "cancelled" ? (
+          <Button
+            variant="secondary"
+            size="md"
+            disabled={pending}
+            aria-label={t("orders.cancel")}
+            title={t("orders.cancel")}
+            className="shrink-0 px-3.5"
+            onClick={() => {
+              if (!window.confirm(t("orders.cancelConfirm", { number: o.number }))) return;
+              const reason = window.prompt(t("orders.cancelReason")) ?? undefined;
+              move("cancelled", reason || undefined);
+            }}
+          >
+            <X className="size-4" aria-hidden="true" />
+          </Button>
+        ) : null}
+        {canUpdate && next ? (
+          <Button
+            size="md"
+            variant={next === "ready" ? "accent" : "primary"}
+            disabled={pending}
+            className="flex-1"
+            onClick={() => move(next)}
+          >
+            {t(`orders.next.${next}`)}
+            <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+          </Button>
+        ) : null}
       </div>
       {error ? (
         <p role="alert" className="px-4 pb-3 text-sm text-danger">

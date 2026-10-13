@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useCallback, useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Link } from "@/i18n/navigation";
+import { ImageIcon, Pencil, Plus, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -214,10 +215,34 @@ export function MenuBoard({
   };
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[340px_minmax(0,1fr)] [&>*]:min-w-0">
-      <Card>
+    <div className="grid items-start gap-6 lg:grid-cols-[320px_minmax(0,1fr)] [&>*]:min-w-0">
+      {categories.length > 0 ? (
+        <nav
+          aria-label={t("menu.categories")}
+          className="-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1 lg:hidden"
+        >
+          {categories.map((c) => (
+            <Link
+              key={c.id}
+              href={`${base}?category=${c.id}`}
+              scroll={false}
+              aria-current={selected?.id === c.id ? "true" : undefined}
+              className={cn(
+                "shrink-0 rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap",
+                selected?.id === c.id
+                  ? "bg-ink text-ink-fg"
+                  : "bg-surface text-fg-muted shadow-[var(--shadow-soft)]",
+              )}
+            >
+              {c.name}
+              <span className="ms-1.5 text-xs tabular-nums opacity-60">{c.productCount}</span>
+            </Link>
+          ))}
+        </nav>
+      ) : null}
+      <Card className="max-lg:order-last lg:sticky lg:top-20">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
-          <h2 className="font-semibold">{t("menu.categories")}</h2>
+          <h2 className="font-extrabold">{t("menu.categories")}</h2>
           {canManage ? (
             <div className="flex gap-1">
               <Dialog
@@ -225,6 +250,7 @@ export function MenuBoard({
                 title={t("menu.fromTemplates")}
                 trigger={(open) => (
                   <Button variant="ghost" size="sm" onClick={open}>
+                    <Sparkles className="size-4" aria-hidden="true" />
                     {t("menu.fromTemplates")}
                   </Button>
                 )}
@@ -239,8 +265,8 @@ export function MenuBoard({
               <Dialog
                 title={t("menu.addCategory")}
                 trigger={(open) => (
-                  <Button size="sm" onClick={open} aria-label={t("menu.addCategory")}>
-                    +
+                  <Button size="sm" onClick={open} aria-label={t("menu.addCategory")} className="px-2.5">
+                    <Plus className="size-4" aria-hidden="true" />
                   </Button>
                 )}
               >
@@ -256,7 +282,7 @@ export function MenuBoard({
           </div>
         ) : (
           <SortableList
-            className="divide-y divide-border p-1"
+            className="space-y-0.5 p-2"
             items={categories}
             getId={(c) => c.id}
             disabled={!canManage}
@@ -265,8 +291,8 @@ export function MenuBoard({
             renderItem={(c, handle) => (
               <div
                 className={cn(
-                  "flex items-center gap-1 rounded-lg bg-surface px-1",
-                  selected?.id === c.id && "bg-surface-2",
+                  "flex items-center gap-1 rounded-2xl bg-surface px-1 transition-colors",
+                  selected?.id === c.id ? "bg-ink text-ink-fg [&_*]:text-inherit" : "hover:bg-surface-2",
                 )}
               >
                 {handle}
@@ -276,12 +302,12 @@ export function MenuBoard({
                   className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2 py-2.5"
                   scroll={false}
                 >
-                  <span className={cn("truncate text-sm font-medium", !c.isActive && "text-fg-subtle")}>
+                  <span className={cn("truncate text-sm font-bold", !c.isActive && "opacity-50")}>
                     {c.name}
                   </span>
                   <span className="flex shrink-0 items-center gap-1.5">
                     {!c.isActive ? <Badge>{t("menu.hidden")}</Badge> : null}
-                    <span className="text-xs text-fg-subtle tabular-nums">
+                    <span className="text-xs tabular-nums opacity-60">
                       {t("menu.productCount", { count: c.productCount })}
                     </span>
                   </span>
@@ -294,18 +320,9 @@ export function MenuBoard({
                         type="button"
                         onClick={open}
                         aria-label={`${t("menu.editCategory")} — ${c.name}`}
-                        className="grid size-8 shrink-0 place-items-center rounded-lg text-fg-subtle hover:bg-surface hover:text-fg"
+                        className="grid size-8 shrink-0 place-items-center rounded-full opacity-60 hover:bg-white/10 hover:opacity-100"
                       >
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="size-4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          aria-hidden="true"
-                        >
-                          <path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4" />
-                        </svg>
+                        <Pencil className="size-4" aria-hidden="true" />
                       </button>
                     )}
                   >
@@ -324,13 +341,19 @@ export function MenuBoard({
 
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
-          <h2 className="font-semibold">{selected?.name ?? t("menu.products")}</h2>
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-black">{selected?.name ?? t("menu.products")}</h2>
+            {selected ? (
+              <p className="text-xs text-fg-muted">{t("menu.productCount", { count: products.length })}</p>
+            ) : null}
+          </div>
           {selected && canManage ? (
             <Link
               href={`${base}/products/new?category=${selected.id}`}
-              className={buttonClasses("primary", "sm")}
+              className={buttonClasses("accent", "sm")}
             >
-              + {t("menu.addProduct")}
+              <Plus className="size-4" aria-hidden="true" />
+              {t("menu.addProduct")}
             </Link>
           ) : null}
         </div>
@@ -343,7 +366,7 @@ export function MenuBoard({
           </div>
         ) : (
           <SortableList
-            className="divide-y divide-border p-1"
+            className="divide-y divide-border px-2 py-1"
             items={products}
             getId={(p) => p.id}
             disabled={!canManage}
@@ -388,20 +411,29 @@ function ProductItem({
   const locale = useLocale();
   const price = (c: number) => formatMoney(c, currency, locale);
   return (
-    <div className="flex items-center gap-2 rounded-lg bg-surface px-1 py-2">
+    <div className="flex items-center gap-2 bg-surface px-1 py-3 sm:gap-3">
       {handle}
-      <div className="size-12 shrink-0 overflow-hidden rounded-lg bg-surface-2">
-        {p.image ? <img src={p.image.sm} alt="" loading="lazy" className="size-full object-cover" /> : null}
+      <div
+        className={cn(
+          "grid size-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-surface-2 text-fg-subtle",
+          !p.isAvailable && "grayscale",
+        )}
+      >
+        {p.image ? (
+          <img src={p.image.sm} alt="" loading="lazy" className="size-full object-cover" />
+        ) : (
+          <ImageIcon className="size-5" aria-hidden="true" />
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <Link
           href={`/dashboard/${restaurantId}/menu/products/${p.id}`}
-          className={cn("block truncate font-medium hover:underline", !p.isActive && "text-fg-subtle")}
+          className={cn("block truncate font-bold hover:underline", !p.isActive && "text-fg-subtle")}
         >
           {p.name}
         </Link>
         <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm">
-          <span className="tabular-nums">{price(p.priceCents)}</span>
+          <span className="font-semibold tabular-nums">{price(p.priceCents)}</span>
           {p.compareAtPriceCents ? (
             <span className="text-fg-subtle tabular-nums line-through">{price(p.compareAtPriceCents)}</span>
           ) : null}
@@ -473,7 +505,7 @@ function FlagSwitch({
         }
         className={cn(
           "relative h-6 w-10 shrink-0 rounded-full transition-colors disabled:opacity-60",
-          optimistic ? "bg-success" : "bg-border-strong",
+          optimistic ? "bg-accent" : "bg-border-strong",
         )}
       >
         <span

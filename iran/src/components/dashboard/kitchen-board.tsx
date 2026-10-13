@@ -2,12 +2,22 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { Bell, BellOff, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 import { LiveIndicator, LiveRefresh, useLiveEvent } from "@/components/realtime/live";
 import { Toast } from "@/components/ui/toast";
 import { OrderCard, type OrderCardData } from "./order-card";
 
 const COLUMNS = ["received", "accepted", "preparing", "ready", "served"] as const;
+
+const DOT: Record<(typeof COLUMNS)[number], string> = {
+  received: "bg-accent",
+  accepted: "bg-warning",
+  preparing: "bg-warning",
+  ready: "bg-success",
+  served: "bg-fg-subtle",
+};
 
 /** Two short tones; browsers only allow audio after a user gesture, hence the toggle. */
 function chime(ctx: AudioContext) {
@@ -61,7 +71,7 @@ export function KitchenBoard({
       <LiveRefresh types={["order.created", "order.updated"]} />
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+          <h1 className="text-2xl font-black tracking-tight sm:text-3xl">{t("title")}</h1>
           <LiveIndicator />
         </div>
         <div className="flex gap-2">
@@ -76,32 +86,47 @@ export function KitchenBoard({
               setSound(!sound);
             }}
           >
-            {sound ? `🔔 ${t("soundOn")}` : `🔕 ${t("soundOff")}`}
+            {sound ? (
+              <Bell className="size-4" aria-hidden="true" />
+            ) : (
+              <BellOff className="size-4" aria-hidden="true" />
+            )}
+            {sound ? t("soundOn") : t("soundOff")}
           </Button>
           <Button
             variant="secondary"
             size="sm"
+            className="max-sm:hidden"
             onClick={() => document.documentElement.requestFullscreen?.().catch(() => {})}
           >
+            <Maximize2 className="size-4" aria-hidden="true" />
             {t("fullscreen")}
           </Button>
         </div>
       </div>
-      <div className="grid min-h-0 flex-1 auto-cols-[minmax(15rem,1fr)] grid-flow-col gap-3 overflow-x-auto pb-2">
+      <div className="-mx-4 grid min-h-0 flex-1 snap-x snap-mandatory scroll-px-4 auto-cols-[min(20rem,85vw)] grid-flow-col gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:auto-cols-[minmax(17rem,1fr)] sm:px-0">
         {COLUMNS.map((col) => {
           const list = byStatus(col);
           return (
             <section
               key={col}
               aria-labelledby={`col-${col}`}
-              className="flex min-h-0 flex-col rounded-2xl bg-surface-2/60 p-2"
+              className="flex min-h-0 snap-start flex-col rounded-3xl bg-surface-2/70 p-2"
             >
               <h2
                 id={`col-${col}`}
-                className="flex items-center justify-between px-2 py-1.5 text-sm font-semibold"
+                className="flex items-center justify-between px-2.5 py-2 text-sm font-extrabold"
               >
-                {t(`columns.${col}`)}
-                <span className="rounded-full bg-surface px-2 py-0.5 text-xs tabular-nums">
+                <span className="flex items-center gap-2">
+                  <span className={cn("size-2 rounded-full", DOT[col])} aria-hidden="true" />
+                  {t(`columns.${col}`)}
+                </span>
+                <span
+                  className={cn(
+                    "grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-black tabular-nums",
+                    list.length ? "bg-ink text-ink-fg" : "bg-surface text-fg-subtle",
+                  )}
+                >
                   {list.length}
                 </span>
               </h2>
@@ -114,11 +139,14 @@ export function KitchenBoard({
                       canUpdate={canUpdate}
                       canCancel={canCancel}
                       timeZone={timeZone}
+                      compact
                     />
                   </li>
                 ))}
                 {list.length === 0 ? (
-                  <li className="py-6 text-center text-sm text-fg-subtle">{t("empty")}</li>
+                  <li className="mx-1 rounded-2xl border-2 border-dashed border-border py-8 text-center text-sm text-fg-subtle">
+                    {t("empty")}
+                  </li>
                 ) : null}
               </ul>
             </section>
