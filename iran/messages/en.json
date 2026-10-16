@@ -283,7 +283,8 @@
       "reactivate": "Reactivate",
       "open": "Open",
       "searchPlaceholder": "Name or slug…",
-      "all": "All"
+      "all": "All",
+      "empty": "No restaurant found"
     },
     "users": {
       "title": "Users",

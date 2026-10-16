@@ -60,67 +60,48 @@ async function RestaurantsTable({
           {tc("search")}
         </Button>
       </form>
-      <Card className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border text-start text-fg-muted">
-            <tr>
-              <th className="px-5 py-3 text-start font-medium">{t("restaurants.name")}</th>
-              <th className="px-5 py-3 text-start font-medium">{t("restaurants.organization")}</th>
-              <th className="px-5 py-3 text-end font-medium">{t("restaurants.orders")}</th>
-              <th className="px-5 py-3 text-start font-medium">{tc("status")}</th>
-              <th className="px-5 py-3 text-end font-medium">
-                <span className="sr-only">{tc("actions")}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {rows.map((r) => (
-              <tr key={r.id}>
-                <td className="px-5 py-3">
-                  <p className="font-medium">{r.name}</p>
-                  <p className="text-xs text-fg-subtle">
-                    /{r.slug} · {format.dateTime(r.createdAt, { dateStyle: "medium" })}
-                  </p>
-                </td>
-                <td className="px-5 py-3 text-fg-muted">{r.organizationName}</td>
-                <td className="px-5 py-3 text-end tabular-nums">{r.ordersCount}</td>
-                <td className="px-5 py-3">
+      {rows.length === 0 ? (
+        <Card className="px-6 py-12 text-center text-fg-muted">{t("restaurants.empty")}</Card>
+      ) : (
+        <ul className="grid gap-3 md:grid-cols-2">
+          {rows.map((r) => (
+            <li key={r.id}>
+              <Card className="flex h-full flex-col gap-4 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <Link href={`/dashboard/${r.id}`} className="min-w-0 hover:underline">
+                    <p className="truncate font-semibold">{r.name}</p>
+                    <p className="truncate text-xs text-fg-subtle">
+                      {r.organizationName} · /{r.slug} ·{" "}
+                      {format.dateTime(r.createdAt, { dateStyle: "medium" })}
+                    </p>
+                  </Link>
                   <Badge tone={r.status === "active" ? "success" : "danger"}>{t(`status.${r.status}`)}</Badge>
-                </td>
-                <td className="px-5 py-3">
-                  <div className="flex justify-end gap-2">
-                    <Link href={`/dashboard/${r.id}`} className={buttonClasses("ghost", "sm")}>
-                      {t("restaurants.open")}
-                    </Link>
-                    <form action={setRestaurantStatusAction}>
-                      <input type="hidden" name="restaurantId" value={r.id} />
-                      <input
-                        type="hidden"
-                        name="status"
-                        value={r.status === "active" ? "suspended" : "active"}
-                      />
-                      <Button
-                        type="submit"
-                        size="sm"
-                        variant={r.status === "active" ? "secondary" : "primary"}
-                      >
-                        {r.status === "active" ? t("restaurants.suspend") : t("restaurants.reactivate")}
-                      </Button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {rows.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-5 py-8 text-center text-fg-muted">
-                  —
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
-      </Card>
+                </div>
+                <div className="mt-auto flex items-center gap-2">
+                  <span className="text-sm text-fg-muted">
+                    {t("restaurants.orders")}{" "}
+                    <span className="font-semibold text-fg tabular-nums">{r.ordersCount}</span>
+                  </span>
+                  <form action={setRestaurantStatusAction} className="ms-auto">
+                    <input type="hidden" name="restaurantId" value={r.id} />
+                    <input
+                      type="hidden"
+                      name="status"
+                      value={r.status === "active" ? "suspended" : "active"}
+                    />
+                    <Button type="submit" size="sm" variant={r.status === "active" ? "ghost" : "secondary"}>
+                      {r.status === "active" ? t("restaurants.suspend") : t("restaurants.reactivate")}
+                    </Button>
+                  </form>
+                  <Link href={`/dashboard/${r.id}`} className={buttonClasses("primary", "sm")}>
+                    {t("restaurants.open")}
+                  </Link>
+                </div>
+              </Card>
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 }

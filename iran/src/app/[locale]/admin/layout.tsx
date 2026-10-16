@@ -21,9 +21,9 @@ async function AdminShell({ children }: { children: React.ReactNode }) {
       subtitle="Super admin"
       user={user}
       nav={[
-        { href: "/admin", label: t("adminOverview"), icon: <IconChart />, exact: true },
-        { href: "/admin/restaurants", label: t("adminRestaurants"), icon: <IconStore /> },
-        { href: "/admin/users", label: t("adminUsers"), icon: <IconUsers /> },
+        { href: "/admin", label: t("adminOverview"), icon: <IconChart />, exact: true, primary: true },
+        { href: "/admin/restaurants", label: t("adminRestaurants"), icon: <IconStore />, primary: true },
+        { href: "/admin/users", label: t("adminUsers"), icon: <IconUsers />, primary: true },
       ]}
     >
       {children}

@@ -149,7 +149,8 @@
       "reactivate": "Réactiver",
       "open": "Ouvrir",
       "searchPlaceholder": "Nom ou slug…",
-      "all": "Tous"
+      "all": "Tous",
+      "empty": "Aucun restaurant trouvé"
     },
     "users": {
       "title": "Utilisateurs",
