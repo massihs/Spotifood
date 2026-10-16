@@ -6,3 +6,4 @@
 /.env.*
 /next-env.d.ts
 /tsconfig.tsbuildinfo
+/apercus
