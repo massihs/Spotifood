@@ -50,7 +50,7 @@ export function Dialog({
         }}
         className={cn(
           "animate-sheet-up m-0 mt-auto w-full max-w-none rounded-t-[1.75rem] bg-surface p-0 text-fg shadow-2xl backdrop:bg-black/60",
-          "sm:m-auto sm:w-[calc(100%-2rem)] sm:rounded-3xl",
+          "sm:m-auto sm:w-[calc(100%-2rem)] sm:rounded-2xl",
           size === "lg" ? "sm:max-w-2xl" : "sm:max-w-md",
         )}
       >
@@ -58,7 +58,7 @@ export function Dialog({
           <DialogContext value={{ close }}>
             <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
               <div>
-                <h2 className="text-lg font-extrabold">{title}</h2>
+                <h2 className="text-lg font-semibold">{title}</h2>
                 {description ? <p className="mt-0.5 text-sm text-fg-muted">{description}</p> : null}
               </div>
               <button

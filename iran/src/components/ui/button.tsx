@@ -5,10 +5,10 @@ export type ButtonVariant = "primary" | "accent" | "secondary" | "outline" | "gh
 export type ButtonSize = "sm" | "md" | "lg" | "xl";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-ink text-ink-fg hover:bg-ink-hover",
-  accent: "bg-accent text-accent-fg hover:bg-accent-hover",
-  secondary: "bg-surface-2 text-fg hover:bg-surface-3",
-  outline: "bg-surface text-fg border border-border-strong hover:bg-surface-2",
+  primary: "bg-accent text-accent-fg hover:bg-accent-hover shadow-[0_1px_2px_hsl(150_60%_20%/0.18)]",
+  accent: "bg-accent text-accent-fg hover:bg-accent-hover shadow-[0_1px_2px_hsl(150_60%_20%/0.18)]",
+  secondary: "bg-surface text-fg ring-1 ring-inset ring-border hover:bg-surface-2",
+  outline: "bg-surface text-fg ring-1 ring-inset ring-border-strong hover:bg-surface-2",
   ghost: "text-fg-muted hover:text-fg hover:bg-surface-2",
   danger: "bg-danger text-white hover:opacity-90",
 };

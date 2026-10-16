@@ -37,7 +37,7 @@ export function GuestTopBar({
         <ChevronLeft className="size-5 ltr:rotate-0 rtl:rotate-180" aria-hidden="true" />
       </Link>
       <div className="min-w-0">
-        <h1 className="truncate text-lg leading-tight font-extrabold">{title}</h1>
+        <h1 className="truncate text-lg leading-tight font-semibold">{title}</h1>
         {subtitle ? <div className="truncate text-sm text-fg-muted">{subtitle}</div> : null}
       </div>
       {extra ? <div className="ms-auto shrink-0">{extra}</div> : null}
@@ -87,7 +87,7 @@ export function CartView({
           <p className="mt-1 text-fg-muted">{t("guest.cartEmptyBody")}</p>
           <Link
             href="/table"
-            className="mt-7 inline-flex h-12 items-center rounded-full bg-ink px-7 font-bold text-ink-fg"
+            className="mt-7 inline-flex h-12 items-center rounded-full bg-accent px-7 font-bold text-accent-fg"
           >
             {t("guest.backToMenu")}
           </Link>
@@ -101,7 +101,7 @@ export function CartView({
         <main className="pb-40">
           <section className="px-4 pt-4">
             <div className="flex items-baseline justify-between">
-              <h2 className="text-xl font-extrabold">{t("guest.items", { count: itemCount })}</h2>
+              <h2 className="text-xl font-semibold">{t("guest.items", { count: itemCount })}</h2>
             </div>
             <ul className="mt-1">
               {lines.map((l) => (
@@ -143,7 +143,7 @@ export function CartView({
                     <dd className="tabular-nums">{money(tx.taxCents)}</dd>
                   </div>
                 ))}
-                <div className="flex justify-between pt-1 text-lg font-extrabold">
+                <div className="flex justify-between pt-1 text-lg font-semibold">
                   <dt>{t("guest.total")}</dt>
                   <dd className="tabular-nums">{money(totals.totalCents)}</dd>
                 </div>
@@ -219,7 +219,7 @@ function OrderPanel({
               }
             })
           }
-          className="flex h-14 w-full items-center justify-between rounded-full bg-ink px-6 text-lg font-bold text-ink-fg transition-transform active:scale-[0.98] disabled:opacity-40"
+          className="flex h-14 w-full items-center justify-between rounded-full bg-accent px-6 text-lg font-bold text-accent-fg transition-transform active:scale-[0.98] disabled:opacity-40"
         >
           <span>{pending ? "…" : t("guest.checkout")}</span>
           <span className="tabular-nums">{totalLabel}</span>
@@ -289,7 +289,10 @@ function CartLine({ line: l, money }: { line: CartLineView; money: (c: number) =
                 placeholder={t("notePlaceholder")}
                 className="h-10 min-w-0 flex-1 rounded-full bg-surface-2 px-4 text-[16px] focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
               />
-              <button type="submit" className="h-10 rounded-full bg-ink px-4 text-sm font-bold text-ink-fg">
+              <button
+                type="submit"
+                className="h-10 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg"
+              >
                 {t("save")}
               </button>
             </form>

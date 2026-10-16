@@ -65,27 +65,25 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
   return (
     <div className="min-h-dvh bg-bg">
       {/* ── Header ─────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0b0b0b]/90 text-white backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-bg/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
-          <span className="[&_.text-fg]:text-white">
-            <Logo className="text-white" />
-          </span>
-          <nav className="ms-6 hidden items-center gap-6 text-sm font-medium text-white/70 md:flex">
-            <a href="#how" className="hover:text-white">
+          <Logo />
+          <nav className="ms-6 hidden items-center gap-6 text-sm font-medium text-fg-muted md:flex">
+            <a href="#how" className="hover:text-fg">
               {t("nav.how")}
             </a>
-            <a href="#features" className="hover:text-white">
+            <a href="#features" className="hover:text-fg">
               {t("nav.features")}
             </a>
-            <a href="#faq" className="hover:text-white">
+            <a href="#faq" className="hover:text-fg">
               {t("nav.faq")}
             </a>
           </nav>
           <div className="ms-auto flex items-center gap-2">
-            <LanguageSwitcher tone="inverted" className="hidden sm:inline-flex" />
+            <LanguageSwitcher className="hidden sm:inline-flex" />
             <Link
               href="/login"
-              className="hidden h-9 items-center rounded-full px-4 text-sm font-semibold text-white/80 hover:text-white sm:inline-flex"
+              className="hidden h-9 items-center rounded-full px-4 text-sm font-medium text-fg-muted hover:text-fg sm:inline-flex"
             >
               {t("ctaSecondary")}
             </Link>
@@ -98,37 +96,30 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 
       <main>
         {/* ── Hero ────────────────────────────────────────── */}
-        <section className="relative overflow-hidden bg-[#0b0b0b] text-white">
+        <section className="relative overflow-hidden bg-gradient-to-b from-accent-soft/70 to-bg">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -end-40 -top-40 size-[34rem] rounded-full bg-accent/25 blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -start-40 bottom-0 size-96 rounded-full bg-accent/10 blur-3xl"
+            className="pointer-events-none absolute -end-40 -top-40 size-[34rem] rounded-full bg-accent/15 blur-3xl"
           />
           <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:pt-20 lg:pb-28">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/90">
+              <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg-muted ring-1 ring-border">
                 <span className="size-1.5 rounded-full bg-accent" />
                 {t("badge")}
               </span>
-              <h1 className="mt-6 text-4xl leading-[1.15] font-black tracking-tight text-balance sm:text-6xl">
+              <h1 className="mt-6 text-4xl leading-[1.2] font-bold tracking-tight text-balance sm:text-[3.4rem]">
                 {t("title")}
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-pretty text-white/70">{t("subtitle")}</p>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-pretty text-fg-muted">{t("subtitle")}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/signup" className={buttonClasses("accent", "xl", "px-8")}>
+                <Link href="/signup" className={buttonClasses("primary", "lg", "px-7")}>
                   {t("ctaPrimary")}
                 </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex h-14 items-center rounded-full border border-white/20 px-8 font-semibold text-white hover:bg-white/10"
-                >
+                <Link href="/login" className={buttonClasses("secondary", "lg", "px-7")}>
                   {t("ctaSecondary")}
                 </Link>
               </div>
-              <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/70">
+              <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-fg-muted">
                 {(["noApp", "zarinpal", "invoice"] as const).map((k) => (
                   <li key={k} className="flex items-center gap-1.5">
                     <Check className="size-4 text-accent" strokeWidth={3} aria-hidden="true" />
@@ -146,7 +137,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
           <div className="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-border sm:grid-cols-4">
             {STATS.map((k) => (
               <div key={k} className="bg-bg px-4 py-7 text-center sm:px-6">
-                <p className="text-2xl font-black tracking-tight sm:text-3xl">{t(`stats.${k}.value`)}</p>
+                <p className="text-2xl font-semibold tracking-tight">{t(`stats.${k}.value`)}</p>
                 <p className="mt-1 text-sm text-fg-muted">{t(`stats.${k}.label`)}</p>
               </div>
             ))}
@@ -158,14 +149,14 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
           <SectionTitle title={t("howTitle")} subtitle={t("howSubtitle")} />
           <ol className="mt-12 grid gap-4 md:grid-cols-3">
             {STEPS.map(({ key, Icon }, i) => (
-              <li key={key} className="relative rounded-3xl border border-border bg-surface p-6">
+              <li key={key} className="relative rounded-2xl border border-border bg-surface p-6">
                 <div className="flex items-center justify-between">
-                  <span className="grid size-12 place-items-center rounded-2xl bg-ink text-accent">
-                    <Icon className="size-6" aria-hidden="true" />
+                  <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                    <Icon className="size-5" aria-hidden="true" />
                   </span>
-                  <span className="text-5xl font-black text-surface-3">{i + 1}</span>
+                  <span className="text-sm font-semibold text-fg-subtle tabular-nums">0{i + 1}</span>
                 </div>
-                <h3 className="mt-5 text-lg font-extrabold">{t(`steps.${key}.title`)}</h3>
+                <h3 className="mt-5 text-lg font-semibold">{t(`steps.${key}.title`)}</h3>
                 <p className="mt-2 leading-7 text-fg-muted">{t(`steps.${key}.body`)}</p>
               </li>
             ))}
@@ -173,16 +164,16 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* ── Features ────────────────────────────────────── */}
-        <section id="features" className="scroll-mt-20 bg-surface-2">
+        <section id="features" className="scroll-mt-20 border-y border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <SectionTitle title={t("featuresTitle")} subtitle={t("featuresSubtitle")} />
             <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {FEATURES.map(({ key, Icon }) => (
-                <li key={key} className="rounded-3xl bg-surface p-6 shadow-[var(--shadow-soft)]">
-                  <span className="grid size-11 place-items-center rounded-2xl bg-accent-soft text-accent-text">
+                <li key={key} className="rounded-2xl border border-border bg-bg p-6">
+                  <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent-text">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
-                  <h3 className="mt-4 font-extrabold">{t(`features.${key}.title`)}</h3>
+                  <h3 className="mt-4 font-semibold">{t(`features.${key}.title`)}</h3>
                   <p className="mt-1.5 text-sm leading-6 text-fg-muted">{t(`features.${key}.body`)}</p>
                 </li>
               ))}
@@ -202,13 +193,13 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
             title={t("split.ownerTitle")}
             points={ownerPoints}
             Icon={ChefHat}
-            className="bg-[#0b0b0b] text-white [&_p]:text-white/75"
+            className="border border-accent/20 bg-accent-soft"
           />
         </section>
 
         {/* ── Showcase ────────────────────────────────────── */}
         <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-          <div className="overflow-hidden rounded-[2rem] bg-surface-2">
+          <div className="overflow-hidden rounded-2xl border border-border bg-surface">
             <div className="grid grid-cols-2 sm:grid-cols-4">
               {["salmon", "pepperoni", "baconavocado", "rockshrimp"].map((n) => (
                 <img
@@ -220,17 +211,17 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                 />
               ))}
             </div>
-            <p className="px-6 py-5 text-center font-semibold">{t("showcase")}</p>
+            <p className="px-6 py-5 text-center font-medium text-fg-muted">{t("showcase")}</p>
           </div>
         </section>
 
         {/* ── FAQ ─────────────────────────────────────────── */}
         <section id="faq" className="mx-auto max-w-3xl scroll-mt-20 px-4 pb-20 sm:px-6">
           <SectionTitle title={t("faqTitle")} />
-          <div className="mt-10 divide-y divide-border rounded-3xl border border-border bg-surface">
+          <div className="mt-10 divide-y divide-border rounded-2xl border border-border bg-surface">
             {FAQ.map((k) => (
               <details key={k} className="group px-6 py-5 [&_summary::-webkit-details-marker]:hidden">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
                   {t(`faq.${k}.q`)}
                   <ChevronDown
                     className="size-5 shrink-0 text-fg-muted transition-transform group-open:rotate-180"
@@ -245,16 +236,19 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 
         {/* ── Final CTA ───────────────────────────────────── */}
         <section className="px-4 pb-20 sm:px-6">
-          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-[#0b0b0b] px-6 py-16 text-center text-white sm:px-12">
+          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl bg-accent px-6 py-16 text-center text-accent-fg sm:px-12">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -top-24 left-1/2 size-96 -translate-x-1/2 rounded-full bg-accent/25 blur-3xl"
+              className="pointer-events-none absolute -top-24 left-1/2 size-96 -translate-x-1/2 rounded-full bg-white/20 blur-3xl"
             />
-            <h2 className="relative text-3xl font-black tracking-tight text-balance sm:text-4xl">
+            <h2 className="relative text-3xl font-bold tracking-tight text-balance sm:text-4xl">
               {t("finalTitle")}
             </h2>
-            <p className="relative mx-auto mt-4 max-w-xl leading-8 text-white/70">{t("finalBody")}</p>
-            <Link href="/signup" className={buttonClasses("accent", "xl", "relative mt-8 px-10")}>
+            <p className="relative mx-auto mt-4 max-w-xl leading-8 opacity-85">{t("finalBody")}</p>
+            <Link
+              href="/signup"
+              className="relative mt-8 inline-flex h-12 items-center rounded-full bg-white px-8 font-semibold text-accent-text shadow-[var(--shadow-soft)] hover:bg-white/90"
+            >
               {t("ctaPrimary")}
             </Link>
           </div>
@@ -283,7 +277,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="text-center">
-      <h2 className="text-3xl font-black tracking-tight text-balance sm:text-4xl">{title}</h2>
+      <h2 className="text-2xl font-bold tracking-tight text-balance sm:text-3xl">{title}</h2>
       {subtitle ? <p className="mt-3 text-lg text-fg-muted">{subtitle}</p> : null}
     </div>
   );
@@ -301,15 +295,15 @@ function BenefitCard({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-[2rem] p-8", className)}>
-      <span className="grid size-12 place-items-center rounded-2xl bg-accent text-accent-fg">
-        <Icon className="size-6" aria-hidden="true" />
+    <div className={cn("rounded-2xl p-8", className)}>
+      <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-fg">
+        <Icon className="size-5" aria-hidden="true" />
       </span>
-      <h3 className="mt-5 text-2xl font-black">{title}</h3>
+      <h3 className="mt-5 text-xl font-semibold">{title}</h3>
       <ul className="mt-5 space-y-3">
         {points.map((p) => (
           <li key={p} className="flex items-start gap-3">
-            <Check className="mt-1 size-5 shrink-0 text-accent" strokeWidth={3} aria-hidden="true" />
+            <Check className="mt-1 size-4 shrink-0 text-accent" strokeWidth={3} aria-hidden="true" />
             <p className="leading-7 text-fg-muted">{p}</p>
           </li>
         ))}
@@ -322,16 +316,16 @@ function BenefitCard({
 function PhoneMock({ table, featured, cart }: { table: string; featured: string; cart: string }) {
   return (
     <div aria-hidden="true" className="mx-auto w-full max-w-[19rem] lg:me-0">
-      <div className="rounded-[2.75rem] border border-white/15 bg-[#1a1a1a] p-2.5 shadow-2xl shadow-black/60">
+      <div className="rounded-[2.75rem] bg-[#1c1c1e] p-2 shadow-[0_30px_80px_-20px_hsl(150_30%_20%/0.35)]">
         <div className="overflow-hidden rounded-[2.25rem] bg-white text-[#141414]" dir="rtl">
-          <div className="bg-[#0b0b0b] px-4 pt-5 pb-8 text-white">
+          <div className="bg-gradient-to-b from-[#e9f8ee] to-white px-4 pt-5 pb-8">
             <div className="flex items-center gap-3">
-              <div className="grid size-11 place-items-center overflow-hidden rounded-xl bg-white">
+              <div className="grid size-11 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-black/5">
                 <img src="/landing/logo-brielle.png" alt="" className="size-full object-contain p-0.5" />
               </div>
               <div>
-                <p className="text-lg font-black">Brielle</p>
-                <span className="rounded-full bg-white/15 px-2 py-0.5 text-[11px] font-semibold">
+                <p className="text-lg font-bold">Brielle</p>
+                <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold ring-1 ring-black/5">
                   {table}
                 </span>
               </div>
@@ -339,7 +333,7 @@ function PhoneMock({ table, featured, cart }: { table: string; featured: string;
           </div>
           <div className="-mt-4 rounded-t-3xl bg-white px-4 pt-4 pb-3">
             <div className="h-9 rounded-full bg-[#f3f3f3]" />
-            <p className="mt-4 text-sm font-black">{featured}</p>
+            <p className="mt-4 text-sm font-bold">{featured}</p>
             <div className="mt-2 space-y-3">
               {MOCK.map((d) => (
                 <div key={d.name} className="flex items-center gap-3">
@@ -349,15 +343,15 @@ function PhoneMock({ table, featured, cart }: { table: string; featured: string;
                   </div>
                   <div className="relative">
                     <img src={d.img} alt="" className="size-16 rounded-xl bg-[#f3f3f3] object-cover" />
-                    <span className="absolute -end-1 -bottom-1 grid size-6 place-items-center rounded-full bg-white text-sm font-black shadow">
+                    <span className="absolute -end-1 -bottom-1 grid size-6 place-items-center rounded-full bg-white text-sm font-bold shadow">
                       +
                     </span>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex h-11 items-center gap-2 rounded-full bg-[#0b0b0b] ps-1.5 pe-4 text-[13px] font-bold text-white">
-              <span className="grid size-8 place-items-center rounded-full bg-accent text-accent-fg">
+            <div className="mt-4 flex h-11 items-center gap-2 rounded-full bg-accent ps-1.5 pe-4 text-[13px] font-bold text-white">
+              <span className="grid size-8 place-items-center rounded-full bg-white/20">
                 <ShoppingBag className="size-4" />
               </span>
               <span className="flex-1">{cart}</span>

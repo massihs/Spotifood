@@ -230,7 +230,7 @@ export function MenuBoard({
               className={cn(
                 "shrink-0 rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap",
                 selected?.id === c.id
-                  ? "bg-ink text-ink-fg"
+                  ? "bg-accent text-accent-fg"
                   : "bg-surface text-fg-muted shadow-[var(--shadow-soft)]",
               )}
             >
@@ -242,7 +242,7 @@ export function MenuBoard({
       ) : null}
       <Card className="max-lg:order-last lg:sticky lg:top-20">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
-          <h2 className="font-extrabold">{t("menu.categories")}</h2>
+          <h2 className="font-semibold">{t("menu.categories")}</h2>
           {canManage ? (
             <div className="flex gap-1">
               <Dialog
@@ -292,7 +292,9 @@ export function MenuBoard({
               <div
                 className={cn(
                   "flex items-center gap-1 rounded-2xl bg-surface px-1 transition-colors",
-                  selected?.id === c.id ? "bg-ink text-ink-fg [&_*]:text-inherit" : "hover:bg-surface-2",
+                  selected?.id === c.id
+                    ? "bg-accent-soft text-accent-text [&_*]:text-inherit"
+                    : "hover:bg-surface-2",
                 )}
               >
                 {handle}
@@ -320,7 +322,7 @@ export function MenuBoard({
                         type="button"
                         onClick={open}
                         aria-label={`${t("menu.editCategory")} — ${c.name}`}
-                        className="grid size-8 shrink-0 place-items-center rounded-full opacity-60 hover:bg-white/10 hover:opacity-100"
+                        className="grid size-8 shrink-0 place-items-center rounded-full opacity-60 hover:bg-surface hover:opacity-100"
                       >
                         <Pencil className="size-4" aria-hidden="true" />
                       </button>
@@ -342,7 +344,7 @@ export function MenuBoard({
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
           <div className="min-w-0">
-            <h2 className="truncate text-lg font-black">{selected?.name ?? t("menu.products")}</h2>
+            <h2 className="truncate text-lg font-bold">{selected?.name ?? t("menu.products")}</h2>
             {selected ? (
               <p className="text-xs text-fg-muted">{t("menu.productCount", { count: products.length })}</p>
             ) : null}

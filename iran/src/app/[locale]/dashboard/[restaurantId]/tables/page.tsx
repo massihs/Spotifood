@@ -80,7 +80,7 @@ async function Tables({ params }: { params: Params }) {
                     <div className="min-w-0">
                       <Link
                         href={`/dashboard/${rid}/tables/${table.id}`}
-                        className="block truncate text-2xl font-black tracking-tight hover:underline"
+                        className="block truncate text-2xl font-bold tracking-tight hover:underline"
                       >
                         {table.label}
                       </Link>

@@ -86,7 +86,7 @@ async function Payments({ params, searchParams }: Pick<Props, "params" | "search
             aria-current={view === key ? "page" : undefined}
             className={cn(
               "rounded-full px-4 py-2 text-sm font-medium",
-              view === key ? "bg-fg text-bg" : "bg-surface-2 text-fg-muted",
+              view === key ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
             )}
           >
             {t(`payments.view.${key}`)}

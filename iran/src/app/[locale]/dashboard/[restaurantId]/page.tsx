@@ -27,7 +27,7 @@ export default function OverviewPage({ params }: PageProps<"/[locale]/dashboard/
       fallback={
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 animate-pulse rounded-3xl bg-surface" />
+            <div key={i} className="h-32 animate-pulse rounded-2xl bg-surface" />
           ))}
         </div>
       }
@@ -87,34 +87,30 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
 
       {/* Today */}
       <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <div className="relative overflow-hidden rounded-3xl bg-[#0b0b0b] p-6 text-white">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -end-20 -top-20 size-64 rounded-full bg-accent/25 blur-3xl"
-          />
-          <p className="relative text-sm font-medium text-white/60">{t("revenueToday")}</p>
-          <p className="relative mt-2 text-4xl font-black tracking-tight tabular-nums">
+        <Card className="p-6">
+          <p className="text-sm font-medium text-fg-muted">{t("revenueToday")}</p>
+          <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">
             {money(today.revenueTodayCents)}
           </p>
-          <div className="relative mt-6">
-            <p className="text-xs font-medium text-white/50">{t("last7")}</p>
+          <div className="mt-6">
+            <p className="text-xs font-medium text-fg-subtle">{t("last7")}</p>
             <div className="mt-3 flex h-24 items-end gap-2">
               {days.map((d, i) => (
                 <div key={d.key} className="flex flex-1 flex-col items-center gap-1.5">
                   <div
-                    className={cn("w-full rounded-lg", i === 6 ? "bg-accent" : "bg-white/20")}
+                    className={cn("w-full rounded-md", i === 6 ? "bg-accent" : "bg-accent-soft")}
                     style={{ height: `${Math.max(6, (d.cents / max) * 80)}px` }}
                     title={money(d.cents)}
                   />
-                  <span className="text-[10px] text-white/50">{d.label}</span>
+                  <span className="text-[10px] text-fg-subtle">{d.label}</span>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </Card>
         <div className="grid grid-cols-2 gap-4">
           <StatCard label={t("ordersToday")} value={today.ordersToday} icon={<ReceiptText />} />
-          <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} tone="accent" />
+          <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} />
           <StatCard label={t("openTables")} value={today.openTables} icon={<LayoutGrid />} />
           <StatCard label={t("stats.tables")} value={overview.tables} icon={<QrCode />} />
         </div>
@@ -129,10 +125,10 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
               <Link
                 key={href}
                 href={href}
-                className="group flex flex-col gap-3 rounded-2xl bg-surface-2 p-4 transition-colors hover:bg-surface-3"
+                className="group flex flex-col gap-3 rounded-xl border border-border p-4 transition-colors hover:border-accent/40 hover:bg-accent-soft/50"
               >
                 <span className="flex items-center justify-between">
-                  <span className="grid size-10 place-items-center rounded-xl bg-ink text-accent">
+                  <span className="grid size-9 place-items-center rounded-lg bg-accent-soft text-accent-text">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
                   <ArrowUpLeft
@@ -140,7 +136,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
                     aria-hidden="true"
                   />
                 </span>
-                <span className="text-sm font-bold">{label}</span>
+                <span className="text-sm font-medium">{label}</span>
               </Link>
             ))}
           </div>
@@ -151,7 +147,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
               { label: t("stats.members"), value: overview.members, Icon: Users },
             ].map(({ label, value }) => (
               <div key={label} className="px-3 py-4">
-                <p className="text-xl font-black tabular-nums">{value}</p>
+                <p className="text-lg font-semibold tabular-nums">{value}</p>
                 <p className="text-xs text-fg-muted">{label}</p>
               </div>
             ))}
@@ -164,13 +160,13 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
             title={t("setupTitle")}
             description={doneCount === steps.length ? t("setupDone") : t("setupSubtitle")}
             action={
-              <span className="rounded-full bg-surface-2 px-3 py-1 text-sm font-bold tabular-nums">
+              <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-text tabular-nums">
                 {doneCount}/{steps.length}
               </span>
             }
           />
           <div className="px-5 pt-4">
-            <div className="h-2 overflow-hidden rounded-full bg-surface-2">
+            <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
               <div
                 className="h-full rounded-full bg-accent transition-all"
                 style={{ width: `${(doneCount / steps.length) * 100}%` }}
@@ -182,18 +178,18 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
               <li key={s.key}>
                 <Link
                   href={s.href}
-                  className="flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-surface-2"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-surface-2"
                 >
                   <span
                     className={cn(
-                      "grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold",
-                      s.done ? "bg-accent text-accent-fg" : "bg-surface-2 text-fg-muted",
+                      "grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold",
+                      s.done ? "bg-accent text-accent-fg" : "text-fg-muted ring-1 ring-border-strong",
                     )}
                     aria-hidden="true"
                   >
                     {s.done ? <Check className="size-4" strokeWidth={3} /> : i + 1}
                   </span>
-                  <span className={cn("text-sm font-semibold", s.done && "text-fg-muted line-through")}>
+                  <span className={cn("text-sm", s.done && "text-fg-muted line-through")}>
                     {t(`setup.${s.key}`)}
                   </span>
                 </Link>

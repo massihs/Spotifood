@@ -17,7 +17,7 @@ export function LogoMark({ className }: { className?: string }) {
 export function Logo({ className, withText = true }: { className?: string; withText?: boolean }) {
   return (
     <span
-      className={cn("inline-flex items-center gap-2 font-extrabold tracking-tight text-fg", className)}
+      className={cn("inline-flex items-center gap-2 font-semibold tracking-tight text-fg", className)}
       dir="ltr"
     >
       <LogoMark className="size-8" />

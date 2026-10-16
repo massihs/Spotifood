@@ -57,14 +57,14 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
         {sp.placed ? (
           <div
             role="status"
-            className="animate-pop-in mb-4 flex items-center gap-3 rounded-3xl bg-[#0b0b0b] p-4 text-white"
+            className="animate-pop-in mb-4 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent-soft p-4"
           >
             <span className="grid size-12 shrink-0 place-items-center rounded-full bg-accent text-accent-fg">
               <CircleCheck className="size-7" aria-hidden="true" />
             </span>
             <div>
-              <p className="text-lg font-extrabold">{t("guest.sentTitle")}</p>
-              <p className="text-sm text-white/70">{t("guest.sentBody")}</p>
+              <p className="text-lg font-semibold">{t("guest.sentTitle")}</p>
+              <p className="text-sm text-fg-muted">{t("guest.sentBody")}</p>
             </div>
           </div>
         ) : null}
@@ -77,7 +77,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
             <p className="mt-5 text-lg font-bold">{t("guest.noOrders")}</p>
             <Link
               href="/table"
-              className="mt-7 inline-flex h-12 items-center rounded-full bg-ink px-7 font-bold text-ink-fg"
+              className="mt-7 inline-flex h-12 items-center rounded-full bg-accent px-7 font-bold text-accent-fg"
             >
               {t("guest.backToMenu")}
             </Link>
@@ -87,10 +87,10 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
             {orders.map((o) => {
               const stepIndex = STEPS.findIndex((s) => s.key === o.status);
               return (
-                <li key={o.id} className="rounded-3xl border border-border bg-surface p-4">
+                <li key={o.id} className="rounded-2xl border border-border bg-surface p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-lg font-extrabold">{t("guest.orderNumber", { number: o.number })}</p>
+                      <p className="text-lg font-semibold">{t("guest.orderNumber", { number: o.number })}</p>
                       <p className="text-sm text-fg-muted">
                         {t("guest.placedAt", {
                           time: format.dateTime(o.placedAt, {
@@ -107,7 +107,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                           ? "bg-accent text-accent-fg"
                           : o.status === "cancelled"
                             ? "bg-danger-soft text-danger"
-                            : "bg-ink text-ink-fg",
+                            : "bg-accent-soft text-accent-text",
                       )}
                     >
                       {t(`orderStatus.${o.status}`)}
@@ -138,7 +138,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                               className={cn(
                                 "relative z-10 grid size-9 place-items-center rounded-full",
                                 current
-                                  ? "bg-ink text-ink-fg ring-4 ring-accent/35"
+                                  ? "bg-accent text-accent-fg ring-4 ring-accent/20"
                                   : done
                                     ? "bg-accent text-accent-fg"
                                     : "bg-surface-2 text-fg-subtle",
@@ -186,7 +186,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-4 flex items-center justify-between border-t border-border pt-3 font-extrabold">
+                  <p className="mt-4 flex items-center justify-between border-t border-border pt-3 font-semibold">
                     <span className="flex items-center gap-2">
                       {t("guest.total")}
                       {o.paymentStatus !== "unpaid" && o.status !== "cancelled" ? (
@@ -209,9 +209,9 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
 
         {orders.length > 0 ? (
           <>
-            <div className="mt-4 flex items-center justify-between rounded-3xl bg-surface-2 px-5 py-4">
+            <div className="mt-4 flex items-center justify-between rounded-2xl bg-surface-2 px-5 py-4">
               <span className="font-semibold">{t("guest.yourTotal")}</span>
-              <span className="text-lg font-extrabold tabular-nums">{money(total)}</span>
+              <span className="text-lg font-semibold tabular-nums">{money(total)}</span>
             </div>
             <PaymentPanel
               state={payState}

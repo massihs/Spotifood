@@ -21,7 +21,7 @@ function useActive() {
     item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
 }
 
-/** Desktop sidebar navigation (on the always-dark sidebar). */
+/** Desktop sidebar navigation. */
 export function SidebarNav({ items, label }: { items: NavItem[]; label: string }) {
   const isActive = useActive();
   return (
@@ -34,12 +34,15 @@ export function SidebarNav({ items, label }: { items: NavItem[]; label: string }
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex h-11 items-center gap-3 rounded-2xl px-3 text-[15px] font-medium transition-colors",
-              active ? "bg-white/12 text-white" : "text-white/60 hover:bg-white/6 hover:text-white",
+              "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors",
+              active ? "bg-accent-soft text-accent-text" : "text-fg-muted hover:bg-surface-2 hover:text-fg",
             )}
           >
             <span
-              className={cn("size-5 shrink-0 [&_svg]:size-5", active ? "text-accent" : "")}
+              className={cn(
+                "size-[18px] shrink-0 [&_svg]:size-[18px]",
+                active ? "text-accent" : "opacity-80",
+              )}
               aria-hidden="true"
             >
               {item.icon}
@@ -80,7 +83,7 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
     <>
       <nav
         aria-label={t("mainNav")}
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden print:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden print:hidden"
       >
         <div className="mx-auto grid max-w-lg grid-cols-5">
           {primary.map((item) => {
@@ -91,14 +94,14 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-semibold",
-                  active ? "text-fg" : "text-fg-subtle",
+                  "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium",
+                  active ? "text-accent-text" : "text-fg-subtle",
                 )}
               >
                 <span
                   className={cn(
                     "grid h-7 w-12 place-items-center rounded-full transition-colors [&_svg]:size-5",
-                    active && "bg-ink text-accent",
+                    active && "bg-accent-soft",
                   )}
                   aria-hidden="true"
                 >
@@ -113,14 +116,14 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
             onClick={() => setOpen(true)}
             aria-expanded={open}
             className={cn(
-              "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-semibold",
-              open || moreActive ? "text-fg" : "text-fg-subtle",
+              "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium",
+              open || moreActive ? "text-accent-text" : "text-fg-subtle",
             )}
           >
             <span
               className={cn(
                 "grid h-7 w-12 place-items-center rounded-full [&_svg]:size-5",
-                (open || moreActive) && "bg-ink text-accent",
+                (open || moreActive) && "bg-accent-soft",
               )}
               aria-hidden="true"
             >
@@ -136,17 +139,17 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
           <button
             type="button"
             aria-label={t("close")}
-            className="animate-fade-in absolute inset-0 bg-black/60"
+            className="animate-fade-in absolute inset-0 bg-black/30 backdrop-blur-[2px]"
             onClick={() => setOpen(false)}
           />
-          <div className="animate-sheet-up absolute inset-x-0 bottom-0 max-h-[88dvh] overflow-y-auto rounded-t-[1.75rem] bg-[#0b0b0b] px-4 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-white">
-            <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-white/25" aria-hidden="true" />
+          <div className="animate-sheet-up absolute inset-x-0 bottom-0 max-h-[88dvh] overflow-y-auto rounded-t-3xl bg-surface px-4 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-float)]">
+            <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-surface-3" aria-hidden="true" />
             <div className="mb-2 flex justify-end">
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={t("close")}
-                className="grid size-9 place-items-center rounded-full bg-white/10"
+                className="grid size-9 place-items-center rounded-full bg-surface-2 text-fg-muted"
               >
                 <X className="size-5" aria-hidden="true" />
               </button>
@@ -160,8 +163,8 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex flex-col items-center gap-2 rounded-2xl px-2 py-4 text-center text-xs font-semibold",
-                      active ? "bg-white/15 text-white" : "bg-white/6 text-white/75",
+                      "flex flex-col items-center gap-2 rounded-xl px-2 py-4 text-center text-xs font-medium",
+                      active ? "bg-accent-soft text-accent-text" : "bg-surface-2 text-fg-muted",
                     )}
                   >
                     <span className={cn("[&_svg]:size-6", active && "text-accent")} aria-hidden="true">

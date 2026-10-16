@@ -71,7 +71,7 @@ export function KitchenBoard({
       <LiveRefresh types={["order.created", "order.updated"]} />
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-black tracking-tight sm:text-3xl">{t("title")}</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("title")}</h1>
           <LiveIndicator />
         </div>
         <div className="flex gap-2">
@@ -111,11 +111,11 @@ export function KitchenBoard({
             <section
               key={col}
               aria-labelledby={`col-${col}`}
-              className="flex min-h-0 snap-start flex-col rounded-3xl bg-surface-2/70 p-2"
+              className="flex min-h-0 snap-start flex-col rounded-2xl bg-surface-2/70 p-2"
             >
               <h2
                 id={`col-${col}`}
-                className="flex items-center justify-between px-2.5 py-2 text-sm font-extrabold"
+                className="flex items-center justify-between px-2.5 py-2 text-sm font-semibold"
               >
                 <span className="flex items-center gap-2">
                   <span className={cn("size-2 rounded-full", DOT[col])} aria-hidden="true" />
@@ -123,8 +123,8 @@ export function KitchenBoard({
                 </span>
                 <span
                   className={cn(
-                    "grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-black tabular-nums",
-                    list.length ? "bg-ink text-ink-fg" : "bg-surface text-fg-subtle",
+                    "grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-bold tabular-nums",
+                    list.length ? "bg-accent text-accent-fg" : "bg-surface text-fg-subtle",
                   )}
                 >
                   {list.length}

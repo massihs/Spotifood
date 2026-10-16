@@ -105,7 +105,7 @@ export function NotificationBell({
         ) : null}
       </button>
       {open ? (
-        <div className="absolute end-0 z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-3xl border border-border bg-surface shadow-2xl">
+        <div className="absolute end-0 z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <p className="font-semibold">{t("title")}</p>
             {unread > 0 ? (

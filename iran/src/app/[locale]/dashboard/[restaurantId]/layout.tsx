@@ -104,7 +104,7 @@ async function RestaurantShell({
           <div className="space-y-1">
             <Link
               href="/dashboard"
-              className="flex h-10 items-center gap-3 rounded-2xl px-3 text-sm text-white/60 hover:bg-white/6 hover:text-white"
+              className="flex h-10 items-center gap-3 rounded-lg px-3 text-sm text-fg-muted hover:bg-surface-2 hover:text-fg"
             >
               <LayoutGrid className="size-4" aria-hidden="true" />
               {t("nav.switchRestaurant")}
@@ -112,7 +112,7 @@ async function RestaurantShell({
             {ctx.user.isSuperAdmin ? (
               <Link
                 href="/admin"
-                className="flex h-10 items-center gap-3 rounded-2xl px-3 text-sm text-white/60 hover:bg-white/6 hover:text-white"
+                className="flex h-10 items-center gap-3 rounded-lg px-3 text-sm text-fg-muted hover:bg-surface-2 hover:text-fg"
               >
                 <Shield className="size-4" aria-hidden="true" />
                 {t("nav.admin")}

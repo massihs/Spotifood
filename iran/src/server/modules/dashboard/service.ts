@@ -83,7 +83,9 @@ export async function getTodayStats(db: DbOrTx, ctx: RestaurantContext) {
     db
       .select({ n: count() })
       .from(orders)
-      .where(and(eq(orders.restaurantId, rid), inArray(orders.status, ["received", "accepted", "preparing"]))),
+      .where(
+        and(eq(orders.restaurantId, rid), inArray(orders.status, ["received", "accepted", "preparing"])),
+      ),
     db
       .select({
         day: sql<string>`to_char(${payments.succeededAt} at time zone ${tz}, 'YYYY-MM-DD')`,

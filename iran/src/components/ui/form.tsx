@@ -134,7 +134,7 @@ export function useCloseOnSuccess(state: ActionState) {
 }
 
 const controlClasses =
-  "w-full rounded-2xl border border-transparent bg-surface-2 px-4 text-[15px] text-fg transition-colors placeholder:text-fg-subtle hover:bg-surface-3 focus-visible:border-ink focus-visible:bg-surface focus-visible:outline-none aria-invalid:border-danger";
+  "w-full rounded-xl border border-border-strong bg-surface px-3.5 text-[15px] text-fg shadow-[0_1px_2px_hsl(var(--shadow-color)/0.04)] transition-[border-color,box-shadow] placeholder:text-fg-subtle hover:border-fg-subtle focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none aria-invalid:border-danger";
 
 function Wrapper({
   id,

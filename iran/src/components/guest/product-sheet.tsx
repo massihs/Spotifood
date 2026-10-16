@@ -109,7 +109,7 @@ export function ProductSheet({
 
           <div className="px-5 pt-5 pb-6">
             <header>
-              <h2 id="sheet-title" className="text-2xl leading-tight font-extrabold tracking-tight">
+              <h2 id="sheet-title" className="text-2xl leading-tight font-semibold tracking-tight">
                 {p.name}
               </h2>
               <p className="mt-2 flex flex-wrap items-center gap-2 text-lg">
@@ -192,7 +192,7 @@ export function ProductSheet({
                       "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
                       g.minSelect > 0
                         ? unmet
-                          ? "bg-ink text-ink-fg"
+                          ? "bg-warning-soft text-fg"
                           : "bg-surface-2 text-fg"
                         : "bg-surface-2 text-fg-muted",
                     )}
@@ -242,12 +242,12 @@ export function ProductSheet({
                           className={cn(
                             "grid size-6 shrink-0 place-items-center border-2 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--ring)]",
                             radio ? "rounded-full" : "rounded-md",
-                            checked ? "border-ink bg-ink text-ink-fg" : "border-border-strong",
+                            checked ? "border-accent bg-accent text-accent-fg" : "border-border-strong",
                           )}
                         >
                           {checked ? (
                             radio ? (
-                              <span className="size-2.5 rounded-full bg-ink-fg" />
+                              <span className="size-2.5 rounded-full bg-white" />
                             ) : (
                               <Check className="size-4" strokeWidth={3} />
                             )
@@ -287,7 +287,7 @@ export function ProductSheet({
               onClick={add}
               disabled={!priced.ok || pending}
               aria-busy={pending}
-              className="flex h-12 min-w-0 flex-1 items-center justify-between gap-2 rounded-full bg-ink px-5 font-bold text-ink-fg transition-transform active:scale-[0.98] disabled:opacity-40"
+              className="flex h-12 min-w-0 flex-1 items-center justify-between gap-2 rounded-full bg-accent px-5 font-bold text-accent-fg transition-transform active:scale-[0.98] disabled:opacity-40"
             >
               {!p.isAvailable ? (
                 <span className="mx-auto">{t("guest.soldOut")}</span>

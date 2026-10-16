@@ -184,7 +184,7 @@ export function LogoForm({
 
   return (
     <div className="flex flex-wrap items-center gap-5">
-      <div className="grid size-24 shrink-0 place-items-center overflow-hidden rounded-3xl bg-surface-2 ring-1 ring-border">
+      <div className="grid size-24 shrink-0 place-items-center overflow-hidden rounded-2xl bg-surface-2 ring-1 ring-border">
         {shown ? (
           <img src={shown} alt={t("settings.logo")} className="size-full object-contain" />
         ) : (

@@ -177,7 +177,7 @@ function SectionTitle({ icon, children }: { icon: ReactNode; children: ReactNode
   return (
     <span className="flex items-center gap-2.5">
       <span
-        className="grid size-9 place-items-center rounded-xl bg-ink text-accent [&_svg]:size-4"
+        className="grid size-9 place-items-center rounded-lg bg-accent-soft text-accent-text [&_svg]:size-4"
         aria-hidden="true"
       >
         {icon}

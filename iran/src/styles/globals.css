@@ -1,36 +1,36 @@
 @import "tailwindcss";
 
 /*
- * Spotifood design tokens: "ink & leaf".
- * Pure white / deep black surfaces, black "ink" for primary actions, one fresh green "leaf" accent
- * for brand moments, success and highlights. All colors are tokens → dark mode swaps values.
+ * Spotifood design tokens: "fresh".
+ * Airy off-white canvas, white cards with hairline borders, one green accent for actions and brand
+ * moments; near-black only for text. All colors are tokens → dark mode swaps values.
  */
 :root {
-  --bg: oklch(1 0 0);
+  --bg: oklch(0.985 0.002 100);
   --surface: oklch(1 0 0);
-  --surface-2: oklch(0.965 0 0);
-  --surface-3: oklch(0.925 0 0);
-  --border: oklch(0.925 0 0);
-  --border-strong: oklch(0.86 0 0);
-  --fg: oklch(0.16 0 0);
-  --fg-muted: oklch(0.47 0 0);
-  --fg-subtle: oklch(0.6 0 0);
-  --ink: oklch(0.16 0 0);
-  --ink-hover: oklch(0.3 0 0);
+  --surface-2: oklch(0.968 0.003 100);
+  --surface-3: oklch(0.935 0.004 100);
+  --border: oklch(0.925 0.004 100);
+  --border-strong: oklch(0.87 0.005 100);
+  --fg: oklch(0.21 0.01 150);
+  --fg-muted: oklch(0.5 0.01 150);
+  --fg-subtle: oklch(0.64 0.008 150);
+  --ink: oklch(0.21 0.01 150);
+  --ink-hover: oklch(0.32 0.01 150);
   --ink-fg: oklch(1 0 0);
-  --accent: oklch(0.74 0.19 150);
-  --accent-hover: oklch(0.69 0.19 150);
-  --accent-fg: oklch(0.16 0.02 150);
-  --accent-text: oklch(0.52 0.15 150);
-  --accent-soft: oklch(0.96 0.04 150);
-  --success: oklch(0.55 0.15 150);
-  --success-soft: oklch(0.96 0.04 150);
-  --warning: oklch(0.78 0.16 75);
-  --warning-soft: oklch(0.96 0.05 85);
-  --danger: oklch(0.58 0.21 27);
-  --danger-soft: oklch(0.96 0.03 25);
-  --ring: oklch(0.74 0.19 150 / 0.45);
-  --shadow-color: 0 0% 0%;
+  --accent: oklch(0.6 0.16 150);
+  --accent-hover: oklch(0.55 0.15 150);
+  --accent-fg: oklch(1 0 0);
+  --accent-text: oklch(0.5 0.13 150);
+  --accent-soft: oklch(0.965 0.03 150);
+  --success: oklch(0.55 0.14 150);
+  --success-soft: oklch(0.965 0.03 150);
+  --warning: oklch(0.75 0.15 70);
+  --warning-soft: oklch(0.97 0.04 85);
+  --danger: oklch(0.58 0.2 27);
+  --danger-soft: oklch(0.97 0.025 25);
+  --ring: oklch(0.6 0.16 150 / 0.3);
+  --shadow-color: 150 10% 20%;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,9 +47,9 @@
     --ink: oklch(0.97 0 0);
     --ink-hover: oklch(0.87 0 0);
     --ink-fg: oklch(0.13 0 0);
-    --accent: oklch(0.78 0.19 150);
-    --accent-hover: oklch(0.83 0.18 150);
-    --accent-fg: oklch(0.16 0.02 150);
+    --accent: oklch(0.72 0.17 150);
+    --accent-hover: oklch(0.78 0.16 150);
+    --accent-fg: oklch(0.15 0.02 150);
     --accent-text: oklch(0.8 0.17 150);
     --accent-soft: oklch(0.28 0.06 150);
     --success: oklch(0.75 0.17 150);
@@ -74,8 +74,8 @@
   --ink: oklch(0.97 0 0);
   --ink-hover: oklch(0.87 0 0);
   --ink-fg: oklch(0.13 0 0);
-  --accent: oklch(0.78 0.19 150);
-  --accent-hover: oklch(0.83 0.18 150);
+  --accent: oklch(0.72 0.17 150);
+  --accent-hover: oklch(0.78 0.16 150);
   --accent-fg: oklch(0.16 0.02 150);
   --accent-text: oklch(0.8 0.17 150);
   --accent-soft: oklch(0.28 0.06 150);
@@ -114,8 +114,8 @@
   --font-sans: var(--app-font);
   --font-mono: var(--font-mono-loaded), ui-monospace, monospace;
   --radius-card: 1.25rem;
-  --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 4px 16px -4px hsl(var(--shadow-color) / 0.08);
-  --shadow-float: 0 8px 30px -6px hsl(var(--shadow-color) / 0.3);
+  --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.04), 0 2px 8px -2px hsl(var(--shadow-color) / 0.05);
+  --shadow-float: 0 12px 40px -8px hsl(var(--shadow-color) / 0.22);
 }
 
 /* Persian: Vazirmatn "Farsi digits" first, so every number (prices, table labels, counts, codes)

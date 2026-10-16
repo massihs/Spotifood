@@ -86,7 +86,7 @@ export function OrderCard({
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={cn(
-              "grid size-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-ink px-1 font-black text-ink-fg tabular-nums",
+              "grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-accent-soft px-1 font-semibold text-accent-text tabular-nums",
               (o.tableLabel?.length ?? 0) > 3 ? "text-[10px] leading-tight break-all" : "text-base",
             )}
             aria-hidden="true"
@@ -94,7 +94,7 @@ export function OrderCard({
             {o.tableLabel ?? "—"}
           </span>
           <div className="min-w-0">
-            <p className="text-lg leading-tight font-black whitespace-nowrap tabular-nums">
+            <p className="text-lg leading-tight font-bold whitespace-nowrap tabular-nums">
               <bdi dir="ltr">#{o.number}</bdi>
             </p>
             <p className="truncate text-xs text-fg-muted">
@@ -124,7 +124,7 @@ export function OrderCard({
       <ul className="mx-4 divide-y divide-border rounded-2xl bg-surface-2/70 text-sm">
         {o.items.map((i) => (
           <li key={i.id} className="flex gap-3 px-3 py-2.5">
-            <span className="grid h-6 min-w-6 shrink-0 place-items-center rounded-lg bg-surface px-1 text-xs font-black tabular-nums shadow-[var(--shadow-soft)]">
+            <span className="grid h-6 min-w-6 shrink-0 place-items-center rounded-lg bg-surface px-1 text-xs font-bold tabular-nums shadow-[var(--shadow-soft)]">
               {i.quantity}
             </span>
             <span className="min-w-0 flex-1">
@@ -151,7 +151,7 @@ export function OrderCard({
         </p>
       ) : null}
       <div className="mt-auto flex items-center justify-between gap-2 px-4 pt-3">
-        <p className="font-black tabular-nums">{formatMoney(o.totalCents, o.currency, locale)}</p>
+        <p className="font-bold tabular-nums">{formatMoney(o.totalCents, o.currency, locale)}</p>
         <span
           className={cn(
             "rounded-full px-2.5 py-0.5 text-xs font-bold",

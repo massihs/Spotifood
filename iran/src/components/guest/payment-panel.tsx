@@ -96,8 +96,8 @@ export function PaymentPanel({
   const nothingDue = state.dueCents === 0 && !state.pending;
 
   return (
-    <section aria-labelledby="pay-title" className="mt-4 rounded-3xl border border-border bg-surface p-5">
-      <h2 id="pay-title" className="flex items-center gap-2 text-lg font-extrabold">
+    <section aria-labelledby="pay-title" className="mt-4 rounded-2xl border border-border bg-surface p-5">
+      <h2 id="pay-title" className="flex items-center gap-2 text-lg font-semibold">
         <Wallet className="size-5" aria-hidden="true" />
         {t("pay.title")}
       </h2>
@@ -121,7 +121,7 @@ export function PaymentPanel({
       <dl className="mt-3 space-y-1 text-sm">
         <div className="flex items-baseline justify-between">
           <dt className="font-medium">{t("pay.due")}</dt>
-          <dd className="text-2xl font-extrabold tabular-nums">{money(state.dueCents)}</dd>
+          <dd className="text-2xl font-semibold tabular-nums">{money(state.dueCents)}</dd>
         </div>
         {state.paidCents > 0 ? (
           <div className="flex justify-between text-fg-muted">
@@ -155,7 +155,7 @@ export function PaymentPanel({
             {state.pending.redirectUrl ? (
               <a
                 href={state.pending.redirectUrl}
-                className="inline-flex h-9 items-center rounded-full bg-ink px-4 font-bold text-ink-fg"
+                className="inline-flex h-9 items-center rounded-full bg-accent px-4 font-semibold text-accent-fg"
               >
                 {t("pay.resume")}
               </a>
@@ -190,7 +190,7 @@ export function PaymentPanel({
           ))}
           {offlineAvailable ? (
             asking ? (
-              <div className="rounded-3xl bg-surface-2 p-4">
+              <div className="rounded-2xl bg-surface-2 p-4">
                 <p className="text-sm font-bold">{t("pay.howAtTable")}</p>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   {state.methods.offline.includes("on_site_terminal") ? (

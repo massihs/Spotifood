@@ -141,7 +141,7 @@ export function MenuApp({
                       "relative shrink-0 px-3 py-3 text-[15px] font-semibold whitespace-nowrap transition-colors",
                       "after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:rounded-full after:transition-colors",
                       active === c.id
-                        ? "text-fg after:bg-ink"
+                        ? "text-fg after:bg-accent"
                         : "text-fg-muted after:bg-transparent hover:text-fg",
                     )}
                   >
@@ -158,7 +158,7 @@ export function MenuApp({
         <main className="pb-36">
           {featured.length > 0 ? (
             <section className="pt-6" aria-labelledby="featured-title">
-              <h2 id="featured-title" className="px-4 text-xl font-extrabold tracking-tight">
+              <h2 id="featured-title" className="px-4 text-xl font-semibold tracking-tight">
                 {t("guest.featured")}
               </h2>
               <ul className="no-scrollbar mt-3 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2">
@@ -212,7 +212,7 @@ export function MenuApp({
                 className="scroll-mt-32 pt-7"
                 aria-labelledby={`h-${c.id}`}
               >
-                <h2 id={`h-${c.id}`} className="px-4 text-xl font-extrabold tracking-tight">
+                <h2 id={`h-${c.id}`} className="px-4 text-xl font-semibold tracking-tight">
                   {c.name}
                 </h2>
                 {c.description ? <p className="mt-0.5 px-4 text-sm text-fg-muted">{c.description}</p> : null}
@@ -278,11 +278,11 @@ export function MenuApp({
           <Link
             key={cart.itemCount}
             href="/table/cart"
-            className="animate-pop-in flex h-14 items-center gap-3 rounded-full bg-ink ps-2 pe-5 font-semibold text-ink-fg shadow-[var(--shadow-float)] transition-transform active:scale-[0.98]"
+            className="animate-pop-in flex h-14 items-center gap-3 rounded-full bg-accent ps-2 pe-5 font-semibold text-accent-fg shadow-[var(--shadow-float)] transition-transform active:scale-[0.98]"
           >
             <span className="relative grid size-10 place-items-center rounded-full bg-accent text-accent-fg">
               <ShoppingBag className="size-5" aria-hidden="true" />
-              <span className="absolute -end-1 -top-1 grid min-w-5 place-items-center rounded-full bg-ink-fg px-1 text-xs leading-5 font-bold text-ink tabular-nums">
+              <span className="absolute -end-1 -top-1 grid min-w-5 place-items-center rounded-full bg-white px-1 text-xs leading-5 font-bold text-accent-text tabular-nums">
                 {cart.itemCount}
               </span>
             </span>
