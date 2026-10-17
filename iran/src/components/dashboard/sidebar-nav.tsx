@@ -13,7 +13,23 @@ export type NavItem = {
   exact?: boolean;
   /** Shown in the mobile bottom tab bar (keep it to 4 items). */
   primary?: boolean;
+  /** Count shown on the item (e.g. new orders); hidden at 0. */
+  badge?: number;
 };
+
+function Badge({ n, className }: { n?: number; className?: string }) {
+  if (!n) return null;
+  return (
+    <span
+      className={cn(
+        "grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1.5 text-[11px] leading-none font-bold text-white tabular-nums",
+        className,
+      )}
+    >
+      {n > 99 ? "99+" : n}
+    </span>
+  );
+}
 
 function useActive() {
   const pathname = usePathname();
@@ -47,7 +63,8 @@ export function SidebarNav({ items, label }: { items: NavItem[]; label: string }
             >
               {item.icon}
             </span>
-            {item.label}
+            <span className="min-w-0 flex-1 truncate">{item.label}</span>
+            <Badge n={item.badge} className="animate-pop-in" />
           </Link>
         );
       })}
@@ -100,12 +117,13 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
               >
                 <span
                   className={cn(
-                    "grid h-7 w-12 place-items-center rounded-full transition-colors [&_svg]:size-5",
+                    "relative grid h-7 w-12 place-items-center rounded-full transition-colors [&_svg]:size-5",
                     active && "bg-accent-soft",
                   )}
                   aria-hidden="true"
                 >
                   {item.icon}
+                  <Badge n={item.badge} className="absolute -end-0.5 -top-1.5 ring-2 ring-surface" />
                 </span>
                 <span className="max-w-full truncate px-1">{item.label}</span>
               </Link>
@@ -167,8 +185,12 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
                       active ? "bg-accent-soft text-accent-text" : "bg-surface-2 text-fg-muted",
                     )}
                   >
-                    <span className={cn("[&_svg]:size-6", active && "text-accent")} aria-hidden="true">
+                    <span
+                      className={cn("relative [&_svg]:size-6", active && "text-accent")}
+                      aria-hidden="true"
+                    >
                       {item.icon}
+                      <Badge n={item.badge} className="absolute -end-3 -top-2" />
                     </span>
                     {item.label}
                   </Link>

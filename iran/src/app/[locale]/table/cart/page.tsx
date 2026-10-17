@@ -38,6 +38,7 @@ async function GuestCart() {
         displayName={guest.participant.displayName}
         hasIssues={cart.hasIssues}
         orderCount={orders.length}
+        requirePhone={guest.restaurant.kind === "food_court"}
       />
     </LiveProvider>
   );

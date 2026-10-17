@@ -1,5 +1,6 @@
 "use server";
 
+import { isRestaurantKind, type RestaurantKind } from "@/lib/restaurant-kind";
 import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
@@ -27,6 +28,7 @@ export async function updateProfileAction(restaurantId: string, _prev: unknown, 
     const ctx = await actionContext(restaurantId, "restaurant.manage");
     await updateProfile(db, ctx, {
       name: str(fd, "name"),
+      kind: isRestaurantKind(str(fd, "kind")) ? (str(fd, "kind") as RestaurantKind) : undefined,
       email: str(fd, "email"),
       phone: str(fd, "phone"),
       addressLine1: str(fd, "addressLine1"),

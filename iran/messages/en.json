@@ -326,7 +326,7 @@
     "currency_locked": "The currency can no longer be changed: orders already exist.",
     "invalid_currency": "Unknown currency.",
     "invalid_timezone": "Unknown time zone.",
-    "invalid_phone": "Invalid phone number.",
+    "invalid_phone": "This mobile number is not valid (e.g. 09123456789).",
     "invalid_country": "2-letter country code (e.g. FR).",
     "invalid_prefix": "1 to 4 letters, no digits.",
     "invalid_url": "The address must start with https://",
@@ -394,7 +394,8 @@
     "payment_not_settled": "The payment is not completed yet.",
     "invalid_national_id": "The national ID must have 10 or 11 digits.",
     "invalid_economic_code": "Invalid economic code.",
-    "invalid_postal_code": "The postal code must have 10 digits."
+    "invalid_postal_code": "The postal code must have 10 digits.",
+    "phone_required": "Enter your mobile number to get a text when your order is ready."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -701,7 +702,22 @@
       "preparing": "Cooking",
       "ready": "Ready",
       "served": "Served"
-    }
+    },
+    "phone": "Mobile number",
+    "phoneHint": "We'll text you as soon as your order is ready.",
+    "summary": "Order summary",
+    "checkoutSteps": {
+      "label": "Order steps",
+      "cart": "Cart",
+      "confirm": "Confirm",
+      "track": "Track"
+    },
+    "readyTitle": "Your order is ready!",
+    "readyBody": "Order {number} is ready for pickup.",
+    "smsSent": "A text will be sent to {phone} when it's ready.",
+    "notifyMe": "Notify me when it's ready",
+    "notifyOn": "Notifications on",
+    "ok": "Got it"
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -901,7 +917,15 @@
       "preparing": "Start preparing",
       "ready": "Mark ready",
       "served": "Mark served"
-    }
+    },
+    "views": {
+      "active": "All active",
+      "new": "New",
+      "progress": "In progress",
+      "ready": "Ready",
+      "done": "Done"
+    },
+    "new": "New"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1123,5 +1147,22 @@
       "stripe": "Stripe",
       "pay_later": "Pay at the table"
     }
+  },
+  "kinds": {
+    "label": "Type of venue",
+    "restaurant": "Restaurant",
+    "cafe": "Café",
+    "food_court": "Food court",
+    "foodCourtHint": "In a food court, guests get a text message when their order is ready."
+  },
+  "sms": {
+    "orderReady": "Your order {number} at {restaurant} is ready. Please come and pick it up."
+  },
+  "alerts": {
+    "title": "New order {number}",
+    "body": "Table {table}",
+    "on": "Order alerts on",
+    "off": "Order alerts off",
+    "dismiss": "Dismiss"
   }
 }

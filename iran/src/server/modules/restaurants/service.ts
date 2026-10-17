@@ -1,3 +1,4 @@
+import type { RestaurantKind } from "@/lib/restaurant-kind";
 import { edition } from "@/config/edition";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { DbOrTx } from "@/server/db/client";
@@ -45,6 +46,7 @@ export async function createRestaurant(
     timezone?: string;
     country?: string;
     defaultLocale?: string;
+    kind?: RestaurantKind;
   },
 ) {
   const slug = await uniqueRestaurantSlug(tx, input.name);
@@ -58,6 +60,7 @@ export async function createRestaurant(
       timezone: input.timezone ?? edition.restaurantDefaults.timezone,
       country: input.country ?? edition.restaurantDefaults.country,
       defaultLocale: input.defaultLocale ?? edition.defaultLocale,
+      kind: input.kind ?? "restaurant",
     })
     .returning();
 

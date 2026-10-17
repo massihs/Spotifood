@@ -16,6 +16,7 @@ export type RestaurantSummary = {
   timezone: string;
   defaultLocale: string;
   logoKey: string | null;
+  kind: "restaurant" | "cafe" | "food_court";
 };
 
 /**
@@ -41,6 +42,7 @@ const restaurantColumns = {
   timezone: restaurants.timezone,
   defaultLocale: restaurants.defaultLocale,
   logoKey: restaurants.logoKey,
+  kind: restaurants.kind,
 };
 
 export async function loadRestaurantContext(

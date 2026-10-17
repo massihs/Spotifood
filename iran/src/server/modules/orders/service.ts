@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { createTranslator } from "next-intl";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
@@ -23,6 +24,9 @@ import { touchSession, type GuestContext } from "@/server/modules/guest/sessions
 import { loadPricedProducts } from "@/server/modules/menu/public";
 import { computeTotals, priceLine, type PricedLine } from "@/server/modules/pricing";
 import { nextCounterValue } from "@/server/modules/restaurants/service";
+import { normalizeIranMobile } from "@/lib/phone";
+import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
+import { sms } from "@/server/infra/sms";
 import { canTransition, STATUS_TIMESTAMP, type OrderStatus } from "./status";
 
 export const placeOrderSchema = z.object({
@@ -31,6 +35,19 @@ export const placeOrderSchema = z.object({
     .trim()
     .max(500)
     .transform((v) => (v === "" ? null : v))
+    .nullable()
+    .optional(),
+  /** Mobile number for the "your order is ready" text; required by food courts. */
+  phone: z
+    .string()
+    .trim()
+    .max(32)
+    .transform((v, ctx) => {
+      if (v === "") return null;
+      const n = normalizeIranMobile(v);
+      if (!n) ctx.addIssue({ code: "custom", message: "invalid_phone" });
+      return n;
+    })
     .nullable()
     .optional(),
 });
@@ -47,8 +64,12 @@ export async function placeOrder(
   guest: GuestContext,
   raw: z.input<typeof placeOrderSchema> = {},
 ) {
-  const input = placeOrderSchema.parse(raw);
+  const parsed = placeOrderSchema.safeParse(raw);
+  if (!parsed.success) throw new AppError("VALIDATION", "invalid_phone", { field: "phone" });
+  const input = parsed.data;
   const rid = guest.restaurant.id;
+  if (guest.restaurant.kind === "food_court" && !input.phone)
+    throw new AppError("VALIDATION", "phone_required", { field: "phone" });
 
   const order = await db.transaction(async (tx) => {
     const [cart] = await tx
@@ -130,6 +151,7 @@ export async function placeOrder(
         totalCents: totals.totalCents,
         pricesIncludeTax,
         note: input.note ?? null,
+        customerPhone: input.phone ?? null,
       })
       .returning();
 
@@ -174,7 +196,7 @@ export async function placeOrder(
     await emit(tx, {
       topic: topics.restaurant(rid),
       type: "order.created",
-      data: { orderId: created!.id, number, tableId: guest.table.id },
+      data: { orderId: created!.id, number, tableId: guest.table.id, tableLabel: guest.table.label },
     });
     await emit(tx, {
       topic: topics.participant(guest.participant.id),
@@ -244,6 +266,7 @@ export async function listActiveOrders(
       currency: orders.currency,
       note: orders.note,
       placedAt: orders.placedAt,
+      customerPhone: orders.customerPhone,
       participantSeq: participantLabel,
       participantName: sessionParticipants.displayName,
     })
@@ -272,7 +295,7 @@ export async function updateOrderStatus(
 ) {
   assertCan(ctx, to === "cancelled" ? "orders.cancel" : "orders.update_status");
   if (!isUuid(orderId)) throw notFound();
-  return db.transaction(async (tx) => {
+  const updated = await db.transaction(async (tx) => {
     const [current] = await tx
       .select()
       .from(orders)
@@ -319,7 +342,7 @@ export async function updateOrderStatus(
       await emit(tx, {
         topic: topics.participant(current.participantId),
         type: "order.updated",
-        data: { orderId, status: to },
+        data: { orderId, status: to, number: current.number },
       });
     }
     if (to === "ready") {
@@ -342,6 +365,47 @@ export async function updateOrderStatus(
     }
     return updated;
   });
+  // Food courts text the guest; after the commit, and a failed SMS never blocks the kitchen.
+  if (to === "ready" && ctx.restaurant.kind === "food_court" && updated.customerPhone)
+    await sendReadySms(db, ctx, updated).catch((e) => console.error("[sms] order ready", e));
+  return updated;
+}
+
+/** Sends the "order ready" text once per order: the row is claimed before sending. */
+export async function sendReadySms(
+  db: Database,
+  ctx: RestaurantContext,
+  order: { id: string; number: string; customerPhone: string | null },
+) {
+  if (!order.customerPhone) return false;
+  const [claimed] = await db
+    .update(orders)
+    .set({ readySmsSentAt: new Date() })
+    .where(and(eq(orders.id, order.id), isNull(orders.readySmsSentAt)))
+    .returning({ id: orders.id });
+  if (!claimed) return false;
+  const locale = isLocale(ctx.restaurant.defaultLocale) ? ctx.restaurant.defaultLocale : DEFAULT_LOCALE;
+  const messages = (await import(`../../../../messages/${locale}.json`)).default;
+  const t = createTranslator({ locale, messages, namespace: "sms" });
+  try {
+    const res = await sms().send(
+      order.customerPhone,
+      t("orderReady", { restaurant: ctx.restaurant.name, number: order.number }),
+    );
+    await recordAudit(db, {
+      action: "order.ready_sms_sent",
+      actorUserId: ctx.user.id,
+      restaurantId: ctx.restaurant.id,
+      entityType: "order",
+      entityId: order.id,
+      metadata: { provider: sms().name, ref: res.ref },
+    });
+    return true;
+  } catch (e) {
+    // Release the claim so a later "ready" (or a retry) can send it.
+    await db.update(orders).set({ readySmsSentAt: null }).where(eq(orders.id, order.id));
+    throw e;
+  }
 }
 
 /** Table view for staff: open session, its participants and their orders/totals. */
@@ -395,4 +459,19 @@ export async function getTableOverview(db: Database, ctx: RestaurantContext, tab
     tableTotalCents: participants.reduce((s, p) => s + p.totalCents, 0),
     unpaidCents: participants.reduce((s, p) => s + p.unpaidCents, 0),
   };
+}
+
+/** Orders waiting for the team to accept them (badge on the Orders / Kitchen tabs). */
+export async function countNewOrders(db: DbOrTx, ctx: RestaurantContext) {
+  if (!ctx.permissions.has("orders.view")) return 0;
+  const [row] = await db
+    .select({ n: sql<number>`count(*)`.mapWith(Number) })
+    .from(orders)
+    .where(
+      and(
+        eq(orders.restaurantId, ctx.restaurant.id),
+        inArray(orders.status, ["received", "pending_payment"]),
+      ),
+    );
+  return row?.n ?? 0;
 }

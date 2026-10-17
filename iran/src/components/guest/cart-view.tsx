@@ -1,8 +1,18 @@
 "use client";
 
-import { ChevronLeft, Plus, ShoppingBag, UserRound } from "lucide-react";
+import {
+  ChefHat,
+  ChevronLeft,
+  Loader2,
+  Plus,
+  ReceiptText,
+  Send,
+  ShoppingBag,
+  Smartphone,
+  UserRound,
+} from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { useActionState, useOptimistic, useState, useTransition } from "react";
+import { useActionState, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import {
   placeOrderAction,
   removeItemAction,
@@ -55,6 +65,7 @@ export function CartView({
   hasIssues,
   orderCount,
   restaurantName,
+  requirePhone = false,
 }: {
   lines: CartLineView[];
   totals: Totals;
@@ -65,6 +76,8 @@ export function CartView({
   hasIssues: boolean;
   orderCount: number;
   restaurantName?: string;
+  /** Food courts: the guest gives a mobile number to be texted when the order is ready. */
+  requirePhone?: boolean;
 }) {
   const t = useTranslations();
   const money = useMoney(currency);
@@ -98,30 +111,37 @@ export function CartView({
           ) : null}
         </main>
       ) : (
-        <main className="pb-40">
-          <section className="px-4 pt-4">
-            <div className="flex items-baseline justify-between">
-              <h2 className="text-xl font-semibold">{t("guest.items", { count: itemCount })}</h2>
+        <main className="mx-auto max-w-2xl space-y-4 px-4 pt-4 pb-40">
+          <Steps />
+          <section className="rounded-2xl border border-border bg-surface shadow-[var(--shadow-soft)]">
+            <div className="flex items-center justify-between px-4 pt-4">
+              <h2 className="flex items-center gap-2 text-lg font-bold">
+                <ShoppingBag className="size-5 text-accent" aria-hidden="true" />
+                {t("guest.items", { count: itemCount })}
+              </h2>
             </div>
-            <ul className="mt-1">
+            <ul className="px-4">
               {lines.map((l) => (
                 <CartLine key={l.id} line={l} money={money} />
               ))}
             </ul>
-            <Link
-              href="/table"
-              className="mt-2 inline-flex h-10 items-center gap-1.5 rounded-full bg-surface-2 px-4 text-sm font-semibold active:bg-surface-3"
-            >
-              <Plus className="size-4" strokeWidth={2.5} aria-hidden="true" />
-              {t("guest.addMore")}
-            </Link>
+            <div className="border-t border-border p-3">
+              <Link
+                href="/table"
+                className="flex h-11 items-center justify-center gap-1.5 rounded-xl border border-dashed border-border-strong text-sm font-semibold text-accent-text hover:bg-accent-soft/50"
+              >
+                <Plus className="size-4" strokeWidth={2.5} aria-hidden="true" />
+                {t("guest.addMore")}
+              </Link>
+            </div>
           </section>
 
-          <div className="mt-6 h-2 bg-surface-2" />
-          <NameForm displayName={displayName} />
-          <div className="h-2 bg-surface-2" />
+          <section className="rounded-2xl border border-border bg-surface shadow-[var(--shadow-soft)]">
+            <NameForm displayName={displayName} />
+          </section>
 
           <OrderPanel
+            requirePhone={requirePhone}
             totalLabel={money(totals.totalCents)}
             disabled={hasIssues || totals.totalCents === 0}
             hasIssues={hasIssues}
@@ -165,43 +185,126 @@ export function CartView({
   );
 }
 
+const PHONE_KEY = "sf-guest-phone";
+
+/** Three steps: cart → confirm → follow; the second is current on this page. */
+function Steps() {
+  const t = useTranslations("guest.checkoutSteps");
+  const steps = ["cart", "confirm", "track"] as const;
+  return (
+    <ol className="flex items-center gap-2 text-xs font-semibold" aria-label={t("label")}>
+      {steps.map((s, i) => (
+        <li key={s} className="flex flex-1 items-center gap-2">
+          <span
+            className={cn(
+              "grid size-6 shrink-0 place-items-center rounded-full tabular-nums",
+              i <= 1 ? "bg-accent text-accent-fg" : "bg-surface-3 text-fg-muted",
+            )}
+            aria-current={i === 1 ? "step" : undefined}
+          >
+            {i + 1}
+          </span>
+          <span className={cn("truncate", i <= 1 ? "text-fg" : "text-fg-subtle")}>{t(s)}</span>
+          {i < steps.length - 1 ? (
+            <span className={cn("h-0.5 flex-1 rounded-full", i < 1 ? "bg-accent" : "bg-surface-3")} />
+          ) : null}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function OrderPanel({
   totalLabel,
   disabled,
   hasIssues,
   summary,
+  requirePhone,
 }: {
   totalLabel: string;
   disabled: boolean;
   hasIssues: boolean;
   summary: React.ReactNode;
+  requirePhone: boolean;
 }) {
   const t = useTranslations();
   const router = useRouter();
   const [note, setNote] = useState("");
+  // A returning guest's number is remembered on this device only (prefilled after hydration).
+  const phoneRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!requirePhone || !phoneRef.current) return;
+    try {
+      phoneRef.current.value ||= localStorage.getItem(PHONE_KEY) ?? "";
+    } catch {
+      /* ignore */
+    }
+  }, [requirePhone]);
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const field =
+    "w-full rounded-xl border border-border-strong bg-surface px-3.5 text-[16px] placeholder:text-fg-subtle focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none";
   return (
-    <section className="space-y-5 px-4 pt-5">
-      <label className="block">
-        <span className="font-bold">{t("guest.forKitchen")}</span>
+    <>
+      {requirePhone ? (
+        <section className="rounded-2xl border border-accent/30 bg-accent-soft/60 p-4">
+          <label htmlFor="guest-phone" className="flex items-center gap-2 font-bold">
+            <Smartphone className="size-5 text-accent-text" aria-hidden="true" />
+            {t("guest.phone")}
+          </label>
+          <p className="mt-1 text-sm text-fg-muted">{t("guest.phoneHint")}</p>
+          <input
+            id="guest-phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            dir="ltr"
+            ref={phoneRef}
+            onChange={() => setPhoneError(null)}
+            placeholder="09xx xxx xxxx"
+            aria-invalid={phoneError ? true : undefined}
+            aria-describedby={phoneError ? "guest-phone-error" : undefined}
+            className={cn(field, "mt-3 h-12 text-start tracking-wide", phoneError && "border-danger")}
+          />
+          {phoneError ? (
+            <p id="guest-phone-error" role="alert" className="mt-1.5 text-sm font-medium text-danger">
+              {phoneError}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+      <section className="rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+        <label htmlFor="order-note" className="flex items-center gap-2 font-bold">
+          <ChefHat className="size-5 text-accent-text" aria-hidden="true" />
+          {t("guest.forKitchen")}
+        </label>
         <textarea
+          id="order-note"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           maxLength={500}
           rows={2}
           placeholder={t("guest.orderNotePlaceholder")}
-          className="mt-2 w-full resize-none rounded-2xl bg-surface-2 px-4 py-3 text-[16px] placeholder:text-fg-muted focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
+          className={cn(field, "mt-3 resize-none py-3")}
         />
-      </label>
-      {summary}
+      </section>
+
+      <section className="rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+        <h2 className="mb-3 flex items-center gap-2 font-bold">
+          <ReceiptText className="size-5 text-accent-text" aria-hidden="true" />
+          {t("guest.summary")}
+        </h2>
+        {summary}
+      </section>
       {hasIssues ? <p className="text-sm font-medium text-danger">{t("guest.fixCart")}</p> : null}
       {error ? (
         <p role="alert" className="rounded-2xl bg-danger-soft px-4 py-3 text-sm font-medium text-danger">
           {error}
         </p>
       ) : null}
-      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl border-t border-border bg-bg/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl">
         <button
           type="button"
           disabled={disabled || pending}
@@ -209,23 +312,51 @@ function OrderPanel({
           onClick={() =>
             startTransition(async () => {
               setError(null);
-              const res = await placeOrderAction(note);
-              if (res?.ok) router.push("/table/orders?placed=1");
-              else if (res) {
-                setError(
-                  t.has(`errorCodes.${res.error}`) ? t(`errorCodes.${res.error}`) : t("errorCodes.internal"),
-                );
-                router.refresh();
+              setPhoneError(null);
+              const phone = phoneRef.current?.value.trim() ?? "";
+              if (requirePhone && !phone) {
+                setPhoneError(t("errorCodes.phone_required"));
+                document.getElementById("guest-phone")?.focus();
+                return;
+              }
+              const res = await placeOrderAction(note, requirePhone ? phone : "");
+              if (res?.ok) {
+                if (requirePhone) {
+                  try {
+                    localStorage.setItem(PHONE_KEY, phone);
+                  } catch {
+                    /* ignore */
+                  }
+                }
+                router.push("/table/orders?placed=1");
+              } else if (res) {
+                const msg = t.has(`errorCodes.${res.error}`)
+                  ? t(`errorCodes.${res.error}`)
+                  : t("errorCodes.internal");
+                if (res.error === "phone_required" || res.error === "invalid_phone") {
+                  setPhoneError(msg);
+                  document.getElementById("guest-phone")?.focus();
+                } else {
+                  setError(msg);
+                  router.refresh();
+                }
               }
             })
           }
-          className="flex h-14 w-full items-center justify-between rounded-full bg-accent px-6 text-lg font-bold text-accent-fg transition-transform active:scale-[0.98] disabled:opacity-40"
+          className="mx-auto flex h-14 w-full max-w-2xl items-center justify-between gap-3 rounded-2xl bg-accent ps-5 pe-2 text-lg font-bold text-accent-fg shadow-[0_10px_24px_-10px_hsl(150_70%_25%/0.7)] transition-transform active:scale-[0.98] disabled:opacity-40"
         >
-          <span>{pending ? "…" : t("guest.checkout")}</span>
-          <span className="tabular-nums">{totalLabel}</span>
+          <span className="flex items-center gap-2">
+            {pending ? (
+              <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Send className="size-5 rtl:-scale-x-100" aria-hidden="true" />
+            )}
+            {t("guest.checkout")}
+          </span>
+          <span className="rounded-xl bg-white/20 px-3 py-1.5 text-base tabular-nums">{totalLabel}</span>
         </button>
       </div>
-    </section>
+    </>
   );
 }
 
@@ -249,7 +380,7 @@ function CartLine({ line: l, money }: { line: CartLineView; money: (c: number) =
             alt=""
             width={72}
             height={72}
-            className="size-[72px] shrink-0 rounded-2xl bg-surface-2 object-cover"
+            className="size-[72px] shrink-0 rounded-xl bg-surface-2 object-cover"
           />
         ) : null}
         <div className="min-w-0 flex-1">
@@ -306,7 +437,9 @@ function CartLine({ line: l, money }: { line: CartLineView; money: (c: number) =
             </button>
           )}
           <div className="mt-2 flex items-center justify-between gap-3">
-            <p className="font-bold tabular-nums">{l.line ? money(l.line.lineTotalCents) : ""}</p>
+            <p className="font-bold text-accent-text tabular-nums">
+              {l.line ? money(l.line.lineTotalCents) : ""}
+            </p>
             <QuantityStepper
               size="md"
               value={quantity}
@@ -336,9 +469,9 @@ function NameForm({ displayName }: { displayName: string | null }) {
   const t = useTranslations("guest");
   const [state, action, pending] = useActionState(renameAction, null);
   return (
-    <form action={action} className="px-4 py-5">
+    <form action={action} className="p-4">
       <label htmlFor="guest-name" className="flex items-center gap-2 font-bold">
-        <UserRound className="size-5" aria-hidden="true" />
+        <UserRound className="size-5 text-accent-text" aria-hidden="true" />
         {t("nameShort")}
         <span className="text-sm font-normal text-fg-subtle">· {t("yourNameHint")}</span>
       </label>
@@ -350,12 +483,12 @@ function NameForm({ displayName }: { displayName: string | null }) {
           maxLength={24}
           autoComplete="given-name"
           placeholder={t("namePlaceholder")}
-          className="h-12 min-w-0 flex-1 rounded-full bg-surface-2 px-5 text-[16px] placeholder:text-fg-muted focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
+          className="h-12 min-w-0 flex-1 rounded-xl border border-border-strong bg-surface px-3.5 text-[16px] placeholder:text-fg-subtle focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none"
         />
         <button
           type="submit"
           disabled={pending}
-          className="h-12 shrink-0 rounded-full bg-surface-2 px-5 text-sm font-bold active:bg-surface-3"
+          className="h-12 shrink-0 rounded-xl bg-surface-2 px-5 text-sm font-bold active:bg-surface-3"
         >
           {state?.ok ? "✓" : t("save")}
         </button>

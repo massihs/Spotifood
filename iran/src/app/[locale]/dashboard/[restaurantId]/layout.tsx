@@ -22,6 +22,8 @@ import { db } from "@/server/db/client";
 import { listNotifications } from "@/server/modules/notifications/service";
 import { LiveProvider } from "@/components/realtime/live";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
+import { OrderAlerts } from "@/components/dashboard/order-alerts";
+import { countNewOrders } from "@/server/modules/orders/service";
 
 export default function RestaurantLayout({
   children,
@@ -46,7 +48,7 @@ async function RestaurantShell({
   const t = await getTranslations();
   const base = `/dashboard/${ctx.restaurant.id}`;
 
-  const { unread } = await listNotifications(db, ctx, 1);
+  const [{ unread }, newOrders] = await Promise.all([listNotifications(db, ctx, 1), countNewOrders(db, ctx)]);
   const nav = [
     { href: base, label: t("nav.overview"), icon: <LayoutDashboard />, exact: true, primary: true },
     can(ctx, "orders.view") && {
@@ -54,12 +56,14 @@ async function RestaurantShell({
       label: t("nav.kitchen"),
       icon: <ChefHat />,
       primary: true,
+      badge: newOrders,
     },
     can(ctx, "orders.view") && {
       href: `${base}/orders`,
       label: t("nav.orders"),
       icon: <ReceiptText />,
       primary: true,
+      badge: newOrders,
     },
     can(ctx, "tables.view") && { href: `${base}/floor`, label: t("nav.floor"), icon: <LayoutGrid /> },
     can(ctx, "menu.view") && {
@@ -93,6 +97,7 @@ async function RestaurantShell({
         user={ctx.user}
         headerExtra={
           <>
+            <OrderAlerts restaurantId={ctx.restaurant.id} newOrders={newOrders} />
             <NotificationBell
               restaurantId={ctx.restaurant.id}
               timeZone={ctx.restaurant.timezone}

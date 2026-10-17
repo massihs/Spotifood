@@ -44,6 +44,7 @@ export async function registerOwner(db: Database, input: SignupInput, meta: { ip
         organizationId: org.id,
         ownerUserId: user!.id,
         name: input.restaurantName,
+        kind: input.kind ?? "restaurant",
       });
 
       await recordAudit(tx, {

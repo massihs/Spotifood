@@ -1,5 +1,7 @@
 "use client";
 
+import { KindPicker } from "@/components/kind-picker";
+import type { RestaurantKind } from "@/lib/restaurant-kind";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,7 @@ const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
 export type ProfileValues = {
   name: string;
+  kind: RestaurantKind;
   email: string | null;
   phone: string | null;
   addressLine1: string | null;
@@ -69,6 +72,7 @@ export function ProfileForm({
           defaultValue={values.name}
           error={err("name")}
         />
+        <KindPicker defaultValue={values.kind} />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             label={t("settings.email")}

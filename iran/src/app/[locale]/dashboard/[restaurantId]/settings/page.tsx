@@ -79,6 +79,7 @@ async function Settings({ params }: { params: Params }) {
                 timezones={timezones}
                 values={{
                   name: r.name,
+                  kind: r.kind,
                   email: r.email,
                   phone: r.phone,
                   addressLine1: r.addressLine1,

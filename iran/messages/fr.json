@@ -192,7 +192,7 @@
     "currency_locked": "La devise ne peut plus être modifiée : des commandes existent déjà.",
     "invalid_currency": "Devise inconnue.",
     "invalid_timezone": "Fuseau horaire inconnu.",
-    "invalid_phone": "Numéro de téléphone invalide.",
+    "invalid_phone": "Ce numéro de mobile n'est pas valide (ex. 09123456789).",
     "invalid_country": "Code pays à 2 lettres (ex. FR).",
     "invalid_prefix": "1 à 4 lettres, sans chiffre.",
     "invalid_url": "L'adresse doit commencer par https://",
@@ -260,7 +260,8 @@
     "payment_not_settled": "Le paiement n'est pas encore terminé.",
     "invalid_national_id": "L'identifiant national doit compter 10 ou 11 chiffres.",
     "invalid_economic_code": "Code économique invalide.",
-    "invalid_postal_code": "Le code postal doit compter 10 chiffres."
+    "invalid_postal_code": "Le code postal doit compter 10 chiffres.",
+    "phone_required": "Indiquez votre numéro de mobile pour recevoir un SMS quand votre commande est prête."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -543,7 +544,22 @@
       "served": "Bon appétit !",
       "cancelled": "Cette commande a été annulée. Contactez l'équipe si besoin."
     },
-    "ordersLink": "Mes commandes ({count})"
+    "ordersLink": "Mes commandes ({count})",
+    "phone": "Numéro de mobile",
+    "phoneHint": "Nous vous envoyons un SMS dès que votre commande est prête.",
+    "summary": "Récapitulatif",
+    "checkoutSteps": {
+      "label": "Étapes de commande",
+      "cart": "Panier",
+      "confirm": "Validation",
+      "track": "Suivi"
+    },
+    "readyTitle": "Votre commande est prête !",
+    "readyBody": "La commande {number} est prête à être récupérée.",
+    "smsSent": "Un SMS sera envoyé au {phone} quand elle sera prête.",
+    "notifyMe": "Me prévenir quand c'est prêt",
+    "notifyOn": "Notifications activées",
+    "ok": "Compris"
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -743,7 +759,15 @@
       "preparing": "Lancer la préparation",
       "ready": "Marquer prête",
       "served": "Marquer servie"
-    }
+    },
+    "views": {
+      "active": "En cours",
+      "new": "Nouvelles",
+      "progress": "En préparation",
+      "ready": "Prêtes",
+      "done": "Terminées"
+    },
+    "new": "Nouveau"
   },
   "tableView": {
     "title": "Table {label}",
@@ -965,5 +989,22 @@
       "stripe": "Stripe",
       "pay_later": "Payer à table"
     }
+  },
+  "kinds": {
+    "label": "Type d'établissement",
+    "restaurant": "Restaurant",
+    "cafe": "Café",
+    "food_court": "Food court",
+    "foodCourtHint": "En food court, le client reçoit un SMS quand sa commande est prête."
+  },
+  "sms": {
+    "orderReady": "Votre commande {number} chez {restaurant} est prête. Venez la récupérer."
+  },
+  "alerts": {
+    "title": "Nouvelle commande {number}",
+    "body": "Table {table}",
+    "on": "Alertes commandes activées",
+    "off": "Alertes commandes coupées",
+    "dismiss": "Fermer"
   }
 }

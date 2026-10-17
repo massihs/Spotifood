@@ -1,5 +1,7 @@
 "use client";
 
+import { KindPicker } from "@/components/kind-picker";
+import { isRestaurantKind } from "@/lib/restaurant-kind";
 import { useTranslations } from "next-intl";
 import { useActionState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
@@ -67,6 +69,7 @@ export function SignupForm() {
         defaultValue={state.values?.restaurantName}
         error={err("restaurantName")}
       />
+      <KindPicker defaultValue={isRestaurantKind(state.values?.kind) ? state.values.kind : "restaurant"} />
       <Field
         label={t("fullName")}
         name="fullName"

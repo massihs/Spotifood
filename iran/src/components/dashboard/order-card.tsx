@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { ArrowRight, Clock, MessageSquareText, X } from "lucide-react";
+import { ArrowRight, Clock, MessageSquareText, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
@@ -22,6 +22,7 @@ export type OrderCardData = {
   currency: string;
   note: string | null;
   placedAt: Date;
+  customerPhone?: string | null;
   participantSeq: number | null;
   participantName: string | null;
   items: {
@@ -78,10 +79,22 @@ export function OrderCard({
     });
 
   const tone = TONE[o.status];
+  const isNew = o.status === "received" || o.status === "pending_payment";
+  const [now] = useState(() => Date.now());
+  // Waiting more than 10 minutes without being ready: shown in orange.
+  const late =
+    ["received", "accepted", "preparing", "pending_payment"].includes(o.status) &&
+    now - new Date(o.placedAt).getTime() > 10 * 60_000;
   const paid = o.paymentStatus === "paid";
 
   return (
-    <Card className={cn("flex flex-col overflow-hidden transition-opacity", pending && "opacity-60")}>
+    <Card
+      className={cn(
+        "flex flex-col overflow-hidden transition-opacity",
+        isNew && "border-accent ring-4 ring-accent/15",
+        pending && "opacity-60",
+      )}
+    >
       <div className="flex items-start justify-between gap-3 p-4 pb-3">
         <div className="flex min-w-0 items-center gap-3">
           <span
@@ -115,7 +128,18 @@ export function OrderCard({
               {t(`orderStatus.${o.status}`)}
             </span>
           )}
-          <span className="flex items-center gap-1 text-xs whitespace-nowrap text-fg-subtle">
+          {isNew ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-danger px-2.5 py-0.5 text-[11px] font-bold text-white">
+              <span className="size-1.5 animate-ping rounded-full bg-white" aria-hidden="true" />
+              {t("orders.new")}
+            </span>
+          ) : null}
+          <span
+            className={cn(
+              "flex items-center gap-1 text-xs whitespace-nowrap",
+              late ? "font-semibold text-warning" : "text-fg-subtle",
+            )}
+          >
             <Clock className="size-3" aria-hidden="true" />
             <TimeAgo date={o.placedAt} timeZone={timeZone} />
           </span>
@@ -141,6 +165,17 @@ export function OrderCard({
           </li>
         ))}
       </ul>
+      {o.customerPhone ? (
+        <a
+          href={`tel:${o.customerPhone}`}
+          dir="ltr"
+          onClick={(e) => e.stopPropagation()}
+          className="mx-4 mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium text-fg-muted"
+        >
+          <Phone className="size-3.5" aria-hidden="true" />
+          {o.customerPhone}
+        </a>
+      ) : null}
       {o.note ? (
         <p className="mx-4 mt-2 flex gap-2 rounded-2xl bg-warning-soft px-3 py-2 text-sm">
           <MessageSquareText className="mt-0.5 size-4 shrink-0" aria-hidden="true" />

@@ -1,8 +1,18 @@
-import { Check, ChefHat, CircleCheck, ConciergeBell, Plus, ReceiptText, Utensils } from "lucide-react";
+import {
+  Check,
+  ChefHat,
+  CircleCheck,
+  ConciergeBell,
+  Plus,
+  ReceiptText,
+  Smartphone,
+  Utensils,
+} from "lucide-react";
 import { Suspense } from "react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { GuestTopBar } from "@/components/guest/cart-view";
 import { PaymentPanel } from "@/components/guest/payment-panel";
+import { ReadyWatcher } from "@/components/guest/ready-watcher";
 import { GuestSkeleton, SessionExpired } from "@/components/guest/states";
 import { LiveIndicator, LiveProvider, LiveRefresh } from "@/components/realtime/live";
 import { Link } from "@/i18n/navigation";
@@ -53,7 +63,8 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
         subtitle={`${guest.restaurant.name} · ${t("guest.tableBadge", { table: guest.table.label })}`}
         extra={<LiveIndicator className="rounded-full bg-surface-2 px-3 py-1.5" />}
       />
-      <main className="px-4 pt-4 pb-32">
+      <main className="mx-auto max-w-2xl px-4 pt-4 pb-32">
+        {orders.length > 0 ? <ReadyWatcher /> : null}
         {sp.placed ? (
           <div
             role="status"
@@ -87,7 +98,13 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
             {orders.map((o) => {
               const stepIndex = STEPS.findIndex((s) => s.key === o.status);
               return (
-                <li key={o.id} className="rounded-2xl border border-border bg-surface p-4">
+                <li
+                  key={o.id}
+                  className={cn(
+                    "rounded-2xl border bg-surface p-4 shadow-[var(--shadow-soft)]",
+                    o.status === "ready" ? "border-accent ring-4 ring-accent/15" : "border-border",
+                  )}
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-lg font-semibold">{t("guest.orderNumber", { number: o.number })}</p>
@@ -162,6 +179,16 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                   <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-sm font-medium">
                     {t(`guest.statusHint.${o.status}`)}
                   </p>
+                  {guest.restaurant.kind === "food_court" &&
+                  o.customerPhone &&
+                  !["ready", "served", "cancelled"].includes(o.status) ? (
+                    <p className="mt-2 flex items-center gap-2 px-1 text-xs text-fg-muted">
+                      <Smartphone className="size-3.5 shrink-0 text-accent-text" aria-hidden="true" />
+                      {t("guest.smsSent", {
+                        phone: `${o.customerPhone.slice(0, 4)}•••${o.customerPhone.slice(-3)}`,
+                      })}
+                    </p>
+                  ) : null}
 
                   <ul className="mt-4 space-y-2.5 text-[15px]">
                     {o.items.map((i) => (

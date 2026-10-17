@@ -76,3 +76,18 @@ image on GitHub, pushes it to `ghcr.io/massihs/spotifood-iran:<commit>` and asks
 it: nothing is built on Liara, a release takes ~4 minutes. The ghcr.io package must stay
 **public** (it contains no secret: all credentials are Liara environment variables).
 Runtime logs: workflow **Liara — app logs (Iran)**.
+
+## SMS « commande prête » (food courts)
+
+Les établissements de type **فودکورت / food court** envoient un SMS au client quand sa commande passe à
+« prête ». Le numéro est demandé au client au moment de commander.
+
+Variables Liara à ajouter :
+
+| Variable | Valeur |
+| --- | --- |
+| `SMS_PROVIDER` | `kavenegar` (`console` = journal uniquement) |
+| `KAVENEGAR_API_KEY` | clé API du panneau Kavenegar (Compte → Paramètres → API Key) |
+| `KAVENEGAR_SENDER` | facultatif : numéro de ligne d'envoi |
+
+Sans clé, rien n'est envoyé : le message apparaît seulement dans les journaux (`[sms:console]`).

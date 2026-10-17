@@ -1,3 +1,4 @@
+import { RESTAURANT_KINDS } from "@/lib/restaurant-kind";
 import { z } from "zod";
 import { LOCALES } from "@/i18n/config";
 
@@ -15,6 +16,7 @@ const SUPPORTED_TIMEZONES = new Set(Intl.supportedValuesOf("timeZone"));
 
 export const profileSchema = z.object({
   name: z.string().trim().min(2).max(160),
+  kind: z.enum(RESTAURANT_KINDS).optional(),
   email: z
     .string()
     .trim()

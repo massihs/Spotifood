@@ -26,36 +26,56 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "orders.view");
   const sp = await searchParams;
-  const view = sp.view === "done" ? "done" : "active";
+  const VIEWS = ["active", "new", "progress", "ready", "done"] as const;
+  type View = (typeof VIEWS)[number];
+  const view: View = (VIEWS as readonly string[]).includes(String(sp.view)) ? (sp.view as View) : "active";
   const [t, all] = await Promise.all([getTranslations("orders"), listActiveOrders(db, ctx)]);
-  const active = all.filter((o) => ACTIVE_STATUSES.includes(o.status));
-  const done = all.filter((o) => !ACTIVE_STATUSES.includes(o.status)).reverse();
-  const shown = view === "done" ? done : active;
+  const groups: Record<View, typeof all> = {
+    active: all.filter((o) => ACTIVE_STATUSES.includes(o.status)),
+    new: all.filter((o) => o.status === "received" || o.status === "pending_payment"),
+    progress: all.filter((o) => o.status === "accepted" || o.status === "preparing"),
+    ready: all.filter((o) => o.status === "ready"),
+    done: all.filter((o) => !ACTIVE_STATUSES.includes(o.status)).reverse(),
+  };
+  const shown = groups[view];
   const base = `/dashboard/${ctx.restaurant.id}/orders`;
 
   return (
     <>
       <LiveRefresh types={["order.created", "order.updated", "session.opened", "session.closed"]} />
       <PageHeader title={t("title")} description={t("subtitle")} />
-      <nav className="mb-5 flex gap-2" aria-label={t("title")}>
-        {(
-          [
-            ["active", t("filterActive"), active.length],
-            ["done", t("filterDone"), done.length],
-          ] as const
-        ).map(([key, label, n]) => (
-          <Link
-            key={key}
-            href={key === "active" ? base : `${base}?view=done`}
-            aria-current={view === key ? "page" : undefined}
-            className={cn(
-              "rounded-full px-4 py-2 text-sm font-medium",
-              view === key ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
-            )}
-          >
-            {label} <span className="tabular-nums opacity-70">{n}</span>
-          </Link>
-        ))}
+      <nav
+        className="-mx-4 mb-5 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
+        aria-label={t("title")}
+      >
+        {VIEWS.map((key) => {
+          const n = groups[key].length;
+          return (
+            <Link
+              key={key}
+              href={key === "active" ? base : `${base}?view=${key}`}
+              aria-current={view === key ? "page" : undefined}
+              className={cn(
+                "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+                view === key ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
+              )}
+            >
+              {t(`views.${key}`)}
+              <span
+                className={cn(
+                  "grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold tabular-nums",
+                  view === key
+                    ? "bg-white/25"
+                    : key === "new" && n > 0
+                      ? "bg-danger text-white"
+                      : "bg-surface-2",
+                )}
+              >
+                {n}
+              </span>
+            </Link>
+          );
+        })}
       </nav>
       {shown.length === 0 ? (
         <Card className="px-6 py-14 text-center">

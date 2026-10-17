@@ -67,6 +67,7 @@ export async function signupAction(_prev: AuthFormState, formData: FormData): Pr
     email: String(formData.get("email") ?? ""),
     password: String(formData.get("password") ?? ""),
     restaurantName: String(formData.get("restaurantName") ?? ""),
+    kind: String(formData.get("kind") ?? "restaurant"),
   };
   const { password: _pw, ...safeValues } = raw;
   const parsed = signupSchema.safeParse(raw);

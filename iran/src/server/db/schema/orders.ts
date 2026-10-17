@@ -91,6 +91,9 @@ export const orders = pgTable(
     pricesIncludeTax: boolean().notNull().default(true),
     note: text(),
     customerEmail: varchar({ length: 320 }),
+    /** Mobile number given at checkout (food courts text it when the order is ready). */
+    customerPhone: varchar({ length: 20 }),
+    readySmsSentAt: tstz(),
     placedAt: tstz().notNull().defaultNow(),
     acceptedAt: tstz(),
     preparingAt: tstz(),

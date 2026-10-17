@@ -14,7 +14,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { pk, softDelete, timestamps } from "./_helpers";
-import { memberRole, memberStatus, restaurantStatus } from "./enums";
+import { memberRole, memberStatus, restaurantKind, restaurantStatus } from "./enums";
 import { organizations, users } from "./platform";
 
 /** The tenant. Every tenant-scoped row carries `restaurant_id`. */
@@ -27,6 +27,7 @@ export const restaurants = pgTable(
       .references(() => organizations.id),
     slug: varchar({ length: 64 }).notNull(),
     name: varchar({ length: 160 }).notNull(),
+    kind: restaurantKind().notNull().default("restaurant"),
     logoKey: text(),
     email: varchar({ length: 320 }),
     phone: varchar({ length: 32 }),

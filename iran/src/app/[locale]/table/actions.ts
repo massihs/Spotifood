@@ -75,10 +75,10 @@ export async function renameAction(_prev: unknown, fd: FormData) {
 }
 
 /** Sends the cart to the kitchen. Prices are recomputed server-side inside placeOrder. */
-export async function placeOrderAction(note: string) {
+export async function placeOrderAction(note: string, phone = "") {
   return runAction(async () => {
     const g = await guest();
-    const order = await placeOrder(db, g, { note });
+    const order = await placeOrder(db, g, { note, phone });
     return { number: order.number };
   });
 }

@@ -1,12 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
-import { Bell, BellOff, Maximize2 } from "lucide-react";
+import { Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { LiveIndicator, LiveRefresh, useLiveEvent } from "@/components/realtime/live";
-import { Toast } from "@/components/ui/toast";
+import { LiveIndicator, LiveRefresh } from "@/components/realtime/live";
 import { OrderCard, type OrderCardData } from "./order-card";
 
 const COLUMNS = ["received", "accepted", "preparing", "ready", "served"] as const;
@@ -18,22 +16,6 @@ const DOT: Record<(typeof COLUMNS)[number], string> = {
   ready: "bg-success",
   served: "bg-fg-subtle",
 };
-
-/** Two short tones; browsers only allow audio after a user gesture, hence the toggle. */
-function chime(ctx: AudioContext) {
-  const now = ctx.currentTime;
-  [880, 1320].forEach((freq, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.0001, now + i * 0.18);
-    gain.gain.exponentialRampToValueAtTime(0.25, now + i * 0.18 + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.18 + 0.16);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(now + i * 0.18);
-    osc.stop(now + i * 0.18 + 0.17);
-  });
-}
 
 export function KitchenBoard({
   restaurantId,
@@ -49,17 +31,6 @@ export function KitchenBoard({
   canCancel: boolean;
 }) {
   const t = useTranslations("kitchen");
-  const audio = useRef<AudioContext | null>(null);
-  const [sound, setSound] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-
-  useLiveEvent((type, data) => {
-    if (type !== "order.created") return;
-    setToast(t("newOrder", { number: String(data.number ?? "") }));
-    if (sound && audio.current) chime(audio.current);
-  });
-
-  useEffect(() => () => void audio.current?.close(), []);
 
   const byStatus = (s: (typeof COLUMNS)[number]) =>
     orders.filter((o) =>
@@ -75,24 +46,6 @@ export function KitchenBoard({
           <LiveIndicator />
         </div>
         <div className="flex gap-2">
-          <Button
-            variant={sound ? "primary" : "secondary"}
-            size="sm"
-            aria-pressed={sound}
-            onClick={() => {
-              if (!audio.current) audio.current = new AudioContext();
-              void audio.current.resume();
-              if (!sound) chime(audio.current);
-              setSound(!sound);
-            }}
-          >
-            {sound ? (
-              <Bell className="size-4" aria-hidden="true" />
-            ) : (
-              <BellOff className="size-4" aria-hidden="true" />
-            )}
-            {sound ? t("soundOn") : t("soundOff")}
-          </Button>
           <Button
             variant="secondary"
             size="sm"
@@ -153,7 +106,6 @@ export function KitchenBoard({
           );
         })}
       </div>
-      <Toast message={toast} onDone={() => setToast(null)} duration={4000} />
     </div>
   );
 }
