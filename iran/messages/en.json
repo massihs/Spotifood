@@ -785,7 +785,17 @@
     "visible": "Visible",
     "orderSaved": "Order saved.",
     "optionsLink": "Options & extras",
-    "selectCategory": "Select a category"
+    "selectCategory": "Select a category",
+    "icons": {
+      "label": "Category icon",
+      "groups": {
+        "dishes": "Dishes",
+        "sweets": "Sweets",
+        "produce": "Produce",
+        "drinks": "Drinks",
+        "other": "Other"
+      }
+    }
   },
   "product": {
     "new": "New product",

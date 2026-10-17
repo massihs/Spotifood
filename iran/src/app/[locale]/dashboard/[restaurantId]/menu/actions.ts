@@ -57,6 +57,7 @@ function menuChanged(ctx: RestaurantContext) {
 const categoryFields = (fd: FormData) => ({
   name: str(fd, "name"),
   description: str(fd, "description"),
+  icon: str(fd, "icon"),
   isActive: fd.get("isActive") === "on",
 });
 

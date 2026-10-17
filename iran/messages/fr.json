@@ -627,7 +627,17 @@
     "visible": "Visible",
     "orderSaved": "Ordre enregistré.",
     "optionsLink": "Options & suppléments",
-    "selectCategory": "Sélectionnez une catégorie"
+    "selectCategory": "Sélectionnez une catégorie",
+    "icons": {
+      "label": "Icône de la catégorie",
+      "groups": {
+        "dishes": "Plats",
+        "sweets": "Desserts",
+        "produce": "Fruits & légumes",
+        "drinks": "Boissons",
+        "other": "Autres"
+      }
+    }
   },
   "product": {
     "new": "Nouveau produit",

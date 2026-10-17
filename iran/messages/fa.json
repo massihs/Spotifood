@@ -785,7 +785,17 @@
     "visible": "قابل مشاهده",
     "orderSaved": "ترتیب ذخیره شد.",
     "optionsLink": "گزینه‌ها و افزودنی‌ها",
-    "selectCategory": "یک دسته انتخاب کنید"
+    "selectCategory": "یک دسته انتخاب کنید",
+    "icons": {
+      "label": "آیکون دسته",
+      "groups": {
+        "dishes": "غذاها",
+        "sweets": "دسر و شیرینی",
+        "produce": "میوه و سبزی",
+        "drinks": "نوشیدنی‌ها",
+        "other": "سایر"
+      }
+    }
   },
   "product": {
     "new": "محصول جدید",

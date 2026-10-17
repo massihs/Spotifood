@@ -22,6 +22,9 @@ import {
   useFieldError,
 } from "@/components/ui/form";
 import { SortableList } from "@/components/ui/sortable-list";
+import { CategoryIcon } from "@/components/category-icon";
+import { IconPicker } from "@/components/dashboard/icon-picker";
+import { resolveCategoryIcon } from "@/lib/category-icons";
 import { Toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import {
@@ -38,6 +41,7 @@ export type CategoryRow = {
   id: string;
   name: string;
   description: string | null;
+  icon: string | null;
   isActive: boolean;
   templateKey: string | null;
   productCount: number;
@@ -94,6 +98,7 @@ function CategoryForm({
           error={err("name")}
           autoFocus
         />
+        <IconPicker name="icon" defaultValue={resolveCategoryIcon(category?.icon, category?.templateKey)} />
         <TextareaField
           label={t("menu.categoryDescription")}
           name="description"
@@ -228,14 +233,15 @@ export function MenuBoard({
               scroll={false}
               aria-current={selected?.id === c.id ? "true" : undefined}
               className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap",
+                "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium whitespace-nowrap",
                 selected?.id === c.id
                   ? "bg-accent text-accent-fg"
                   : "bg-surface text-fg-muted shadow-[var(--shadow-soft)]",
               )}
             >
+              <CategoryIcon icon={c.icon} templateKey={c.templateKey} className="size-4" />
               {c.name}
-              <span className="ms-1.5 text-xs tabular-nums opacity-60">{c.productCount}</span>
+              <span className="text-xs tabular-nums opacity-60">{c.productCount}</span>
             </Link>
           ))}
         </nav>
@@ -263,6 +269,7 @@ export function MenuBoard({
                 />
               </Dialog>
               <Dialog
+                size="lg"
                 title={t("menu.addCategory")}
                 trigger={(open) => (
                   <Button size="sm" onClick={open} aria-label={t("menu.addCategory")} className="px-2.5">
@@ -304,8 +311,16 @@ export function MenuBoard({
                   className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2 py-2.5"
                   scroll={false}
                 >
-                  <span className={cn("truncate text-sm font-bold", !c.isActive && "opacity-50")}>
-                    {c.name}
+                  <span
+                    className={cn(
+                      "flex min-w-0 items-center gap-2.5 text-sm font-medium",
+                      !c.isActive && "opacity-50",
+                    )}
+                  >
+                    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-surface text-accent-text ring-1 ring-border">
+                      <CategoryIcon icon={c.icon} templateKey={c.templateKey} className="size-4" />
+                    </span>
+                    <span className="truncate">{c.name}</span>
                   </span>
                   <span className="flex shrink-0 items-center gap-1.5">
                     {!c.isActive ? <Badge>{t("menu.hidden")}</Badge> : null}
@@ -316,6 +331,7 @@ export function MenuBoard({
                 </Link>
                 {canManage ? (
                   <Dialog
+                    size="lg"
                     title={t("menu.editCategory")}
                     trigger={(open) => (
                       <button

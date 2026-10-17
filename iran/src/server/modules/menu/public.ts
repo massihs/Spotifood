@@ -1,3 +1,4 @@
+import { resolveCategoryIcon } from "@/lib/category-icons";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import type { DbOrTx } from "@/server/db/client";
 import {
@@ -27,7 +28,14 @@ export type PublicProduct = PricedProduct & {
 };
 
 export type PublicMenu = {
-  categories: { id: string; name: string; description: string | null; productIds: string[] }[];
+  categories: {
+    id: string;
+    name: string;
+    description: string | null;
+    /** Resolved library icon key (chosen icon, else the template's, else a plate). */
+    icon: string;
+    productIds: string[];
+  }[];
   products: Record<string, PublicProduct>;
 };
 
@@ -37,7 +45,13 @@ export type PublicMenu = {
  */
 export async function loadPublicMenu(db: DbOrTx, restaurantId: string): Promise<PublicMenu> {
   const cats = await db
-    .select({ id: categories.id, name: categories.name, description: categories.description })
+    .select({
+      id: categories.id,
+      name: categories.name,
+      description: categories.description,
+      icon: categories.icon,
+      templateKey: categories.templateKey,
+    })
     .from(categories)
     .where(
       and(
@@ -58,7 +72,11 @@ export async function loadPublicMenu(db: DbOrTx, restaurantId: string): Promise<
   }
   return {
     categories: cats
-      .map((c) => ({ ...c, productIds: byCategory.get(c.id) ?? [] }))
+      .map(({ templateKey, icon, ...c }) => ({
+        ...c,
+        icon: resolveCategoryIcon(icon, templateKey),
+        productIds: byCategory.get(c.id) ?? [],
+      }))
       .filter((c) => c.productIds.length > 0),
     products: Object.fromEntries(items.map((p) => [p.id, p])),
   };

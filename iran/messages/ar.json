@@ -785,7 +785,17 @@
     "visible": "ظاهر",
     "orderSaved": "تم حفظ الترتيب.",
     "optionsLink": "الخيارات والإضافات",
-    "selectCategory": "اختر فئة"
+    "selectCategory": "اختر فئة",
+    "icons": {
+      "label": "أيقونة الفئة",
+      "groups": {
+        "dishes": "الأطباق",
+        "sweets": "الحلويات",
+        "produce": "فواكه وخضار",
+        "drinks": "المشروبات",
+        "other": "أخرى"
+      }
+    }
   },
   "product": {
     "new": "منتج جديد",

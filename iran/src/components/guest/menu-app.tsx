@@ -8,6 +8,7 @@ import { Toast } from "@/components/ui/toast";
 import { useMoney } from "@/components/ui/use-money";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
+import { CategoryIcon } from "@/components/category-icon";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
 import { AddButton, canQuickAdd, initialSelection, Price, ProductImage, type CartSummary } from "./parts";
 import { ProductSheet } from "./product-sheet";
@@ -67,7 +68,7 @@ export function MenuApp({
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
         if (visible[0]) setActive(visible[0].target.getAttribute("data-category"));
       },
-      { rootMargin: "-130px 0px -65% 0px" },
+      { rootMargin: "-190px 0px -60% 0px" },
     );
     document.querySelectorAll("[data-category]").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
@@ -129,7 +130,7 @@ export function MenuApp({
           </div>
           {!q ? (
             <nav aria-label={t("guest.categoriesNav")} className="mt-2 border-b border-border">
-              <div ref={tabsRef} className="no-scrollbar flex gap-1 overflow-x-auto px-2">
+              <div ref={tabsRef} className="no-scrollbar flex gap-1 overflow-x-auto px-3 pt-1">
                 {menu.categories.map((c) => (
                   <a
                     key={c.id}
@@ -138,14 +139,21 @@ export function MenuApp({
                     aria-current={active === c.id ? "true" : undefined}
                     onClick={() => setActive(c.id)}
                     className={cn(
-                      "relative shrink-0 px-3 py-3 text-[15px] font-semibold whitespace-nowrap transition-colors",
-                      "after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:rounded-full after:transition-colors",
-                      active === c.id
-                        ? "text-fg after:bg-accent"
-                        : "text-fg-muted after:bg-transparent hover:text-fg",
+                      "group flex w-[4.75rem] shrink-0 flex-col items-center gap-1.5 pt-1 pb-2.5 text-center transition-colors",
+                      active === c.id ? "text-fg" : "text-fg-muted hover:text-fg",
                     )}
                   >
-                    {c.name}
+                    <span
+                      className={cn(
+                        "grid size-14 place-items-center rounded-2xl transition-all",
+                        active === c.id
+                          ? "bg-accent text-accent-fg shadow-[0_6px_16px_-6px_hsl(150_70%_30%/0.55)]"
+                          : "bg-surface text-accent-text ring-1 ring-border group-hover:ring-border-strong",
+                      )}
+                    >
+                      <CategoryIcon icon={c.icon} className="size-6" />
+                    </span>
+                    <span className="line-clamp-1 w-full text-xs font-medium">{c.name}</span>
                   </a>
                 ))}
               </div>
@@ -209,10 +217,16 @@ export function MenuApp({
                 key={c.id}
                 id={`c-${c.id}`}
                 data-category={c.id}
-                className="scroll-mt-32 pt-7"
+                className="scroll-mt-48 pt-7"
                 aria-labelledby={`h-${c.id}`}
               >
-                <h2 id={`h-${c.id}`} className="px-4 text-xl font-semibold tracking-tight">
+                <h2
+                  id={`h-${c.id}`}
+                  className="flex items-center gap-2.5 px-4 text-xl font-semibold tracking-tight"
+                >
+                  <span className="grid size-9 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                    <CategoryIcon icon={c.icon} className="size-5" />
+                  </span>
                   {c.name}
                 </h2>
                 {c.description ? <p className="mt-0.5 px-4 text-sm text-fg-muted">{c.description}</p> : null}

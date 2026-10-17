@@ -1,3 +1,4 @@
+import { isCategoryIcon } from "@/lib/category-icons";
 import { MAX_AMOUNT_CENTS } from "@/lib/money";
 import { z } from "zod";
 
@@ -47,7 +48,14 @@ const optionalInt = (max: number) => z.number().int().min(0).max(max).nullable()
 export const categorySchema = z.object({
   name: z.string().trim().min(1).max(80),
   description: text(500),
-  icon: text(32),
+  /** One of the 80 library icons; empty → none (the template icon or a plate is shown). */
+  icon: z
+    .string()
+    .trim()
+    .refine((v) => v === "" || isCategoryIcon(v), "invalid_icon")
+    .transform((v) => (v === "" ? null : v))
+    .nullable()
+    .optional(),
   templateKey: text(48),
   isActive: z.boolean().default(true),
 });
