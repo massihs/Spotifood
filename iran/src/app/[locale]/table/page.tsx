@@ -27,6 +27,10 @@ async function GuestMenu() {
     getCartView(db, guest),
     listGuestOrders(db, guest),
   ]);
+  // Cover: the first featured dish with a photo, else any dish with a photo.
+  const dishes = Object.values(menu.products);
+  const cover =
+    (dishes.find((p) => p.isFeatured && p.images[0]) ?? dishes.find((p) => p.images[0]))?.images[0] ?? null;
   return (
     <LiveProvider url="/api/v1/realtime/guest">
       <LiveRefresh types={["session.closed"]} />
@@ -34,7 +38,7 @@ async function GuestMenu() {
         menu={menu}
         currency={guest.restaurant.currency}
         initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents }}
-        header={<GuestHeader guest={guest} orderCount={orders.length} />}
+        header={<GuestHeader guest={guest} orderCount={orders.length} cover={cover} />}
       />
     </LiveProvider>
   );

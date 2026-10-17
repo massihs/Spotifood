@@ -70,7 +70,7 @@ export function Price({
   const pct = discountPct(p);
   return (
     <span className={cn("flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px]", className)}>
-      <span className="font-bold tabular-nums">{money(p.priceCents)}</span>
+      <span className="font-bold text-fg tabular-nums">{money(p.priceCents)}</span>
       {pct ? (
         <>
           <s className="text-sm text-fg-subtle tabular-nums">{money(p.compareAtPriceCents!)}</s>
@@ -111,7 +111,7 @@ export function AddButton({
         onClick();
       }}
       className={cn(
-        "grid size-9 place-items-center rounded-full bg-surface text-fg shadow-[var(--shadow-float)] ring-1 ring-black/5",
+        "grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-fg shadow-[0_6px_14px_-6px_hsl(150_70%_25%/0.7)] ring-[3px] ring-surface",
         "transition-transform active:scale-90 disabled:opacity-60",
         className,
       )}

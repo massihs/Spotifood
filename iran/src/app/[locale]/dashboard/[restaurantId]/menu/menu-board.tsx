@@ -431,18 +431,6 @@ function ProductItem({
   return (
     <div className="flex items-center gap-2 bg-surface px-1 py-3 sm:gap-3">
       {handle}
-      <div
-        className={cn(
-          "grid size-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-surface-2 text-fg-subtle",
-          !p.isAvailable && "grayscale",
-        )}
-      >
-        {p.image ? (
-          <img src={p.image.sm} alt="" loading="lazy" className="size-full object-cover" />
-        ) : (
-          <ImageIcon className="size-5" aria-hidden="true" />
-        )}
-      </div>
       <div className="min-w-0 flex-1">
         <Link
           href={`/dashboard/${restaurantId}/menu/products/${p.id}`}
@@ -451,7 +439,7 @@ function ProductItem({
           {p.name}
         </Link>
         <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm">
-          <span className="font-semibold tabular-nums">{price(p.priceCents)}</span>
+          <span className="font-bold text-accent-text tabular-nums">{price(p.priceCents)}</span>
           {p.compareAtPriceCents ? (
             <span className="text-fg-subtle tabular-nums line-through">{price(p.compareAtPriceCents)}</span>
           ) : null}
@@ -482,6 +470,18 @@ function ProductItem({
             onError={onError}
           />
         ) : null}
+      </div>
+      <div
+        className={cn(
+          "grid size-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-surface-2 text-fg-subtle sm:size-[4.5rem]",
+          !p.isAvailable && "grayscale",
+        )}
+      >
+        {p.image ? (
+          <img src={p.image.sm} alt="" loading="lazy" className="size-full object-cover" />
+        ) : (
+          <ImageIcon className="size-5" aria-hidden="true" />
+        )}
       </div>
     </div>
   );
