@@ -19,7 +19,7 @@ export function IconPicker({ name, defaultValue }: { name: string; defaultValue:
   const Current = CATEGORY_ICON_COMPONENTS[value];
 
   return (
-    <fieldset className="space-y-3">
+    <fieldset className="min-w-0 space-y-3">
       <legend className="mb-2 flex items-center gap-2 text-sm font-medium">
         <span className="grid size-8 place-items-center rounded-lg bg-accent text-accent-fg">
           <Current className="size-[18px]" aria-hidden="true" />
