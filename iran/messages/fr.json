@@ -113,7 +113,8 @@
       "catalog": "Menu & stock",
       "business": "Ventes & clients",
       "manage": "Gestion"
-    }
+    },
+    "delivery": "Livraison"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -290,7 +291,13 @@
     "duplicate_coupon": "Ce code existe déjà.",
     "no_recipients": "Personne dans ce groupe.",
     "owner_only": "Seul le propriétaire peut créer une succursale.",
-    "other_organization": "Cet établissement n'appartient pas à votre organisation."
+    "other_organization": "Cet établissement n'appartient pas à votre organisation.",
+    "address_required": "Saisissez l’adresse de livraison.",
+    "below_zone_minimum": "Commande inférieure au minimum de la zone.",
+    "nothing_to_settle": "Rien à régler.",
+    "not_dispatched": "Commande pas encore partie.",
+    "already_delivered": "Déjà livrée.",
+    "order_cancelled": "Commande annulée."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1218,7 +1225,8 @@
     "all": "Tout",
     "channels": {
       "takeaway": "À emporter",
-      "dine_in": "À table"
+      "dine_in": "À table",
+      "delivery": "Livraison"
     },
     "table": "Table",
     "noTable": "Sans table (comptoir)",
@@ -1277,7 +1285,11 @@
     "removeCoupon": "Retirer le code",
     "couponMin": "min. {amount}",
     "couponLine": "Code {code}",
-    "pointsLine": "{points} points"
+    "pointsLine": "{points} points",
+    "deliveryAddress": "Adresse de livraison complète…",
+    "zone": "Zone de livraison",
+    "deliveryNeedsPhone": "Saisissez le téléphone du client pour une livraison.",
+    "deliveryFee": "Frais de livraison"
   },
   "inventory": {
     "title": "Stocks",
@@ -1566,5 +1578,57 @@
     "fuchsia": "Fuchsia",
     "plum": "Prune",
     "slate": "Ardoise"
+  },
+  "delivery": {
+    "title": "Livraison",
+    "subtitle": "Commandes livrées et coursiers : départ, livraison, règlement des coursiers.",
+    "tabs": {
+      "board": "Dispatch",
+      "settlement": "Règlement coursiers",
+      "settings": "Zones & coursiers"
+    },
+    "cols": {
+      "toAssign": "À expédier",
+      "onTheRoad": "En route",
+      "delivered": "Livrées"
+    },
+    "empty": "Aucune commande",
+    "customer": "Client",
+    "paid": "Payée",
+    "collect": "À encaisser",
+    "minutes": "{count} min",
+    "courier": "Coursier",
+    "dispatch": "Expédier",
+    "delivered": "Livrée",
+    "settled": "Réglée",
+    "noCouriers": "Aucun coursier — ajoutez-en dans « Zones & coursiers ».",
+    "settlement": "Règlement des coursiers",
+    "toSettle": "{count} commandes à régler",
+    "onRoadN": "{count} en route",
+    "cashToCollect": "Espèces détenues",
+    "settle": "Régler",
+    "settledDone": "{name} réglé : {amount} ajoutés à la caisse.",
+    "stats7d": "Performance coursiers (7 jours)",
+    "deliveries": "Livraisons",
+    "avgTrip": "Aller-retour moyen",
+    "amount": "Montant",
+    "zones": "Zones de livraison",
+    "newZone": "Nouvelle zone",
+    "editZone": "Modifier la zone",
+    "eta": "environ {count} min",
+    "minOrder": "min. {amount}",
+    "noZones": "Aucune zone (livraison gratuite).",
+    "couriers": "Coursiers",
+    "courierName": "Nom du coursier",
+    "addCourier": "Ajouter",
+    "active": "Actif",
+    "deleteCourier": "Supprimer ce coursier ?",
+    "zoneName": "Nom de la zone",
+    "zoneNamePh": "ex. Zone 1 (jusqu’à 3 km)",
+    "fee": "Frais de livraison",
+    "minOrderLabel": "Commande min.",
+    "etaLabel": "Délai (min)",
+    "deleteZone": "Supprimer cette zone ?",
+    "save": "Enregistrer"
   }
 }

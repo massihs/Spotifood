@@ -99,6 +99,15 @@ export const orders = pgTable(
     couponId: uuid(),
     /** Loyalty points spent on this order (part of discountCents). */
     pointsRedeemed: integer().notNull().default(0),
+    /** Delivery (channel "delivery"): snapshot address, zone, fee (part of totalCents), courier. */
+    deliveryAddress: text(),
+    deliveryZoneId: uuid(),
+    deliveryFeeCents: money().notNull().default(0),
+    courierId: uuid(),
+    dispatchedAt: tstz(),
+    deliveredAt: tstz(),
+    /** The courier handed the collected money to the till. */
+    courierSettledAt: tstz(),
     /** Staff member who rang it up at the till (null = ordered by the guest). */
     createdByUserId: uuid().references(() => users.id, { onDelete: "set null" }),
     placedAt: tstz().notNull().defaultNow(),

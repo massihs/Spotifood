@@ -17,6 +17,7 @@ import { isUuid } from "@/lib/ids";
 import { MAX_AMOUNT_CENTS } from "@/lib/money";
 import { asciiDigits, normalizeIranMobile } from "@/lib/phone";
 import { couponDiscount } from "@/lib/coupon";
+import { listAddresses } from "@/server/modules/delivery/service";
 
 const cents = z.coerce.number().int().min(0).max(MAX_AMOUNT_CENTS);
 const DAY = 86_400_000;
@@ -349,7 +350,7 @@ export async function lookupCustomer(db: DbOrTx, ctx: RestaurantContext, phone: 
   assertCan(ctx, "orders.create");
   const n = normalizeIranMobile(phone);
   const cfg = await loyaltyConfig(db, ctx.restaurant.id);
-  if (!n) return { customer: null, ...cfg };
+  if (!n) return { customer: null, addresses: [], ...cfg };
   const [c] = await db
     .select({
       id: customers.id,
@@ -359,7 +360,8 @@ export async function lookupCustomer(db: DbOrTx, ctx: RestaurantContext, phone: 
     })
     .from(customers)
     .where(and(eq(customers.restaurantId, ctx.restaurant.id), eq(customers.phone, n)));
-  return { customer: c ?? null, ...cfg };
+  const addresses = c ? await listAddresses(db, ctx.restaurant.id, c.id) : [];
+  return { customer: c ?? null, addresses, ...cfg };
 }
 
 export const customerSchema = z.object({

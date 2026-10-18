@@ -8,6 +8,7 @@ import { getPublicMenu } from "@/server/modules/menu/public-cache";
 import { paymentConfig } from "@/server/modules/payments/service";
 import { getOpenShift, shiftSummary } from "@/server/modules/pos/service";
 import { listTables } from "@/server/modules/tables/service";
+import { listZones } from "@/server/modules/delivery/service";
 import { can } from "@/server/tenancy";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/pos">["params"];
@@ -23,12 +24,13 @@ export default function PosPage({ params }: { params: Params }) {
 async function Pos({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "orders.create");
-  const [menu, tables, config, shift, format] = await Promise.all([
+  const [menu, tables, config, shift, format, zones] = await Promise.all([
     getPublicMenu(ctx.restaurant.id),
     listTables(db, ctx),
     paymentConfig(db, ctx.restaurant.id),
     getOpenShift(db, ctx),
     getFormatter(),
+    listZones(db, ctx),
   ]);
   const summary = shift ? await shiftSummary(db, shift) : null;
   return (
@@ -68,6 +70,9 @@ async function Pos({ params }: { params: Params }) {
           .map((tb) => ({ id: tb.id, label: tb.label }))}
         methods={config.offline}
         canPay={can(ctx, "payments.record")}
+        zones={zones
+          .filter((z) => z.isActive)
+          .map((z) => ({ id: z.id, name: z.name, feeCents: z.feeCents, minOrderCents: z.minOrderCents }))}
       />
     </>
   );

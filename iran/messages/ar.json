@@ -229,7 +229,8 @@
       "catalog": "القائمة والمخزون",
       "business": "المبيعات والعملاء",
       "manage": "الإدارة"
-    }
+    },
+    "delivery": "التوصيل"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -422,7 +423,13 @@
     "duplicate_coupon": "هذا الكود موجود مسبقاً.",
     "no_recipients": "لا أحد في هذه المجموعة.",
     "owner_only": "المالك فقط يمكنه إنشاء فرع.",
-    "other_organization": "هذا المطعم ليس ضمن مؤسستك."
+    "other_organization": "هذا المطعم ليس ضمن مؤسستك.",
+    "address_required": "أدخل عنوان التسليم.",
+    "below_zone_minimum": "الطلب أقل من الحد الأدنى للمنطقة.",
+    "nothing_to_settle": "لا شيء للتسوية.",
+    "not_dispatched": "لم يُرسل الطلب بعد.",
+    "already_delivered": "تم التسليم مسبقاً.",
+    "order_cancelled": "الطلب ملغى."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -1374,7 +1381,8 @@
     "all": "All",
     "channels": {
       "takeaway": "Takeaway",
-      "dine_in": "At a table"
+      "dine_in": "At a table",
+      "delivery": "توصيل"
     },
     "table": "Table",
     "noTable": "No table (counter)",
@@ -1433,7 +1441,11 @@
     "removeCoupon": "إزالة الكود",
     "couponMin": "حد أدنى {amount}",
     "couponLine": "الكود {code}",
-    "pointsLine": "{points} نقطة"
+    "pointsLine": "{points} نقطة",
+    "deliveryAddress": "عنوان التسليم الكامل…",
+    "zone": "منطقة التوصيل",
+    "deliveryNeedsPhone": "أدخل رقم العميل للتوصيل.",
+    "deliveryFee": "رسوم التوصيل"
   },
   "inventory": {
     "title": "المخزون",
@@ -1722,5 +1734,57 @@
     "fuchsia": "فوشيا",
     "plum": "برقوقي",
     "slate": "رمادي"
+  },
+  "delivery": {
+    "title": "التوصيل",
+    "subtitle": "طلبات التوصيل والمندوبون: الإرسال والتسليم وتسوية المندوب.",
+    "tabs": {
+      "board": "لوحة الإرسال",
+      "settlement": "تسوية المندوبين",
+      "settings": "المناطق والمندوبون"
+    },
+    "cols": {
+      "toAssign": "جاهز للإرسال",
+      "onTheRoad": "في الطريق",
+      "delivered": "تم التسليم"
+    },
+    "empty": "لا طلبات",
+    "customer": "عميل",
+    "paid": "مدفوع",
+    "collect": "الدفع عند الاستلام",
+    "minutes": "{count} دقيقة",
+    "courier": "المندوب",
+    "dispatch": "إرسال",
+    "delivered": "تم التسليم",
+    "settled": "تمت التسوية",
+    "noCouriers": "لا يوجد مندوبون بعد.",
+    "settlement": "تسوية المندوبين",
+    "toSettle": "{count} طلبات غير مسوّاة",
+    "onRoadN": "{count} في الطريق",
+    "cashToCollect": "النقد لدى المندوب",
+    "settle": "تسوية",
+    "settledDone": "تمت تسوية {name}: أضيف {amount} إلى الصندوق.",
+    "stats7d": "أداء المندوبين (7 أيام)",
+    "deliveries": "التوصيلات",
+    "avgTrip": "متوسط الذهاب والعودة",
+    "amount": "المبلغ",
+    "zones": "مناطق التوصيل",
+    "newZone": "منطقة جديدة",
+    "editZone": "تعديل المنطقة",
+    "eta": "حوالي {count} دقيقة",
+    "minOrder": "حد أدنى {amount}",
+    "noZones": "لا مناطق (توصيل مجاني).",
+    "couriers": "المندوبون",
+    "courierName": "اسم المندوب",
+    "addCourier": "إضافة مندوب",
+    "active": "نشط",
+    "deleteCourier": "حذف هذا المندوب؟",
+    "zoneName": "اسم المنطقة",
+    "zoneNamePh": "مثلاً المنطقة 1",
+    "fee": "رسوم التوصيل",
+    "minOrderLabel": "الحد الأدنى",
+    "etaLabel": "المدة (دقيقة)",
+    "deleteZone": "حذف هذه المنطقة؟",
+    "save": "حفظ"
   }
 }

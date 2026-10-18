@@ -26,12 +26,17 @@ import { computeTotals, priceLine, type PricedLine } from "@/server/modules/pric
 import { nextCounterValue } from "@/server/modules/restaurants/service";
 import { applyOrderToStock } from "@/server/modules/inventory/service";
 import { commitDiscounts, computeDiscounts, linkOrderCustomer } from "@/server/modules/customers/service";
+import { getZone, rememberAddress } from "@/server/modules/delivery/service";
 import { emitPaymentUpdate, paymentConfig, settleAllocations } from "@/server/modules/payments/service";
 
 const amount = z.coerce.number().int().min(0).max(MAX_AMOUNT_CENTS);
 
 export const posOrderSchema = z.object({
-  channel: z.enum(["dine_in", "takeaway"]).default("takeaway"),
+  channel: z.enum(["dine_in", "takeaway", "delivery"]).default("takeaway"),
+  /** Delivery: address text (snapshot), zone (fee), and whether to remember the address. */
+  deliveryAddress: z.string().trim().max(500).default(""),
+  deliveryZoneId: z.uuid().nullable().optional(),
+  saveAddress: z.boolean().default(true),
   tableId: z.uuid().nullable().optional(),
   lines: z
     .array(
@@ -84,6 +89,12 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
   if (input.payment) {
     const config = await paymentConfig(db, rid);
     if (!config.offline.includes(input.payment.provider)) throw forbidden("payment_method_disabled");
+  }
+
+  if (input.channel === "delivery") {
+    if (!input.customerPhone) throw new AppError("VALIDATION", "phone_required", { field: "phone" });
+    if (input.deliveryAddress.length < 5)
+      throw new AppError("VALIDATION", "address_required", { field: "address" });
   }
 
   return db.transaction(async (tx) => {
@@ -156,9 +167,18 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       customer: known ?? null,
     });
     const discountCents = manualCents + extra.discountCents;
-    const totalCents = totals.totalCents - discountCents;
+    const zone =
+      input.channel === "delivery" && input.deliveryZoneId
+        ? await getZone(tx, rid, input.deliveryZoneId)
+        : null;
+    if (zone && totals.totalCents - discountCents < zone.minOrderCents)
+      throw new AppError("VALIDATION", "below_zone_minimum", { amountCents: zone.minOrderCents });
+    const deliveryFeeCents = zone?.feeCents ?? 0;
+    const totalCents = totals.totalCents - discountCents + deliveryFeeCents;
     const taxCents =
-      totals.totalCents > 0 ? Math.round(totals.taxCents * (totalCents / totals.totalCents)) : 0;
+      totals.totalCents > 0
+        ? Math.round(totals.taxCents * ((totalCents - deliveryFeeCents) / totals.totalCents))
+        : 0;
     const seq = await nextCounterValue(tx, rid, "order", 1001);
     const number = `${settings?.orderPrefix ?? "A"}-${seq}`;
     const now = new Date();
@@ -185,6 +205,9 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
         note: input.note || null,
         customerPhone: input.customerPhone,
         createdByUserId: ctx.user.id,
+        ...(input.channel === "delivery"
+          ? { deliveryAddress: input.deliveryAddress, deliveryZoneId: zone?.id ?? null, deliveryFeeCents }
+          : {}),
       })
       .returning();
 
@@ -219,6 +242,8 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
     const customer = input.customerPhone
       ? await linkOrderCustomer(tx, rid, order!.id, input.customerPhone, input.customerName)
       : null;
+    if (customer && input.channel === "delivery" && input.saveAddress)
+      await rememberAddress(tx, rid, customer.id, input.deliveryAddress, zone?.id ?? null);
     await commitDiscounts(
       tx,
       rid,

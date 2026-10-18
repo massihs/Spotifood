@@ -229,7 +229,8 @@
       "catalog": "Menu & stock",
       "business": "Sales & customers",
       "manage": "Management"
-    }
+    },
+    "delivery": "Delivery"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -422,7 +423,13 @@
     "duplicate_coupon": "This code already exists.",
     "no_recipients": "Nobody in this group.",
     "owner_only": "Only the owner can open a branch.",
-    "other_organization": "This restaurant is not in your organization."
+    "other_organization": "This restaurant is not in your organization.",
+    "address_required": "Enter the delivery address.",
+    "below_zone_minimum": "The order is below this zone’s minimum.",
+    "nothing_to_settle": "Nothing to settle.",
+    "not_dispatched": "This order has not left yet.",
+    "already_delivered": "Already delivered.",
+    "order_cancelled": "This order is cancelled."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1374,7 +1381,8 @@
     "all": "All",
     "channels": {
       "takeaway": "Takeaway",
-      "dine_in": "At a table"
+      "dine_in": "At a table",
+      "delivery": "Delivery"
     },
     "table": "Table",
     "noTable": "No table (counter)",
@@ -1433,7 +1441,11 @@
     "removeCoupon": "Remove code",
     "couponMin": "min. {amount}",
     "couponLine": "Code {code}",
-    "pointsLine": "{points} points"
+    "pointsLine": "{points} points",
+    "deliveryAddress": "Full delivery address…",
+    "zone": "Delivery zone",
+    "deliveryNeedsPhone": "Enter the customer phone for a delivery.",
+    "deliveryFee": "Delivery fee"
   },
   "inventory": {
     "title": "Stock",
@@ -1722,5 +1734,57 @@
     "fuchsia": "Fuchsia",
     "plum": "Plum",
     "slate": "Slate"
+  },
+  "delivery": {
+    "title": "Delivery",
+    "subtitle": "Delivery orders and couriers: dispatch, delivered, courier settlement.",
+    "tabs": {
+      "board": "Dispatch board",
+      "settlement": "Courier settlement",
+      "settings": "Zones & couriers"
+    },
+    "cols": {
+      "toAssign": "Ready to dispatch",
+      "onTheRoad": "On the road",
+      "delivered": "Delivered"
+    },
+    "empty": "No orders",
+    "customer": "Customer",
+    "paid": "Paid",
+    "collect": "Collect on delivery",
+    "minutes": "{count} min",
+    "courier": "Courier",
+    "dispatch": "Dispatch",
+    "delivered": "Delivered",
+    "settled": "Settled",
+    "noCouriers": "No couriers yet — add them in \"Zones & couriers\".",
+    "settlement": "Courier settlement",
+    "toSettle": "{count} unsettled orders",
+    "onRoadN": "{count} on the road",
+    "cashToCollect": "Cash held",
+    "settle": "Settle",
+    "settledDone": "{name} settled: {amount} added to the till.",
+    "stats7d": "Courier performance (7 days)",
+    "deliveries": "Deliveries",
+    "avgTrip": "Avg round trip",
+    "amount": "Amount",
+    "zones": "Delivery zones",
+    "newZone": "New zone",
+    "editZone": "Edit zone",
+    "eta": "about {count} min",
+    "minOrder": "min. {amount}",
+    "noZones": "No zones (free delivery).",
+    "couriers": "Couriers",
+    "courierName": "Courier name",
+    "addCourier": "Add courier",
+    "active": "Active",
+    "deleteCourier": "Delete this courier?",
+    "zoneName": "Zone name",
+    "zoneNamePh": "e.g. Zone 1 (up to 3 km)",
+    "fee": "Delivery fee",
+    "minOrderLabel": "Min. order",
+    "etaLabel": "ETA (min)",
+    "deleteZone": "Delete this zone?",
+    "save": "Save"
   }
 }

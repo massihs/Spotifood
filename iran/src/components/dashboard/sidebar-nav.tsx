@@ -34,6 +34,7 @@ const TONES: Record<string, string> = {
 };
 const BY_SEGMENT: Record<string, keyof typeof TONES> = {
   kitchen: "orange",
+  delivery: "sky",
   pos: "emerald",
   orders: "sky",
   floor: "teal",

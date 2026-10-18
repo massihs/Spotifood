@@ -5,6 +5,7 @@ import {
   Boxes,
   HeartHandshake,
   ChartColumn,
+  Bike,
   Network,
   Calculator,
   ChefHat,
@@ -31,6 +32,7 @@ import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { OrderAlerts } from "@/components/dashboard/order-alerts";
 import { countNewOrders } from "@/server/modules/orders/service";
 import { countLowStock } from "@/server/modules/inventory/service";
+import { countToDispatch } from "@/server/modules/delivery/service";
 
 export default function RestaurantLayout({
   children,
@@ -55,10 +57,11 @@ async function RestaurantShell({
   const t = await getTranslations();
   const base = `/dashboard/${ctx.restaurant.id}`;
 
-  const [{ unread }, newOrders, lowStock] = await Promise.all([
+  const [{ unread }, newOrders, lowStock, undeliveredCount] = await Promise.all([
     listNotifications(db, ctx, 1),
     countNewOrders(db, ctx),
     countLowStock(db, ctx),
+    countToDispatch(db, ctx),
   ]);
   const g = {
     ops: t("nav.groups.ops"),
@@ -96,6 +99,13 @@ async function RestaurantShell({
       primary: true,
       badge: newOrders,
       group: g.ops,
+    },
+    can(ctx, "orders.view") && {
+      href: `${base}/delivery`,
+      label: t("nav.delivery"),
+      icon: <Bike />,
+      group: g.ops,
+      badge: undeliveredCount,
     },
     can(ctx, "tables.view") && {
       href: `${base}/floor`,

@@ -229,7 +229,8 @@
       "catalog": "منو و انبار",
       "business": "فروش و مشتریان",
       "manage": "مدیریت"
-    }
+    },
+    "delivery": "ارسال و پیک"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -422,7 +423,13 @@
     "duplicate_coupon": "این کد قبلاً ساخته شده است.",
     "no_recipients": "مخاطبی در این گروه نیست.",
     "owner_only": "فقط مالک می‌تواند شعبه بسازد.",
-    "other_organization": "این رستوران متعلق به مجموعه شما نیست."
+    "other_organization": "این رستوران متعلق به مجموعه شما نیست.",
+    "address_required": "آدرس تحویل را وارد کنید.",
+    "below_zone_minimum": "مبلغ سفارش کمتر از حداقل این محدوده است.",
+    "nothing_to_settle": "سفارشی برای تسویه نیست.",
+    "not_dispatched": "این سفارش هنوز ارسال نشده است.",
+    "already_delivered": "این سفارش قبلاً تحویل شده است.",
+    "order_cancelled": "این سفارش لغو شده است."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -1374,7 +1381,8 @@
     "all": "همه",
     "channels": {
       "takeaway": "بیرون‌بر",
-      "dine_in": "سر میز"
+      "dine_in": "سر میز",
+      "delivery": "ارسال"
     },
     "table": "میز",
     "noTable": "بدون میز (پیشخوان)",
@@ -1433,7 +1441,11 @@
     "removeCoupon": "حذف کد",
     "couponMin": "حداقل {amount}",
     "couponLine": "کد {code}",
-    "pointsLine": "{points} امتیاز"
+    "pointsLine": "{points} امتیاز",
+    "deliveryAddress": "آدرس کامل تحویل…",
+    "zone": "محدوده ارسال",
+    "deliveryNeedsPhone": "برای ارسال، شماره مشتری را وارد کنید.",
+    "deliveryFee": "هزینه ارسال"
   },
   "inventory": {
     "title": "انبار",
@@ -1722,5 +1734,57 @@
     "fuchsia": "ارغوانی",
     "plum": "آلویی",
     "slate": "سنگی"
+  },
+  "delivery": {
+    "title": "ارسال و پیک",
+    "subtitle": "سفارش‌های بیرون‌بر با پیک: ارسال، رسیدن و تسویه با پیک.",
+    "tabs": {
+      "board": "تابلوی ارسال",
+      "settlement": "تسویه پیک",
+      "settings": "محدوده‌ها و پیک‌ها"
+    },
+    "cols": {
+      "toAssign": "آماده ارسال",
+      "onTheRoad": "در مسیر",
+      "delivered": "تحویل شد"
+    },
+    "empty": "سفارشی نیست",
+    "customer": "مشتری",
+    "paid": "پرداخت شده",
+    "collect": "دریافت در محل",
+    "minutes": "{count} دقیقه",
+    "courier": "پیک",
+    "dispatch": "ارسال",
+    "delivered": "تحویل شد",
+    "settled": "تسویه شد",
+    "noCouriers": "هنوز پیکی تعریف نشده؛ از تب «محدوده‌ها و پیک‌ها» اضافه کنید.",
+    "settlement": "تسویه با پیک‌ها",
+    "toSettle": "{count} سفارش تسویه‌نشده",
+    "onRoadN": "{count} در مسیر",
+    "cashToCollect": "وجه نقد نزد پیک",
+    "settle": "تسویه",
+    "settledDone": "تسویه {name}: {amount} به صندوق اضافه شد.",
+    "stats7d": "عملکرد پیک‌ها (۷ روز)",
+    "deliveries": "ارسال",
+    "avgTrip": "میانگین رفت‌وبرگشت",
+    "amount": "مبلغ",
+    "zones": "محدوده‌های ارسال",
+    "newZone": "محدوده جدید",
+    "editZone": "ویرایش محدوده",
+    "eta": "حدود {count} دقیقه",
+    "minOrder": "حداقل {amount}",
+    "noZones": "محدوده‌ای تعریف نشده (هزینه ارسال صفر).",
+    "couriers": "پیک‌ها",
+    "courierName": "نام پیک",
+    "addCourier": "افزودن پیک",
+    "active": "فعال",
+    "deleteCourier": "این پیک حذف شود؟",
+    "zoneName": "نام محدوده",
+    "zoneNamePh": "مثلاً منطقه ۱ (تا ۳ کیلومتر)",
+    "fee": "هزینه ارسال",
+    "minOrderLabel": "حداقل سفارش",
+    "etaLabel": "زمان (دقیقه)",
+    "deleteZone": "این محدوده حذف شود؟",
+    "save": "ذخیره"
   }
 }

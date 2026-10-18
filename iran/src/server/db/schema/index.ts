@@ -10,4 +10,5 @@ export * from "./cash";
 export * from "./inventory";
 export * from "./customers";
 export * from "./accounting";
+export * from "./delivery";
 export * from "./relations";

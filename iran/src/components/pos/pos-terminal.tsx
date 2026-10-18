@@ -12,6 +12,8 @@ import {
   Plus,
   Search,
   ShoppingBag,
+  Bike,
+  MapPin,
   Smartphone,
   Star,
   Ticket,
@@ -51,6 +53,7 @@ export function PosTerminal({
   tables,
   methods,
   canPay,
+  zones,
 }: {
   restaurantId: string;
   menu: PublicMenu;
@@ -58,6 +61,7 @@ export function PosTerminal({
   tables: { id: string; label: string }[];
   methods: ("cash" | "on_site_terminal")[];
   canPay: boolean;
+  zones: { id: string; name: string; feeCents: number; minOrderCents: number }[];
 }) {
   const t = useTranslations("pos");
   const tErr = useTranslations("errorCodes");
@@ -65,13 +69,16 @@ export function PosTerminal({
   const [category, setCategory] = useState<string | "all">("all");
   const [query, setQuery] = useState("");
   const [lines, setLines] = useState<Line[]>([]);
-  const [channel, setChannel] = useState<"takeaway" | "dine_in">("takeaway");
+  const [channel, setChannel] = useState<"takeaway" | "dine_in" | "delivery">("takeaway");
+  const [address, setAddress] = useState("");
+  const [zoneId, setZoneId] = useState(zones[0]?.id ?? "");
   const [tableId, setTableId] = useState<string>("");
   const [phone, setPhone] = useState("");
   const [discount, setDiscount] = useState(0);
   const [club, setClub] = useState<{
     phone: string;
     customer: { name: string | null; points: number } | null;
+    addresses: { id: string; label: string | null; address: string; zoneId: string | null }[];
     enabled: boolean;
     pointValueCents: number;
   } | null>(null);
@@ -114,7 +121,9 @@ export function PosTerminal({
   const pointsUsed = usePoints ? redeemable : 0;
   const pointsCents = pointsUsed * (member?.pointValueCents ?? 0);
   const discountCents = manualCents + couponCents + pointsCents;
-  const total = subtotal - discountCents;
+  const zone = channel === "delivery" ? zones.find((z) => z.id === zoneId) : undefined;
+  const feeCents = zone?.feeCents ?? 0;
+  const total = subtotal - discountCents + feeCents;
 
   const onPhone = (v: string) => {
     setPhone(v);
@@ -122,7 +131,14 @@ export function PosTerminal({
     const n = normalizeIranMobile(v);
     if (!n || n === club?.phone) return;
     void lookupCustomerAction(restaurantId, n).then((res) => {
-      if (res?.ok && res.data) setClub({ phone: n, ...res.data });
+      if (res?.ok && res.data) {
+        setClub({ phone: n, ...res.data });
+        const last = res.data.addresses[0];
+        if (last) {
+          setAddress((a) => a || last.address);
+          if (last.zoneId) setZoneId(last.zoneId);
+        }
+      }
     });
   };
   const applyCoupon = () =>
@@ -166,6 +182,8 @@ export function PosTerminal({
       const res = await createPosOrderAction(restaurantId, {
         channel,
         tableId: channel === "dine_in" && tableId ? tableId : null,
+        deliveryAddress: channel === "delivery" ? address : "",
+        deliveryZoneId: channel === "delivery" && zoneId ? zoneId : null,
         lines: lines.map((l) => ({
           productId: l.product.id,
           optionValueIds: l.optionValueIds,
@@ -188,6 +206,7 @@ export function PosTerminal({
         });
         setLines([]);
         setPhone("");
+        setAddress("");
         setNote("");
         setDiscount(0);
         setClub(null);
@@ -201,8 +220,8 @@ export function PosTerminal({
 
   const ticket = (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
-        {(["takeaway", "dine_in"] as const).map((c) => (
+      <div className="grid grid-cols-3 gap-1 rounded-xl bg-surface-2 p-1">
+        {(["takeaway", "dine_in", "delivery"] as const).map((c) => (
           <button
             key={c}
             type="button"
@@ -212,7 +231,13 @@ export function PosTerminal({
               channel === c ? "bg-surface text-fg shadow-sm" : "text-fg-muted",
             )}
           >
-            {c === "takeaway" ? <ShoppingBag className="size-4" /> : <UtensilsCrossed className="size-4" />}
+            {c === "takeaway" ? (
+              <ShoppingBag className="size-4" />
+            ) : c === "delivery" ? (
+              <Bike className="size-4" />
+            ) : (
+              <UtensilsCrossed className="size-4" />
+            )}
             {t(`channels.${c}`)}
           </button>
         ))}
@@ -231,6 +256,54 @@ export function PosTerminal({
             </option>
           ))}
         </select>
+      ) : null}
+      {channel === "delivery" ? (
+        <div className="mt-2 space-y-2 rounded-xl border border-tone-sky/30 bg-tone-sky/5 p-2">
+          {member?.addresses.length ? (
+            <div className="flex [scrollbar-width:none] gap-1.5 overflow-x-auto">
+              {member.addresses.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => {
+                    setAddress(a.address);
+                    if (a.zoneId) setZoneId(a.zoneId);
+                  }}
+                  className={cn(
+                    "inline-flex max-w-48 shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs",
+                    address === a.address ? "bg-tone-sky text-white" : "bg-surface ring-1 ring-border",
+                  )}
+                >
+                  <MapPin className="size-3 shrink-0" />
+                  <span className="truncate">{a.label ?? a.address}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <textarea
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            rows={2}
+            maxLength={500}
+            placeholder={t("deliveryAddress")}
+            className="w-full resize-none rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+          />
+          {zones.length ? (
+            <select
+              value={zoneId}
+              onChange={(e) => setZoneId(e.target.value)}
+              className="h-9 w-full rounded-lg border border-border bg-surface px-2 text-sm"
+              aria-label={t("zone")}
+            >
+              {zones.map((z) => (
+                <option key={z.id} value={z.id}>
+                  {z.name} · {money(z.feeCents)}
+                </option>
+              ))}
+            </select>
+          ) : null}
+          {!phone ? <p className="text-xs text-warning">{t("deliveryNeedsPhone")}</p> : null}
+        </div>
       ) : null}
 
       <ul className="mt-3 min-h-0 flex-1 divide-y divide-border overflow-y-auto">
@@ -434,6 +507,12 @@ export function PosTerminal({
                 </div>
               ) : null}
             </>
+          ) : null}
+          {feeCents ? (
+            <div className="flex justify-between text-tone-sky">
+              <dt>{t("deliveryFee")}</dt>
+              <dd className="tabular-nums">+{money(feeCents)}</dd>
+            </div>
           ) : null}
           <div className="flex justify-between text-lg font-bold">
             <dt>{t("total")}</dt>
