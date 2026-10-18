@@ -71,6 +71,20 @@
       "when": 1792325491742,
       "tag": "0009_accounting",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792359146505,
+      "tag": "0010_brand_color",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792359730083,
+      "tag": "0011_music_covers",
+      "breakpoints": true
     }
   ]
 }

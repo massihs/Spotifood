@@ -319,7 +319,7 @@ function BenefitCard({
 function PhoneMock({ table, featured, cart }: { table: string; featured: string; cart: string }) {
   return (
     <div aria-hidden="true" className="mx-auto w-full max-w-[19rem] lg:me-0">
-      <div className="rounded-[2.75rem] bg-[#1c1c1e] p-2 shadow-[0_30px_80px_-20px_hsl(150_30%_20%/0.35)]">
+      <div className="rounded-[2.75rem] bg-[#1c1c1e] p-2 shadow-[0_30px_80px_-20px_hsl(265_30%_20%/0.35)]">
         <div className="overflow-hidden rounded-[2.25rem] bg-white text-[#141414]" dir="rtl">
           <div className="bg-gradient-to-b from-[#e9f8ee] to-white px-4 pt-5 pb-8">
             <div className="flex items-center gap-3">

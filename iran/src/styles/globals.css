@@ -1,90 +1,158 @@
 @import "tailwindcss";
+@import "./brands.css";
 
 /*
- * Spotifood design tokens: "fresh".
- * Airy off-white canvas, white cards with hairline borders, one green accent for actions and brand
- * moments; near-black only for text. All colors are tokens → dark mode swaps values.
+ * Spotifood design tokens: "palette".
+ * Cool neutral canvas, white cards, a deep ink sidebar, and a brand accent whose hue comes from
+ * the restaurant's chosen color (`data-brand`, see brands.css). A set of "tone" hues colors icons,
+ * charts and statuses so screens are never single-colored. Dark mode swaps values.
  */
 :root {
-  --bg: oklch(0.985 0.002 100);
+  --brand-h: 292;
+  --brand-c: 0.2;
+  --brand-l: 0.55;
+  --brand-fg: oklch(1 0 0);
+
+  --bg: oklch(0.975 0.006 265);
   --surface: oklch(1 0 0);
-  --surface-2: oklch(0.968 0.003 100);
-  --surface-3: oklch(0.935 0.004 100);
-  --border: oklch(0.925 0.004 100);
-  --border-strong: oklch(0.87 0.005 100);
-  --fg: oklch(0.21 0.01 150);
-  --fg-muted: oklch(0.5 0.01 150);
-  --fg-subtle: oklch(0.64 0.008 150);
-  --ink: oklch(0.21 0.01 150);
-  --ink-hover: oklch(0.32 0.01 150);
+  --surface-2: oklch(0.962 0.008 265);
+  --surface-3: oklch(0.925 0.011 265);
+  --border: oklch(0.915 0.01 265);
+  --border-strong: oklch(0.86 0.014 265);
+  --fg: oklch(0.21 0.03 270);
+  --fg-muted: oklch(0.49 0.025 268);
+  --fg-subtle: oklch(0.63 0.02 266);
+  --ink: oklch(0.21 0.03 270);
+  --ink-hover: oklch(0.3 0.035 270);
   --ink-fg: oklch(1 0 0);
-  --accent: oklch(0.6 0.16 150);
-  --accent-hover: oklch(0.55 0.15 150);
-  --accent-fg: oklch(1 0 0);
-  --accent-text: oklch(0.5 0.13 150);
-  --accent-soft: oklch(0.965 0.03 150);
-  --success: oklch(0.55 0.14 150);
-  --success-soft: oklch(0.965 0.03 150);
-  --warning: oklch(0.75 0.15 70);
-  --warning-soft: oklch(0.97 0.04 85);
-  --danger: oklch(0.58 0.2 27);
-  --danger-soft: oklch(0.97 0.025 25);
-  --ring: oklch(0.6 0.16 150 / 0.3);
-  --shadow-color: 150 10% 20%;
+
+  --sidebar: oklch(0.205 0.035 272);
+  --sidebar-2: oklch(0.255 0.04 272);
+  --sidebar-fg: oklch(0.96 0.01 270);
+  --sidebar-muted: oklch(0.72 0.03 270);
+  --sidebar-border: oklch(0.3 0.04 272);
+
+  --success: oklch(0.6 0.15 155);
+  --success-soft: oklch(0.96 0.035 155);
+  --warning: oklch(0.72 0.16 65);
+  --warning-soft: oklch(0.97 0.045 80);
+  --danger: oklch(0.6 0.21 25);
+  --danger-soft: oklch(0.965 0.025 20);
+  --info: oklch(0.6 0.15 237);
+  --info-soft: oklch(0.965 0.025 237);
+
+  /* Tones: icon tiles, charts, categories. */
+  --tone-violet: oklch(0.58 0.2 292);
+  --tone-sky: oklch(0.62 0.15 237);
+  --tone-amber: oklch(0.74 0.16 70);
+  --tone-rose: oklch(0.62 0.2 12);
+  --tone-teal: oklch(0.62 0.12 190);
+  --tone-orange: oklch(0.68 0.18 45);
+  --tone-emerald: oklch(0.62 0.15 158);
+  --tone-fuchsia: oklch(0.6 0.22 338);
+  --tone-indigo: oklch(0.55 0.19 268);
+  --tone-lime: oklch(0.72 0.17 128);
+
+  --shadow-color: 265 30% 25%;
+}
+
+:root,
+[data-brand] {
+  --accent: oklch(var(--brand-l) var(--brand-c) var(--brand-h));
+  --accent-hover: oklch(calc(var(--brand-l) - 0.05) var(--brand-c) var(--brand-h));
+  --accent-fg: var(--brand-fg);
+  --accent-text: oklch(min(calc(var(--brand-l) - 0.06), 0.5) var(--brand-c) var(--brand-h));
+  --accent-soft: oklch(0.955 calc(var(--brand-c) * 0.2) var(--brand-h));
+  --accent-soft-2: oklch(0.9 calc(var(--brand-c) * 0.4) var(--brand-h));
+  --ring: oklch(var(--brand-l) var(--brand-c) var(--brand-h) / 0.3);
+  --brand-gradient: linear-gradient(
+    135deg,
+    oklch(var(--brand-l) var(--brand-c) var(--brand-h)),
+    oklch(calc(var(--brand-l) - 0.08) var(--brand-c) calc(var(--brand-h) + 40))
+  );
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: oklch(0.13 0 0);
-    --surface: oklch(0.18 0 0);
-    --surface-2: oklch(0.22 0 0);
-    --surface-3: oklch(0.27 0 0);
-    --border: oklch(0.26 0 0);
-    --border-strong: oklch(0.34 0 0);
-    --fg: oklch(0.97 0 0);
-    --fg-muted: oklch(0.72 0 0);
-    --fg-subtle: oklch(0.58 0 0);
-    --ink: oklch(0.97 0 0);
-    --ink-hover: oklch(0.87 0 0);
-    --ink-fg: oklch(0.13 0 0);
-    --accent: oklch(0.72 0.17 150);
-    --accent-hover: oklch(0.78 0.16 150);
-    --accent-fg: oklch(0.15 0.02 150);
-    --accent-text: oklch(0.8 0.17 150);
-    --accent-soft: oklch(0.28 0.06 150);
-    --success: oklch(0.75 0.17 150);
-    --success-soft: oklch(0.28 0.06 150);
-    --warning-soft: oklch(0.32 0.06 80);
-    --danger: oklch(0.7 0.19 27);
+    --bg: oklch(0.15 0.015 270);
+    --surface: oklch(0.195 0.02 270);
+    --surface-2: oklch(0.235 0.022 270);
+    --surface-3: oklch(0.285 0.025 270);
+    --border: oklch(0.27 0.022 270);
+    --border-strong: oklch(0.35 0.025 270);
+    --fg: oklch(0.97 0.005 270);
+    --fg-muted: oklch(0.74 0.02 270);
+    --fg-subtle: oklch(0.6 0.02 270);
+    --ink: oklch(0.97 0.005 270);
+    --ink-hover: oklch(0.87 0.01 270);
+    --ink-fg: oklch(0.15 0.015 270);
+    --sidebar: oklch(0.13 0.02 272);
+    --sidebar-2: oklch(0.2 0.03 272);
+    --sidebar-border: oklch(0.24 0.03 272);
+    --success: oklch(0.75 0.16 155);
+    --success-soft: oklch(0.29 0.06 155);
+    --warning-soft: oklch(0.32 0.06 75);
+    --danger: oklch(0.72 0.18 25);
     --danger-soft: oklch(0.3 0.08 25);
+    --info-soft: oklch(0.3 0.06 237);
     --shadow-color: 0 0% 0%;
+  }
+  :root:not([data-theme="light"]),
+  :root:not([data-theme="light"]) [data-brand] {
+    --accent: oklch(max(var(--brand-l), 0.66) var(--brand-c) var(--brand-h));
+    --accent-hover: oklch(max(calc(var(--brand-l) + 0.05), 0.71) var(--brand-c) var(--brand-h));
+    --accent-text: oklch(0.8 var(--brand-c) var(--brand-h));
+    --accent-soft: oklch(0.3 calc(var(--brand-c) * 0.35) var(--brand-h));
+    --accent-soft-2: oklch(0.36 calc(var(--brand-c) * 0.5) var(--brand-h));
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: oklch(0.13 0 0);
-  --surface: oklch(0.18 0 0);
-  --surface-2: oklch(0.22 0 0);
-  --surface-3: oklch(0.27 0 0);
-  --border: oklch(0.26 0 0);
-  --border-strong: oklch(0.34 0 0);
-  --fg: oklch(0.97 0 0);
-  --fg-muted: oklch(0.72 0 0);
-  --fg-subtle: oklch(0.58 0 0);
-  --ink: oklch(0.97 0 0);
-  --ink-hover: oklch(0.87 0 0);
-  --ink-fg: oklch(0.13 0 0);
-  --accent: oklch(0.72 0.17 150);
-  --accent-hover: oklch(0.78 0.16 150);
-  --accent-fg: oklch(0.16 0.02 150);
-  --accent-text: oklch(0.8 0.17 150);
-  --accent-soft: oklch(0.28 0.06 150);
-  --success: oklch(0.75 0.17 150);
-  --success-soft: oklch(0.28 0.06 150);
-  --warning-soft: oklch(0.32 0.06 80);
-  --danger: oklch(0.7 0.19 27);
+  --bg: oklch(0.15 0.015 270);
+  --surface: oklch(0.195 0.02 270);
+  --surface-2: oklch(0.235 0.022 270);
+  --surface-3: oklch(0.285 0.025 270);
+  --border: oklch(0.27 0.022 270);
+  --border-strong: oklch(0.35 0.025 270);
+  --fg: oklch(0.97 0.005 270);
+  --fg-muted: oklch(0.74 0.02 270);
+  --fg-subtle: oklch(0.6 0.02 270);
+  --ink: oklch(0.97 0.005 270);
+  --ink-hover: oklch(0.87 0.01 270);
+  --ink-fg: oklch(0.15 0.015 270);
+  --sidebar: oklch(0.13 0.02 272);
+  --sidebar-2: oklch(0.2 0.03 272);
+  --sidebar-border: oklch(0.24 0.03 272);
+  --success: oklch(0.75 0.16 155);
+  --success-soft: oklch(0.29 0.06 155);
+  --warning-soft: oklch(0.32 0.06 75);
+  --danger: oklch(0.72 0.18 25);
   --danger-soft: oklch(0.3 0.08 25);
+  --info-soft: oklch(0.3 0.06 237);
   --shadow-color: 0 0% 0%;
+}
+:root[data-theme="dark"],
+:root[data-theme="dark"] [data-brand] {
+  --accent: oklch(max(var(--brand-l), 0.66) var(--brand-c) var(--brand-h));
+  --accent-hover: oklch(max(calc(var(--brand-l) + 0.05), 0.71) var(--brand-c) var(--brand-h));
+  --accent-text: oklch(0.8 var(--brand-c) var(--brand-h));
+  --accent-soft: oklch(0.3 calc(var(--brand-c) * 0.35) var(--brand-h));
+  --accent-soft-2: oklch(0.36 calc(var(--brand-c) * 0.5) var(--brand-h));
+}
+
+/* Dark sidebar: every token-based component inside (links, switchers, cards) adapts. */
+.on-dark {
+  --surface: var(--sidebar-2);
+  --surface-2: oklch(0.3 0.04 272);
+  --surface-3: oklch(0.35 0.045 272);
+  --fg: var(--sidebar-fg);
+  --fg-muted: var(--sidebar-muted);
+  --fg-subtle: oklch(0.6 0.03 270);
+  --border: var(--sidebar-border);
+  --border-strong: oklch(0.38 0.045 272);
+  --ink: var(--sidebar-fg);
+  --ink-fg: var(--sidebar);
+  color: var(--fg);
 }
 
 @theme inline {
@@ -111,11 +179,31 @@
   --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-accent-soft-2: var(--accent-soft-2);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-2: var(--sidebar-2);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-tone-violet: var(--tone-violet);
+  --color-tone-sky: var(--tone-sky);
+  --color-tone-amber: var(--tone-amber);
+  --color-tone-rose: var(--tone-rose);
+  --color-tone-teal: var(--tone-teal);
+  --color-tone-orange: var(--tone-orange);
+  --color-tone-emerald: var(--tone-emerald);
+  --color-tone-fuchsia: var(--tone-fuchsia);
+  --color-tone-indigo: var(--tone-indigo);
+  --color-tone-lime: var(--tone-lime);
   --font-sans: var(--app-font);
   --font-mono: var(--font-mono-loaded), ui-monospace, monospace;
   --radius-card: 1.25rem;
   --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.04), 0 2px 8px -2px hsl(var(--shadow-color) / 0.05);
   --shadow-float: 0 12px 40px -8px hsl(var(--shadow-color) / 0.22);
+  --shadow-accent: 0 10px 24px -10px oklch(var(--brand-l) var(--brand-c) var(--brand-h) / 0.65);
+  --shadow-accent-sm: 0 1px 2px oklch(var(--brand-l) var(--brand-c) var(--brand-h) / 0.3);
 }
 
 /* Persian: Vazirmatn "Farsi digits" first, so every number (prices, table labels, counts, codes)

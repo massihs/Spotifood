@@ -1,5 +1,6 @@
 "use server";
 
+import { isBrandColor } from "@/lib/brand-colors";
 import { isRestaurantKind, type RestaurantKind } from "@/lib/restaurant-kind";
 import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
@@ -29,6 +30,7 @@ export async function updateProfileAction(restaurantId: string, _prev: unknown, 
     await updateProfile(db, ctx, {
       name: str(fd, "name"),
       kind: isRestaurantKind(str(fd, "kind")) ? (str(fd, "kind") as RestaurantKind) : undefined,
+      brandColor: isBrandColor(str(fd, "brandColor")) ? str(fd, "brandColor") : undefined,
       email: str(fd, "email"),
       phone: str(fd, "phone"),
       addressLine1: str(fd, "addressLine1"),

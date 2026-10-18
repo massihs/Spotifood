@@ -18,6 +18,18 @@ export { useMoney };
 
 const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
+/** Inactive category tiles cycle through soft tones so the strip is colorful. */
+const TILE_TONES = [
+  "bg-tone-orange/12 text-tone-orange",
+  "bg-tone-emerald/12 text-tone-emerald",
+  "bg-tone-amber/18 text-tone-amber",
+  "bg-tone-rose/12 text-tone-rose",
+  "bg-tone-sky/12 text-tone-sky",
+  "bg-tone-fuchsia/12 text-tone-fuchsia",
+  "bg-tone-teal/12 text-tone-teal",
+  "bg-tone-violet/12 text-tone-violet",
+];
+
 export function MenuApp({
   menu,
   currency,
@@ -131,7 +143,7 @@ export function MenuApp({
           {!q ? (
             <nav aria-label={t("guest.categoriesNav")} className="mt-3 border-b border-border">
               <div ref={tabsRef} className="no-scrollbar flex gap-1 overflow-x-auto px-3">
-                {menu.categories.map((c) => (
+                {menu.categories.map((c, ci) => (
                   <a
                     key={c.id}
                     href={`#c-${c.id}`}
@@ -150,8 +162,11 @@ export function MenuApp({
                       className={cn(
                         "grid size-14 place-items-center rounded-2xl transition-all",
                         active === c.id
-                          ? "bg-accent text-accent-fg shadow-[0_8px_18px_-8px_hsl(150_70%_28%/0.6)]"
-                          : "bg-surface text-accent-text ring-1 ring-border group-hover:ring-border-strong",
+                          ? "bg-accent text-accent-fg shadow-accent"
+                          : cn(
+                              "ring-1 ring-black/[0.03] group-hover:scale-105",
+                              TILE_TONES[ci % TILE_TONES.length],
+                            ),
                       )}
                     >
                       <CategoryIcon icon={c.icon} className="size-6" />

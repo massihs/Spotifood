@@ -1,5 +1,6 @@
 "use server";
 
+import { restaurantNowPlaying } from "@/server/modules/music/service";
 import { findUsableCoupon } from "@/server/modules/customers/service";
 import { validation } from "@/server/errors";
 import { refresh } from "next/cache";
@@ -137,5 +138,13 @@ export async function checkCouponAction(code: string) {
     const c = await findUsableCoupon(db, g.restaurant.id, code);
     if (!c) throw validation("coupon_invalid");
     return { code: c.code, kind: c.kind, value: c.value, minOrderCents: c.minOrderCents };
+  });
+}
+
+/** The song playing in the restaurant right now (null when the music is off). */
+export async function nowPlayingAction() {
+  return runAction(async () => {
+    const g = await guest();
+    return restaurantNowPlaying(db, g.restaurant.id);
   });
 }

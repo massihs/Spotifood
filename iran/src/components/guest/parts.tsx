@@ -111,7 +111,7 @@ export function AddButton({
         onClick();
       }}
       className={cn(
-        "grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-fg shadow-[0_6px_14px_-6px_hsl(150_70%_25%/0.7)] ring-[3px] ring-surface",
+        "grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-fg shadow-accent ring-[3px] ring-surface",
         "transition-transform active:scale-90 disabled:opacity-60",
         className,
       )}

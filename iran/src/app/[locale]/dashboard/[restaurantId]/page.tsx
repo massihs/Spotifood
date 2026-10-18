@@ -12,7 +12,7 @@ import {
 import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
-import { Card, CardHeader, StatCard } from "@/components/ui/card";
+import { Card, CardHeader, StatCard, TONE_TILE, type Tone } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
@@ -72,10 +72,30 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const max = Math.max(1, ...days.map((d) => d.cents));
 
   const quick = [
-    can(ctx, "orders.view") && { href: `${base}/kitchen`, label: t("quickActions.kitchen"), Icon: ChefHat },
-    can(ctx, "tables.view") && { href: `${base}/floor`, label: t("quickActions.floor"), Icon: LayoutGrid },
-    can(ctx, "menu.view") && { href: `${base}/menu`, label: t("quickActions.menu"), Icon: UtensilsCrossed },
-    can(ctx, "tables.view") && { href: `${base}/tables`, label: t("quickActions.qr"), Icon: QrCode },
+    can(ctx, "orders.view") && {
+      href: `${base}/kitchen`,
+      label: t("quickActions.kitchen"),
+      Icon: ChefHat,
+      tone: "orange" as Tone,
+    },
+    can(ctx, "tables.view") && {
+      href: `${base}/floor`,
+      label: t("quickActions.floor"),
+      Icon: LayoutGrid,
+      tone: "teal" as Tone,
+    },
+    can(ctx, "menu.view") && {
+      href: `${base}/menu`,
+      label: t("quickActions.menu"),
+      Icon: UtensilsCrossed,
+      tone: "rose" as Tone,
+    },
+    can(ctx, "tables.view") && {
+      href: `${base}/tables`,
+      label: t("quickActions.qr"),
+      Icon: QrCode,
+      tone: "sky" as Tone,
+    },
   ].filter((x) => !!x);
 
   return (
@@ -87,32 +107,50 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
 
       {/* Today */}
       <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <Card className="p-6">
-          <p className="text-sm font-medium text-fg-muted">{t("revenueToday")}</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">
-            {money(today.revenueTodayCents)}
-          </p>
-          <div className="mt-6">
-            <p className="text-xs font-medium text-fg-subtle">{t("last7")}</p>
-            <div className="mt-3 flex h-24 items-end gap-2">
+        <Card
+          className="overflow-hidden border-transparent p-6 text-white shadow-accent"
+          style={{ background: "var(--brand-gradient)" }}
+        >
+          <div
+            className="pointer-events-none absolute -end-16 -top-20 size-64 rounded-full bg-white/10"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute start-1/3 -bottom-24 size-56 rounded-full bg-white/[0.06]"
+            aria-hidden="true"
+          />
+          <div className="relative flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium opacity-80">{t("revenueToday")}</p>
+              <p className="mt-1 text-4xl font-bold tracking-tight tabular-nums">
+                {money(today.revenueTodayCents)}
+              </p>
+            </div>
+            <span className="grid size-11 place-items-center rounded-2xl bg-white/18" aria-hidden="true">
+              <Wallet className="size-5" />
+            </span>
+          </div>
+          <div className="relative mt-6">
+            <p className="text-xs font-medium opacity-75">{t("last7")}</p>
+            <div className="mt-3 flex h-28 items-end gap-2">
               {days.map((d, i) => (
                 <div key={d.key} className="flex flex-1 flex-col items-center gap-1.5">
                   <div
-                    className={cn("w-full rounded-md", i === 6 ? "bg-accent" : "bg-accent-soft")}
-                    style={{ height: `${Math.max(6, (d.cents / max) * 80)}px` }}
+                    className={cn("w-full rounded-lg", i === 6 ? "bg-white" : "bg-white/30")}
+                    style={{ height: `${Math.max(6, (d.cents / max) * 88)}px` }}
                     title={money(d.cents)}
                   />
-                  <span className="text-[10px] text-fg-subtle">{d.label}</span>
+                  <span className="text-[10px] opacity-75">{d.label}</span>
                 </div>
               ))}
             </div>
           </div>
         </Card>
         <div className="grid grid-cols-2 gap-4">
-          <StatCard label={t("ordersToday")} value={today.ordersToday} icon={<ReceiptText />} />
-          <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} />
-          <StatCard label={t("openTables")} value={today.openTables} icon={<LayoutGrid />} />
-          <StatCard label={t("stats.tables")} value={overview.tables} icon={<QrCode />} />
+          <StatCard label={t("ordersToday")} value={today.ordersToday} icon={<ReceiptText />} tone="sky" />
+          <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} tone="orange" />
+          <StatCard label={t("openTables")} value={today.openTables} icon={<LayoutGrid />} tone="teal" />
+          <StatCard label={t("stats.tables")} value={overview.tables} icon={<QrCode />} tone="fuchsia" />
         </div>
       </section>
 
@@ -121,14 +159,14 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
         <Card>
           <CardHeader title={t("quick")} />
           <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-4">
-            {quick.map(({ href, label, Icon }) => (
+            {quick.map(({ href, label, Icon, tone }) => (
               <Link
                 key={href}
                 href={href}
                 className="group flex flex-col gap-3 rounded-xl border border-border p-4 transition-colors hover:border-accent/40 hover:bg-accent-soft/50"
               >
                 <span className="flex items-center justify-between">
-                  <span className="grid size-9 place-items-center rounded-lg bg-accent-soft text-accent-text">
+                  <span className={cn("grid size-10 place-items-center rounded-xl", TONE_TILE[tone])}>
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
                   <ArrowUpLeft

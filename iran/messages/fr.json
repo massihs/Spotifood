@@ -107,7 +107,13 @@
     "inventory": "Stocks",
     "customers": "Club clients",
     "reports": "Rapports & compta",
-    "branches": "Succursales"
+    "branches": "Succursales",
+    "groups": {
+      "ops": "Opérations",
+      "catalog": "Menu & stock",
+      "business": "Ventes & clients",
+      "manage": "Gestion"
+    }
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -603,7 +609,17 @@
     "coupon": "Code promo",
     "applyCoupon": "Appliquer",
     "removeCoupon": "Retirer le code",
-    "couponMin": "Commande minimum {amount}"
+    "couponMin": "Commande minimum {amount}",
+    "music": {
+      "nowPlayingIn": "En ce moment chez {name}",
+      "openPlayer": "Voir le morceau en cours",
+      "nowPlaying": "En cours de lecture",
+      "playingIn": "En lecture chez",
+      "close": "Fermer",
+      "unknownArtist": "Artiste inconnu",
+      "upNext": "À suivre",
+      "hint": "La musique diffusée dans le restaurant en ce moment."
+    }
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -1116,7 +1132,10 @@
       "pause": "Pause",
       "loop": "La playlist tourne en boucle",
       "volume": "Volume",
-      "tracks": "{count} morceaux"
+      "tracks": "{count} morceaux",
+      "minutes": "{count} min",
+      "titleCol": "Titre",
+      "durationCol": "Durée"
     },
     "radio": {
       "pageTitle": "Radio Spotifood",
@@ -1132,7 +1151,14 @@
       "offAir": "Cette station est hors antenne.",
       "upNext": "À suivre",
       "stations": "Stations",
-      "noStations": "Aucune station à l'antenne pour l'instant."
+      "noStations": "Aucune station à l'antenne pour l'instant.",
+      "stationMeta": "Radio · {count} titres",
+      "liveStation": "Station de radio en direct",
+      "minutes": "{count} min",
+      "titleCol": "Titre",
+      "durationCol": "Durée",
+      "moreStations": "Autres stations",
+      "volume": "Volume"
     },
     "admin": {
       "title": "Musique",
@@ -1181,7 +1207,8 @@
         "forbidden": "Accès refusé.",
         "internal": "Échec de l'envoi.",
         "duration": "Durée illisible."
-      }
+      },
+      "changeCover": "Changer la pochette"
     }
   },
   "pos": {
@@ -1523,5 +1550,21 @@
     "copying": "Copie…",
     "import": "Importer",
     "copied": "{categories} catégories et {products} plats copiés."
+  },
+  "brandColors": {
+    "label": "Couleur de marque",
+    "hint": "Utilisée sur le menu client, les boutons et le tableau de bord. Aperçu immédiat.",
+    "violet": "Violet",
+    "indigo": "Indigo",
+    "sky": "Ciel",
+    "teal": "Sarcelle",
+    "emerald": "Émeraude",
+    "olive": "Olive",
+    "saffron": "Safran",
+    "coral": "Corail",
+    "rose": "Rose",
+    "fuchsia": "Fuchsia",
+    "plum": "Prune",
+    "slate": "Ardoise"
   }
 }

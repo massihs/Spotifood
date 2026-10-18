@@ -11,7 +11,9 @@ import {
   getMusicState,
   loadTrackFile,
   nowPlaying,
+  reportPlayback,
   requestSubscription,
+  restaurantNowPlaying,
 } from "@/server/modules/music/service";
 import { createOwnerWithRestaurant, createUser } from "../helpers/factories";
 
@@ -93,5 +95,38 @@ describe("music", () => {
     expect(live?.offsetSec).toBe(30);
     await db.update(musicThemes).set({ radioEnabled: false }).where(eq(musicThemes.id, theme.id));
     expect(await nowPlaying(db, theme.slug)).toBeNull();
+  });
+
+  it("shows guests the song the restaurant is playing", async () => {
+    const { admin, theme } = await themeWithTracks(3);
+    const owner = await createOwnerWithRestaurant("Café");
+    const rid = owner.ctx.restaurant.id;
+    expect(await restaurantNowPlaying(db, rid)).toBeNull();
+    const sub = await requestSubscription(db, owner.ctx, { plan: "monthly", themeId: theme.id });
+    await activateSubscription(db, admin, sub.id);
+    const [first] = (await getMusicState(db, owner.ctx)).playlist!.tracks;
+
+    const t0 = new Date();
+    await reportPlayback(db, owner.ctx, { trackId: first!.id, positionSec: 30, playing: true }, t0);
+    const np = await restaurantNowPlaying(db, rid, new Date(t0.getTime() + 10_000));
+    expect(np?.track.title).toBe(first!.title);
+    expect(np?.positionSec).toBeCloseTo(40, 0);
+    expect(np?.upNext).toHaveLength(2);
+
+    // Past the end of the song (no report since): the player stopped.
+    expect(await restaurantNowPlaying(db, rid, new Date(t0.getTime() + 200_000))).toBeNull();
+    // Paused: nothing to show.
+    await reportPlayback(db, owner.ctx, { trackId: first!.id, positionSec: 50, playing: false });
+    expect(await restaurantNowPlaying(db, rid)).toBeNull();
+
+    // A track outside the subscription is refused.
+    const other = await themeWithTracks(1);
+    const [foreign] = (await getMusicState(db, owner.ctx)).themes
+      .filter((x) => x.id === other.theme.id)
+      .map((x) => x.id);
+    expect(foreign).toBe(other.theme.id);
+    await expect(
+      reportPlayback(db, owner.ctx, { trackId: first!.id.replace(/.$/, "0"), positionSec: 0, playing: true }),
+    ).rejects.toThrow();
   });
 });

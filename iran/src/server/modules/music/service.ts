@@ -3,7 +3,13 @@ import { and, asc, desc, eq, gt, inArray, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { edition } from "@/config/edition";
 import type { Database, DbOrTx } from "@/server/db/client";
-import { musicSubscriptions, musicThemes, musicTracks, restaurants } from "@/server/db/schema";
+import {
+  musicNowPlaying,
+  musicSubscriptions,
+  musicThemes,
+  musicTracks,
+  restaurants,
+} from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import type { SessionUser } from "@/server/auth/sessions";
 import { AppError, conflict, notFound } from "@/server/errors";
@@ -30,6 +36,34 @@ const liveTheme = and(isNull(musicThemes.deletedAt), eq(musicThemes.isActive, tr
 const liveTrack = and(isNull(musicTracks.deletedAt), eq(musicTracks.isActive, true));
 
 export const trackUrl = (id: string) => `/api/v1/music/tracks/${id}`;
+export const coverUrl = (key: string | null | undefined) => (key ? storage().publicUrl(key) : null);
+
+const COVER_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]);
+
+/** Square 600px webp artwork in public storage; returns its key. */
+async function saveCover(body: Uint8Array | Buffer) {
+  const { default: sharp } = await import("sharp");
+  const out = await sharp(body).rotate().resize(600, 600, { fit: "cover" }).webp({ quality: 82 }).toBuffer();
+  const key = `music/covers/${randomBytes(12).toString("hex")}.webp`;
+  await storage().put(key, out, "image/webp");
+  return key;
+}
+
+/** Tags embedded in the audio file: album art (ID3 APIC, MP4 covr, Vorbis picture), title, artist. */
+async function readTags(body: Buffer, mime: string) {
+  try {
+    const { parseBuffer } = await import("music-metadata");
+    const meta = await parseBuffer(body, { mimeType: mime }, { skipPostHeaders: true, duration: false });
+    const pic = meta.common.picture?.[0];
+    return {
+      coverKey: pic?.data?.length ? await saveCover(pic.data).catch(() => null) : null,
+      title: meta.common.title?.trim().slice(0, 160) || null,
+      artist: (meta.common.artist ?? meta.common.albumartist)?.trim().slice(0, 160) || null,
+    };
+  } catch {
+    return { coverKey: null, title: null, artist: null };
+  }
+}
 
 // ─── Themes (super admin) ────────────────────────────────────────────────────
 
@@ -164,6 +198,8 @@ export async function getThemeForAdmin(db: Database, user: SessionUser, id: stri
 
 export const trackMetaSchema = z.object({
   title: z.string().trim().min(1).max(160),
+  /** The title is only the file name: prefer the file's own tags. */
+  fromFileName: z.boolean().default(false),
   artist: z
     .string()
     .trim()
@@ -199,7 +235,9 @@ export async function addTrack(
   if (!theme) throw notFound();
 
   const key = `music/${themeId}/${randomBytes(12).toString("hex")}.${ext}`;
-  await storage().put(key, file.body, file.type === "audio/mp3" ? "audio/mpeg" : file.type);
+  const mime = file.type === "audio/mp3" ? "audio/mpeg" : file.type;
+  await storage().put(key, file.body, mime);
+  const tags = await readTags(file.body, mime);
   const [{ n } = { n: 0 }] = await db
     .select({ n: sql<number>`count(*)`.mapWith(Number) })
     .from(musicTracks)
@@ -208,17 +246,48 @@ export async function addTrack(
     .insert(musicTracks)
     .values({
       themeId,
-      title: meta.title,
-      artist: meta.artist ?? null,
+      // Tags win over the file name; an admin-typed title/artist wins over tags.
+      title: meta.fromFileName ? (tags.title ?? meta.title) : meta.title,
+      artist: meta.artist ?? tags.artist,
       durationSec: meta.durationSec,
       storageKey: key,
-      mimeType: file.type === "audio/mp3" ? "audio/mpeg" : file.type,
+      coverKey: tags.coverKey,
+      mimeType: mime,
       sizeBytes: file.body.length,
       sortOrder: n,
       uploadedByUserId: user.id,
     })
     .returning();
   return track!;
+}
+
+/** Replaces the artwork of a track or of a theme (station) with an uploaded image. */
+export async function setCover(
+  db: Database,
+  user: SessionUser,
+  target: { kind: "track" | "theme"; id: string },
+  file: { body: Buffer; type: string },
+) {
+  assertSuperAdmin(user);
+  if (!isUuid(target.id)) throw notFound();
+  if (!COVER_TYPES.has(file.type)) throw new AppError("VALIDATION", "image_type");
+  if (file.body.length === 0 || file.body.length > 8 * 1024 * 1024)
+    throw new AppError("VALIDATION", "image_size");
+  const key = await saveCover(file.body);
+  const table = target.kind === "track" ? musicTracks : musicThemes;
+  const [old] = await db.select({ coverKey: table.coverKey }).from(table).where(eq(table.id, target.id));
+  if (!old) {
+    await storage()
+      .delete([key])
+      .catch(() => undefined);
+    throw notFound();
+  }
+  await db.update(table).set({ coverKey: key }).where(eq(table.id, target.id));
+  if (old.coverKey)
+    await storage()
+      .delete([old.coverKey])
+      .catch(() => undefined);
+  return { coverKey: key, url: coverUrl(key)! };
 }
 
 export async function setTrackActive(db: Database, user: SessionUser, trackId: string, isActive: boolean) {
@@ -274,6 +343,12 @@ async function currentSubscription(db: DbOrTx, restaurantId: string, now = new D
   return rows.find((r) => r.status === "active") ?? rows[0] ?? null;
 }
 
+const trackView = <T extends { id: string; coverKey: string | null }>({ coverKey, ...t }: T) => ({
+  ...t,
+  url: trackUrl(t.id),
+  cover: coverUrl(coverKey),
+});
+
 async function themeTracks(db: DbOrTx, themeId: string) {
   return db
     .select({
@@ -281,6 +356,7 @@ async function themeTracks(db: DbOrTx, themeId: string) {
       title: musicTracks.title,
       artist: musicTracks.artist,
       durationSec: musicTracks.durationSec,
+      coverKey: musicTracks.coverKey,
     })
     .from(musicTracks)
     .where(and(eq(musicTracks.themeId, themeId), liveTrack))
@@ -298,6 +374,7 @@ export async function getMusicState(db: Database, ctx: RestaurantContext, now = 
         name: musicThemes.name,
         description: musicThemes.description,
         color: musicThemes.color,
+        coverKey: musicThemes.coverKey,
         slug: musicThemes.slug,
         radioEnabled: musicThemes.radioEnabled,
         trackCount:
@@ -316,7 +393,7 @@ export async function getMusicState(db: Database, ctx: RestaurantContext, now = 
     playlist = {
       period: key,
       nextChangeAt: sub.plan === "weekly" ? nextWeeklyChange(now) : null,
-      tracks: playlistFor(tracks, `${sub.themeId}:${key}`).map((t) => ({ ...t, url: trackUrl(t.id) })),
+      tracks: playlistFor(tracks, `${sub.themeId}:${key}`).map(trackView),
     };
   }
   return {
@@ -480,15 +557,25 @@ export async function listStations(db: Database) {
       name: musicThemes.name,
       description: musicThemes.description,
       color: musicThemes.color,
+      coverKey: musicThemes.coverKey,
       createdAt: musicThemes.createdAt,
     })
     .from(musicThemes)
     .where(and(liveTheme, eq(musicThemes.radioEnabled, true)))
     .orderBy(asc(musicThemes.sortOrder));
   const out = [];
-  for (const th of themes) {
+  for (const { coverKey, ...th } of themes) {
     const tracks = await themeTracks(db, th.id);
-    if (tracks.length) out.push({ ...th, trackCount: tracks.length });
+    if (!tracks.length) continue;
+    const covers = [...new Set(tracks.map((t) => t.coverKey).filter(Boolean))].slice(0, 4).map(coverUrl);
+    const minutes = Math.round(tracks.reduce((s, t) => s + t.durationSec, 0) / 60);
+    out.push({
+      ...th,
+      cover: coverUrl(coverKey) ?? covers[0] ?? null,
+      mosaic: covers as string[],
+      trackCount: tracks.length,
+      minutes,
+    });
   }
   return out;
 }
@@ -503,9 +590,9 @@ export async function nowPlaying(db: Database, slug: string, now = new Date()) {
   const tracks = await themeTracks(db, theme.id);
   const live = radioNow(tracks, theme.createdAt, now);
   if (!live) return null;
-  const view = (t: (typeof tracks)[number]) => ({ ...t, url: trackUrl(t.id) });
+  const view = trackView;
   return {
-    station: { slug: theme.slug, name: theme.name, color: theme.color },
+    station: { slug: theme.slug, name: theme.name, color: theme.color, cover: coverUrl(theme.coverKey) },
     track: view(live.track),
     offsetSec: live.offsetSec,
     remainingSec: live.remainingSec,
@@ -514,4 +601,105 @@ export async function nowPlaying(db: Database, slug: string, now = new Date()) {
   };
 }
 
+// ─── In-restaurant "now playing" ─────────────────────────────────────────────
+
+export const playbackSchema = z.object({
+  trackId: z.uuid().nullable(),
+  positionSec: z
+    .number()
+    .min(0)
+    .max(4 * 3600)
+    .default(0),
+  playing: z.boolean(),
+});
+
+/** The dashboard player reports what it plays (track change, play, pause, seek). */
+export async function reportPlayback(
+  db: Database,
+  ctx: RestaurantContext,
+  raw: z.input<typeof playbackSchema>,
+  now = new Date(),
+) {
+  assertCan(ctx, "restaurant.view");
+  const input = playbackSchema.parse(raw);
+  if (input.trackId) {
+    const sub = await currentSubscription(db, ctx.restaurant.id, now);
+    if (sub?.status !== "active") throw notFound();
+    const [ok] = await db
+      .select({ id: musicTracks.id })
+      .from(musicTracks)
+      .where(and(eq(musicTracks.id, input.trackId), eq(musicTracks.themeId, sub.themeId)));
+    if (!ok) throw notFound();
+  }
+  const values = {
+    trackId: input.trackId,
+    isPlaying: input.playing && !!input.trackId,
+    startedAt: input.trackId ? new Date(now.getTime() - input.positionSec * 1000) : null,
+    updatedAt: now,
+  };
+  await db
+    .insert(musicNowPlaying)
+    .values({ restaurantId: ctx.restaurant.id, ...values })
+    .onConflictDoUpdate({ target: musicNowPlaying.restaurantId, set: values });
+}
+
+/**
+ * What guests at the tables see: the song the restaurant is playing now, its cover and
+ * progress, and the next songs of the playlist. Null when nothing is playing.
+ */
+export async function restaurantNowPlaying(db: DbOrTx, restaurantId: string, now = new Date()) {
+  const [row] = await db
+    .select({
+      isPlaying: musicNowPlaying.isPlaying,
+      startedAt: musicNowPlaying.startedAt,
+      track: {
+        id: musicTracks.id,
+        title: musicTracks.title,
+        artist: musicTracks.artist,
+        durationSec: musicTracks.durationSec,
+        coverKey: musicTracks.coverKey,
+        themeId: musicTracks.themeId,
+      },
+      theme: { name: musicThemes.name, color: musicThemes.color, coverKey: musicThemes.coverKey },
+    })
+    .from(musicNowPlaying)
+    .innerJoin(musicTracks, eq(musicTracks.id, musicNowPlaying.trackId))
+    .innerJoin(musicThemes, eq(musicThemes.id, musicTracks.themeId))
+    .where(eq(musicNowPlaying.restaurantId, restaurantId));
+  if (!row?.isPlaying || !row.startedAt) return null;
+  const positionSec = (now.getTime() - row.startedAt.getTime()) / 1000;
+  // The player reports every track change: past the end (+ grace), it stopped silently.
+  if (positionSec > row.track.durationSec + 20) return null;
+
+  const sub = await currentSubscription(db, restaurantId, now);
+  let upNext: ReturnType<typeof trackView>[] = [];
+  if (sub?.status === "active" && sub.themeId === row.track.themeId) {
+    const list = playlistFor(
+      await themeTracks(db, sub.themeId),
+      `${sub.themeId}:${periodKey(sub.plan, now)}`,
+    );
+    const i = list.findIndex((t) => t.id === row.track.id);
+    if (i >= 0)
+      upNext = [1, 2, 3]
+        .map((k) => list[(i + k) % list.length]!)
+        .filter((t) => t.id !== row.track.id)
+        .map(trackView);
+  }
+  const { coverKey, themeId: _t, ...track } = row.track;
+  return {
+    track: { ...track, cover: coverUrl(coverKey) ?? coverUrl(row.theme.coverKey) },
+    theme: { name: row.theme.name, color: row.theme.color },
+    positionSec: Math.min(positionSec, row.track.durationSec),
+    upNext,
+    serverTime: now.toISOString(),
+  };
+}
+export type NowPlaying = NonNullable<Awaited<ReturnType<typeof restaurantNowPlaying>>>;
+
 export type { MusicPlan };
+
+/** True when the restaurant has an active music subscription (guests then poll "now playing"). */
+export async function hasActiveMusic(db: DbOrTx, restaurantId: string, now = new Date()) {
+  const sub = await currentSubscription(db, restaurantId, now);
+  return sub?.status === "active";
+}

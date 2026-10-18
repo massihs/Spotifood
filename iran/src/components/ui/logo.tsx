@@ -7,8 +7,14 @@ import { cn } from "@/lib/cn";
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" aria-hidden="true" className={cn("size-8 shrink-0", className)}>
+      <defs>
+        <linearGradient id="sf-spot" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="var(--accent)" />
+          <stop offset="1" stopColor="oklch(0.7 0.18 calc(var(--brand-h) + 50))" />
+        </linearGradient>
+      </defs>
       <rect width="32" height="32" rx="9" className="fill-ink" />
-      <circle cx="16" cy="16" r="8" className="fill-accent" />
+      <circle cx="16" cy="16" r="8" fill="url(#sf-spot)" />
       <circle cx="22.2" cy="10.2" r="3.4" className="fill-ink" />
     </svg>
   );

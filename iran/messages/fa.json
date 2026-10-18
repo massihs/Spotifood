@@ -223,7 +223,13 @@
     "inventory": "انبار",
     "customers": "باشگاه مشتریان",
     "reports": "گزارش و حسابداری",
-    "branches": "شعبه‌ها"
+    "branches": "شعبه‌ها",
+    "groups": {
+      "ops": "عملیات روزانه",
+      "catalog": "منو و انبار",
+      "business": "فروش و مشتریان",
+      "manage": "مدیریت"
+    }
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -759,7 +765,17 @@
     "coupon": "کد تخفیف",
     "applyCoupon": "اعمال",
     "removeCoupon": "حذف کد",
-    "couponMin": "حداقل خرید {amount}"
+    "couponMin": "حداقل خرید {amount}",
+    "music": {
+      "nowPlayingIn": "در حال پخش در {name}",
+      "openPlayer": "نمایش آهنگ در حال پخش",
+      "nowPlaying": "در حال پخش",
+      "playingIn": "در حال پخش در",
+      "close": "بستن",
+      "unknownArtist": "هنرمند ناشناس",
+      "upNext": "آهنگ‌های بعدی",
+      "hint": "این موسیقی همین حالا در رستوران پخش می‌شود."
+    }
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",
@@ -1272,7 +1288,10 @@
       "pause": "توقف",
       "loop": "تکرار پلی‌لیست",
       "volume": "صدا",
-      "tracks": "{count} آهنگ"
+      "tracks": "{count} آهنگ",
+      "minutes": "{count} دقیقه",
+      "titleCol": "عنوان",
+      "durationCol": "مدت"
     },
     "radio": {
       "pageTitle": "رادیو اسپاتی‌فود",
@@ -1288,7 +1307,14 @@
       "offAir": "این ایستگاه فعلاً خاموش است.",
       "upNext": "بعدی",
       "stations": "ایستگاه‌ها",
-      "noStations": "هنوز ایستگاهی روی آنتن نیست."
+      "noStations": "هنوز ایستگاهی روی آنتن نیست.",
+      "stationMeta": "رادیو · {count} آهنگ",
+      "liveStation": "ایستگاه رادیویی زنده",
+      "minutes": "{count} دقیقه",
+      "titleCol": "عنوان",
+      "durationCol": "مدت",
+      "moreStations": "ایستگاه‌های دیگر",
+      "volume": "صدا"
     },
     "admin": {
       "title": "موسیقی",
@@ -1337,7 +1363,8 @@
         "forbidden": "دسترسی ندارید.",
         "internal": "بارگذاری ناموفق بود.",
         "duration": "مدت آهنگ خوانده نشد."
-      }
+      },
+      "changeCover": "تغییر کاور"
     }
   },
   "pos": {
@@ -1679,5 +1706,21 @@
     "copying": "در حال کپی…",
     "import": "وارد کردن",
     "copied": "{categories} دسته و {products} غذا کپی شد."
+  },
+  "brandColors": {
+    "label": "رنگ برند",
+    "hint": "رنگ منوی مشتری، دکمه‌ها و پنل شما. بلافاصله پیش‌نمایش می‌شود.",
+    "violet": "بنفش",
+    "indigo": "نیلی",
+    "sky": "آبی آسمانی",
+    "teal": "فیروزه‌ای",
+    "emerald": "زمردی",
+    "olive": "زیتونی",
+    "saffron": "زعفرانی",
+    "coral": "مرجانی",
+    "rose": "سرخابی",
+    "fuchsia": "ارغوانی",
+    "plum": "آلویی",
+    "slate": "سنگی"
   }
 }

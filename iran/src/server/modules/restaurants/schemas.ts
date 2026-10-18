@@ -1,4 +1,5 @@
 import { RESTAURANT_KINDS } from "@/lib/restaurant-kind";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 import { z } from "zod";
 import { LOCALES } from "@/i18n/config";
 
@@ -17,6 +18,7 @@ const SUPPORTED_TIMEZONES = new Set(Intl.supportedValuesOf("timeZone"));
 export const profileSchema = z.object({
   name: z.string().trim().min(2).max(160),
   kind: z.enum(RESTAURANT_KINDS).optional(),
+  brandColor: z.enum(BRAND_COLORS.map((b) => b.key) as [string, ...string[]]).optional(),
   email: z
     .string()
     .trim()

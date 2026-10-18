@@ -43,7 +43,7 @@ export type PublicKind = (typeof PUBLIC_KINDS)[number];
 
 /** Keys are generated server-side only; this guards route handlers that receive a key. */
 export const PUBLIC_KEY_RE =
-  /^r\/[0-9a-f-]{36}\/(logo|product)\/[A-Za-z0-9]{8,40}-[a-z0-9]{2,4}\.(webp|png)$/;
+  /^(r\/[0-9a-f-]{36}\/(logo|product)\/[A-Za-z0-9]{8,40}-[a-z0-9]{2,4}\.(webp|png)|music\/covers\/[0-9a-f]{24}\.webp)$/;
 
 /** `r/{restaurantId}/{kind}/{random}` — variants append `-{suffix}.{ext}`. */
 export function newAssetBase(restaurantId: string, kind: string, random: string) {

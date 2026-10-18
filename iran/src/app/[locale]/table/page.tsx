@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { NowPlaying } from "@/components/guest/now-playing";
+import { hasActiveMusic, restaurantNowPlaying } from "@/server/modules/music/service";
 import { getGuest } from "@/server/modules/guest/current";
 import { db } from "@/server/db/client";
 import { getCartView } from "@/server/modules/cart/service";
@@ -22,24 +24,33 @@ async function GuestMenu() {
   const guest = await getGuest();
   if (!guest) return <SessionExpired />;
   // Menu comes from the tag-invalidated cache; the cart is always read live.
-  const [menu, cart, orders] = await Promise.all([
+  const [menu, cart, orders, music] = await Promise.all([
     getPublicMenu(guest.restaurant.id),
     getCartView(db, guest),
     listGuestOrders(db, guest),
+    hasActiveMusic(db, guest.restaurant.id),
   ]);
+  const playing = music ? await restaurantNowPlaying(db, guest.restaurant.id) : null;
   // Cover: the first featured dish with a photo, else any dish with a photo.
   const dishes = Object.values(menu.products);
   const cover =
     (dishes.find((p) => p.isFeatured && p.images[0]) ?? dishes.find((p) => p.images[0]))?.images[0] ?? null;
   return (
     <LiveProvider url="/api/v1/realtime/guest">
-      <LiveRefresh types={["session.closed"]} />
-      <MenuApp
-        menu={menu}
-        currency={guest.restaurant.currency}
-        initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents }}
-        header={<GuestHeader guest={guest} orderCount={orders.length} cover={cover} />}
-      />
+      <div data-brand={guest.restaurant.brandColor} className="contents">
+        <LiveRefresh types={["session.closed"]} />
+        <MenuApp
+          menu={menu}
+          currency={guest.restaurant.currency}
+          initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents }}
+          header={
+            <>
+              <GuestHeader guest={guest} orderCount={orders.length} cover={cover} />
+              {music ? <NowPlaying initial={playing} restaurantName={guest.restaurant.name} /> : null}
+            </>
+          }
+        />
+      </div>
     </LiveProvider>
   );
 }

@@ -16,8 +16,11 @@ export async function AppShell({
   footer,
   user,
   headerExtra,
+  brand,
   children,
 }: {
+  /** Restaurant brand color key: scopes the accent (data-brand). */
+  brand?: string;
   title: string;
   subtitle?: string;
   /** Restaurant logo URL, shown in the sidebar identity card. */
@@ -32,7 +35,7 @@ export async function AppShell({
   const t = await getTranslations();
   const identity = (
     <div className="flex min-w-0 items-center gap-3">
-      <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-accent-soft text-base font-bold text-accent-text ring-1 ring-border">
+      <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-white text-base font-bold text-accent-text ring-2 ring-accent/60">
         {avatar ? (
           <img src={avatar} alt="" className="size-full object-contain p-0.5" />
         ) : (
@@ -41,14 +44,35 @@ export async function AppShell({
       </span>
       <div className="min-w-0">
         <p className="truncate text-sm font-semibold">{title}</p>
-        {subtitle ? <p className="truncate text-xs text-fg-muted">{subtitle}</p> : null}
+        {subtitle ? (
+          <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-fg-muted">
+            <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
+            {subtitle}
+          </p>
+        ) : null}
       </div>
     </div>
   );
+  const initials = user.fullName
+    .split(/\s+/)
+    .map((w) => [...w][0] ?? "")
+    .slice(0, 2)
+    .join("");
   const account = (
-    <div className="rounded-xl border border-border bg-surface p-3">
-      <p className="truncate text-sm font-semibold">{user.fullName}</p>
-      <p className="truncate text-xs text-fg-muted">{user.email}</p>
+    <div className="rounded-2xl border border-border bg-surface p-3">
+      <div className="flex items-center gap-2.5">
+        <span
+          className="grid size-9 shrink-0 place-items-center rounded-full text-sm font-bold text-white"
+          style={{ background: "var(--brand-gradient)" }}
+          aria-hidden="true"
+        >
+          {initials || "•"}
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold">{user.fullName}</p>
+          <p className="truncate text-xs text-fg-muted">{user.email}</p>
+        </div>
+      </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <LanguageSwitcher />
         <form action={logoutAction}>
@@ -65,7 +89,10 @@ export async function AppShell({
   );
 
   return (
-    <div className="min-h-dvh bg-bg lg:grid lg:grid-cols-[264px_1fr] print:block print:bg-white">
+    <div
+      data-brand={brand}
+      className="min-h-dvh bg-bg lg:grid lg:grid-cols-[272px_1fr] print:block print:bg-white"
+    >
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2"
@@ -74,15 +101,23 @@ export async function AppShell({
       </a>
 
       {/* Desktop sidebar */}
-      <div className="hidden border-e border-border bg-surface lg:block print:hidden">
-        <aside className="flex flex-col lg:sticky lg:top-0 lg:h-dvh">
-          <div className="px-5 pt-6 pb-4">
+      <div className="on-dark relative hidden overflow-hidden bg-sidebar lg:block print:hidden">
+        {/* Brand glow behind the logo. */}
+        <div
+          className="pointer-events-none absolute -start-20 -top-24 size-72 rounded-full opacity-35 blur-3xl"
+          style={{ background: "var(--brand-gradient)" }}
+          aria-hidden="true"
+        />
+        <aside className="relative flex flex-col lg:sticky lg:top-0 lg:h-dvh">
+          <div className="px-5 pt-6 pb-5">
             <Link href="/dashboard" aria-label="Spotifood" className="inline-flex">
               <Logo />
             </Link>
           </div>
-          <div className="mx-3 rounded-xl bg-surface-2 p-2.5">{identity}</div>
-          <div className="flex-1 overflow-y-auto px-3 py-4">
+          <div className="mx-3 rounded-2xl border border-border bg-surface/70 p-2.5 backdrop-blur">
+            {identity}
+          </div>
+          <div className="flex-1 [scrollbar-width:thin] overflow-y-auto px-3 pt-1 pb-4">
             <SidebarNav items={nav} label={title} />
             {footer ? <div className="mt-4 border-t border-border pt-4">{footer}</div> : null}
           </div>
@@ -90,9 +125,14 @@ export async function AppShell({
         </aside>
       </div>
 
-      <div className="min-w-0">
+      <div className="relative min-w-0">
+        {/* Soft brand wash at the top of every page. */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-accent-soft/80 to-transparent print:hidden"
+          aria-hidden="true"
+        />
         {/* Top bar */}
-        <header className="sticky top-0 z-30 border-b border-border bg-bg/80 backdrop-blur-xl print:hidden">
+        <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/75 backdrop-blur-xl print:hidden">
           <div className="flex h-16 items-center gap-3 px-4 sm:px-8">
             <Link href="/dashboard" aria-label="Spotifood" className="lg:hidden">
               <LogoMark className="size-8" />
@@ -106,7 +146,7 @@ export async function AppShell({
         </header>
         <main
           id="main"
-          className="mx-auto max-w-7xl px-4 pt-6 pb-28 sm:px-8 lg:pt-8 lg:pb-12 print:max-w-none print:p-0"
+          className="relative mx-auto max-w-7xl px-4 pt-6 pb-28 sm:px-8 lg:pt-8 lg:pb-12 print:max-w-none print:p-0"
         >
           {children}
         </main>
@@ -137,7 +177,7 @@ export function PageHeader({
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4 lg:mb-8">
       <div className="min-w-0">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="text-[26px] leading-tight font-bold tracking-tight">{title}</h1>
         {description ? <p className="mt-1 text-sm text-fg-muted">{description}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
@@ -147,8 +187,8 @@ export function PageHeader({
 
 export function ShellSkeleton() {
   return (
-    <div className="min-h-dvh bg-bg lg:grid lg:grid-cols-[264px_1fr]" aria-busy="true">
-      <aside className="hidden border-e border-border bg-surface lg:block" />
+    <div className="min-h-dvh bg-bg lg:grid lg:grid-cols-[272px_1fr]" aria-busy="true">
+      <aside className="hidden bg-sidebar lg:block" />
       <div className="px-4 py-8 sm:px-8">
         <div className="h-8 w-56 animate-pulse rounded-full bg-surface-3" />
         <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

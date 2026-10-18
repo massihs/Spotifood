@@ -1,7 +1,8 @@
-import { ChevronRight, Music } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { coverUrl } from "@/server/modules/music/service";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
-import { ThemeFlags, TrackRow, TrackUploader } from "@/components/music/admin-forms";
+import { CoverEdit, ThemeFlags, TrackRow, TrackUploader } from "@/components/music/admin-forms";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { fmtDuration } from "@/lib/duration";
@@ -36,12 +37,13 @@ async function AdminTheme({ params }: Pick<PageProps<"/[locale]/admin/music/[the
         {t("title")}
       </Link>
       <div className="mb-6 flex flex-wrap items-center gap-4">
-        <span
-          className="grid size-16 place-items-center rounded-2xl text-white shadow-sm"
-          style={{ background: `linear-gradient(135deg, ${theme.color}, ${theme.color}aa)` }}
-        >
-          <Music className="size-7" aria-hidden="true" />
-        </span>
+        <CoverEdit
+          kind="theme"
+          id={theme.id}
+          src={coverUrl(theme.coverKey)}
+          color={theme.color}
+          className="size-24"
+        />
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-semibold tracking-tight">{theme.name}</h1>
           <p className="text-sm text-fg-muted">
@@ -61,7 +63,7 @@ async function AdminTheme({ params }: Pick<PageProps<"/[locale]/admin/music/[the
           ) : (
             <ul className="divide-y divide-border">
               {tracks.map((tr) => (
-                <TrackRow key={tr.id} track={tr} />
+                <TrackRow key={tr.id} track={{ ...tr, cover: coverUrl(tr.coverKey) }} color={theme.color} />
               ))}
             </ul>
           )}

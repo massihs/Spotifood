@@ -27,19 +27,21 @@ async function GuestCart() {
   ]);
   return (
     <LiveProvider url="/api/v1/realtime/guest">
-      <LiveRefresh types={["session.closed"]} />
-      <CartView
-        lines={cart.lines}
-        totals={cart.totals}
-        currency={guest.restaurant.currency}
-        pricesIncludeTax={guest.restaurant.pricesIncludeTax}
-        seatLabel={t("tableBadge", { table: guest.table.label })}
-        restaurantName={guest.restaurant.name}
-        displayName={guest.participant.displayName}
-        hasIssues={cart.hasIssues}
-        orderCount={orders.length}
-        requirePhone={guest.restaurant.kind === "food_court"}
-      />
+      <div data-brand={guest.restaurant.brandColor} className="contents">
+        <LiveRefresh types={["session.closed"]} />
+        <CartView
+          lines={cart.lines}
+          totals={cart.totals}
+          currency={guest.restaurant.currency}
+          pricesIncludeTax={guest.restaurant.pricesIncludeTax}
+          seatLabel={t("tableBadge", { table: guest.table.label })}
+          restaurantName={guest.restaurant.name}
+          displayName={guest.participant.displayName}
+          hasIssues={cart.hasIssues}
+          orderCount={orders.length}
+          requirePhone={guest.restaurant.kind === "food_court"}
+        />
+      </div>
     </LiveProvider>
   );
 }

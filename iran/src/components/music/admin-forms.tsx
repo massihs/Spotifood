@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, Loader2, Pause, Play, Plus, Power, Radio, Trash2, Upload, X } from "lucide-react";
+import { Check, ImagePlus, Loader2, Pause, Play, Plus, Power, Radio, Trash2, Upload, X } from "lucide-react";
+import { Cover } from "@/components/music/cover";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -190,13 +191,6 @@ export function TrackUploader({ themeId }: { themeId: string }) {
         const duration = await audioDuration(file);
         const fd = new FormData();
         fd.set("file", file);
-        fd.set(
-          "title",
-          file.name
-            .replace(/\.[^.]+$/, "")
-            .replace(/[_-]+/g, " ")
-            .trim(),
-        );
         fd.set("durationSec", String(Math.round(duration)));
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
@@ -305,6 +299,7 @@ export function TrackUploader({ themeId }: { themeId: string }) {
 
 export function TrackRow({
   track,
+  color,
 }: {
   track: {
     id: string;
@@ -313,7 +308,9 @@ export function TrackRow({
     durationSec: number;
     isActive: boolean;
     sizeBytes: number;
+    cover: string | null;
   };
+  color: string;
 }) {
   const t = useTranslations("music.admin");
   const [pending, start] = useTransition();
@@ -346,6 +343,7 @@ export function TrackRow({
         onPause={() => setPlaying(false)}
         onEnded={() => setPlaying(false)}
       />
+      <CoverEdit kind="track" id={track.id} src={track.cover} color={color} className="size-12" />
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium" dir="auto">
           {track.title}
@@ -405,5 +403,75 @@ export function SubscriptionActions({ id, status }: { id: string; status: string
         {t("cancel")}
       </Button>
     </div>
+  );
+}
+
+/** Click the artwork to replace it (track or station). */
+export function CoverEdit({
+  kind,
+  id,
+  src,
+  color,
+  className,
+}: {
+  kind: "track" | "theme";
+  id: string;
+  src: string | null;
+  color: string;
+  className?: string;
+}) {
+  const t = useTranslations("music.admin");
+  const router = useRouter();
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => input.current?.click()}
+      disabled={busy}
+      title={t("changeCover")}
+      aria-label={t("changeCover")}
+      className={cn("group relative shrink-0 overflow-hidden rounded-lg", className)}
+    >
+      <Cover src={src} color={color} className="size-full" rounded="rounded-lg" />
+      <span
+        className={cn(
+          "absolute inset-0 grid place-items-center bg-black/55 text-white transition-opacity",
+          busy || error ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+        )}
+      >
+        {busy ? (
+          <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+        ) : error ? (
+          <X className="size-5 text-red-300" aria-hidden="true" />
+        ) : (
+          <ImagePlus className="size-5" aria-hidden="true" />
+        )}
+      </span>
+      <input
+        ref={input}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        hidden
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (!file) return;
+          setBusy(true);
+          setError(false);
+          const fd = new FormData();
+          fd.set("file", file);
+          fd.set("kind", kind);
+          fd.set("id", id);
+          const res = await fetch("/api/v1/admin/music/covers", { method: "POST", body: fd }).catch(
+            () => null,
+          );
+          setBusy(false);
+          if (res?.ok) router.refresh();
+          else setError(true);
+        }}
+      />
+    </button>
   );
 }

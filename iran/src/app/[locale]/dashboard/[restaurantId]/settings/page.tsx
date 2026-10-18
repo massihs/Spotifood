@@ -80,6 +80,7 @@ async function Settings({ params }: { params: Params }) {
                 values={{
                   name: r.name,
                   kind: r.kind,
+                  brandColor: r.brandColor,
                   email: r.email,
                   phone: r.phone,
                   addressLine1: r.addressLine1,

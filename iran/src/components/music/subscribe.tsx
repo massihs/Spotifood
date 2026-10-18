@@ -47,9 +47,7 @@ export function SubscribeForm({
               aria-pressed={on}
               className={cn(
                 "relative rounded-2xl border-2 bg-surface p-5 text-start transition-colors",
-                on
-                  ? "border-accent shadow-[0_10px_30px_-14px_hsl(150_70%_25%/0.5)]"
-                  : "border-border hover:border-border-strong",
+                on ? "border-accent shadow-accent" : "border-border hover:border-border-strong",
               )}
             >
               {p === "weekly" ? (
@@ -137,7 +135,7 @@ export function SubscribeForm({
               if (res && !res.ok) setError(t("requestFailed"));
             })
           }
-          className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-accent px-6 py-3.5 text-lg font-bold text-accent-fg shadow-[0_10px_24px_-10px_hsl(150_70%_25%/0.7)] disabled:opacity-50 sm:w-auto"
+          className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-accent px-6 py-3.5 text-lg font-bold text-accent-fg shadow-accent disabled:opacity-50 sm:w-auto"
         >
           {pending ? <Loader2 className="size-5 animate-spin" aria-hidden="true" /> : null}
           {t("subscribe")}

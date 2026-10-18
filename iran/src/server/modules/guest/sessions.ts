@@ -149,6 +149,7 @@ export type GuestContext = {
     pricesIncludeTax: boolean;
     enabledLocales: string[];
     kind: "restaurant" | "cafe" | "food_court";
+    brandColor: string;
   };
 };
 
@@ -188,6 +189,7 @@ export async function loadGuestContext(
         defaultLocale: restaurants.defaultLocale,
         status: restaurants.status,
         kind: restaurants.kind,
+        brandColor: restaurants.brandColor,
         pricesIncludeTax: restaurantSettings.pricesIncludeTax,
         enabledLocales: restaurantSettings.enabledLocales,
       },

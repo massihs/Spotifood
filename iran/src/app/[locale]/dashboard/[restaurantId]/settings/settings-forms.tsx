@@ -1,6 +1,7 @@
 "use client";
 
 import { KindPicker } from "@/components/kind-picker";
+import { BrandPicker } from "@/components/brand-picker";
 import type { RestaurantKind } from "@/lib/restaurant-kind";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -33,6 +34,7 @@ const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 export type ProfileValues = {
   name: string;
   kind: RestaurantKind;
+  brandColor: string;
   email: string | null;
   phone: string | null;
   addressLine1: string | null;
@@ -73,6 +75,7 @@ export function ProfileForm({
           error={err("name")}
         />
         <KindPicker defaultValue={values.kind} />
+        <BrandPicker defaultValue={values.brandColor} />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             label={t("settings.email")}

@@ -432,7 +432,7 @@ function OrderPanel({
               }
             })
           }
-          className="mx-auto flex h-14 w-full max-w-2xl items-center justify-between gap-3 rounded-2xl bg-accent ps-5 pe-2 text-lg font-bold text-accent-fg shadow-[0_10px_24px_-10px_hsl(150_70%_25%/0.7)] transition-transform active:scale-[0.98] disabled:opacity-40"
+          className="mx-auto flex h-14 w-full max-w-2xl items-center justify-between gap-3 rounded-2xl bg-accent ps-5 pe-2 text-lg font-bold text-accent-fg shadow-accent transition-transform active:scale-[0.98] disabled:opacity-40"
         >
           <span className="flex items-center gap-2">
             {pending ? (

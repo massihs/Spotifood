@@ -15,7 +15,49 @@ export type NavItem = {
   primary?: boolean;
   /** Count shown on the item (e.g. new orders); hidden at 0. */
   badge?: number;
+  /** Sidebar section label; a heading is drawn when it changes. */
+  group?: string;
 };
+
+/** Icon tile colors, by the item's last path segment (static class names for Tailwind). */
+const TONES: Record<string, string> = {
+  violet: "bg-tone-violet/15 text-tone-violet",
+  sky: "bg-tone-sky/15 text-tone-sky",
+  amber: "bg-tone-amber/20 text-tone-amber",
+  rose: "bg-tone-rose/15 text-tone-rose",
+  teal: "bg-tone-teal/15 text-tone-teal",
+  orange: "bg-tone-orange/15 text-tone-orange",
+  emerald: "bg-tone-emerald/15 text-tone-emerald",
+  fuchsia: "bg-tone-fuchsia/15 text-tone-fuchsia",
+  indigo: "bg-tone-indigo/20 text-tone-indigo",
+  lime: "bg-tone-lime/15 text-tone-lime",
+};
+const BY_SEGMENT: Record<string, keyof typeof TONES> = {
+  kitchen: "orange",
+  pos: "emerald",
+  orders: "sky",
+  floor: "teal",
+  menu: "rose",
+  inventory: "amber",
+  customers: "fuchsia",
+  reports: "indigo",
+  branches: "lime",
+  payments: "emerald",
+  invoices: "sky",
+  tables: "violet",
+  music: "fuchsia",
+  team: "teal",
+  settings: "indigo",
+  restaurants: "sky",
+  users: "teal",
+  plans: "amber",
+  audit: "rose",
+};
+const ORDER = Object.keys(TONES);
+export function toneOf(item: NavItem, index: number) {
+  const seg = item.href.split("/").filter(Boolean).pop() ?? "";
+  return TONES[BY_SEGMENT[seg] ?? ORDER[index % ORDER.length]!]!;
+}
 
 function Badge({ n, className }: { n?: number; className?: string }) {
   if (!n) return null;
@@ -37,35 +79,47 @@ function useActive() {
     item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
 }
 
-/** Desktop sidebar navigation. */
+/** Desktop sidebar navigation (dark sidebar): colored icon tiles, grouped sections. */
 export function SidebarNav({ items, label }: { items: NavItem[]; label: string }) {
   const isActive = useActive();
   return (
-    <nav aria-label={label} className="space-y-1">
-      {items.map((item) => {
+    <nav aria-label={label} className="space-y-0.5">
+      {items.map((item, i) => {
         const active = isActive(item);
+        const heading = item.group && item.group !== items[i - 1]?.group ? item.group : null;
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-current={active ? "page" : undefined}
-            className={cn(
-              "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors",
-              active ? "bg-accent-soft text-accent-text" : "text-fg-muted hover:bg-surface-2 hover:text-fg",
-            )}
-          >
-            <span
+          <div key={item.href}>
+            {heading ? (
+              <p className="px-3 pt-4 pb-1.5 text-[11px] font-semibold tracking-wide text-sidebar-muted/70 uppercase">
+                {heading}
+              </p>
+            ) : null}
+            <Link
+              href={item.href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "size-[18px] shrink-0 [&_svg]:size-[18px]",
-                active ? "text-accent" : "opacity-80",
+                "group relative flex h-10 items-center gap-3 rounded-xl px-2 text-sm font-medium transition-colors",
+                active
+                  ? "bg-sidebar-2 text-sidebar-fg"
+                  : "text-sidebar-muted hover:bg-sidebar-2/60 hover:text-sidebar-fg",
               )}
-              aria-hidden="true"
             >
-              {item.icon}
-            </span>
-            <span className="min-w-0 flex-1 truncate">{item.label}</span>
-            <Badge n={item.badge} className="animate-pop-in" />
-          </Link>
+              {active ? (
+                <span className="absolute inset-y-2 start-0 w-1 rounded-full bg-accent" aria-hidden="true" />
+              ) : null}
+              <span
+                className={cn(
+                  "grid size-7 shrink-0 place-items-center rounded-lg transition-transform group-hover:scale-105 [&_svg]:size-4",
+                  active ? "bg-accent text-accent-fg shadow-accent" : toneOf(item, i),
+                )}
+                aria-hidden="true"
+              >
+                {item.icon}
+              </span>
+              <span className="min-w-0 flex-1 truncate">{item.label}</span>
+              <Badge n={item.badge} className="animate-pop-in" />
+            </Link>
+          </div>
         );
       })}
     </nav>
@@ -173,7 +227,7 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
               </button>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {items.map((item) => {
+              {items.map((item, i) => {
                 const active = isActive(item);
                 return (
                   <Link
@@ -186,7 +240,10 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
                     )}
                   >
                     <span
-                      className={cn("relative [&_svg]:size-6", active && "text-accent")}
+                      className={cn(
+                        "relative grid size-11 place-items-center rounded-2xl [&_svg]:size-5",
+                        active ? "bg-accent text-accent-fg" : toneOf(item, i),
+                      )}
                       aria-hidden="true"
                     >
                       {item.icon}

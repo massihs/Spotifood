@@ -17,6 +17,7 @@ export type RestaurantSummary = {
   defaultLocale: string;
   logoKey: string | null;
   kind: "restaurant" | "cafe" | "food_court";
+  brandColor: string;
 };
 
 /**
@@ -43,6 +44,7 @@ const restaurantColumns = {
   defaultLocale: restaurants.defaultLocale,
   logoKey: restaurants.logoKey,
   kind: restaurants.kind,
+  brandColor: restaurants.brandColor,
 };
 
 export async function loadRestaurantContext(

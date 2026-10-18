@@ -29,6 +29,8 @@ export const restaurants = pgTable(
     name: varchar({ length: 160 }).notNull(),
     kind: restaurantKind().notNull().default("restaurant"),
     logoKey: text(),
+    /** Brand color key (lib/brand-colors): menu and dashboard accent. */
+    brandColor: varchar({ length: 16 }).notNull().default("violet"),
     email: varchar({ length: 320 }),
     phone: varchar({ length: 32 }),
     addressLine1: varchar({ length: 200 }),

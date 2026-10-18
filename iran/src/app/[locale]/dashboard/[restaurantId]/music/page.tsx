@@ -47,6 +47,7 @@ async function MusicContent({ params }: { params: Params }) {
           <div className="space-y-4">
             {state.playlist.tracks.length ? (
               <PlaylistPlayer
+                restaurantId={ctx.restaurant.id}
                 tracks={state.playlist.tracks}
                 color={state.theme.color}
                 title={state.theme.name}

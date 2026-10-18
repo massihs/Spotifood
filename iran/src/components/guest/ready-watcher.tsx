@@ -76,7 +76,7 @@ export function ReadyWatcher() {
             >
               <X className="size-4" aria-hidden="true" />
             </button>
-            <span className="mx-auto grid size-20 place-items-center rounded-full bg-accent text-accent-fg shadow-[0_12px_30px_-10px_hsl(150_70%_25%/0.7)]">
+            <span className="mx-auto grid size-20 place-items-center rounded-full bg-accent text-accent-fg shadow-accent">
               <ConciergeBell className="size-10" aria-hidden="true" />
             </span>
             <p id="ready-title" className="mt-5 text-2xl font-bold">

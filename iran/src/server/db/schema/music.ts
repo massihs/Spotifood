@@ -17,6 +17,8 @@ export const musicThemes = pgTable(
     description: text(),
     /** Accent colour of the station artwork (hex). */
     color: varchar({ length: 7 }).notNull().default("#16a34a"),
+    /** Station artwork (public storage key, square webp). */
+    coverKey: text(),
     isActive: boolean().notNull().default(true),
     /** The radio is on air (public station page). */
     radioEnabled: boolean().notNull().default(true),
@@ -41,6 +43,8 @@ export const musicTracks = pgTable(
     sizeBytes: integer().notNull(),
     /** Seconds, measured in the browser at upload; drives the radio clock. */
     durationSec: integer().notNull(),
+    /** Album art: extracted from the file's tags at upload, or uploaded by the admin. */
+    coverKey: text(),
     isActive: boolean().notNull().default(true),
     sortOrder: integer().notNull().default(0),
     uploadedByUserId: uuid().references(() => users.id),
@@ -74,3 +78,17 @@ export const musicSubscriptions = pgTable(
   },
   (t) => [index("music_subscriptions_restaurant_idx").on(t.restaurantId, t.status)],
 );
+
+/**
+ * What a restaurant's in-house player is playing, reported by the dashboard player, so guests
+ * at the tables can see the song and its cover. `startedAt` is when the track's second 0 was.
+ */
+export const musicNowPlaying = pgTable("music_now_playing", {
+  restaurantId: uuid()
+    .primaryKey()
+    .references(() => restaurants.id, { onDelete: "cascade" }),
+  trackId: uuid().references(() => musicTracks.id, { onDelete: "set null" }),
+  isPlaying: boolean().notNull().default(false),
+  startedAt: tstz(),
+  updatedAt: tstz().notNull().defaultNow(),
+});

@@ -223,7 +223,13 @@
     "inventory": "المخزون",
     "customers": "نادي العملاء",
     "reports": "التقارير والمحاسبة",
-    "branches": "الفروع"
+    "branches": "الفروع",
+    "groups": {
+      "ops": "العمليات اليومية",
+      "catalog": "القائمة والمخزون",
+      "business": "المبيعات والعملاء",
+      "manage": "الإدارة"
+    }
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -759,7 +765,17 @@
     "coupon": "كود الخصم",
     "applyCoupon": "تطبيق",
     "removeCoupon": "إزالة الكود",
-    "couponMin": "الحد الأدنى للطلب {amount}"
+    "couponMin": "الحد الأدنى للطلب {amount}",
+    "music": {
+      "nowPlayingIn": "يُعزف الآن في {name}",
+      "openPlayer": "عرض الأغنية الحالية",
+      "nowPlaying": "يُعزف الآن",
+      "playingIn": "يُعزف في",
+      "close": "إغلاق",
+      "unknownArtist": "فنان غير معروف",
+      "upNext": "التالي",
+      "hint": "هذه الموسيقى تُعزف في المطعم الآن."
+    }
   },
   "categoryTemplates": {
     "starters": "المقبلات",
@@ -1272,7 +1288,10 @@
       "pause": "Pause",
       "loop": "Playlist loops",
       "volume": "Volume",
-      "tracks": "{count} tracks"
+      "tracks": "{count} tracks",
+      "minutes": "{count} دقيقة",
+      "titleCol": "العنوان",
+      "durationCol": "المدة"
     },
     "radio": {
       "pageTitle": "راديو سبوتيفود",
@@ -1288,7 +1307,14 @@
       "offAir": "This station is off air for now.",
       "upNext": "Up next",
       "stations": "Stations",
-      "noStations": "No station is on air yet."
+      "noStations": "No station is on air yet.",
+      "stationMeta": "راديو · {count} أغنية",
+      "liveStation": "محطة راديو مباشرة",
+      "minutes": "{count} دقيقة",
+      "titleCol": "العنوان",
+      "durationCol": "المدة",
+      "moreStations": "محطات أخرى",
+      "volume": "الصوت"
     },
     "admin": {
       "title": "Music",
@@ -1337,7 +1363,8 @@
         "forbidden": "Not allowed.",
         "internal": "Upload failed.",
         "duration": "Could not read the duration."
-      }
+      },
+      "changeCover": "تغيير الغلاف"
     }
   },
   "pos": {
@@ -1679,5 +1706,21 @@
     "copying": "جارٍ النسخ…",
     "import": "استيراد",
     "copied": "نُسخت {categories} فئات و{products} أطباق."
+  },
+  "brandColors": {
+    "label": "لون العلامة",
+    "hint": "يُستخدم في قائمة الضيوف والأزرار ولوحة التحكم. معاينة فورية.",
+    "violet": "بنفسجي",
+    "indigo": "نيلي",
+    "sky": "سماوي",
+    "teal": "فيروزي",
+    "emerald": "زمردي",
+    "olive": "زيتوني",
+    "saffron": "زعفراني",
+    "coral": "مرجاني",
+    "rose": "وردي",
+    "fuchsia": "فوشيا",
+    "plum": "برقوقي",
+    "slate": "رمادي"
   }
 }

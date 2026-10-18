@@ -60,19 +60,34 @@ async function RestaurantShell({
     countNewOrders(db, ctx),
     countLowStock(db, ctx),
   ]);
+  const g = {
+    ops: t("nav.groups.ops"),
+    catalog: t("nav.groups.catalog"),
+    business: t("nav.groups.business"),
+    manage: t("nav.groups.manage"),
+  };
   const nav = [
-    { href: base, label: t("nav.overview"), icon: <LayoutDashboard />, exact: true, primary: true },
+    {
+      href: base,
+      label: t("nav.overview"),
+      icon: <LayoutDashboard />,
+      exact: true,
+      primary: true,
+      group: g.ops,
+    },
     can(ctx, "orders.view") && {
       href: `${base}/kitchen`,
       label: t("nav.kitchen"),
       icon: <ChefHat />,
       primary: true,
       badge: newOrders,
+      group: g.ops,
     },
     can(ctx, "orders.create") && {
       href: `${base}/pos`,
       label: t("nav.pos"),
       icon: <Calculator />,
+      group: g.ops,
     },
     can(ctx, "orders.view") && {
       href: `${base}/orders`,
@@ -80,48 +95,81 @@ async function RestaurantShell({
       icon: <ReceiptText />,
       primary: true,
       badge: newOrders,
+      group: g.ops,
     },
-    can(ctx, "tables.view") && { href: `${base}/floor`, label: t("nav.floor"), icon: <LayoutGrid /> },
+    can(ctx, "tables.view") && {
+      href: `${base}/floor`,
+      label: t("nav.floor"),
+      icon: <LayoutGrid />,
+      group: g.ops,
+    },
     can(ctx, "menu.view") && {
       href: `${base}/menu`,
       label: t("nav.menu"),
       icon: <UtensilsCrossed />,
       primary: true,
+      group: g.catalog,
     },
     can(ctx, "inventory.view") && {
       href: `${base}/inventory`,
       label: t("nav.inventory"),
       icon: <Boxes />,
       badge: lowStock,
+      group: g.catalog,
+    },
+    can(ctx, "tables.view") && {
+      href: `${base}/tables`,
+      label: t("nav.tables"),
+      icon: <QrCode />,
+      group: g.catalog,
     },
     can(ctx, "customers.view") && {
       href: `${base}/customers`,
       label: t("nav.customers"),
       icon: <HeartHandshake />,
+      group: g.business,
     },
     can(ctx, "accounting.manage") && {
       href: `${base}/reports`,
       label: t("nav.reports"),
       icon: <ChartColumn />,
+      group: g.business,
+    },
+    can(ctx, "payments.view") && {
+      href: `${base}/payments`,
+      label: t("nav.payments"),
+      icon: <Wallet />,
+      group: g.business,
+    },
+    can(ctx, "invoices.view") && {
+      href: `${base}/invoices`,
+      label: t("nav.invoices"),
+      icon: <FileText />,
+      group: g.business,
     },
     ctx.role !== "staff" && {
       href: `${base}/branches`,
       label: t("nav.branches"),
       icon: <Network />,
+      group: g.manage,
     },
-    can(ctx, "payments.view") && { href: `${base}/payments`, label: t("nav.payments"), icon: <Wallet /> },
-    can(ctx, "invoices.view") && {
-      href: `${base}/invoices`,
-      label: t("nav.invoices"),
-      icon: <FileText />,
+    can(ctx, "restaurant.view") && {
+      href: `${base}/music`,
+      label: t("nav.music"),
+      icon: <Music />,
+      group: g.manage,
     },
-    can(ctx, "tables.view") && { href: `${base}/tables`, label: t("nav.tables"), icon: <QrCode /> },
-    can(ctx, "restaurant.view") && { href: `${base}/music`, label: t("nav.music"), icon: <Music /> },
-    can(ctx, "members.manage") && { href: `${base}/team`, label: t("nav.team"), icon: <Users /> },
+    can(ctx, "members.manage") && {
+      href: `${base}/team`,
+      label: t("nav.team"),
+      icon: <Users />,
+      group: g.manage,
+    },
     can(ctx, "restaurant.view") && {
       href: `${base}/settings`,
       label: t("nav.settings"),
       icon: <Settings />,
+      group: g.manage,
     },
   ].filter((x) => !!x);
 
@@ -131,6 +179,7 @@ async function RestaurantShell({
         title={ctx.restaurant.name}
         subtitle={t(`roles.${ctx.role}`)}
         avatar={logoUrl(ctx.restaurant.logoKey)}
+        brand={ctx.restaurant.brandColor}
         nav={nav}
         user={ctx.user}
         headerExtra={

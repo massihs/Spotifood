@@ -20,6 +20,7 @@ async function AdminShell({ children }: { children: React.ReactNode }) {
     <AppShell
       title={t("admin")}
       subtitle="Super admin"
+      brand="indigo"
       user={user}
       nav={[
         { href: "/admin", label: t("adminOverview"), icon: <IconChart />, exact: true, primary: true },

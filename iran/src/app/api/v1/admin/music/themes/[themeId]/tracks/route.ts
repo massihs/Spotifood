@@ -23,7 +23,15 @@ export async function POST(
       themeId,
       { body: Buffer.from(await file.arrayBuffer()), type: file.type },
       {
-        title: String(fd.get("title") ?? file.name.replace(/\.[^.]+$/, "")),
+        title: String(
+          fd.get("title") ||
+            file.name
+              .replace(/\.[^.]+$/, "")
+              .replace(/[_-]+/g, " ")
+              .trim() ||
+            "—",
+        ),
+        fromFileName: !fd.get("title"),
         artist: String(fd.get("artist") ?? ""),
         durationSec: Math.round(Number(fd.get("durationSec") ?? 0)),
       },

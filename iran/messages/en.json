@@ -223,7 +223,13 @@
     "inventory": "Stock",
     "customers": "Customer club",
     "reports": "Reports & accounting",
-    "branches": "Branches"
+    "branches": "Branches",
+    "groups": {
+      "ops": "Daily operations",
+      "catalog": "Menu & stock",
+      "business": "Sales & customers",
+      "manage": "Management"
+    }
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -759,7 +765,17 @@
     "coupon": "Promo code",
     "applyCoupon": "Apply",
     "removeCoupon": "Remove code",
-    "couponMin": "Minimum order {amount}"
+    "couponMin": "Minimum order {amount}",
+    "music": {
+      "nowPlayingIn": "Now playing at {name}",
+      "openPlayer": "Show the song playing",
+      "nowPlaying": "Now playing",
+      "playingIn": "Playing at",
+      "close": "Close",
+      "unknownArtist": "Unknown artist",
+      "upNext": "Up next",
+      "hint": "This is the music playing in the restaurant right now."
+    }
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -1272,7 +1288,10 @@
       "pause": "Pause",
       "loop": "Playlist loops",
       "volume": "Volume",
-      "tracks": "{count} tracks"
+      "tracks": "{count} tracks",
+      "minutes": "{count} min",
+      "titleCol": "Title",
+      "durationCol": "Duration"
     },
     "radio": {
       "pageTitle": "Spotifood Radio",
@@ -1288,7 +1307,14 @@
       "offAir": "This station is off air for now.",
       "upNext": "Up next",
       "stations": "Stations",
-      "noStations": "No station is on air yet."
+      "noStations": "No station is on air yet.",
+      "stationMeta": "Radio · {count} songs",
+      "liveStation": "Live radio station",
+      "minutes": "{count} min",
+      "titleCol": "Title",
+      "durationCol": "Duration",
+      "moreStations": "More stations",
+      "volume": "Volume"
     },
     "admin": {
       "title": "Music",
@@ -1337,7 +1363,8 @@
         "forbidden": "Not allowed.",
         "internal": "Upload failed.",
         "duration": "Could not read the duration."
-      }
+      },
+      "changeCover": "Change artwork"
     }
   },
   "pos": {
@@ -1679,5 +1706,21 @@
     "copying": "Copying…",
     "import": "Import",
     "copied": "{categories} categories and {products} dishes copied."
+  },
+  "brandColors": {
+    "label": "Brand color",
+    "hint": "Used on your guest menu, buttons and dashboard. Previews instantly.",
+    "violet": "Violet",
+    "indigo": "Indigo",
+    "sky": "Sky",
+    "teal": "Teal",
+    "emerald": "Emerald",
+    "olive": "Olive",
+    "saffron": "Saffron",
+    "coral": "Coral",
+    "rose": "Rose",
+    "fuchsia": "Fuchsia",
+    "plum": "Plum",
+    "slate": "Slate"
   }
 }
