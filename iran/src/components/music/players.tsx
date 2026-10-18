@@ -300,11 +300,15 @@ export function RadioPlayer({ slug, name, color }: { slug: string; name: string;
       if (!res.ok) throw new Error("off_air");
       const data = (await res.json()) as Live;
       setLive(data);
-      a.src = data.track.url;
-      await new Promise<void>((resolve, reject) => {
+      // Listen before setting src (cached files can fire immediately), and force loading.
+      const ready = new Promise<void>((resolve, reject) => {
         a.onloadedmetadata = () => resolve();
         a.onerror = () => reject(new Error("load"));
       });
+      a.preload = "auto";
+      a.src = data.track.url;
+      a.load();
+      await ready;
       a.currentTime = data.offsetSec + (performance.now() - asked) / 1000;
       await a.play();
       setState("playing");
