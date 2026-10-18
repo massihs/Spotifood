@@ -221,7 +221,8 @@
     "adminMusic": "Music",
     "pos": "Till",
     "inventory": "Stock",
-    "customers": "Customer club"
+    "customers": "Customer club",
+    "reports": "Reports & accounting"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -1552,5 +1553,92 @@
     "spendPerPoint": "One point for every … spent",
     "pointValue": "Value of one point",
     "loyaltyExample": "Every {spend} spent = 1 point worth {value} (about {rate}% back)."
+  },
+  "reports": {
+    "title": "Reports & accounting",
+    "periodLabel": "{from} – {to} · {days} days",
+    "exportCsv": "Export CSV",
+    "presets": {
+      "today": "Today",
+      "7d": "7 days",
+      "30d": "30 days",
+      "month": "This month"
+    },
+    "custom": "Custom range",
+    "from": "From",
+    "to": "To",
+    "apply": "Show",
+    "tabs": {
+      "overview": "Profit & loss",
+      "sales": "Sales",
+      "products": "Products",
+      "expenses": "Expenses"
+    },
+    "revenue": "Revenue",
+    "ordersN": "{count} orders",
+    "avgTicket": "Average ticket",
+    "grossMargin": "Gross margin",
+    "afterCogs": "after food cost",
+    "netProfit": "Net profit",
+    "marginPct": "{pct}% margin",
+    "dailySales": "Daily sales",
+    "pnl": "Profit & loss",
+    "vat": "VAT",
+    "netSales": "Net sales",
+    "cogs": "Food cost",
+    "cogsCoverage": "{pct}% of sales with a recipe",
+    "purchasesNote": "Stock purchases in this period: {amount} ({count} invoices) — counted through food cost, not as an expense.",
+    "paymentMethods": "Payment methods",
+    "channels": "Sales channels",
+    "channel": {
+      "qr": "QR order",
+      "pos_takeaway": "Till · takeaway",
+      "pos_table": "Till · table"
+    },
+    "providers": {
+      "cash": "Cash",
+      "on_site_terminal": "Card terminal",
+      "zarinpal": "Zarinpal",
+      "stripe": "Online card",
+      "pay_later": "Later"
+    },
+    "subtotal": "Items total",
+    "discounts": "Discounts",
+    "cancelled": "Cancelled",
+    "byHour": "Orders by hour",
+    "date": "Date",
+    "orders": "Orders",
+    "byCategory": "Sales by category",
+    "product": "Product",
+    "category": "Category",
+    "categoryLabel": "Type",
+    "qty": "Qty",
+    "cost": "Food cost",
+    "margin": "Margin",
+    "noData": "No sales in this period.",
+    "totalExpenses": "Total expenses",
+    "entries": "{count} entries",
+    "noExpenses": "No expenses recorded.",
+    "newExpense": "Add expense",
+    "amount": "Amount",
+    "description": "Description",
+    "method": "Payment method",
+    "save": "Save",
+    "deleteExpense": "Delete this expense?",
+    "categories": {
+      "rent": "Rent",
+      "salaries": "Salaries",
+      "utilities": "Utilities",
+      "supplies": "Supplies",
+      "marketing": "Marketing",
+      "maintenance": "Maintenance",
+      "taxes": "Taxes & fees",
+      "other": "Other"
+    },
+    "methods": {
+      "cash": "Cash",
+      "card": "Card",
+      "transfer": "Bank transfer"
+    }
   }
 }

@@ -17,7 +17,8 @@ import { createPosOrder } from "@/server/modules/pos/service";
 import { updateOrderStatus } from "@/server/modules/orders/service";
 import { createOwnerWithRestaurant } from "../helpers/factories";
 
-const qtyOf = async (id: string) => (await db.select().from(stockItems).where(eq(stockItems.id, id)))[0]!.quantity;
+const qtyOf = async (id: string) =>
+  (await db.select().from(stockItems).where(eq(stockItems.id, id)))[0]!.quantity;
 
 describe("inventory", () => {
   it("tracks purchases, recipes, sales and cancellations", async () => {
@@ -62,7 +63,12 @@ describe("inventory", () => {
 
   it("counts, wastes and alerts below the threshold", async () => {
     const { ctx, restaurant } = await createOwnerWithRestaurant("Kafe");
-    const item = await createStockItem(db, ctx, { name: "Sucre", unit: "kg", lowStockThreshold: 2, initialQuantity: 5 });
+    const item = await createStockItem(db, ctx, {
+      name: "Sucre",
+      unit: "kg",
+      lowStockThreshold: 2,
+      initialQuantity: 5,
+    });
     await adjustStock(db, ctx, item.id, { kind: "waste", quantity: 1.5 });
     expect(await qtyOf(item.id)).toBe(3.5);
     await adjustStock(db, ctx, item.id, { kind: "count", quantity: 1 });

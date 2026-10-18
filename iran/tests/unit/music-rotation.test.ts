@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { nextWeeklyChange, periodKey, playlistFor, radioNow } from "@/server/modules/music/rotation";
 
-const tracks = Array.from({ length: 50 }, (_, i) => ({ id: `t${String(i).padStart(2, "0")}`, durationSec: 100 }));
+const tracks = Array.from({ length: 50 }, (_, i) => ({
+  id: `t${String(i).padStart(2, "0")}`,
+  durationSec: 100,
+}));
 
 describe("music rotation", () => {
   it("changes the weekly period on Saturday 00:00 Tehran", () => {

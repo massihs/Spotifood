@@ -105,7 +105,8 @@
     "adminMusic": "Musique",
     "pos": "Caisse",
     "inventory": "Stocks",
-    "customers": "Club clients"
+    "customers": "Club clients",
+    "reports": "Rapports & compta"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -1396,5 +1397,92 @@
     "spendPerPoint": "Un point tous les … dépensés",
     "pointValue": "Valeur d'un point",
     "loyaltyExample": "Chaque {spend} dépensé = 1 point valant {value} (environ {rate} % reversés)."
+  },
+  "reports": {
+    "title": "Rapports & comptabilité",
+    "periodLabel": "{from} – {to} · {days} jours",
+    "exportCsv": "Exporter CSV",
+    "presets": {
+      "today": "Aujourd'hui",
+      "7d": "7 jours",
+      "30d": "30 jours",
+      "month": "Ce mois"
+    },
+    "custom": "Période libre",
+    "from": "Du",
+    "to": "Au",
+    "apply": "Afficher",
+    "tabs": {
+      "overview": "Résultat",
+      "sales": "Ventes",
+      "products": "Produits",
+      "expenses": "Dépenses"
+    },
+    "revenue": "Chiffre d'affaires",
+    "ordersN": "{count} commandes",
+    "avgTicket": "Ticket moyen",
+    "grossMargin": "Marge brute",
+    "afterCogs": "après coût matière",
+    "netProfit": "Résultat net",
+    "marginPct": "marge {pct} %",
+    "dailySales": "Ventes par jour",
+    "pnl": "Compte de résultat",
+    "vat": "TVA",
+    "netSales": "Ventes HT",
+    "cogs": "Coût matière",
+    "cogsCoverage": "{pct} % des ventes avec recette",
+    "purchasesNote": "Achats de stock sur la période : {amount} ({count} factures) — comptés via le coût matière, pas en dépense.",
+    "paymentMethods": "Moyens de paiement",
+    "channels": "Canaux de vente",
+    "channel": {
+      "qr": "Commande QR",
+      "pos_takeaway": "Caisse · à emporter",
+      "pos_table": "Caisse · sur table"
+    },
+    "providers": {
+      "cash": "Espèces",
+      "on_site_terminal": "TPE",
+      "zarinpal": "Zarinpal",
+      "stripe": "Carte en ligne",
+      "pay_later": "Plus tard"
+    },
+    "subtotal": "Total articles",
+    "discounts": "Remises",
+    "cancelled": "Annulées",
+    "byHour": "Commandes par heure",
+    "date": "Date",
+    "orders": "Commandes",
+    "byCategory": "Ventes par catégorie",
+    "product": "Produit",
+    "category": "Catégorie",
+    "categoryLabel": "Type",
+    "qty": "Qté",
+    "cost": "Coût matière",
+    "margin": "Marge",
+    "noData": "Aucune vente sur la période.",
+    "totalExpenses": "Total dépenses",
+    "entries": "{count} lignes",
+    "noExpenses": "Aucune dépense.",
+    "newExpense": "Ajouter une dépense",
+    "amount": "Montant",
+    "description": "Libellé",
+    "method": "Moyen de paiement",
+    "save": "Enregistrer",
+    "deleteExpense": "Supprimer cette dépense ?",
+    "categories": {
+      "rent": "Loyer",
+      "salaries": "Salaires",
+      "utilities": "Énergie & eau",
+      "supplies": "Fournitures",
+      "marketing": "Marketing",
+      "maintenance": "Entretien",
+      "taxes": "Impôts & taxes",
+      "other": "Autre"
+    },
+    "methods": {
+      "cash": "Espèces",
+      "card": "Carte",
+      "transfer": "Virement"
+    }
   }
 }

@@ -221,7 +221,8 @@
     "adminMusic": "الموسيقى",
     "pos": "الصندوق",
     "inventory": "المخزون",
-    "customers": "نادي العملاء"
+    "customers": "نادي العملاء",
+    "reports": "التقارير والمحاسبة"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -1552,5 +1553,92 @@
     "spendPerPoint": "نقطة لكل … إنفاق",
     "pointValue": "قيمة النقطة",
     "loyaltyExample": "كل {spend} = نقطة واحدة بقيمة {value} (حوالي {rate}٪ استرداد)."
+  },
+  "reports": {
+    "title": "التقارير والمحاسبة",
+    "periodLabel": "{from} – {to} · {days} يوماً",
+    "exportCsv": "تصدير CSV",
+    "presets": {
+      "today": "اليوم",
+      "7d": "7 أيام",
+      "30d": "30 يوماً",
+      "month": "هذا الشهر"
+    },
+    "custom": "فترة مخصصة",
+    "from": "من",
+    "to": "إلى",
+    "apply": "عرض",
+    "tabs": {
+      "overview": "الأرباح والخسائر",
+      "sales": "المبيعات",
+      "products": "المنتجات",
+      "expenses": "المصروفات"
+    },
+    "revenue": "المبيعات",
+    "ordersN": "{count} طلب",
+    "avgTicket": "متوسط الفاتورة",
+    "grossMargin": "الربح الإجمالي",
+    "afterCogs": "بعد تكلفة المواد",
+    "netProfit": "صافي الربح",
+    "marginPct": "هامش {pct}٪",
+    "dailySales": "المبيعات اليومية",
+    "pnl": "قائمة الأرباح والخسائر",
+    "vat": "ضريبة القيمة المضافة",
+    "netSales": "صافي المبيعات",
+    "cogs": "تكلفة المواد",
+    "cogsCoverage": "{pct}٪ من المبيعات لها وصفة",
+    "purchasesNote": "مشتريات المخزون في الفترة: {amount} ({count} فاتورة) — تُحتسب ضمن تكلفة المواد لا كمصروف.",
+    "paymentMethods": "طرق الدفع",
+    "channels": "قنوات البيع",
+    "channel": {
+      "qr": "طلب QR",
+      "pos_takeaway": "الصندوق · سفري",
+      "pos_table": "الصندوق · طاولة"
+    },
+    "providers": {
+      "cash": "نقداً",
+      "on_site_terminal": "جهاز البطاقة",
+      "zarinpal": "زرين‌بال",
+      "stripe": "بطاقة أونلاين",
+      "pay_later": "لاحقاً"
+    },
+    "subtotal": "مجموع الأصناف",
+    "discounts": "الخصومات",
+    "cancelled": "ملغاة",
+    "byHour": "الطلبات حسب الساعة",
+    "date": "التاريخ",
+    "orders": "الطلبات",
+    "byCategory": "المبيعات حسب الفئة",
+    "product": "المنتج",
+    "category": "الفئة",
+    "categoryLabel": "النوع",
+    "qty": "الكمية",
+    "cost": "تكلفة المواد",
+    "margin": "الهامش",
+    "noData": "لا مبيعات في هذه الفترة.",
+    "totalExpenses": "إجمالي المصروفات",
+    "entries": "{count} بند",
+    "noExpenses": "لا مصروفات مسجلة.",
+    "newExpense": "إضافة مصروف",
+    "amount": "المبلغ",
+    "description": "الوصف",
+    "method": "طريقة الدفع",
+    "save": "حفظ",
+    "deleteExpense": "حذف هذا المصروف؟",
+    "categories": {
+      "rent": "الإيجار",
+      "salaries": "الرواتب",
+      "utilities": "الخدمات",
+      "supplies": "المستلزمات",
+      "marketing": "التسويق",
+      "maintenance": "الصيانة",
+      "taxes": "الضرائب والرسوم",
+      "other": "أخرى"
+    },
+    "methods": {
+      "cash": "نقداً",
+      "card": "بطاقة",
+      "transfer": "تحويل بنكي"
+    }
   }
 }

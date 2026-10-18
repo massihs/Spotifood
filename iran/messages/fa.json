@@ -221,7 +221,8 @@
     "adminMusic": "موسیقی",
     "pos": "صندوق",
     "inventory": "انبار",
-    "customers": "باشگاه مشتریان"
+    "customers": "باشگاه مشتریان",
+    "reports": "گزارش و حسابداری"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -1552,5 +1553,92 @@
     "spendPerPoint": "به ازای هر … خرید یک امتیاز (تومان)",
     "pointValue": "ارزش هر امتیاز (تومان)",
     "loyaltyExample": "هر {spend} خرید = ۱ امتیاز به ارزش {value} (حدود {rate}٪ بازگشت)."
+  },
+  "reports": {
+    "title": "گزارش و حسابداری",
+    "periodLabel": "{from} تا {to} · {days} روز",
+    "exportCsv": "خروجی اکسل (CSV)",
+    "presets": {
+      "today": "امروز",
+      "7d": "۷ روز",
+      "30d": "۳۰ روز",
+      "month": "این ماه"
+    },
+    "custom": "بازه دلخواه",
+    "from": "از",
+    "to": "تا",
+    "apply": "نمایش",
+    "tabs": {
+      "overview": "سود و زیان",
+      "sales": "فروش",
+      "products": "محصولات",
+      "expenses": "هزینه‌ها"
+    },
+    "revenue": "فروش",
+    "ordersN": "{count} سفارش",
+    "avgTicket": "میانگین فاکتور",
+    "grossMargin": "سود ناخالص",
+    "afterCogs": "پس از بهای مواد",
+    "netProfit": "سود خالص",
+    "marginPct": "حاشیه {pct}٪",
+    "dailySales": "فروش روزانه",
+    "pnl": "صورت سود و زیان",
+    "vat": "مالیات بر ارزش افزوده",
+    "netSales": "فروش خالص",
+    "cogs": "بهای تمام‌شده مواد",
+    "cogsCoverage": "{pct}٪ فروش دارای رسپی",
+    "purchasesNote": "خرید مواد در این بازه: {amount} ({count} فاکتور) — در بهای تمام‌شده حساب می‌شود، نه به‌عنوان هزینه.",
+    "paymentMethods": "روش‌های پرداخت",
+    "channels": "کانال فروش",
+    "channel": {
+      "qr": "سفارش QR",
+      "pos_takeaway": "صندوق · بیرون‌بر",
+      "pos_table": "صندوق · سر میز"
+    },
+    "providers": {
+      "cash": "نقدی",
+      "on_site_terminal": "کارت‌خوان",
+      "zarinpal": "زرین‌پال",
+      "stripe": "کارت آنلاین",
+      "pay_later": "بعداً"
+    },
+    "subtotal": "جمع اقلام",
+    "discounts": "تخفیف‌ها",
+    "cancelled": "لغو شده",
+    "byHour": "سفارش بر اساس ساعت",
+    "date": "تاریخ",
+    "orders": "سفارش",
+    "byCategory": "فروش بر اساس دسته",
+    "product": "محصول",
+    "category": "دسته",
+    "categoryLabel": "نوع هزینه",
+    "qty": "تعداد",
+    "cost": "بهای مواد",
+    "margin": "حاشیه",
+    "noData": "در این بازه فروشی نیست.",
+    "totalExpenses": "کل هزینه‌ها",
+    "entries": "{count} مورد",
+    "noExpenses": "هزینه‌ای ثبت نشده است.",
+    "newExpense": "ثبت هزینه",
+    "amount": "مبلغ (تومان)",
+    "description": "شرح",
+    "method": "روش پرداخت",
+    "save": "ثبت",
+    "deleteExpense": "این هزینه حذف شود؟",
+    "categories": {
+      "rent": "اجاره",
+      "salaries": "حقوق و دستمزد",
+      "utilities": "آب، برق، گاز",
+      "supplies": "لوازم مصرفی",
+      "marketing": "تبلیغات",
+      "maintenance": "تعمیرات",
+      "taxes": "مالیات و عوارض",
+      "other": "سایر"
+    },
+    "methods": {
+      "cash": "نقدی",
+      "card": "کارت",
+      "transfer": "انتقال بانکی"
+    }
   }
 }

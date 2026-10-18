@@ -51,7 +51,13 @@ describe("music", () => {
     await expect(createTheme(db, owner.sessionUser, { name: "Lounge" })).rejects.toThrow();
     const { admin, theme } = await themeWithTracks(0);
     await expect(
-      addTrack(db, admin, theme.id, { body: Buffer.from("x"), type: "image/png" }, { title: "x", durationSec: 3 }),
+      addTrack(
+        db,
+        admin,
+        theme.id,
+        { body: Buffer.from("x"), type: "image/png" },
+        { title: "x", durationSec: 3 },
+      ),
     ).rejects.toMatchObject({ message: "audio_type" });
   });
 
@@ -73,7 +79,9 @@ describe("music", () => {
     expect(file?.contentType).toBe("audio/mpeg");
 
     // A theme with subscribers cannot be removed.
-    await expect(deleteTheme(db, admin, theme.id)).rejects.toMatchObject({ message: "theme_has_subscribers" });
+    await expect(deleteTheme(db, admin, theme.id)).rejects.toMatchObject({
+      message: "theme_has_subscribers",
+    });
   });
 
   it("puts the station on air from its own clock", async () => {

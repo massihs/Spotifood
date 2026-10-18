@@ -4,6 +4,7 @@ import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import {
   Boxes,
   HeartHandshake,
+  ChartColumn,
   Calculator,
   ChefHat,
   FileText,
@@ -96,6 +97,11 @@ async function RestaurantShell({
       href: `${base}/customers`,
       label: t("nav.customers"),
       icon: <HeartHandshake />,
+    },
+    can(ctx, "accounting.manage") && {
+      href: `${base}/reports`,
+      label: t("nav.reports"),
+      icon: <ChartColumn />,
     },
     can(ctx, "payments.view") && { href: `${base}/payments`, label: t("nav.payments"), icon: <Wallet /> },
     can(ctx, "invoices.view") && {

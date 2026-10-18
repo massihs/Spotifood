@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { CATEGORY_ICON_KEYS, TEMPLATE_ICONS, isCategoryIcon, resolveCategoryIcon } from "@/lib/category-icons";
+import {
+  CATEGORY_ICON_KEYS,
+  TEMPLATE_ICONS,
+  isCategoryIcon,
+  resolveCategoryIcon,
+} from "@/lib/category-icons";
 import { CATEGORY_ICON_COMPONENTS } from "@/components/category-icon";
 import { DEFAULT_CATEGORY_TEMPLATES } from "@/server/modules/catalog/defaults";
 import { categorySchema } from "@/server/modules/menu/schemas";

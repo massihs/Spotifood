@@ -9,4 +9,5 @@ export * from "./music";
 export * from "./cash";
 export * from "./inventory";
 export * from "./customers";
+export * from "./accounting";
 export * from "./relations";

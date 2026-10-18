@@ -76,7 +76,9 @@ describe("customer club", () => {
     const file = await getCustomer(db, ctx, c!.id);
     expect(file.customer.points).toBe(6);
     expect(file.orders).toHaveLength(2);
-    await expect(adjustPoints(db, ctx, c!.id, -100)).rejects.toMatchObject({ message: "points_insufficient" });
+    await expect(adjustPoints(db, ctx, c!.id, -100)).rejects.toMatchObject({
+      message: "points_insufficient",
+    });
   });
 
   it("texts a campaign to customers who did not opt out", async () => {
