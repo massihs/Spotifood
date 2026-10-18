@@ -218,7 +218,8 @@
     "close": "إغلاق",
     "mainNav": "التنقل الرئيسي",
     "music": "الموسيقى",
-    "adminMusic": "الموسيقى"
+    "adminMusic": "الموسيقى",
+    "pos": "الصندوق"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -398,7 +399,9 @@
     "invalid_national_id": "يجب أن يتكون الرقم الوطني من 10 أو 11 رقمًا.",
     "invalid_economic_code": "رمز اقتصادي غير صالح.",
     "invalid_postal_code": "يجب أن يتكون الرمز البريدي من 10 أرقام.",
-    "phone_required": "أدخل رقم جوالك لتصلك رسالة عند جاهزية الطلب."
+    "phone_required": "أدخل رقم جوالك لتصلك رسالة عند جاهزية الطلب.",
+    "shift_already_open": "الصندوق مفتوح بالفعل.",
+    "no_open_shift": "لا يوجد صندوق مفتوح."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -497,7 +500,8 @@
     "orders": {
       "view": "عرض الطلبات",
       "update_status": "تغيير حالة الطلب",
-      "cancel": "إلغاء الطلبات"
+      "cancel": "إلغاء الطلبات",
+      "create": "تسجيل الطلبات في الصندوق"
     },
     "payments": {
       "view": "عرض المدفوعات",
@@ -518,6 +522,20 @@
     },
     "audit": {
       "view": "عرض سجل التدقيق"
+    },
+    "cash": {
+      "manage": "فتح وإغلاق الصندوق"
+    },
+    "inventory": {
+      "view": "عرض المخزون",
+      "manage": "إدارة المخزون والمشتريات"
+    },
+    "customers": {
+      "view": "عرض العملاء",
+      "manage": "نادي العملاء والحملات"
+    },
+    "accounting": {
+      "manage": "المصاريف والتقارير المالية"
     }
   },
   "settings": {
@@ -1296,6 +1314,64 @@
         "internal": "Upload failed.",
         "duration": "Could not read the duration."
       }
+    }
+  },
+  "pos": {
+    "title": "الصندوق",
+    "subtitle": "Counter, takeaway and phone orders, and payments.",
+    "search": "Search products…",
+    "all": "All",
+    "channels": {
+      "takeaway": "Takeaway",
+      "dine_in": "At a table"
+    },
+    "table": "Table",
+    "noTable": "No table (counter)",
+    "tableN": "Table {label}",
+    "emptyTicket": "No product selected.",
+    "sent": "Order {number} recorded",
+    "changeDue": "Change due: {amount}",
+    "missing": "Missing: {amount}",
+    "lineNote": "+ note",
+    "less": "Less",
+    "more": "More",
+    "phone": "Customer mobile",
+    "discount": "Disc. %",
+    "orderNote": "Order note (kitchen)",
+    "subtotal": "Subtotal",
+    "discountLine": "Discount {pct}%",
+    "total": "الإجمالي",
+    "toKitchen": "إرسال للمطبخ",
+    "charge": "تحصيل",
+    "ticket": "{count} items",
+    "close": "Close",
+    "addToTicket": "Add to order",
+    "toPay": "Amount due",
+    "methods": {
+      "cash": "Cash",
+      "on_site_terminal": "Card terminal"
+    },
+    "tendered": "Cash received",
+    "confirmPayment": "Confirm payment",
+    "shift": {
+      "closed": "The till is closed. Open it to record cash sales.",
+      "closedResult": "Till closed — expected {expected}, counted {counted}, difference {diff}",
+      "open": "Open till",
+      "float": "Opening float",
+      "openSince": "Till open since {time}",
+      "salesLine": "Sales: {sales} · cash in drawer: {cash}",
+      "payIn": "Pay in",
+      "payOut": "Pay out",
+      "close": "Close till",
+      "amount": "Amount",
+      "reason": "Reason",
+      "reasonPlaceholder": "e.g. milk purchase",
+      "save": "Save",
+      "cashSales": "Cash sales",
+      "expected": "Expected in drawer",
+      "counted": "Counted cash",
+      "difference": "Difference: {amount}",
+      "confirmClose": "Close and record"
     }
   }
 }

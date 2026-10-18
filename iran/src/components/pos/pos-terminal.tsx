@@ -1,0 +1,653 @@
+"use client";
+
+import {
+  Banknote,
+  Check,
+  ChefHat,
+  CreditCard,
+  ImageIcon,
+  Loader2,
+  Minus,
+  Percent,
+  Plus,
+  Search,
+  ShoppingBag,
+  Smartphone,
+  Trash2,
+  UtensilsCrossed,
+  X,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useMemo, useState, useTransition } from "react";
+import { CategoryIcon } from "@/components/category-icon";
+import { useMoney } from "@/components/ui/use-money";
+import { cn } from "@/lib/cn";
+import { parseMoneyInput } from "@/lib/money";
+import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
+import { createPosOrderAction } from "@/app/[locale]/dashboard/[restaurantId]/pos/actions";
+
+type Line = { key: string; product: PublicProduct; optionValueIds: string[]; quantity: number; note: string };
+
+const newKey = () =>
+  Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(16).padStart(2, "0")).join("");
+
+function unitPrice(p: PublicProduct, valueIds: string[]) {
+  const deltas = p.optionGroups.flatMap((g) => g.values).filter((v) => valueIds.includes(v.id));
+  return p.priceCents + deltas.reduce((s, v) => s + v.priceDeltaCents, 0);
+}
+
+export function PosTerminal({
+  restaurantId,
+  menu,
+  currency,
+  tables,
+  methods,
+  canPay,
+}: {
+  restaurantId: string;
+  menu: PublicMenu;
+  currency: string;
+  tables: { id: string; label: string }[];
+  methods: ("cash" | "on_site_terminal")[];
+  canPay: boolean;
+}) {
+  const t = useTranslations("pos");
+  const tErr = useTranslations("errorCodes");
+  const money = useMoney(currency);
+  const [category, setCategory] = useState<string | "all">("all");
+  const [query, setQuery] = useState("");
+  const [lines, setLines] = useState<Line[]>([]);
+  const [channel, setChannel] = useState<"takeaway" | "dine_in">("takeaway");
+  const [tableId, setTableId] = useState<string>("");
+  const [phone, setPhone] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [note, setNote] = useState("");
+  const [picking, setPicking] = useState<PublicProduct | null>(null);
+  const [paying, setPaying] = useState(false);
+  const [ticketOpen, setTicketOpen] = useState(false);
+  const [done, setDone] = useState<{ number: string; change: number | null } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, start] = useTransition();
+
+  const products = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const ids =
+      category === "all"
+        ? menu.categories.flatMap((c) => c.productIds)
+        : (menu.categories.find((c) => c.id === category)?.productIds ?? []);
+    return ids.map((id) => menu.products[id]!).filter((p) => !q || p.name.toLowerCase().includes(q));
+  }, [menu, category, query]);
+
+  const subtotal = lines.reduce((s, l) => s + unitPrice(l.product, l.optionValueIds) * l.quantity, 0);
+  const discountCents = Math.round(subtotal * (discount / 100));
+  const total = subtotal - discountCents;
+  const count = lines.reduce((s, l) => s + l.quantity, 0);
+
+  const add = (p: PublicProduct, optionValueIds: string[] = []) => {
+    setDone(null);
+    setLines((ls) => {
+      const same = ls.find(
+        (l) =>
+          l.product.id === p.id && l.optionValueIds.join() === [...optionValueIds].sort().join() && !l.note,
+      );
+      if (same) return ls.map((l) => (l === same ? { ...l, quantity: Math.min(99, l.quantity + 1) } : l));
+      return [
+        ...ls,
+        { key: newKey(), product: p, optionValueIds: [...optionValueIds].sort(), quantity: 1, note: "" },
+      ];
+    });
+  };
+  const tap = (p: PublicProduct) => {
+    if (!p.isAvailable) return;
+    if (p.optionGroups.length) setPicking(p);
+    else add(p);
+  };
+  const setQty = (key: string, q: number) =>
+    setLines((ls) =>
+      q <= 0 ? ls.filter((l) => l.key !== key) : ls.map((l) => (l.key === key ? { ...l, quantity: q } : l)),
+    );
+
+  const submit = (payment: { provider: "cash" | "on_site_terminal"; tenderedCents: number | null } | null) =>
+    start(async () => {
+      setError(null);
+      const res = await createPosOrderAction(restaurantId, {
+        channel,
+        tableId: channel === "dine_in" && tableId ? tableId : null,
+        lines: lines.map((l) => ({
+          productId: l.product.id,
+          optionValueIds: l.optionValueIds,
+          quantity: l.quantity,
+          note: l.note,
+        })),
+        note,
+        customerPhone: phone,
+        discountPct: discount,
+        payment,
+        idempotencyKey: newKey(),
+      });
+      if (res?.ok && res.data) {
+        setDone({
+          number: res.data.number,
+          change: payment?.tenderedCents != null ? payment.tenderedCents - res.data.totalCents : null,
+        });
+        setLines([]);
+        setPhone("");
+        setNote("");
+        setDiscount(0);
+        setPaying(false);
+        setTicketOpen(false);
+      } else if (res && !res.ok) setError(tErr.has(res.error) ? tErr(res.error) : tErr("internal"));
+    });
+
+  const ticket = (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-2 p-1">
+        {(["takeaway", "dine_in"] as const).map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setChannel(c)}
+            className={cn(
+              "flex h-9 items-center justify-center gap-1.5 rounded-lg text-sm font-semibold",
+              channel === c ? "bg-surface text-fg shadow-sm" : "text-fg-muted",
+            )}
+          >
+            {c === "takeaway" ? <ShoppingBag className="size-4" /> : <UtensilsCrossed className="size-4" />}
+            {t(`channels.${c}`)}
+          </button>
+        ))}
+      </div>
+      {channel === "dine_in" ? (
+        <select
+          value={tableId}
+          onChange={(e) => setTableId(e.target.value)}
+          className="mt-2 h-10 rounded-xl border border-border-strong bg-surface px-3 text-sm"
+          aria-label={t("table")}
+        >
+          <option value="">{t("noTable")}</option>
+          {tables.map((tb) => (
+            <option key={tb.id} value={tb.id}>
+              {t("tableN", { label: tb.label })}
+            </option>
+          ))}
+        </select>
+      ) : null}
+
+      <ul className="mt-3 min-h-0 flex-1 divide-y divide-border overflow-y-auto">
+        {lines.length === 0 ? (
+          <li className="flex h-full flex-col items-center justify-center gap-2 py-10 text-center text-sm text-fg-subtle">
+            <ShoppingBag className="size-8" aria-hidden="true" />
+            {done ? (
+              <span className="rounded-xl bg-accent-soft px-4 py-3 text-accent-text">
+                <span className="block font-bold">{t("sent", { number: done.number })}</span>
+                {done.change != null && done.change > 0 ? (
+                  <span className="block">{t("changeDue", { amount: money(done.change) })}</span>
+                ) : null}
+              </span>
+            ) : (
+              t("emptyTicket")
+            )}
+          </li>
+        ) : (
+          lines.map((l) => {
+            const opts = l.product.optionGroups
+              .flatMap((g) => g.values)
+              .filter((v) => l.optionValueIds.includes(v.id));
+            return (
+              <li key={l.key} className="py-2.5">
+                <div className="flex items-start gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">{l.product.name}</p>
+                    {opts.length ? (
+                      <p className="truncate text-xs text-fg-muted">{opts.map((o) => o.name).join(" · ")}</p>
+                    ) : null}
+                    <input
+                      value={l.note}
+                      onChange={(e) =>
+                        setLines((ls) =>
+                          ls.map((x) => (x.key === l.key ? { ...x, note: e.target.value } : x)),
+                        )
+                      }
+                      placeholder={t("lineNote")}
+                      maxLength={280}
+                      className="mt-1 h-7 w-full rounded-md bg-transparent text-xs text-fg-muted placeholder:text-fg-subtle focus:bg-surface-2 focus:outline-none"
+                    />
+                  </div>
+                  <span className="shrink-0 text-sm font-bold tabular-nums">
+                    {money(unitPrice(l.product, l.optionValueIds) * l.quantity)}
+                  </span>
+                </div>
+                <div className="mt-1 flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setQty(l.key, l.quantity - 1)}
+                    className="grid size-8 place-items-center rounded-lg bg-surface-2"
+                    aria-label={t("less")}
+                  >
+                    {l.quantity === 1 ? <Trash2 className="size-3.5" /> : <Minus className="size-3.5" />}
+                  </button>
+                  <span className="w-7 text-center text-sm font-bold tabular-nums">{l.quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQty(l.key, Math.min(99, l.quantity + 1))}
+                    className="grid size-8 place-items-center rounded-lg bg-surface-2"
+                    aria-label={t("more")}
+                  >
+                    <Plus className="size-3.5" />
+                  </button>
+                </div>
+              </li>
+            );
+          })
+        )}
+      </ul>
+
+      <div className="space-y-2 border-t border-border pt-3">
+        <div className="flex gap-2">
+          <label className="relative flex-1">
+            <Smartphone className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-fg-subtle" />
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              inputMode="tel"
+              dir="ltr"
+              placeholder={t("phone")}
+              className="h-9 w-full rounded-lg border border-border bg-surface ps-8 pe-2 text-sm"
+            />
+          </label>
+          <label className="relative w-24">
+            <Percent className="pointer-events-none absolute start-2.5 top-1/2 size-3.5 -translate-y-1/2 text-fg-subtle" />
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={discount || ""}
+              onChange={(e) => setDiscount(Math.min(100, Math.max(0, Number(e.target.value) || 0)))}
+              placeholder={t("discount")}
+              className="h-9 w-full rounded-lg border border-border bg-surface ps-7 pe-2 text-sm"
+            />
+          </label>
+        </div>
+        <input
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder={t("orderNote")}
+          maxLength={500}
+          className="h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm"
+        />
+        <dl className="space-y-1 pt-1 text-sm">
+          {discountCents ? (
+            <>
+              <div className="flex justify-between text-fg-muted">
+                <dt>{t("subtotal")}</dt>
+                <dd className="tabular-nums">{money(subtotal)}</dd>
+              </div>
+              <div className="flex justify-between text-accent-text">
+                <dt>{t("discountLine", { pct: discount })}</dt>
+                <dd className="tabular-nums">−{money(discountCents)}</dd>
+              </div>
+            </>
+          ) : null}
+          <div className="flex justify-between text-lg font-bold">
+            <dt>{t("total")}</dt>
+            <dd className="tabular-nums">{money(total)}</dd>
+          </div>
+        </dl>
+        {error ? <p className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p> : null}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            disabled={!lines.length || pending}
+            onClick={() => submit(null)}
+            className="flex h-12 items-center justify-center gap-2 rounded-xl bg-surface-2 font-semibold ring-1 ring-border disabled:opacity-40"
+          >
+            <ChefHat className="size-5" aria-hidden="true" />
+            {t("toKitchen")}
+          </button>
+          <button
+            type="button"
+            disabled={!lines.length || pending || !canPay || methods.length === 0}
+            onClick={() => setPaying(true)}
+            className="flex h-12 items-center justify-center gap-2 rounded-xl bg-accent font-bold text-accent-fg disabled:opacity-40"
+          >
+            <Banknote className="size-5" aria-hidden="true" />
+            {t("charge")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="grid min-h-0 gap-4 lg:h-[calc(100dvh-12rem)] lg:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="flex min-h-0 flex-col">
+        <label className="relative">
+          <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-fg-subtle" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("search")}
+            className="h-11 w-full rounded-xl border border-border bg-surface ps-9 pe-3"
+          />
+        </label>
+        <div className="-mx-4 mt-3 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:px-0">
+          <button
+            type="button"
+            onClick={() => setCategory("all")}
+            className={cn(
+              "shrink-0 rounded-full px-4 py-2 text-sm font-semibold",
+              category === "all" ? "bg-accent text-accent-fg" : "bg-surface ring-1 ring-border",
+            )}
+          >
+            {t("all")}
+          </button>
+          {menu.categories.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setCategory(c.id)}
+              className={cn(
+                "inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap",
+                category === c.id ? "bg-accent text-accent-fg" : "bg-surface ring-1 ring-border",
+              )}
+            >
+              <CategoryIcon icon={c.icon} className="size-4" />
+              {c.name}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 grid min-h-0 flex-1 auto-rows-max grid-cols-2 gap-3 overflow-y-auto pb-24 sm:grid-cols-3 lg:pb-2 xl:grid-cols-4">
+          {products.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => tap(p)}
+              disabled={!p.isAvailable}
+              className="group overflow-hidden rounded-2xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.97] disabled:opacity-45"
+            >
+              <span className="relative block aspect-[4/3] bg-surface-2">
+                {p.images[0] ? (
+                  <img src={p.images[0].sm} alt="" loading="lazy" className="size-full object-cover" />
+                ) : (
+                  <span className="grid size-full place-items-center text-fg-subtle">
+                    <ImageIcon className="size-6" />
+                  </span>
+                )}
+                {lines.some((l) => l.product.id === p.id) ? (
+                  <span className="absolute end-2 top-2 grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-accent-fg tabular-nums">
+                    {lines.filter((l) => l.product.id === p.id).reduce((s, l) => s + l.quantity, 0)}
+                  </span>
+                ) : null}
+              </span>
+              <span className="block p-2.5">
+                <span className="line-clamp-1 text-sm font-semibold">{p.name}</span>
+                <span className="mt-0.5 block text-sm font-bold text-accent-text tabular-nums">
+                  {money(p.priceCents)}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <aside className="hidden min-h-0 rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-soft)] lg:block">
+        {ticket}
+      </aside>
+
+      {/* Mobile: ticket in a bottom sheet */}
+      <button
+        type="button"
+        onClick={() => setTicketOpen(true)}
+        className="fixed inset-x-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 flex h-14 items-center justify-between rounded-2xl bg-accent px-5 font-bold text-accent-fg shadow-[var(--shadow-float)] lg:hidden"
+      >
+        <span className="flex items-center gap-2">
+          <ShoppingBag className="size-5" />
+          {t("ticket", { count })}
+        </span>
+        <span className="tabular-nums">{money(total)}</span>
+      </button>
+      {ticketOpen ? (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            aria-label={t("close")}
+            className="absolute inset-0 bg-black/30"
+            onClick={() => setTicketOpen(false)}
+          />
+          <div className="animate-sheet-up absolute inset-x-0 bottom-0 flex h-[85dvh] flex-col rounded-t-3xl bg-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="mb-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setTicketOpen(false)}
+                className="grid size-9 place-items-center rounded-full bg-surface-2"
+                aria-label={t("close")}
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            {ticket}
+          </div>
+        </div>
+      ) : null}
+
+      {picking ? (
+        <OptionPicker
+          product={picking}
+          money={money}
+          onClose={() => setPicking(null)}
+          onAdd={(ids) => (add(picking, ids), setPicking(null))}
+        />
+      ) : null}
+      {paying ? (
+        <PayDialog
+          total={total}
+          currency={currency}
+          methods={methods}
+          pending={pending}
+          onClose={() => setPaying(false)}
+          onPay={(provider, tendered) => submit({ provider, tenderedCents: tendered })}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function OptionPicker({
+  product,
+  money,
+  onClose,
+  onAdd,
+}: {
+  product: PublicProduct;
+  money: (c: number) => string;
+  onClose: () => void;
+  onAdd: (ids: string[]) => void;
+}) {
+  const t = useTranslations("pos");
+  const [sel, setSel] = useState<Record<string, string[]>>(() =>
+    Object.fromEntries(
+      product.optionGroups.map((g) => [
+        g.id,
+        g.values
+          .filter((v) => v.isDefault && v.isAvailable)
+          .slice(0, g.maxSelect)
+          .map((v) => v.id),
+      ]),
+    ),
+  );
+  const ok = product.optionGroups.every((g) => (sel[g.id]?.length ?? 0) >= g.minSelect);
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-end sm:place-items-center"
+      role="dialog"
+      aria-modal="true"
+    >
+      <button
+        type="button"
+        aria-label={t("close")}
+        className="absolute inset-0 bg-black/30"
+        onClick={onClose}
+      />
+      <div className="animate-sheet-up relative max-h-[85dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 sm:max-w-md sm:rounded-3xl">
+        <p className="text-lg font-bold">{product.name}</p>
+        {product.optionGroups.map((g) => (
+          <fieldset key={g.id} className="mt-4">
+            <legend className="text-sm font-semibold">
+              {g.name}
+              {g.minSelect > 0 ? <span className="ms-2 text-xs text-danger">*</span> : null}
+            </legend>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {g.values.map((v) => {
+                const on = sel[g.id]?.includes(v.id) ?? false;
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    disabled={!v.isAvailable}
+                    onClick={() =>
+                      setSel((s) => {
+                        const cur = s[g.id] ?? [];
+                        if (on) return { ...s, [g.id]: cur.filter((x) => x !== v.id) };
+                        if (g.maxSelect === 1) return { ...s, [g.id]: [v.id] };
+                        return cur.length >= g.maxSelect ? s : { ...s, [g.id]: [...cur, v.id] };
+                      })
+                    }
+                    className={cn(
+                      "rounded-xl px-3 py-2 text-sm ring-1 disabled:opacity-40",
+                      on ? "bg-accent-soft font-semibold text-accent-text ring-accent" : "ring-border",
+                    )}
+                  >
+                    {on ? <Check className="me-1 inline size-3.5" /> : null}
+                    {v.name}
+                    {v.priceDeltaCents ? (
+                      <span className="ms-1 text-xs opacity-70">+{money(v.priceDeltaCents)}</span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+        ))}
+        <button
+          type="button"
+          disabled={!ok}
+          onClick={() => onAdd(Object.values(sel).flat())}
+          className="mt-6 h-12 w-full rounded-xl bg-accent font-bold text-accent-fg disabled:opacity-40"
+        >
+          {t("addToTicket")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function PayDialog({
+  total,
+  currency,
+  methods,
+  pending,
+  onClose,
+  onPay,
+}: {
+  total: number;
+  currency: string;
+  methods: ("cash" | "on_site_terminal")[];
+  pending: boolean;
+  onClose: () => void;
+  onPay: (provider: "cash" | "on_site_terminal", tendered: number | null) => void;
+}) {
+  const t = useTranslations("pos");
+  const money = useMoney(currency);
+  const [method, setMethod] = useState(methods[0]!);
+  const [tendered, setTendered] = useState("");
+  const tenderedCents = tendered ? parseMoneyInput(tendered, currency) : null;
+  const unit = currency === "IRR" ? 1000 : 100;
+  const step = currency === "IRR" ? 50_000_000 : 1000; // round-ups: 50,000 toman / 10 €
+  const quick = [total, Math.ceil(total / step) * step, Math.ceil(total / step) * step + step].filter(
+    (v, i, a) => a.indexOf(v) === i,
+  );
+  const change = tenderedCents != null ? tenderedCents - total : null;
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-end sm:place-items-center"
+      role="dialog"
+      aria-modal="true"
+    >
+      <button
+        type="button"
+        aria-label={t("close")}
+        className="absolute inset-0 bg-black/30"
+        onClick={onClose}
+      />
+      <div className="animate-sheet-up relative w-full rounded-t-3xl bg-surface p-5 sm:max-w-md sm:rounded-3xl">
+        <p className="text-sm text-fg-muted">{t("toPay")}</p>
+        <p className="text-3xl font-bold tabular-nums">{money(total)}</p>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          {methods.map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMethod(m)}
+              className={cn(
+                "flex h-14 items-center justify-center gap-2 rounded-xl font-semibold ring-1",
+                method === m ? "bg-accent-soft text-accent-text ring-accent" : "ring-border",
+              )}
+            >
+              {m === "cash" ? <Banknote className="size-5" /> : <CreditCard className="size-5" />}
+              {t(`methods.${m}`)}
+            </button>
+          ))}
+        </div>
+        {method === "cash" ? (
+          <div className="mt-4">
+            <label className="text-sm font-medium" htmlFor="tendered">
+              {t("tendered")}
+            </label>
+            <input
+              id="tendered"
+              value={tendered}
+              onChange={(e) => setTendered(e.target.value)}
+              inputMode="numeric"
+              dir="ltr"
+              placeholder={String(total / unit)}
+              className="mt-1 h-12 w-full rounded-xl border border-border-strong px-3 text-lg tabular-nums"
+            />
+            <div className="mt-2 flex flex-wrap gap-2">
+              {quick.map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setTendered(String(v / unit))}
+                  className="rounded-full bg-surface-2 px-3 py-1.5 text-sm font-medium tabular-nums"
+                >
+                  {money(v)}
+                </button>
+              ))}
+            </div>
+            {change != null ? (
+              <p
+                className={cn(
+                  "mt-3 rounded-xl px-4 py-3 text-lg font-bold",
+                  change >= 0 ? "bg-accent-soft text-accent-text" : "bg-danger-soft text-danger",
+                )}
+              >
+                {change >= 0
+                  ? t("changeDue", { amount: money(change) })
+                  : t("missing", { amount: money(-change) })}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+        <button
+          type="button"
+          disabled={pending || (method === "cash" && change != null && change < 0)}
+          onClick={() => onPay(method, method === "cash" ? tenderedCents : null)}
+          className="mt-5 flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-lg font-bold text-accent-fg disabled:opacity-40"
+        >
+          {pending ? <Loader2 className="size-5 animate-spin" /> : <Check className="size-5" />}
+          {t("confirmPayment")}
+        </button>
+      </div>
+    </div>
+  );
+}

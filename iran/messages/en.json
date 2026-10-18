@@ -218,7 +218,8 @@
     "close": "Close",
     "mainNav": "Main navigation",
     "music": "Music",
-    "adminMusic": "Music"
+    "adminMusic": "Music",
+    "pos": "Till"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -398,7 +399,9 @@
     "invalid_national_id": "The national ID must have 10 or 11 digits.",
     "invalid_economic_code": "Invalid economic code.",
     "invalid_postal_code": "The postal code must have 10 digits.",
-    "phone_required": "Enter your mobile number to get a text when your order is ready."
+    "phone_required": "Enter your mobile number to get a text when your order is ready.",
+    "shift_already_open": "The till is already open.",
+    "no_open_shift": "No open till."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -497,7 +500,8 @@
     "orders": {
       "view": "View orders",
       "update_status": "Update order status",
-      "cancel": "Cancel orders"
+      "cancel": "Cancel orders",
+      "create": "Take orders at the till"
     },
     "payments": {
       "view": "View payments",
@@ -518,6 +522,20 @@
     },
     "audit": {
       "view": "View audit log"
+    },
+    "cash": {
+      "manage": "Open and close the till"
+    },
+    "inventory": {
+      "view": "View stock",
+      "manage": "Manage stock and purchases"
+    },
+    "customers": {
+      "view": "View customers",
+      "manage": "Loyalty club and campaigns"
+    },
+    "accounting": {
+      "manage": "Expenses and financial reports"
     }
   },
   "settings": {
@@ -1296,6 +1314,64 @@
         "internal": "Upload failed.",
         "duration": "Could not read the duration."
       }
+    }
+  },
+  "pos": {
+    "title": "Till",
+    "subtitle": "Counter, takeaway and phone orders, and payments.",
+    "search": "Search products…",
+    "all": "All",
+    "channels": {
+      "takeaway": "Takeaway",
+      "dine_in": "At a table"
+    },
+    "table": "Table",
+    "noTable": "No table (counter)",
+    "tableN": "Table {label}",
+    "emptyTicket": "No product selected.",
+    "sent": "Order {number} recorded",
+    "changeDue": "Change due: {amount}",
+    "missing": "Missing: {amount}",
+    "lineNote": "+ note",
+    "less": "Less",
+    "more": "More",
+    "phone": "Customer mobile",
+    "discount": "Disc. %",
+    "orderNote": "Order note (kitchen)",
+    "subtotal": "Subtotal",
+    "discountLine": "Discount {pct}%",
+    "total": "Total",
+    "toKitchen": "Send to kitchen",
+    "charge": "Charge",
+    "ticket": "{count} items",
+    "close": "Close",
+    "addToTicket": "Add to order",
+    "toPay": "Amount due",
+    "methods": {
+      "cash": "Cash",
+      "on_site_terminal": "Card terminal"
+    },
+    "tendered": "Cash received",
+    "confirmPayment": "Confirm payment",
+    "shift": {
+      "closed": "The till is closed. Open it to record cash sales.",
+      "closedResult": "Till closed — expected {expected}, counted {counted}, difference {diff}",
+      "open": "Open till",
+      "float": "Opening float",
+      "openSince": "Till open since {time}",
+      "salesLine": "Sales: {sales} · cash in drawer: {cash}",
+      "payIn": "Pay in",
+      "payOut": "Pay out",
+      "close": "Close till",
+      "amount": "Amount",
+      "reason": "Reason",
+      "reasonPlaceholder": "e.g. milk purchase",
+      "save": "Save",
+      "cashSales": "Cash sales",
+      "expected": "Expected in drawer",
+      "counted": "Counted cash",
+      "difference": "Difference: {amount}",
+      "confirmClose": "Close and record"
     }
   }
 }

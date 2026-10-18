@@ -95,6 +95,7 @@ export function OrderAlerts({ restaurantId, newOrders }: { restaurantId: string;
     if (type === "order.updated") return refreshSoon();
     if (type !== "order.created") return;
     refreshSoon();
+    if (data.source === "pos") return; // rung up by the team itself
     const alert: Alert = {
       id: String(data.orderId ?? Date.now()),
       number: String(data.number ?? ""),

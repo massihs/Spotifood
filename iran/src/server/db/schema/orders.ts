@@ -94,6 +94,8 @@ export const orders = pgTable(
     /** Mobile number given at checkout (food courts text it when the order is ready). */
     customerPhone: varchar({ length: 20 }),
     readySmsSentAt: tstz(),
+    /** Staff member who rang it up at the till (null = ordered by the guest). */
+    createdByUserId: uuid().references(() => users.id, { onDelete: "set null" }),
     placedAt: tstz().notNull().defaultNow(),
     acceptedAt: tstz(),
     preparingAt: tstz(),

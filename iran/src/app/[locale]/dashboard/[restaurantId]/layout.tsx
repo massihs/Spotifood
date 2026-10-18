@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import {
+  Calculator,
   ChefHat,
   FileText,
   LayoutDashboard,
@@ -58,6 +59,11 @@ async function RestaurantShell({
       icon: <ChefHat />,
       primary: true,
       badge: newOrders,
+    },
+    can(ctx, "orders.create") && {
+      href: `${base}/pos`,
+      label: t("nav.pos"),
+      icon: <Calculator />,
     },
     can(ctx, "orders.view") && {
       href: `${base}/orders`,

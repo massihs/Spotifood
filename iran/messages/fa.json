@@ -218,7 +218,8 @@
     "close": "بستن",
     "mainNav": "ناوبری اصلی",
     "music": "موسیقی",
-    "adminMusic": "موسیقی"
+    "adminMusic": "موسیقی",
+    "pos": "صندوق"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -398,7 +399,9 @@
     "invalid_national_id": "شناسه / کد ملی باید ۱۰ یا ۱۱ رقم باشد.",
     "invalid_economic_code": "کد اقتصادی نامعتبر است.",
     "invalid_postal_code": "کد پستی باید ۱۰ رقم باشد.",
-    "phone_required": "شماره موبایل را وارد کنید تا وقتی سفارش آماده شد پیامک بگیرید."
+    "phone_required": "شماره موبایل را وارد کنید تا وقتی سفارش آماده شد پیامک بگیرید.",
+    "shift_already_open": "صندوق از قبل باز است.",
+    "no_open_shift": "صندوق باز نیست."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -497,7 +500,8 @@
     "orders": {
       "view": "مشاهده سفارش‌ها",
       "update_status": "تغییر وضعیت سفارش",
-      "cancel": "لغو سفارش"
+      "cancel": "لغو سفارش",
+      "create": "ثبت سفارش در صندوق"
     },
     "payments": {
       "view": "مشاهده پرداخت‌ها",
@@ -518,6 +522,20 @@
     },
     "audit": {
       "view": "مشاهده گزارش ممیزی"
+    },
+    "cash": {
+      "manage": "باز و بستن صندوق"
+    },
+    "inventory": {
+      "view": "مشاهده انبار",
+      "manage": "مدیریت انبار و خرید"
+    },
+    "customers": {
+      "view": "مشاهده مشتریان",
+      "manage": "باشگاه مشتریان و کمپین‌ها"
+    },
+    "accounting": {
+      "manage": "هزینه‌ها و گزارش مالی"
     }
   },
   "settings": {
@@ -1296,6 +1314,64 @@
         "internal": "بارگذاری ناموفق بود.",
         "duration": "مدت آهنگ خوانده نشد."
       }
+    }
+  },
+  "pos": {
+    "title": "صندوق",
+    "subtitle": "ثبت سفارش حضوری، بیرون‌بر و تلفنی و دریافت وجه.",
+    "search": "جستجوی محصول…",
+    "all": "همه",
+    "channels": {
+      "takeaway": "بیرون‌بر",
+      "dine_in": "سر میز"
+    },
+    "table": "میز",
+    "noTable": "بدون میز (پیشخوان)",
+    "tableN": "میز {label}",
+    "emptyTicket": "محصولی انتخاب نشده است.",
+    "sent": "سفارش {number} ثبت شد",
+    "changeDue": "باقی‌مانده به مشتری: {amount}",
+    "missing": "کسری: {amount}",
+    "lineNote": "+ توضیح",
+    "less": "کم کردن",
+    "more": "افزودن",
+    "phone": "موبایل مشتری",
+    "discount": "تخفیف٪",
+    "orderNote": "توضیح سفارش (برای آشپزخانه)",
+    "subtotal": "جمع",
+    "discountLine": "تخفیف {pct}٪",
+    "total": "مبلغ کل",
+    "toKitchen": "ارسال به آشپزخانه",
+    "charge": "دریافت وجه",
+    "ticket": "{count} قلم",
+    "close": "بستن",
+    "addToTicket": "افزودن به سفارش",
+    "toPay": "مبلغ قابل پرداخت",
+    "methods": {
+      "cash": "نقدی",
+      "on_site_terminal": "کارت‌خوان"
+    },
+    "tendered": "مبلغ دریافتی (تومان)",
+    "confirmPayment": "تأیید پرداخت",
+    "shift": {
+      "closed": "صندوق بسته است. برای ثبت فروش نقدی، صندوق را باز کنید.",
+      "closedResult": "صندوق بسته شد — مورد انتظار {expected}، شمارش {counted}، اختلاف {diff}",
+      "open": "باز کردن صندوق",
+      "float": "موجودی اولیه صندوق (تومان)",
+      "openSince": "صندوق باز از {time}",
+      "salesLine": "فروش: {sales} · نقد در صندوق: {cash}",
+      "payIn": "ورود وجه",
+      "payOut": "خروج وجه",
+      "close": "بستن صندوق",
+      "amount": "مبلغ (تومان)",
+      "reason": "بابت",
+      "reasonPlaceholder": "مثلاً خرید شیر",
+      "save": "ثبت",
+      "cashSales": "فروش نقدی",
+      "expected": "موجودی مورد انتظار",
+      "counted": "موجودی شمارش‌شده (تومان)",
+      "difference": "اختلاف: {amount}",
+      "confirmClose": "بستن و ثبت"
     }
   }
 }

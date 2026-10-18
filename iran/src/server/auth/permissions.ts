@@ -14,10 +14,17 @@ export const PERMISSIONS = [
   "orders.view",
   "orders.update_status",
   "orders.cancel",
+  "orders.create", // point of sale: counter / phone / takeaway orders
+  "cash.manage", // open and close the cash drawer
   "payments.view",
   "payments.record", // record cash / terminal payment
   "payments.refund",
   "invoices.view",
+  "inventory.view",
+  "inventory.manage", // ingredients, recipes, purchases, suppliers
+  "customers.view",
+  "customers.manage", // loyalty, coupons, SMS campaigns
+  "accounting.manage", // expenses and financial reports
   "analytics.view",
   "feedback.view",
   "complaints.manage",
@@ -41,6 +48,10 @@ export const ROLE_PERMISSIONS: Record<MemberRole, ReadonlySet<Permission>> = {
     "orders.update_status",
     "payments.view",
     "payments.record",
+    "orders.create",
+    "cash.manage",
+    "inventory.view",
+    "customers.view",
     // Waiters hand out invoices (فاکتور) when a guest asks for one.
     "invoices.view",
     "feedback.view",

@@ -113,7 +113,7 @@ async function releasePayment(tx: Tx, paymentId: string, status: "failed" | "can
   return updated;
 }
 
-async function emitPaymentUpdate(tx: Tx, p: typeof payments.$inferSelect) {
+export async function emitPaymentUpdate(tx: Tx, p: typeof payments.$inferSelect) {
   await emit(tx, {
     topic: topics.restaurant(p.restaurantId),
     type: "payment.updated",
@@ -136,7 +136,7 @@ async function emitPaymentUpdate(tx: Tx, p: typeof payments.$inferSelect) {
  * payment (requirePaymentBeforeOrder) are released to the kitchen.
  * Returns the orders that could NOT be marked paid (already paid by someone else).
  */
-async function settleAllocations(tx: Tx, p: typeof payments.$inferSelect, actorUserId: string | null) {
+export async function settleAllocations(tx: Tx, p: typeof payments.$inferSelect, actorUserId: string | null) {
   const alloc = await tx
     .select({ orderId: paymentAllocations.orderId })
     .from(paymentAllocations)
@@ -218,7 +218,7 @@ async function notifyPayment(
 
 // ─── Guest side ──────────────────────────────────────────────────────────────
 
-async function paymentConfig(db: DbOrTx, restaurantId: string) {
+export async function paymentConfig(db: DbOrTx, restaurantId: string) {
   const [settings] = await db
     .select({
       onlinePaymentEnabled: restaurantSettings.onlinePaymentEnabled,

@@ -102,7 +102,8 @@
     "payments": "Paiements",
     "invoices": "Factures",
     "music": "Musique",
-    "adminMusic": "Musique"
+    "adminMusic": "Musique",
+    "pos": "Caisse"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -266,7 +267,9 @@
     "invalid_national_id": "L'identifiant national doit compter 10 ou 11 chiffres.",
     "invalid_economic_code": "Code économique invalide.",
     "invalid_postal_code": "Le code postal doit compter 10 chiffres.",
-    "phone_required": "Indiquez votre numéro de mobile pour recevoir un SMS quand votre commande est prête."
+    "phone_required": "Indiquez votre numéro de mobile pour recevoir un SMS quand votre commande est prête.",
+    "shift_already_open": "La caisse est déjà ouverte.",
+    "no_open_shift": "Aucune caisse ouverte."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -365,7 +368,8 @@
     "orders": {
       "view": "Voir les commandes",
       "update_status": "Changer le statut des commandes",
-      "cancel": "Annuler des commandes"
+      "cancel": "Annuler des commandes",
+      "create": "Prendre des commandes en caisse"
     },
     "payments": {
       "view": "Voir les paiements",
@@ -386,6 +390,20 @@
     },
     "audit": {
       "view": "Voir le journal d'audit"
+    },
+    "cash": {
+      "manage": "Ouvrir et clôturer la caisse"
+    },
+    "inventory": {
+      "view": "Voir les stocks",
+      "manage": "Gérer stocks et achats"
+    },
+    "customers": {
+      "view": "Voir les clients",
+      "manage": "Club clients et campagnes"
+    },
+    "accounting": {
+      "manage": "Dépenses et rapports financiers"
     }
   },
   "settings": {
@@ -1140,6 +1158,64 @@
         "internal": "Échec de l'envoi.",
         "duration": "Durée illisible."
       }
+    }
+  },
+  "pos": {
+    "title": "Caisse",
+    "subtitle": "Commandes comptoir, à emporter et par téléphone, encaissement.",
+    "search": "Rechercher un produit…",
+    "all": "Tout",
+    "channels": {
+      "takeaway": "À emporter",
+      "dine_in": "À table"
+    },
+    "table": "Table",
+    "noTable": "Sans table (comptoir)",
+    "tableN": "Table {label}",
+    "emptyTicket": "Aucun produit sélectionné.",
+    "sent": "Commande {number} enregistrée",
+    "changeDue": "Monnaie à rendre : {amount}",
+    "missing": "Manque : {amount}",
+    "lineNote": "+ note",
+    "less": "Moins",
+    "more": "Plus",
+    "phone": "Mobile du client",
+    "discount": "Remise %",
+    "orderNote": "Note pour la cuisine",
+    "subtotal": "Sous-total",
+    "discountLine": "Remise {pct} %",
+    "total": "Total",
+    "toKitchen": "Envoyer en cuisine",
+    "charge": "Encaisser",
+    "ticket": "{count} articles",
+    "close": "Fermer",
+    "addToTicket": "Ajouter",
+    "toPay": "À encaisser",
+    "methods": {
+      "cash": "Espèces",
+      "on_site_terminal": "Carte"
+    },
+    "tendered": "Montant reçu",
+    "confirmPayment": "Valider le paiement",
+    "shift": {
+      "closed": "La caisse est fermée. Ouvrez-la pour encaisser en espèces.",
+      "closedResult": "Caisse clôturée — attendu {expected}, compté {counted}, écart {diff}",
+      "open": "Ouvrir la caisse",
+      "float": "Fond de caisse",
+      "openSince": "Caisse ouverte depuis {time}",
+      "salesLine": "Ventes : {sales} · espèces en caisse : {cash}",
+      "payIn": "Entrée",
+      "payOut": "Sortie",
+      "close": "Clôturer",
+      "amount": "Montant",
+      "reason": "Motif",
+      "reasonPlaceholder": "ex. achat de lait",
+      "save": "Enregistrer",
+      "cashSales": "Ventes espèces",
+      "expected": "Attendu en caisse",
+      "counted": "Espèces comptées",
+      "difference": "Écart : {amount}",
+      "confirmClose": "Clôturer"
     }
   }
 }
