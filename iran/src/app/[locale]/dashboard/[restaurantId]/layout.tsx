@@ -5,6 +5,7 @@ import {
   Boxes,
   HeartHandshake,
   ChartColumn,
+  Network,
   Calculator,
   ChefHat,
   FileText,
@@ -102,6 +103,11 @@ async function RestaurantShell({
       href: `${base}/reports`,
       label: t("nav.reports"),
       icon: <ChartColumn />,
+    },
+    ctx.role !== "staff" && {
+      href: `${base}/branches`,
+      label: t("nav.branches"),
+      icon: <Network />,
     },
     can(ctx, "payments.view") && { href: `${base}/payments`, label: t("nav.payments"), icon: <Wallet /> },
     can(ctx, "invoices.view") && {

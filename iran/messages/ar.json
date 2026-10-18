@@ -222,7 +222,8 @@
     "pos": "الصندوق",
     "inventory": "المخزون",
     "customers": "نادي العملاء",
-    "reports": "التقارير والمحاسبة"
+    "reports": "التقارير والمحاسبة",
+    "branches": "الفروع"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -413,7 +414,9 @@
     "points_insufficient": "النقاط غير كافية.",
     "duplicate_customer": "هذا الرقم مسجّل مسبقاً.",
     "duplicate_coupon": "هذا الكود موجود مسبقاً.",
-    "no_recipients": "لا أحد في هذه المجموعة."
+    "no_recipients": "لا أحد في هذه المجموعة.",
+    "owner_only": "المالك فقط يمكنه إنشاء فرع.",
+    "other_organization": "هذا المطعم ليس ضمن مؤسستك."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -1640,5 +1643,41 @@
       "card": "بطاقة",
       "transfer": "تحويل بنكي"
     }
+  },
+  "branches": {
+    "title": "الفروع",
+    "subtitle": "{count} فروع · نظرة عامة على المجموعة",
+    "newBranch": "فرع جديد",
+    "branchName": "اسم الفرع",
+    "branchNamePlaceholder": "مثلاً {name} - وسط المدينة",
+    "copyMenuFrom": "نسخ قائمة «{name}»",
+    "copySettings": "نسخ الإعدادات (الدفع، الضريبة، الولاء، اللغات)",
+    "newBranchHint": "يُنشأ الفرع في نفس المؤسسة وأنت مالكه. أضف الطاولات والموظفين لاحقاً.",
+    "creating": "جارٍ الإنشاء…",
+    "create": "إنشاء الفرع",
+    "todaySales": "مبيعات اليوم (كل الفروع)",
+    "todayOrders": "طلبات اليوم",
+    "weekSales": "مبيعات 7 أيام",
+    "activeOrders": "طلبات جارية",
+    "current": "الفرع الحالي",
+    "suspended": "معلّق",
+    "open": "فتح",
+    "today": "مبيعات اليوم",
+    "week": "7 أيام",
+    "ordersToday": "{count} طلب",
+    "inProgress": "{count} جارية",
+    "openTables": "{count} طاولة مفتوحة",
+    "lowStock": "{count} منخفض المخزون",
+    "importMenu": "استيراد قائمة فرع آخر",
+    "importMenuHint": "تُنسخ الفئات والأطباق والصور والخيارات. يمكنك تعديل الأسعار لاحقاً.",
+    "modes": {
+      "append": "إضافة",
+      "replace": "استبدال"
+    },
+    "confirmReplace": "أرشفة القائمة الحالية واستبدالها؟",
+    "confirmAppend": "إضافة القائمة المختارة إلى قائمة هذا الفرع؟",
+    "copying": "جارٍ النسخ…",
+    "import": "استيراد",
+    "copied": "نُسخت {categories} فئات و{products} أطباق."
   }
 }

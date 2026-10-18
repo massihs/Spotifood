@@ -129,8 +129,15 @@ export async function deleteProductImage(db: Database, ctx: RestaurantContext, i
     for (const [i, r] of rest.entries()) {
       await tx.update(productImages).set({ sortOrder: i }).where(eq(productImages.id, r.id));
     }
-    return img;
+    // Branches that copied a menu share the stored files: keep them while still referenced.
+    const [shared] = await tx
+      .select({ id: productImages.id })
+      .from(productImages)
+      .where(eq(productImages.storageKey, img.storageKey))
+      .limit(1);
+    return { ...img, shared: Boolean(shared) };
   });
+  if (img.shared) return;
   await storage()
     .delete(variantKeys(img.storageKey))
     .catch((e) => console.error("[storage] failed to delete product image", e));

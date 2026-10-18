@@ -222,7 +222,8 @@
     "pos": "Till",
     "inventory": "Stock",
     "customers": "Customer club",
-    "reports": "Reports & accounting"
+    "reports": "Reports & accounting",
+    "branches": "Branches"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -413,7 +414,9 @@
     "points_insufficient": "Not enough points.",
     "duplicate_customer": "This number is already registered.",
     "duplicate_coupon": "This code already exists.",
-    "no_recipients": "Nobody in this group."
+    "no_recipients": "Nobody in this group.",
+    "owner_only": "Only the owner can open a branch.",
+    "other_organization": "This restaurant is not in your organization."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1640,5 +1643,41 @@
       "card": "Card",
       "transfer": "Bank transfer"
     }
+  },
+  "branches": {
+    "title": "Branches",
+    "subtitle": "{count} branches · group overview",
+    "newBranch": "New branch",
+    "branchName": "Branch name",
+    "branchNamePlaceholder": "e.g. {name} – Downtown",
+    "copyMenuFrom": "Copy the “{name}” menu",
+    "copySettings": "Copy settings (payments, VAT, loyalty, languages)",
+    "newBranchHint": "The branch is created in the same organization and you own it. Add its tables and staff separately.",
+    "creating": "Creating…",
+    "create": "Create branch",
+    "todaySales": "Sales today (all branches)",
+    "todayOrders": "Orders today",
+    "weekSales": "Sales, 7 days",
+    "activeOrders": "Orders in progress",
+    "current": "current branch",
+    "suspended": "suspended",
+    "open": "Open",
+    "today": "Sales today",
+    "week": "7 days",
+    "ordersToday": "{count} orders",
+    "inProgress": "{count} in progress",
+    "openTables": "{count} open tables",
+    "lowStock": "{count} low stock",
+    "importMenu": "Import the menu of another branch",
+    "importMenuHint": "Categories, dishes, photos and options are copied. You can then change prices for this branch.",
+    "modes": {
+      "append": "Add",
+      "replace": "Replace"
+    },
+    "confirmReplace": "Archive this branch’s current menu and replace it?",
+    "confirmAppend": "Add the selected menu to this branch’s menu?",
+    "copying": "Copying…",
+    "import": "Import",
+    "copied": "{categories} categories and {products} dishes copied."
   }
 }

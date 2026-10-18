@@ -106,7 +106,8 @@
     "pos": "Caisse",
     "inventory": "Stocks",
     "customers": "Club clients",
-    "reports": "Rapports & compta"
+    "reports": "Rapports & compta",
+    "branches": "Succursales"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -281,7 +282,9 @@
     "points_insufficient": "Points insuffisants.",
     "duplicate_customer": "Ce numéro est déjà enregistré.",
     "duplicate_coupon": "Ce code existe déjà.",
-    "no_recipients": "Personne dans ce groupe."
+    "no_recipients": "Personne dans ce groupe.",
+    "owner_only": "Seul le propriétaire peut créer une succursale.",
+    "other_organization": "Cet établissement n'appartient pas à votre organisation."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1484,5 +1487,41 @@
       "card": "Carte",
       "transfer": "Virement"
     }
+  },
+  "branches": {
+    "title": "Succursales",
+    "subtitle": "{count} établissements · vue groupe",
+    "newBranch": "Nouvelle succursale",
+    "branchName": "Nom de la succursale",
+    "branchNamePlaceholder": "ex. {name} – Centre",
+    "copyMenuFrom": "Copier le menu de « {name} »",
+    "copySettings": "Copier les réglages (paiements, TVA, fidélité, langues)",
+    "newBranchHint": "La succursale est créée dans la même organisation et vous en êtes propriétaire. Ajoutez ensuite ses tables et son équipe.",
+    "creating": "Création…",
+    "create": "Créer la succursale",
+    "todaySales": "Ventes du jour (toutes)",
+    "todayOrders": "Commandes du jour",
+    "weekSales": "Ventes 7 jours",
+    "activeOrders": "Commandes en cours",
+    "current": "établissement actuel",
+    "suspended": "suspendu",
+    "open": "Ouvrir",
+    "today": "Ventes du jour",
+    "week": "7 jours",
+    "ordersToday": "{count} commandes",
+    "inProgress": "{count} en cours",
+    "openTables": "{count} tables ouvertes",
+    "lowStock": "{count} en rupture proche",
+    "importMenu": "Importer le menu d'une autre succursale",
+    "importMenuHint": "Catégories, plats, photos et options sont copiés. Vous pourrez ensuite adapter les prix.",
+    "modes": {
+      "append": "Ajouter",
+      "replace": "Remplacer"
+    },
+    "confirmReplace": "Archiver le menu actuel et le remplacer ?",
+    "confirmAppend": "Ajouter le menu choisi à celui de cet établissement ?",
+    "copying": "Copie…",
+    "import": "Importer",
+    "copied": "{categories} catégories et {products} plats copiés."
   }
 }

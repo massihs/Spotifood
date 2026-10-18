@@ -222,7 +222,8 @@
     "pos": "صندوق",
     "inventory": "انبار",
     "customers": "باشگاه مشتریان",
-    "reports": "گزارش و حسابداری"
+    "reports": "گزارش و حسابداری",
+    "branches": "شعبه‌ها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -413,7 +414,9 @@
     "points_insufficient": "امتیاز کافی نیست.",
     "duplicate_customer": "این شماره قبلاً ثبت شده است.",
     "duplicate_coupon": "این کد قبلاً ساخته شده است.",
-    "no_recipients": "مخاطبی در این گروه نیست."
+    "no_recipients": "مخاطبی در این گروه نیست.",
+    "owner_only": "فقط مالک می‌تواند شعبه بسازد.",
+    "other_organization": "این رستوران متعلق به مجموعه شما نیست."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -1640,5 +1643,41 @@
       "card": "کارت",
       "transfer": "انتقال بانکی"
     }
+  },
+  "branches": {
+    "title": "شعبه‌ها",
+    "subtitle": "{count} شعبه · نمای کلی گروه",
+    "newBranch": "شعبه جدید",
+    "branchName": "نام شعبه",
+    "branchNamePlaceholder": "مثلاً {name} - ونک",
+    "copyMenuFrom": "منوی «{name}» کپی شود",
+    "copySettings": "تنظیمات (پرداخت، مالیات، امتیاز، زبان‌ها) کپی شود",
+    "newBranchHint": "شعبه جدید در همین مجموعه ساخته می‌شود و شما مالک آن هستید. میزها و کارکنان را جداگانه اضافه کنید.",
+    "creating": "در حال ساخت…",
+    "create": "ساخت شعبه",
+    "todaySales": "فروش امروز (همه شعب)",
+    "todayOrders": "سفارش امروز",
+    "weekSales": "فروش ۷ روز",
+    "activeOrders": "سفارش در جریان",
+    "current": "شعبه فعلی",
+    "suspended": "تعلیق",
+    "open": "ورود",
+    "today": "فروش امروز",
+    "week": "۷ روز",
+    "ordersToday": "{count} سفارش",
+    "inProgress": "{count} در جریان",
+    "openTables": "{count} میز باز",
+    "lowStock": "{count} کالای رو به اتمام",
+    "importMenu": "وارد کردن منو از شعبه دیگر",
+    "importMenuHint": "دسته‌ها، غذاها، عکس‌ها و گزینه‌ها کپی می‌شوند. قیمت‌ها را بعداً می‌توانید برای این شعبه تغییر دهید.",
+    "modes": {
+      "append": "افزودن",
+      "replace": "جایگزینی"
+    },
+    "confirmReplace": "منوی فعلی این شعبه بایگانی و با منوی انتخابی جایگزین شود؟",
+    "confirmAppend": "منوی انتخابی به منوی این شعبه اضافه شود؟",
+    "copying": "در حال کپی…",
+    "import": "وارد کردن",
+    "copied": "{categories} دسته و {products} غذا کپی شد."
   }
 }
