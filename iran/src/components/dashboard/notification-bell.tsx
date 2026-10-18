@@ -68,6 +68,9 @@ export function NotificationBell({
           table: String(n.payload.tableLabel ?? ""),
           client: String(n.payload.seq ?? ""),
           method: String(n.payload.method ?? "any"),
+          name: String(n.payload.name ?? ""),
+          quantity: String(n.payload.quantity ?? ""),
+          unit: String(n.payload.unit ?? ""),
           amount:
             typeof n.payload.amountCents === "number" && typeof n.payload.currency === "string"
               ? formatMoney(n.payload.amountCents, n.payload.currency, locale)

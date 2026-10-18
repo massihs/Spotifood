@@ -219,7 +219,8 @@
     "mainNav": "ناوبری اصلی",
     "music": "موسیقی",
     "adminMusic": "موسیقی",
-    "pos": "صندوق"
+    "pos": "صندوق",
+    "inventory": "انبار"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -401,7 +402,8 @@
     "invalid_postal_code": "کد پستی باید ۱۰ رقم باشد.",
     "phone_required": "شماره موبایل را وارد کنید تا وقتی سفارش آماده شد پیامک بگیرید.",
     "shift_already_open": "صندوق از قبل باز است.",
-    "no_open_shift": "صندوق باز نیست."
+    "no_open_shift": "صندوق باز نیست.",
+    "duplicate_ingredient": "یک ماده دو بار آمده است."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -1017,6 +1019,9 @@
         "received": "پرداخت دریافت شد {amount} · میز {table}",
         "requested": "میز {table} · مشتری {client} می‌خواهد {amount} پرداخت کند ({method, select, cash {نقدی} card {کارت} other {سر میز}})",
         "needs_review": "پرداخت نیازمند بررسی · میز {table}"
+      },
+      "stock": {
+        "low": "{name} رو به اتمام است ({quantity} {unit})"
       }
     }
   },
@@ -1372,6 +1377,76 @@
       "counted": "موجودی شمارش‌شده (تومان)",
       "difference": "اختلاف: {amount}",
       "confirmClose": "بستن و ثبت"
+    }
+  },
+  "inventory": {
+    "title": "انبار",
+    "subtitle": "مواد اولیه، رسپی غذاها، خرید و تأمین‌کنندگان. موجودی با هر فروش خودکار کم می‌شود.",
+    "tabs": {
+      "stock": "موجودی",
+      "purchases": "خریدها",
+      "recipes": "رسپی و بهای تمام‌شده",
+      "suppliers": "تأمین‌کنندگان",
+      "movements": "گردش انبار"
+    },
+    "stockValue": "ارزش موجودی",
+    "lowCount": "کالاهای رو به اتمام",
+    "newItem": "کالای جدید",
+    "editItem": "ویرایش کالا",
+    "noItems": "هنوز کالایی ثبت نشده است. مواد اولیه را اضافه کنید.",
+    "avgCost": "میانگین {amount} برای هر {unit}",
+    "threshold": "هشدار زیر {qty} {unit}",
+    "count": "شمارش",
+    "waste": "ضایعات",
+    "edit": "ویرایش",
+    "name": "نام کالا",
+    "unit": "واحد",
+    "lowThreshold": "حد هشدار",
+    "initialQty": "موجودی اولیه",
+    "unitCost": "قیمت هر واحد (تومان)",
+    "unitCostShort": "قیمت واحد",
+    "save": "ذخیره",
+    "delete": "حذف",
+    "deleteConfirm": "حذف شود؟",
+    "countHint": "مقدار شمارش‌شده واقعی را وارد کنید؛ اختلاف ثبت می‌شود.",
+    "wasteHint": "مقدار ضایع یا دورریخته‌شده را وارد کنید.",
+    "quantity": "مقدار",
+    "note": "توضیح",
+    "newPurchase": "ثبت خرید",
+    "supplier": "تأمین‌کننده",
+    "reference": "شماره فاکتور",
+    "item": "کالا",
+    "addLine": "افزودن ردیف",
+    "total": "جمع کل",
+    "savePurchase": "ثبت خرید و افزایش موجودی",
+    "supplierName": "نام تأمین‌کننده",
+    "phone": "تلفن",
+    "add": "افزودن",
+    "noSuppliers": "تأمین‌کننده‌ای ثبت نشده است.",
+    "noPurchases": "هنوز خریدی ثبت نشده است.",
+    "lines": "{count} قلم",
+    "price": "قیمت",
+    "cost": "بهای تمام‌شده",
+    "margin": "سود {pct}٪",
+    "noRecipe": "رسپی تعریف نشده",
+    "editRecipe": "تعریف رسپی",
+    "recipe": "رسپی",
+    "recipeHint": "مقدار مصرف هر ماده برای یک پرس. با هر فروش از انبار کم می‌شود.",
+    "addIngredient": "افزودن ماده",
+    "units": {
+      "g": "گرم",
+      "kg": "کیلو",
+      "ml": "میلی‌لیتر",
+      "l": "لیتر",
+      "piece": "عدد",
+      "pack": "بسته"
+    },
+    "kinds": {
+      "purchase": "خرید",
+      "sale": "فروش",
+      "sale_cancel": "لغو فروش",
+      "adjustment": "اصلاح",
+      "waste": "ضایعات"
     }
   }
 }

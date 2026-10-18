@@ -27,6 +27,7 @@ import { nextCounterValue } from "@/server/modules/restaurants/service";
 import { normalizeIranMobile } from "@/lib/phone";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { sms } from "@/server/infra/sms";
+import { applyOrderToStock } from "@/server/modules/inventory/service";
 import { canTransition, STATUS_TIMESTAMP, type OrderStatus } from "./status";
 
 export const placeOrderSchema = z.object({
@@ -179,6 +180,7 @@ export async function placeOrder(
     await tx
       .insert(orderStatusEvents)
       .values({ restaurantId: rid, orderId: created!.id, fromStatus: null, toStatus: status });
+    await applyOrderToStock(tx, rid, created!.id, -1);
     await tx.delete(cartItems).where(eq(cartItems.cartId, cart!.id));
     await touchSession(tx, guest.session.id);
     await tx.insert(notifications).values({
@@ -354,6 +356,7 @@ export async function updateOrderStatus(
       await emit(tx, { topic: topics.restaurant(ctx.restaurant.id), type: "notification.created" });
     }
     if (to === "cancelled") {
+      await applyOrderToStock(tx, ctx.restaurant.id, orderId, 1);
       await recordAudit(tx, {
         action: "order.cancelled",
         actorUserId: ctx.user.id,

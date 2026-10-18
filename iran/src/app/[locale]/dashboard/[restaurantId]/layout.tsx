@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import {
+  Boxes,
   Calculator,
   ChefHat,
   FileText,
@@ -26,6 +27,7 @@ import { LiveProvider } from "@/components/realtime/live";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { OrderAlerts } from "@/components/dashboard/order-alerts";
 import { countNewOrders } from "@/server/modules/orders/service";
+import { countLowStock } from "@/server/modules/inventory/service";
 
 export default function RestaurantLayout({
   children,
@@ -50,7 +52,11 @@ async function RestaurantShell({
   const t = await getTranslations();
   const base = `/dashboard/${ctx.restaurant.id}`;
 
-  const [{ unread }, newOrders] = await Promise.all([listNotifications(db, ctx, 1), countNewOrders(db, ctx)]);
+  const [{ unread }, newOrders, lowStock] = await Promise.all([
+    listNotifications(db, ctx, 1),
+    countNewOrders(db, ctx),
+    countLowStock(db, ctx),
+  ]);
   const nav = [
     { href: base, label: t("nav.overview"), icon: <LayoutDashboard />, exact: true, primary: true },
     can(ctx, "orders.view") && {
@@ -78,6 +84,12 @@ async function RestaurantShell({
       label: t("nav.menu"),
       icon: <UtensilsCrossed />,
       primary: true,
+    },
+    can(ctx, "inventory.view") && {
+      href: `${base}/inventory`,
+      label: t("nav.inventory"),
+      icon: <Boxes />,
+      badge: lowStock,
     },
     can(ctx, "payments.view") && { href: `${base}/payments`, label: t("nav.payments"), icon: <Wallet /> },
     can(ctx, "invoices.view") && {

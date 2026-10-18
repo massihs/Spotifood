@@ -103,7 +103,8 @@
     "invoices": "Factures",
     "music": "Musique",
     "adminMusic": "Musique",
-    "pos": "Caisse"
+    "pos": "Caisse",
+    "inventory": "Stocks"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -269,7 +270,8 @@
     "invalid_postal_code": "Le code postal doit compter 10 chiffres.",
     "phone_required": "Indiquez votre numéro de mobile pour recevoir un SMS quand votre commande est prête.",
     "shift_already_open": "La caisse est déjà ouverte.",
-    "no_open_shift": "Aucune caisse ouverte."
+    "no_open_shift": "Aucune caisse ouverte.",
+    "duplicate_ingredient": "Un ingrédient apparaît deux fois."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -861,6 +863,9 @@
         "received": "Paiement reçu {amount} · Table {table}",
         "requested": "Table {table} · Client {client} veut payer {amount} ({method, select, cash {espèces} card {carte} other {à table}})",
         "needs_review": "Paiement à vérifier · Table {table}"
+      },
+      "stock": {
+        "low": "{name} est presque épuisé ({quantity} {unit})"
       }
     }
   },
@@ -1216,6 +1221,76 @@
       "counted": "Espèces comptées",
       "difference": "Écart : {amount}",
       "confirmClose": "Clôturer"
+    }
+  },
+  "inventory": {
+    "title": "Stocks",
+    "subtitle": "Ingrédients, fiches recettes, achats et fournisseurs. Le stock baisse automatiquement à chaque vente.",
+    "tabs": {
+      "stock": "Stock",
+      "purchases": "Achats",
+      "recipes": "Recettes & coût",
+      "suppliers": "Fournisseurs",
+      "movements": "Mouvements"
+    },
+    "stockValue": "Valeur du stock",
+    "lowCount": "Stock bas",
+    "newItem": "Nouvel article",
+    "editItem": "Edit item",
+    "noItems": "No item yet. Add your ingredients.",
+    "avgCost": "avg {amount} per {unit}",
+    "threshold": "alert below {qty} {unit}",
+    "count": "Inventaire",
+    "waste": "Perte",
+    "edit": "Edit",
+    "name": "Name",
+    "unit": "Unit",
+    "lowThreshold": "Alert threshold",
+    "initialQty": "Initial quantity",
+    "unitCost": "Cost per unit",
+    "unitCostShort": "Unit cost",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "deleteConfirm": "Delete?",
+    "countHint": "Enter the quantity actually counted; the difference is recorded.",
+    "wasteHint": "Enter the quantity wasted.",
+    "quantity": "Quantity",
+    "note": "Note",
+    "newPurchase": "Nouvel achat",
+    "supplier": "Supplier",
+    "reference": "Invoice no.",
+    "item": "Item",
+    "addLine": "Add line",
+    "total": "Total",
+    "savePurchase": "Record purchase",
+    "supplierName": "Supplier name",
+    "phone": "Phone",
+    "add": "Add",
+    "noSuppliers": "No supplier yet.",
+    "noPurchases": "No purchase yet.",
+    "lines": "{count} lines",
+    "price": "Price",
+    "cost": "Cost",
+    "margin": "marge {pct} %",
+    "noRecipe": "No recipe",
+    "editRecipe": "Fiche recette",
+    "recipe": "Recette",
+    "recipeHint": "Quantity of each ingredient per portion. Deducted from stock at every sale.",
+    "addIngredient": "Add ingredient",
+    "units": {
+      "g": "g",
+      "kg": "kg",
+      "ml": "ml",
+      "l": "l",
+      "piece": "pcs",
+      "pack": "pack"
+    },
+    "kinds": {
+      "purchase": "Purchase",
+      "sale": "Sale",
+      "sale_cancel": "Cancelled",
+      "adjustment": "Adjustment",
+      "waste": "Waste"
     }
   }
 }

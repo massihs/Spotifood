@@ -23,6 +23,7 @@ import { normalizeIranMobile } from "@/lib/phone";
 import { loadPricedProducts } from "@/server/modules/menu/public";
 import { computeTotals, priceLine, type PricedLine } from "@/server/modules/pricing";
 import { nextCounterValue } from "@/server/modules/restaurants/service";
+import { applyOrderToStock } from "@/server/modules/inventory/service";
 import { emitPaymentUpdate, paymentConfig, settleAllocations } from "@/server/modules/payments/service";
 
 const amount = z.coerce.number().int().min(0).max(MAX_AMOUNT_CENTS);
@@ -195,6 +196,7 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       toStatus: "accepted",
       actorUserId: ctx.user.id,
     });
+    await applyOrderToStock(tx, rid, order!.id, -1);
 
     let payment: typeof payments.$inferSelect | null = null;
     if (input.payment && totalCents > 0) {
