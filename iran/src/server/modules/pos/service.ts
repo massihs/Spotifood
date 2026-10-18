@@ -4,6 +4,7 @@ import type { Database, DbOrTx } from "@/server/db/client";
 import {
   cashMovements,
   cashShifts,
+  customers,
   diningTables,
   notifications,
   orderItems,
@@ -24,6 +25,7 @@ import { loadPricedProducts } from "@/server/modules/menu/public";
 import { computeTotals, priceLine, type PricedLine } from "@/server/modules/pricing";
 import { nextCounterValue } from "@/server/modules/restaurants/service";
 import { applyOrderToStock } from "@/server/modules/inventory/service";
+import { commitDiscounts, computeDiscounts, linkOrderCustomer } from "@/server/modules/customers/service";
 import { emitPaymentUpdate, paymentConfig, settleAllocations } from "@/server/modules/payments/service";
 
 const amount = z.coerce.number().int().min(0).max(MAX_AMOUNT_CENTS);
@@ -54,8 +56,12 @@ export const posOrderSchema = z.object({
       if (!n) ctx.addIssue({ code: "custom", message: "invalid_phone" });
       return n;
     }),
+  customerName: z.string().trim().max(120).default(""),
   /** Manual discount, percent of the bill. */
   discountPct: z.number().min(0).max(100).default(0),
+  couponCode: z.string().trim().max(32).default(""),
+  /** Loyalty points to spend (needs the customer's phone). */
+  redeemPoints: z.number().int().min(0).max(1_000_000).default(0),
   /** Set → the order is paid on the spot. */
   payment: z
     .object({ provider: z.enum(["cash", "on_site_terminal"]), tenderedCents: amount.nullable().optional() })
@@ -136,10 +142,23 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       lines.map((l) => l.line),
       pricesIncludeTax,
     );
-    const factor = 1 - input.discountPct / 100;
-    const discountCents = Math.round(totals.totalCents * (input.discountPct / 100));
+    const manualCents = Math.round(totals.totalCents * (input.discountPct / 100));
+    const [known] = input.customerPhone
+      ? await tx
+          .select({ id: customers.id, points: customers.points })
+          .from(customers)
+          .where(and(eq(customers.restaurantId, rid), eq(customers.phone, input.customerPhone)))
+      : [];
+    const extra = await computeDiscounts(tx, rid, {
+      totalCents: totals.totalCents - manualCents,
+      couponCode: input.couponCode,
+      redeemPoints: input.redeemPoints,
+      customer: known ?? null,
+    });
+    const discountCents = manualCents + extra.discountCents;
     const totalCents = totals.totalCents - discountCents;
-    const taxCents = Math.round(totals.taxCents * factor);
+    const taxCents =
+      totals.totalCents > 0 ? Math.round(totals.taxCents * (totalCents / totals.totalCents)) : 0;
     const seq = await nextCounterValue(tx, rid, "order", 1001);
     const number = `${settings?.orderPrefix ?? "A"}-${seq}`;
     const now = new Date();
@@ -197,6 +216,16 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       actorUserId: ctx.user.id,
     });
     await applyOrderToStock(tx, rid, order!.id, -1);
+    const customer = input.customerPhone
+      ? await linkOrderCustomer(tx, rid, order!.id, input.customerPhone, input.customerName)
+      : null;
+    await commitDiscounts(
+      tx,
+      rid,
+      order!.id,
+      { couponId: extra.couponId, pointsRedeemed: extra.pointsRedeemed, customerId: customer?.id ?? null },
+      ctx.user.id,
+    );
 
     let payment: typeof payments.$inferSelect | null = null;
     if (input.payment && totalCents > 0) {

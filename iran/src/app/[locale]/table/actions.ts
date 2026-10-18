@@ -1,5 +1,7 @@
 "use server";
 
+import { findUsableCoupon } from "@/server/modules/customers/service";
+import { validation } from "@/server/errors";
 import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
 import { runAction } from "@/server/actions";
@@ -75,10 +77,10 @@ export async function renameAction(_prev: unknown, fd: FormData) {
 }
 
 /** Sends the cart to the kitchen. Prices are recomputed server-side inside placeOrder. */
-export async function placeOrderAction(note: string, phone = "") {
+export async function placeOrderAction(note: string, phone = "", couponCode = "") {
   return runAction(async () => {
     const g = await guest();
-    const order = await placeOrder(db, g, { note, phone });
+    const order = await placeOrder(db, g, { note, phone, couponCode });
     return { number: order.number };
   });
 }
@@ -125,5 +127,15 @@ export async function getInvoiceAction(paymentId: string) {
     const g = await guest();
     const invoice = await issueInvoiceAsGuest(db, g, paymentId);
     return { token: invoice.publicToken };
+  });
+}
+
+/** Checks a promo code for the cart (the discount is applied again server-side at checkout). */
+export async function checkCouponAction(code: string) {
+  return runAction(async () => {
+    const g = await guest();
+    const c = await findUsableCoupon(db, g.restaurant.id, code);
+    if (!c) throw validation("coupon_invalid");
+    return { code: c.code, kind: c.kind, value: c.value, minOrderCents: c.minOrderCents };
   });
 }

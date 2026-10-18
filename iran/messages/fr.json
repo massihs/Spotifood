@@ -104,7 +104,8 @@
     "music": "Musique",
     "adminMusic": "Musique",
     "pos": "Caisse",
-    "inventory": "Stocks"
+    "inventory": "Stocks",
+    "customers": "Club clients"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -271,7 +272,15 @@
     "phone_required": "Indiquez votre numéro de mobile pour recevoir un SMS quand votre commande est prête.",
     "shift_already_open": "La caisse est déjà ouverte.",
     "no_open_shift": "Aucune caisse ouverte.",
-    "duplicate_ingredient": "Un ingrédient apparaît deux fois."
+    "duplicate_ingredient": "Un ingrédient apparaît deux fois.",
+    "coupon_invalid": "Ce code promo n'est pas valide ou a expiré.",
+    "coupon_min_order": "La commande n'atteint pas le minimum de ce code.",
+    "customer_required": "Saisissez le numéro du client pour utiliser ses points.",
+    "loyalty_disabled": "La fidélité est désactivée.",
+    "points_insufficient": "Points insuffisants.",
+    "duplicate_customer": "Ce numéro est déjà enregistré.",
+    "duplicate_coupon": "Ce code existe déjà.",
+    "no_recipients": "Personne dans ce groupe."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -584,7 +593,13 @@
     "smsSent": "Un SMS sera envoyé au {phone} quand elle sera prête.",
     "notifyMe": "Me prévenir quand c'est prêt",
     "notifyOn": "Notifications activées",
-    "ok": "Compris"
+    "ok": "Compris",
+    "phoneOptional": "Mobile (facultatif)",
+    "phoneClubHint": "Gagnez des points à chaque commande.",
+    "coupon": "Code promo",
+    "applyCoupon": "Appliquer",
+    "removeCoupon": "Retirer le code",
+    "couponMin": "Commande minimum {amount}"
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -1221,7 +1236,17 @@
       "counted": "Espèces comptées",
       "difference": "Écart : {amount}",
       "confirmClose": "Clôturer"
-    }
+    },
+    "member": "Client",
+    "pointsBalance": "{points} points",
+    "usePoints": "Utiliser {points} pts",
+    "newCustomerName": "Nom du nouveau client (facultatif)",
+    "couponCode": "Code promo",
+    "applyCoupon": "Appliquer",
+    "removeCoupon": "Retirer le code",
+    "couponMin": "min. {amount}",
+    "couponLine": "Code {code}",
+    "pointsLine": "{points} points"
   },
   "inventory": {
     "title": "Stocks",
@@ -1292,5 +1317,84 @@
       "adjustment": "Adjustment",
       "waste": "Waste"
     }
+  },
+  "customers": {
+    "title": "Club clients",
+    "subtitle": "Fichier clients, points de fidélité, codes promo et campagnes SMS.",
+    "tabs": {
+      "customers": "Clients",
+      "coupons": "Codes promo",
+      "campaigns": "Campagnes SMS",
+      "loyalty": "Fidélité"
+    },
+    "newCustomer": "Nouveau client",
+    "phone": "Mobile",
+    "name": "Nom",
+    "note": "Note",
+    "save": "Enregistrer",
+    "saved": "Enregistré ✓",
+    "smsOptOut": "Pas de SMS marketing",
+    "adjustPoints": "Ajuster les points",
+    "addPoints": "Ajouter",
+    "removePoints": "Retirer",
+    "statTotal": "Clients",
+    "statActive": "Actifs (30 j)",
+    "statPoints": "Points en cours",
+    "statSpent": "Total dépensé",
+    "search": "Rechercher nom ou numéro…",
+    "noCustomers": "Aucun client. Une fiche est créée automatiquement quand un numéro est saisi en caisse ou à la commande.",
+    "unnamed": "Sans nom",
+    "ordersCount": "{count} commandes",
+    "points": "Points",
+    "orders": "Commandes",
+    "lastVisit": "Dernière visite",
+    "ledger": "Historique des points",
+    "entry": {
+      "earn": "Gagnés",
+      "redeem": "Utilisés",
+      "reverse_earn": "Commande annulée",
+      "reverse_redeem": "Points rendus",
+      "adjust": "Manuel"
+    },
+    "audiences": {
+      "all": "Tous",
+      "inactive": "Inactifs (30 j+)",
+      "loyal": "Fidèles (5+ cmd)",
+      "new": "Nouveaux (30 j)"
+    },
+    "newCoupon": "Nouveau code promo",
+    "noCoupons": "Aucun code promo.",
+    "code": "Code",
+    "kinds": {
+      "percent": "Pourcentage",
+      "amount": "Montant fixe"
+    },
+    "percent": "Pourcentage",
+    "amount": "Montant",
+    "minOrderLabel": "Commande minimum",
+    "maxUses": "Utilisations max",
+    "endsAt": "Valable jusqu'au",
+    "percentOff": "-{value} %",
+    "amountOff": "-{amount}",
+    "minOrder": "min. {amount}",
+    "usesOf": "{used} / {max} utilisés",
+    "uses": "{used} utilisations",
+    "until": "jusqu'au {date}",
+    "active": "Actif",
+    "deleteCoupon": "Supprimer ce code ?",
+    "newCampaign": "Envoyer un SMS aux clients",
+    "people": "{count} personnes",
+    "messagePlaceholder": "ex. -20 % ce week-end avec le code NOWRUZ",
+    "smsParts": "{chars} caractères · {parts} SMS",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "confirmSend": "Envoyer ce SMS à {count} personnes ?",
+    "campaignSent": "{sent} sur {recipients} SMS envoyés.",
+    "history": "Campagnes passées",
+    "sentOf": "{sent}/{total} envoyés",
+    "loyaltyEnabled": "Points de fidélité activés",
+    "spendPerPoint": "Un point tous les … dépensés",
+    "pointValue": "Valeur d'un point",
+    "loyaltyExample": "Chaque {spend} dépensé = 1 point valant {value} (environ {rate} % reversés)."
   }
 }

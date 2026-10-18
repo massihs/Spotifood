@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import {
   Boxes,
+  HeartHandshake,
   Calculator,
   ChefHat,
   FileText,
@@ -90,6 +91,11 @@ async function RestaurantShell({
       label: t("nav.inventory"),
       icon: <Boxes />,
       badge: lowStock,
+    },
+    can(ctx, "customers.view") && {
+      href: `${base}/customers`,
+      label: t("nav.customers"),
+      icon: <HeartHandshake />,
     },
     can(ctx, "payments.view") && { href: `${base}/payments`, label: t("nav.payments"), icon: <Wallet /> },
     can(ctx, "invoices.view") && {

@@ -220,7 +220,8 @@
     "music": "Music",
     "adminMusic": "Music",
     "pos": "Till",
-    "inventory": "Stock"
+    "inventory": "Stock",
+    "customers": "Customer club"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -403,7 +404,15 @@
     "phone_required": "Enter your mobile number to get a text when your order is ready.",
     "shift_already_open": "The till is already open.",
     "no_open_shift": "No open till.",
-    "duplicate_ingredient": "An ingredient is listed twice."
+    "duplicate_ingredient": "An ingredient is listed twice.",
+    "coupon_invalid": "This promo code is not valid or has expired.",
+    "coupon_min_order": "The order is below this code's minimum.",
+    "customer_required": "Enter the customer's number to use points.",
+    "loyalty_disabled": "Loyalty points are disabled.",
+    "points_insufficient": "Not enough points.",
+    "duplicate_customer": "This number is already registered.",
+    "duplicate_coupon": "This code already exists.",
+    "no_recipients": "Nobody in this group."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -740,7 +749,13 @@
     "smsSent": "A text will be sent to {phone} when it's ready.",
     "notifyMe": "Notify me when it's ready",
     "notifyOn": "Notifications on",
-    "ok": "Got it"
+    "ok": "Got it",
+    "phoneOptional": "Mobile number (optional)",
+    "phoneClubHint": "Earn points on every order.",
+    "coupon": "Promo code",
+    "applyCoupon": "Apply",
+    "removeCoupon": "Remove code",
+    "couponMin": "Minimum order {amount}"
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -1377,7 +1392,17 @@
       "counted": "Counted cash",
       "difference": "Difference: {amount}",
       "confirmClose": "Close and record"
-    }
+    },
+    "member": "Customer",
+    "pointsBalance": "{points} points",
+    "usePoints": "Use {points} pts",
+    "newCustomerName": "New customer name (optional)",
+    "couponCode": "Promo code",
+    "applyCoupon": "Apply",
+    "removeCoupon": "Remove code",
+    "couponMin": "min. {amount}",
+    "couponLine": "Code {code}",
+    "pointsLine": "{points} points"
   },
   "inventory": {
     "title": "Stock",
@@ -1448,5 +1473,84 @@
       "adjustment": "Adjustment",
       "waste": "Waste"
     }
+  },
+  "customers": {
+    "title": "Customer club",
+    "subtitle": "Customer file, loyalty points, promo codes and SMS campaigns.",
+    "tabs": {
+      "customers": "Customers",
+      "coupons": "Promo codes",
+      "campaigns": "SMS campaigns",
+      "loyalty": "Loyalty"
+    },
+    "newCustomer": "New customer",
+    "phone": "Mobile number",
+    "name": "Name",
+    "note": "Note",
+    "save": "Save",
+    "saved": "Saved ✓",
+    "smsOptOut": "No marketing SMS",
+    "adjustPoints": "Adjust points",
+    "addPoints": "Add",
+    "removePoints": "Remove",
+    "statTotal": "Customers",
+    "statActive": "Active (30 days)",
+    "statPoints": "Open points",
+    "statSpent": "Total spent",
+    "search": "Search name or number…",
+    "noCustomers": "No customers yet. A file is created automatically when a phone number is given at the till or at checkout.",
+    "unnamed": "No name",
+    "ordersCount": "{count} orders",
+    "points": "Points",
+    "orders": "Orders",
+    "lastVisit": "Last visit",
+    "ledger": "Points history",
+    "entry": {
+      "earn": "Earned",
+      "redeem": "Redeemed",
+      "reverse_earn": "Order cancelled",
+      "reverse_redeem": "Points returned",
+      "adjust": "Manual"
+    },
+    "audiences": {
+      "all": "All",
+      "inactive": "Inactive (30+ days)",
+      "loyal": "Loyal (5+ orders)",
+      "new": "New (30 days)"
+    },
+    "newCoupon": "New promo code",
+    "noCoupons": "No promo codes yet.",
+    "code": "Code",
+    "kinds": {
+      "percent": "Percent",
+      "amount": "Fixed amount"
+    },
+    "percent": "Percent",
+    "amount": "Amount",
+    "minOrderLabel": "Minimum order",
+    "maxUses": "Max uses",
+    "endsAt": "Valid until",
+    "percentOff": "{value}% off",
+    "amountOff": "{amount} off",
+    "minOrder": "min. {amount}",
+    "usesOf": "{used} of {max} used",
+    "uses": "{used} uses",
+    "until": "until {date}",
+    "active": "Active",
+    "deleteCoupon": "Delete this code?",
+    "newCampaign": "Text your customers",
+    "people": "{count} people",
+    "messagePlaceholder": "e.g. 20% off this weekend with code NOWRUZ",
+    "smsParts": "{chars} characters · {parts} SMS",
+    "send": "Send",
+    "sending": "Sending…",
+    "confirmSend": "Send this SMS to {count} people?",
+    "campaignSent": "{sent} of {recipients} messages sent.",
+    "history": "Past campaigns",
+    "sentOf": "{sent}/{total} sent",
+    "loyaltyEnabled": "Loyalty points enabled",
+    "spendPerPoint": "One point for every … spent",
+    "pointValue": "Value of one point",
+    "loyaltyExample": "Every {spend} spent = 1 point worth {value} (about {rate}% back)."
   }
 }

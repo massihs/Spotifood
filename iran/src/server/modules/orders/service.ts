@@ -28,6 +28,12 @@ import { normalizeIranMobile } from "@/lib/phone";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { sms } from "@/server/infra/sms";
 import { applyOrderToStock } from "@/server/modules/inventory/service";
+import {
+  commitDiscounts,
+  computeDiscounts,
+  linkOrderCustomer,
+  onOrderCancelled,
+} from "@/server/modules/customers/service";
 import { canTransition, STATUS_TIMESTAMP, type OrderStatus } from "./status";
 
 export const placeOrderSchema = z.object({
@@ -51,6 +57,7 @@ export const placeOrderSchema = z.object({
     })
     .nullable()
     .optional(),
+  couponCode: z.string().trim().max(32).nullable().optional(),
 });
 
 /**
@@ -128,6 +135,13 @@ export async function placeOrder(
       lines.map((l) => l.line),
       pricesIncludeTax,
     );
+    const discount = await computeDiscounts(tx, rid, {
+      totalCents: totals.totalCents,
+      couponCode: input.couponCode,
+    });
+    const totalCents = totals.totalCents - discount.discountCents;
+    const taxCents =
+      totals.totalCents > 0 ? Math.round(totals.taxCents * (totalCents / totals.totalCents)) : 0;
     const seq = await nextCounterValue(tx, rid, "order", 1001);
     const number = `${settings?.orderPrefix ?? "A"}-${seq}`;
     const status: OrderStatus = settings?.requirePaymentBeforeOrder ? "pending_payment" : "received";
@@ -147,9 +161,9 @@ export async function placeOrder(
         paymentStatus: "unpaid",
         currency: guest.restaurant.currency,
         subtotalCents: totals.subtotalCents,
-        discountCents: 0,
-        taxCents: totals.taxCents,
-        totalCents: totals.totalCents,
+        discountCents: discount.discountCents,
+        taxCents,
+        totalCents,
         pricesIncludeTax,
         note: input.note ?? null,
         customerPhone: input.phone ?? null,
@@ -181,6 +195,14 @@ export async function placeOrder(
       .insert(orderStatusEvents)
       .values({ restaurantId: rid, orderId: created!.id, fromStatus: null, toStatus: status });
     await applyOrderToStock(tx, rid, created!.id, -1);
+    const customer = input.phone ? await linkOrderCustomer(tx, rid, created!.id, input.phone) : null;
+    await commitDiscounts(
+      tx,
+      rid,
+      created!.id,
+      { couponId: discount.couponId, pointsRedeemed: 0, customerId: customer?.id ?? null },
+      null,
+    );
     await tx.delete(cartItems).where(eq(cartItems.cartId, cart!.id));
     await touchSession(tx, guest.session.id);
     await tx.insert(notifications).values({
@@ -190,7 +212,7 @@ export async function placeOrder(
         orderId: created!.id,
         number,
         tableLabel: guest.table.label,
-        totalCents: totals.totalCents,
+        totalCents,
         seq: guest.participant.seq,
       },
     });
@@ -211,7 +233,7 @@ export async function placeOrder(
       restaurantId: rid,
       entityType: "order",
       entityId: created!.id,
-      metadata: { number, totalCents: totals.totalCents, items: lines.length },
+      metadata: { number, totalCents, items: lines.length },
     });
     return created!;
   });
@@ -357,6 +379,7 @@ export async function updateOrderStatus(
     }
     if (to === "cancelled") {
       await applyOrderToStock(tx, ctx.restaurant.id, orderId, 1);
+      await onOrderCancelled(tx, ctx.restaurant.id, orderId);
       await recordAudit(tx, {
         action: "order.cancelled",
         actorUserId: ctx.user.id,

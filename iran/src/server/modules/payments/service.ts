@@ -1,4 +1,5 @@
 import { MAX_AMOUNT_CENTS } from "@/lib/money";
+import { onOrdersPaid } from "@/server/modules/customers/service";
 import { and, asc, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
@@ -154,6 +155,11 @@ export async function settleAllocations(tx: Tx, p: typeof payments.$inferSelect,
       tableId: orders.tableId,
     });
 
+  await onOrdersPaid(
+    tx,
+    p.restaurantId,
+    settled.map((o) => o.id),
+  );
   for (const o of settled) {
     if (o.status === "pending_payment") {
       await tx

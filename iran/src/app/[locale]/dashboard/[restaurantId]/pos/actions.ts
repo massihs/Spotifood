@@ -10,6 +10,8 @@ import {
   openShift,
   type PosOrderInput,
 } from "@/server/modules/pos/service";
+import { findUsableCoupon, lookupCustomer } from "@/server/modules/customers/service";
+import { validation } from "@/server/errors";
 
 export async function createPosOrderAction(restaurantId: string, input: PosOrderInput) {
   return runAction(async () => {
@@ -47,5 +49,21 @@ export async function closeShiftAction(restaurantId: string, countedCashCents: n
     const { summary, shift } = await closeShift(db, ctx, { countedCashCents, note });
     refresh();
     return { expected: summary.expectedCash, counted: shift.countedCashCents ?? 0 };
+  });
+}
+
+export async function lookupCustomerAction(restaurantId: string, phone: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "orders.create");
+    return lookupCustomer(db, ctx, phone);
+  });
+}
+
+export async function checkCouponAction(restaurantId: string, code: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "orders.create");
+    const c = await findUsableCoupon(db, ctx.restaurant.id, code);
+    if (!c) throw validation("coupon_invalid");
+    return { code: c.code, kind: c.kind, value: c.value, minOrderCents: c.minOrderCents };
   });
 }

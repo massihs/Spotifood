@@ -9,11 +9,14 @@ import {
   Send,
   ShoppingBag,
   Smartphone,
+  Ticket,
   UserRound,
+  X,
 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useActionState, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import {
+  checkCouponAction,
   placeOrderAction,
   removeItemAction,
   renameAction,
@@ -23,6 +26,7 @@ import {
 import { useMoney } from "@/components/ui/use-money";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
+import { couponDiscount } from "@/lib/coupon";
 import type { CartLineView } from "@/server/modules/cart/service";
 import type { Totals } from "@/server/modules/pricing";
 import { QuantityStepper } from "./parts";
@@ -142,7 +146,8 @@ export function CartView({
 
           <OrderPanel
             requirePhone={requirePhone}
-            totalLabel={money(totals.totalCents)}
+            totalCents={totals.totalCents}
+            money={money}
             disabled={hasIssues || totals.totalCents === 0}
             hasIssues={hasIssues}
             summary={
@@ -215,13 +220,15 @@ function Steps() {
 }
 
 function OrderPanel({
-  totalLabel,
+  totalCents,
+  money,
   disabled,
   hasIssues,
   summary,
   requirePhone,
 }: {
-  totalLabel: string;
+  totalCents: number;
+  money: (c: number) => string;
   disabled: boolean;
   hasIssues: boolean;
   summary: React.ReactNode;
@@ -233,13 +240,23 @@ function OrderPanel({
   // A returning guest's number is remembered on this device only (prefilled after hydration).
   const phoneRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (!requirePhone || !phoneRef.current) return;
+    if (!phoneRef.current) return;
     try {
       phoneRef.current.value ||= localStorage.getItem(PHONE_KEY) ?? "";
     } catch {
       /* ignore */
     }
-  }, [requirePhone]);
+  }, []);
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<{
+    code: string;
+    kind: string;
+    value: number;
+    minOrderCents: number;
+  } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const couponCents = coupon && totalCents >= coupon.minOrderCents ? couponDiscount(coupon, totalCents) : 0;
+  const totalLabel = money(totalCents - couponCents);
   const [error, setError] = useState<string | null>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -247,13 +264,22 @@ function OrderPanel({
     "w-full rounded-xl border border-border-strong bg-surface px-3.5 text-[16px] placeholder:text-fg-subtle focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none";
   return (
     <>
-      {requirePhone ? (
-        <section className="rounded-2xl border border-accent/30 bg-accent-soft/60 p-4">
+      {
+        <section
+          className={cn(
+            "rounded-2xl border p-4",
+            requirePhone
+              ? "border-accent/30 bg-accent-soft/60"
+              : "border-border bg-surface shadow-[var(--shadow-soft)]",
+          )}
+        >
           <label htmlFor="guest-phone" className="flex items-center gap-2 font-bold">
             <Smartphone className="size-5 text-accent-text" aria-hidden="true" />
-            {t("guest.phone")}
+            {requirePhone ? t("guest.phone") : t("guest.phoneOptional")}
           </label>
-          <p className="mt-1 text-sm text-fg-muted">{t("guest.phoneHint")}</p>
+          <p className="mt-1 text-sm text-fg-muted">
+            {requirePhone ? t("guest.phoneHint") : t("guest.phoneClubHint")}
+          </p>
           <input
             id="guest-phone"
             type="tel"
@@ -273,7 +299,67 @@ function OrderPanel({
             </p>
           ) : null}
         </section>
-      ) : null}
+      }
+
+      <section className="rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+        <label htmlFor="guest-coupon" className="flex items-center gap-2 font-bold">
+          <Ticket className="size-5 text-accent-text" aria-hidden="true" />
+          {t("guest.coupon")}
+        </label>
+        {coupon ? (
+          <div className="mt-3 flex items-center gap-2 rounded-xl bg-accent-soft px-3 py-2.5">
+            <span dir="ltr" className="font-mono font-bold">
+              {coupon.code}
+            </span>
+            <span className="text-sm text-accent-text">
+              {couponCents
+                ? `−${money(couponCents)}`
+                : t("guest.couponMin", { amount: money(coupon.minOrderCents) })}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCoupon(null)}
+              className="ms-auto grid size-8 place-items-center rounded-full hover:bg-surface"
+              aria-label={t("guest.removeCoupon")}
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="mt-3 flex gap-2">
+            <input
+              id="guest-coupon"
+              value={couponInput}
+              onChange={(e) => (setCouponInput(e.target.value.toUpperCase()), setCouponError(null))}
+              dir="ltr"
+              autoCapitalize="characters"
+              placeholder="NOWRUZ"
+              className={cn(field, "h-12 flex-1 font-mono tracking-wider")}
+            />
+            <button
+              type="button"
+              disabled={couponInput.trim().length < 3 || pending}
+              onClick={() =>
+                startTransition(async () => {
+                  const res = await checkCouponAction(couponInput);
+                  if (res?.ok && res.data) {
+                    setCoupon(res.data);
+                    setCouponInput("");
+                  } else setCouponError(t("errorCodes.coupon_invalid"));
+                })
+              }
+              className="h-12 shrink-0 rounded-xl px-4 font-semibold ring-1 ring-border-strong disabled:opacity-40"
+            >
+              {t("guest.applyCoupon")}
+            </button>
+          </div>
+        )}
+        {couponError ? (
+          <p role="alert" className="mt-1.5 text-sm font-medium text-danger">
+            {couponError}
+          </p>
+        ) : null}
+      </section>
 
       <section className="rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
         <label htmlFor="order-note" className="flex items-center gap-2 font-bold">
@@ -319,9 +405,9 @@ function OrderPanel({
                 document.getElementById("guest-phone")?.focus();
                 return;
               }
-              const res = await placeOrderAction(note, requirePhone ? phone : "");
+              const res = await placeOrderAction(note, phone, coupon?.code ?? "");
               if (res?.ok) {
-                if (requirePhone) {
+                if (phone) {
                   try {
                     localStorage.setItem(PHONE_KEY, phone);
                   } catch {
@@ -333,7 +419,10 @@ function OrderPanel({
                 const msg = t.has(`errorCodes.${res.error}`)
                   ? t(`errorCodes.${res.error}`)
                   : t("errorCodes.internal");
-                if (res.error === "phone_required" || res.error === "invalid_phone") {
+                if (res.error === "coupon_invalid" || res.error === "coupon_min_order") {
+                  setCoupon(null);
+                  setCouponError(msg);
+                } else if (res.error === "phone_required" || res.error === "invalid_phone") {
                   setPhoneError(msg);
                   document.getElementById("guest-phone")?.focus();
                 } else {

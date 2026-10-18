@@ -13,7 +13,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { pk, softDelete, timestamps } from "./_helpers";
+import { money, pk, softDelete, timestamps } from "./_helpers";
 import { memberRole, memberStatus, restaurantKind, restaurantStatus } from "./enums";
 import { organizations, users } from "./platform";
 
@@ -74,6 +74,10 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   zarinpalMerchantId: varchar({ length: 64 }),
   /** Auto-close idle table sessions after N minutes (null = manual only). */
   sessionAutoCloseMinutes: integer().default(180),
+  /** Loyalty club: one point per `loyaltySpendPerPointCents` paid, worth `loyaltyPointValueCents`. */
+  loyaltyEnabled: boolean().notNull().default(true),
+  loyaltySpendPerPointCents: money().notNull().default(10_000_000),
+  loyaltyPointValueCents: money().notNull().default(500_000),
   openingHours: jsonb().$type<OpeningHours>(),
   legalName: varchar({ length: 200 }),
   legalId: varchar({ length: 64 }),

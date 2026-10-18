@@ -220,7 +220,8 @@
     "music": "موسیقی",
     "adminMusic": "موسیقی",
     "pos": "صندوق",
-    "inventory": "انبار"
+    "inventory": "انبار",
+    "customers": "باشگاه مشتریان"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -403,7 +404,15 @@
     "phone_required": "شماره موبایل را وارد کنید تا وقتی سفارش آماده شد پیامک بگیرید.",
     "shift_already_open": "صندوق از قبل باز است.",
     "no_open_shift": "صندوق باز نیست.",
-    "duplicate_ingredient": "یک ماده دو بار آمده است."
+    "duplicate_ingredient": "یک ماده دو بار آمده است.",
+    "coupon_invalid": "کد تخفیف معتبر نیست یا منقضی شده است.",
+    "coupon_min_order": "مبلغ سفارش به حداقل لازم برای این کد نرسیده است.",
+    "customer_required": "برای استفاده از امتیاز، شماره مشتری را وارد کنید.",
+    "loyalty_disabled": "امتیاز وفاداری غیرفعال است.",
+    "points_insufficient": "امتیاز کافی نیست.",
+    "duplicate_customer": "این شماره قبلاً ثبت شده است.",
+    "duplicate_coupon": "این کد قبلاً ساخته شده است.",
+    "no_recipients": "مخاطبی در این گروه نیست."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -740,7 +749,13 @@
     "smsSent": "پیامک آماده بودن سفارش به {phone} ارسال می‌شود.",
     "notifyMe": "وقتی آماده شد خبرم کن",
     "notifyOn": "اعلان فعال است",
-    "ok": "باشه"
+    "ok": "باشه",
+    "phoneOptional": "شماره موبایل (اختیاری)",
+    "phoneClubHint": "با ثبت شماره، از هر خرید امتیاز بگیرید.",
+    "coupon": "کد تخفیف",
+    "applyCoupon": "اعمال",
+    "removeCoupon": "حذف کد",
+    "couponMin": "حداقل خرید {amount}"
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",
@@ -1377,7 +1392,17 @@
       "counted": "موجودی شمارش‌شده (تومان)",
       "difference": "اختلاف: {amount}",
       "confirmClose": "بستن و ثبت"
-    }
+    },
+    "member": "مشتری",
+    "pointsBalance": "{points} امتیاز",
+    "usePoints": "استفاده از {points} امتیاز",
+    "newCustomerName": "نام مشتری جدید (اختیاری)",
+    "couponCode": "کد تخفیف",
+    "applyCoupon": "اعمال",
+    "removeCoupon": "حذف کد",
+    "couponMin": "حداقل {amount}",
+    "couponLine": "کد {code}",
+    "pointsLine": "{points} امتیاز"
   },
   "inventory": {
     "title": "انبار",
@@ -1448,5 +1473,84 @@
       "adjustment": "اصلاح",
       "waste": "ضایعات"
     }
+  },
+  "customers": {
+    "title": "باشگاه مشتریان",
+    "subtitle": "پرونده مشتریان، امتیاز وفاداری، کدهای تخفیف و پیامک تبلیغاتی.",
+    "tabs": {
+      "customers": "مشتریان",
+      "coupons": "کدهای تخفیف",
+      "campaigns": "کمپین پیامکی",
+      "loyalty": "امتیاز وفاداری"
+    },
+    "newCustomer": "مشتری جدید",
+    "phone": "شماره موبایل",
+    "name": "نام",
+    "note": "یادداشت",
+    "save": "ذخیره",
+    "saved": "ذخیره شد ✓",
+    "smsOptOut": "پیامک تبلیغاتی نفرست",
+    "adjustPoints": "تغییر دستی امتیاز",
+    "addPoints": "افزودن",
+    "removePoints": "کسر",
+    "statTotal": "کل مشتریان",
+    "statActive": "فعال در ۳۰ روز",
+    "statPoints": "امتیاز باز",
+    "statSpent": "مجموع خرید",
+    "search": "جستجوی نام یا شماره…",
+    "noCustomers": "هنوز مشتری‌ای ثبت نشده. با ثبت شماره در صندوق یا سفارش، پرونده خودکار ساخته می‌شود.",
+    "unnamed": "بدون نام",
+    "ordersCount": "{count} سفارش",
+    "points": "امتیاز",
+    "orders": "سفارش‌ها",
+    "lastVisit": "آخرین مراجعه",
+    "ledger": "تاریخچه امتیاز",
+    "entry": {
+      "earn": "کسب از خرید",
+      "redeem": "استفاده در خرید",
+      "reverse_earn": "لغو سفارش",
+      "reverse_redeem": "بازگشت امتیاز",
+      "adjust": "تغییر دستی"
+    },
+    "audiences": {
+      "all": "همه",
+      "inactive": "غیرفعال (+۳۰ روز)",
+      "loyal": "وفادار (۵+ سفارش)",
+      "new": "جدید (۳۰ روز)"
+    },
+    "newCoupon": "کد تخفیف جدید",
+    "noCoupons": "کد تخفیفی ساخته نشده است.",
+    "code": "کد",
+    "kinds": {
+      "percent": "درصدی",
+      "amount": "مبلغ ثابت"
+    },
+    "percent": "درصد",
+    "amount": "مبلغ (تومان)",
+    "minOrderLabel": "حداقل خرید",
+    "maxUses": "حداکثر استفاده",
+    "endsAt": "تا تاریخ",
+    "percentOff": "{value}٪ تخفیف",
+    "amountOff": "{amount} تخفیف",
+    "minOrder": "حداقل {amount}",
+    "usesOf": "{used} از {max} استفاده",
+    "uses": "{used} استفاده",
+    "until": "تا {date}",
+    "active": "فعال",
+    "deleteCoupon": "حذف این کد؟",
+    "newCampaign": "ارسال پیامک به مشتریان",
+    "people": "{count} نفر",
+    "messagePlaceholder": "مثلاً: این آخر هفته ۲۰٪ تخفیف با کد NOWRUZ",
+    "smsParts": "{chars} نویسه · {parts} پیامک",
+    "send": "ارسال",
+    "sending": "در حال ارسال…",
+    "confirmSend": "پیامک برای {count} نفر ارسال شود؟",
+    "campaignSent": "{sent} از {recipients} پیامک ارسال شد.",
+    "history": "کمپین‌های قبلی",
+    "sentOf": "{sent}/{total} ارسال",
+    "loyaltyEnabled": "امتیاز وفاداری فعال باشد",
+    "spendPerPoint": "به ازای هر … خرید یک امتیاز (تومان)",
+    "pointValue": "ارزش هر امتیاز (تومان)",
+    "loyaltyExample": "هر {spend} خرید = ۱ امتیاز به ارزش {value} (حدود {rate}٪ بازگشت)."
   }
 }

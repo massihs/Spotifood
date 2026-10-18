@@ -220,7 +220,8 @@
     "music": "الموسيقى",
     "adminMusic": "الموسيقى",
     "pos": "الصندوق",
-    "inventory": "المخزون"
+    "inventory": "المخزون",
+    "customers": "نادي العملاء"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -403,7 +404,15 @@
     "phone_required": "أدخل رقم جوالك لتصلك رسالة عند جاهزية الطلب.",
     "shift_already_open": "الصندوق مفتوح بالفعل.",
     "no_open_shift": "لا يوجد صندوق مفتوح.",
-    "duplicate_ingredient": "مكوّن مكرر."
+    "duplicate_ingredient": "مكوّن مكرر.",
+    "coupon_invalid": "كود الخصم غير صالح أو منتهٍ.",
+    "coupon_min_order": "الطلب أقل من الحد الأدنى لهذا الكود.",
+    "customer_required": "أدخل رقم العميل لاستخدام النقاط.",
+    "loyalty_disabled": "نقاط الولاء معطلة.",
+    "points_insufficient": "النقاط غير كافية.",
+    "duplicate_customer": "هذا الرقم مسجّل مسبقاً.",
+    "duplicate_coupon": "هذا الكود موجود مسبقاً.",
+    "no_recipients": "لا أحد في هذه المجموعة."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -740,7 +749,13 @@
     "smsSent": "سترسل رسالة إلى {phone} عند الجاهزية.",
     "notifyMe": "نبّهني عند الجاهزية",
     "notifyOn": "التنبيهات مفعّلة",
-    "ok": "حسناً"
+    "ok": "حسناً",
+    "phoneOptional": "رقم الجوال (اختياري)",
+    "phoneClubHint": "اكسب نقاطاً مع كل طلب.",
+    "coupon": "كود الخصم",
+    "applyCoupon": "تطبيق",
+    "removeCoupon": "إزالة الكود",
+    "couponMin": "الحد الأدنى للطلب {amount}"
   },
   "categoryTemplates": {
     "starters": "المقبلات",
@@ -1377,7 +1392,17 @@
       "counted": "Counted cash",
       "difference": "Difference: {amount}",
       "confirmClose": "Close and record"
-    }
+    },
+    "member": "عميل",
+    "pointsBalance": "{points} نقطة",
+    "usePoints": "استخدم {points} نقطة",
+    "newCustomerName": "اسم العميل الجديد (اختياري)",
+    "couponCode": "كود الخصم",
+    "applyCoupon": "تطبيق",
+    "removeCoupon": "إزالة الكود",
+    "couponMin": "حد أدنى {amount}",
+    "couponLine": "الكود {code}",
+    "pointsLine": "{points} نقطة"
   },
   "inventory": {
     "title": "المخزون",
@@ -1448,5 +1473,84 @@
       "adjustment": "Adjustment",
       "waste": "Waste"
     }
+  },
+  "customers": {
+    "title": "نادي العملاء",
+    "subtitle": "ملف العملاء، نقاط الولاء، أكواد الخصم ورسائل SMS.",
+    "tabs": {
+      "customers": "العملاء",
+      "coupons": "أكواد الخصم",
+      "campaigns": "حملات SMS",
+      "loyalty": "الولاء"
+    },
+    "newCustomer": "عميل جديد",
+    "phone": "رقم الجوال",
+    "name": "الاسم",
+    "note": "ملاحظة",
+    "save": "حفظ",
+    "saved": "تم الحفظ ✓",
+    "smsOptOut": "بدون رسائل تسويقية",
+    "adjustPoints": "تعديل النقاط",
+    "addPoints": "إضافة",
+    "removePoints": "خصم",
+    "statTotal": "العملاء",
+    "statActive": "نشطون (30 يوماً)",
+    "statPoints": "النقاط المفتوحة",
+    "statSpent": "إجمالي المشتريات",
+    "search": "ابحث بالاسم أو الرقم…",
+    "noCustomers": "لا يوجد عملاء بعد. يُنشأ الملف تلقائياً عند إدخال الرقم في الصندوق أو الطلب.",
+    "unnamed": "بدون اسم",
+    "ordersCount": "{count} طلبات",
+    "points": "النقاط",
+    "orders": "الطلبات",
+    "lastVisit": "آخر زيارة",
+    "ledger": "سجل النقاط",
+    "entry": {
+      "earn": "مكتسبة",
+      "redeem": "مستخدمة",
+      "reverse_earn": "طلب ملغى",
+      "reverse_redeem": "نقاط مستردة",
+      "adjust": "يدوي"
+    },
+    "audiences": {
+      "all": "الكل",
+      "inactive": "غير نشطين (+30 يوماً)",
+      "loyal": "أوفياء (5+ طلبات)",
+      "new": "جدد (30 يوماً)"
+    },
+    "newCoupon": "كود خصم جديد",
+    "noCoupons": "لا توجد أكواد خصم.",
+    "code": "الكود",
+    "kinds": {
+      "percent": "نسبة",
+      "amount": "مبلغ ثابت"
+    },
+    "percent": "النسبة",
+    "amount": "المبلغ",
+    "minOrderLabel": "الحد الأدنى للطلب",
+    "maxUses": "أقصى استخدام",
+    "endsAt": "صالح حتى",
+    "percentOff": "خصم {value}٪",
+    "amountOff": "خصم {amount}",
+    "minOrder": "حد أدنى {amount}",
+    "usesOf": "{used} من {max}",
+    "uses": "{used} استخدام",
+    "until": "حتى {date}",
+    "active": "مفعّل",
+    "deleteCoupon": "حذف هذا الكود؟",
+    "newCampaign": "أرسل رسالة للعملاء",
+    "people": "{count} شخص",
+    "messagePlaceholder": "مثلاً: خصم 20٪ هذا الأسبوع بالكود NOWRUZ",
+    "smsParts": "{chars} حرف · {parts} رسالة",
+    "send": "إرسال",
+    "sending": "جارٍ الإرسال…",
+    "confirmSend": "إرسال الرسالة إلى {count} شخص؟",
+    "campaignSent": "أُرسلت {sent} من {recipients} رسالة.",
+    "history": "الحملات السابقة",
+    "sentOf": "{sent}/{total} أُرسلت",
+    "loyaltyEnabled": "تفعيل نقاط الولاء",
+    "spendPerPoint": "نقطة لكل … إنفاق",
+    "pointValue": "قيمة النقطة",
+    "loyaltyExample": "كل {spend} = نقطة واحدة بقيمة {value} (حوالي {rate}٪ استرداد)."
   }
 }

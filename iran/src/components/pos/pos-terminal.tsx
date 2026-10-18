@@ -13,6 +13,8 @@ import {
   Search,
   ShoppingBag,
   Smartphone,
+  Star,
+  Ticket,
   Trash2,
   UtensilsCrossed,
   X,
@@ -22,9 +24,15 @@ import { useMemo, useState, useTransition } from "react";
 import { CategoryIcon } from "@/components/category-icon";
 import { useMoney } from "@/components/ui/use-money";
 import { cn } from "@/lib/cn";
+import { couponDiscount } from "@/lib/coupon";
 import { parseMoneyInput } from "@/lib/money";
+import { normalizeIranMobile } from "@/lib/phone";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
-import { createPosOrderAction } from "@/app/[locale]/dashboard/[restaurantId]/pos/actions";
+import {
+  checkCouponAction,
+  createPosOrderAction,
+  lookupCustomerAction,
+} from "@/app/[locale]/dashboard/[restaurantId]/pos/actions";
 
 type Line = { key: string; product: PublicProduct; optionValueIds: string[]; quantity: number; note: string };
 
@@ -61,6 +69,22 @@ export function PosTerminal({
   const [tableId, setTableId] = useState<string>("");
   const [phone, setPhone] = useState("");
   const [discount, setDiscount] = useState(0);
+  const [club, setClub] = useState<{
+    phone: string;
+    customer: { name: string | null; points: number } | null;
+    enabled: boolean;
+    pointValueCents: number;
+  } | null>(null);
+  const [customerName, setCustomerName] = useState("");
+  const [usePoints, setUsePoints] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<{
+    code: string;
+    kind: string;
+    value: number;
+    minOrderCents: number;
+  } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [picking, setPicking] = useState<PublicProduct | null>(null);
   const [paying, setPaying] = useState(false);
@@ -79,8 +103,37 @@ export function PosTerminal({
   }, [menu, category, query]);
 
   const subtotal = lines.reduce((s, l) => s + unitPrice(l.product, l.optionValueIds) * l.quantity, 0);
-  const discountCents = Math.round(subtotal * (discount / 100));
+  const manualCents = Math.round(subtotal * (discount / 100));
+  const afterManual = subtotal - manualCents;
+  const couponCents = coupon && afterManual >= coupon.minOrderCents ? couponDiscount(coupon, afterManual) : 0;
+  const member = club && club.phone === normalizeIranMobile(phone) ? club : null;
+  const redeemable =
+    member?.customer && member.enabled && member.pointValueCents > 0
+      ? Math.min(member.customer.points, Math.floor((afterManual - couponCents) / member.pointValueCents))
+      : 0;
+  const pointsUsed = usePoints ? redeemable : 0;
+  const pointsCents = pointsUsed * (member?.pointValueCents ?? 0);
+  const discountCents = manualCents + couponCents + pointsCents;
   const total = subtotal - discountCents;
+
+  const onPhone = (v: string) => {
+    setPhone(v);
+    setUsePoints(false);
+    const n = normalizeIranMobile(v);
+    if (!n || n === club?.phone) return;
+    void lookupCustomerAction(restaurantId, n).then((res) => {
+      if (res?.ok && res.data) setClub({ phone: n, ...res.data });
+    });
+  };
+  const applyCoupon = () =>
+    start(async () => {
+      setCouponError(null);
+      const res = await checkCouponAction(restaurantId, couponInput);
+      if (res?.ok && res.data) {
+        setCoupon(res.data);
+        setCouponInput("");
+      } else setCouponError(tErr("coupon_invalid"));
+    });
   const count = lines.reduce((s, l) => s + l.quantity, 0);
 
   const add = (p: PublicProduct, optionValueIds: string[] = []) => {
@@ -121,7 +174,10 @@ export function PosTerminal({
         })),
         note,
         customerPhone: phone,
+        customerName,
         discountPct: discount,
+        couponCode: coupon?.code ?? "",
+        redeemPoints: pointsUsed,
         payment,
         idempotencyKey: newKey(),
       });
@@ -134,6 +190,10 @@ export function PosTerminal({
         setPhone("");
         setNote("");
         setDiscount(0);
+        setClub(null);
+        setCustomerName("");
+        setUsePoints(false);
+        setCoupon(null);
         setPaying(false);
         setTicketOpen(false);
       } else if (res && !res.ok) setError(tErr.has(res.error) ? tErr(res.error) : tErr("internal"));
@@ -248,7 +308,7 @@ export function PosTerminal({
             <Smartphone className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-fg-subtle" />
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => onPhone(e.target.value)}
               inputMode="tel"
               dir="ltr"
               placeholder={t("phone")}
@@ -268,6 +328,79 @@ export function PosTerminal({
             />
           </label>
         </div>
+        {member?.customer ? (
+          <div className="flex items-center gap-2 rounded-lg bg-warning-soft px-3 py-2 text-sm">
+            <Star className="size-4 shrink-0 fill-warning text-warning" />
+            <span className="min-w-0 flex-1 truncate">
+              <b>{member.customer.name ?? t("member")}</b> ·{" "}
+              {t("pointsBalance", { points: member.customer.points })}
+            </span>
+            {redeemable > 0 ? (
+              <button
+                type="button"
+                onClick={() => setUsePoints((u) => !u)}
+                className={cn(
+                  "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
+                  usePoints ? "bg-warning text-white" : "bg-surface ring-1 ring-warning/40",
+                )}
+              >
+                {t("usePoints", { points: redeemable })}
+              </button>
+            ) : null}
+          </div>
+        ) : member ? (
+          <input
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            placeholder={t("newCustomerName")}
+            maxLength={120}
+            className="h-9 w-full rounded-lg border border-dashed border-border-strong bg-surface px-3 text-sm"
+          />
+        ) : null}
+        {coupon ? (
+          <div className="flex items-center gap-2 rounded-lg bg-accent-soft px-3 py-2 text-sm">
+            <Ticket className="size-4 shrink-0 text-accent" />
+            <span dir="ltr" className="font-mono font-bold">
+              {coupon.code}
+            </span>
+            {afterManual < coupon.minOrderCents ? (
+              <span className="text-xs text-danger">
+                {t("couponMin", { amount: money(coupon.minOrderCents) })}
+              </span>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setCoupon(null)}
+              className="ms-auto grid size-6 place-items-center rounded-full hover:bg-surface"
+              aria-label={t("removeCoupon")}
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <label className="relative flex-1">
+              <Ticket className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-fg-subtle" />
+              <input
+                value={couponInput}
+                onChange={(e) => (setCouponInput(e.target.value.toUpperCase()), setCouponError(null))}
+                onKeyDown={(e) => e.key === "Enter" && couponInput.length >= 3 && applyCoupon()}
+                dir="ltr"
+                placeholder={t("couponCode")}
+                className="h-9 w-full rounded-lg border border-border bg-surface ps-8 pe-2 font-mono text-sm"
+              />
+            </label>
+            <button
+              type="button"
+              disabled={couponInput.length < 3 || pending}
+              onClick={applyCoupon}
+              className="h-9 shrink-0 rounded-lg px-3 text-sm font-semibold ring-1 ring-border disabled:opacity-50"
+            >
+              {t("applyCoupon")}
+            </button>
+          </div>
+        )}
+        {couponError ? <p className="text-xs text-danger">{couponError}</p> : null}
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -282,10 +415,24 @@ export function PosTerminal({
                 <dt>{t("subtotal")}</dt>
                 <dd className="tabular-nums">{money(subtotal)}</dd>
               </div>
-              <div className="flex justify-between text-accent-text">
-                <dt>{t("discountLine", { pct: discount })}</dt>
-                <dd className="tabular-nums">−{money(discountCents)}</dd>
-              </div>
+              {manualCents ? (
+                <div className="flex justify-between text-accent-text">
+                  <dt>{t("discountLine", { pct: discount })}</dt>
+                  <dd className="tabular-nums">−{money(manualCents)}</dd>
+                </div>
+              ) : null}
+              {couponCents ? (
+                <div className="flex justify-between text-accent-text">
+                  <dt>{t("couponLine", { code: coupon!.code })}</dt>
+                  <dd className="tabular-nums">−{money(couponCents)}</dd>
+                </div>
+              ) : null}
+              {pointsCents ? (
+                <div className="flex justify-between text-warning">
+                  <dt>{t("pointsLine", { points: pointsUsed })}</dt>
+                  <dd className="tabular-nums">−{money(pointsCents)}</dd>
+                </div>
+              ) : null}
             </>
           ) : null}
           <div className="flex justify-between text-lg font-bold">
