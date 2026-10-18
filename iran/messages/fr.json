@@ -52,6 +52,9 @@
         "title": "Ventes & avis",
         "body": "Chiffre d'affaires, produits phares, avis et plaintes au même endroit."
       }
+    },
+    "nav": {
+      "radio": "Radio"
     }
   },
   "auth": {
@@ -97,7 +100,9 @@
     "kitchen": "Cuisine",
     "floor": "Salle",
     "payments": "Paiements",
-    "invoices": "Factures"
+    "invoices": "Factures",
+    "music": "Musique",
+    "adminMusic": "Musique"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -1006,5 +1011,135 @@
     "on": "Alertes commandes activées",
     "off": "Alertes commandes coupées",
     "dismiss": "Fermer"
+  },
+  "music": {
+    "title": "Musique",
+    "subtitle": "La musique de votre établissement, renouvelée chaque semaine ou chaque mois.",
+    "heroTitle": "Créez l'ambiance en musique",
+    "heroBody": "Des playlists par style, renouvelées automatiquement. Il suffit d'appuyer sur lecture.",
+    "popular": "Populaire",
+    "perMonth": "mois",
+    "chooseTheme": "Choisissez un style",
+    "noThemesYet": "Les styles de musique arrivent bientôt.",
+    "subscribe": "Demander l'abonnement",
+    "requestFailed": "La demande n'a pas pu être envoyée.",
+    "ownerOnly": "Seul le propriétaire ou un admin peut s'abonner.",
+    "cancelRequest": "Annuler la demande",
+    "pendingTitle": "Demande reçue",
+    "pendingBody": "L'abonnement « {plan} » avec « {theme} » démarre dès que l'équipe Spotifood confirme le paiement.",
+    "playlistOfWeek": "Playlist de la semaine",
+    "playlistOfMonth": "Playlist du mois",
+    "emptyTheme": "Ce style n'a pas encore de morceaux.",
+    "theme": "Style",
+    "validUntil": "Valable jusqu'au",
+    "nextPlaylist": "Prochaine playlist",
+    "nextMonth": "Le mois prochain",
+    "changeTheme": "Changer de style ou d'offre",
+    "radioPromoTitle": "Radio live Spotifood",
+    "radioPromoBody": "Tout le monde peut écouter la radio live gratuitement ; abonnez-vous pour votre propre playlist.",
+    "allStations": "Toutes les stations →",
+    "plans": {
+      "weekly": {
+        "name": "Playlist hebdomadaire",
+        "body": "Une nouvelle playlist chaque samedi.",
+        "features": [
+          "30 nouveaux morceaux chaque semaine",
+          "Pas de répétitions lassantes",
+          "Lecture sur tout appareil"
+        ]
+      },
+      "monthly": {
+        "name": "Playlist mensuelle",
+        "body": "Une nouvelle playlist chaque mois.",
+        "features": [
+          "30 nouveaux morceaux chaque mois",
+          "Idéal pour une ambiance calme",
+          "Lecture sur tout appareil"
+        ]
+      }
+    },
+    "status": {
+      "pending": "En attente",
+      "active": "Actif",
+      "cancelled": "Annulé",
+      "expired": "Expiré"
+    },
+    "player": {
+      "unknownArtist": "Artiste inconnu",
+      "seek": "Position",
+      "shuffle": "Aléatoire",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "play": "Lecture",
+      "pause": "Pause",
+      "loop": "La playlist tourne en boucle",
+      "volume": "Volume",
+      "tracks": "{count} morceaux"
+    },
+    "radio": {
+      "pageTitle": "Radio Spotifood",
+      "heading": "Radio live",
+      "intro": "De la musique en continu pour cafés et restaurants. Choisissez une station et lancez la lecture.",
+      "live": "EN DIRECT",
+      "station": "Station",
+      "onAir": "À l'antenne",
+      "tapToListen": "Appuyez pour écouter en direct.",
+      "listen": "Écouter",
+      "listening": "En direct",
+      "stop": "Arrêter",
+      "offAir": "Cette station est hors antenne.",
+      "upNext": "À suivre",
+      "stations": "Stations",
+      "noStations": "Aucune station à l'antenne pour l'instant."
+    },
+    "admin": {
+      "title": "Musique",
+      "subtitle": "Styles, morceaux, radio et abonnements des restaurants.",
+      "openRadio": "Page radio",
+      "newTheme": "Nouveau style",
+      "themes": "Styles",
+      "noThemes": "Aucun style pour l'instant.",
+      "trackCount": "{count, plural, one {# morceau} other {# morceaux}}",
+      "inactive": "Inactif",
+      "active": "Actif",
+      "radioOn": "Radio active",
+      "radioOff": "Radio coupée",
+      "subscribers": "{count} abonnés",
+      "subscriptions": "Abonnements",
+      "subscriptionsHint": "Activez l'abonnement (30 jours) une fois le paiement reçu. Hebdo : {weekly} · Mensuel : {monthly} par mois.",
+      "pendingCount": "{count} en attente",
+      "noSubscriptions": "Aucune demande pour l'instant.",
+      "until": "jusqu'au {date}",
+      "themeName": "Nom du style",
+      "themeNamePlaceholder": "ex. Jazz doux",
+      "themeDescription": "Description",
+      "color": "Couleur",
+      "createTheme": "Créer le style",
+      "delete": "Supprimer",
+      "deleteThemeConfirm": "Supprimer ce style ?",
+      "themeHasSubscribers": "Ce style a des abonnés actifs.",
+      "tracks": "Morceaux",
+      "tracksHint": "Les morceaux actifs passent dans les playlists et à la radio.",
+      "noTracks": "Aucun morceau pour l'instant.",
+      "uploadTitle": "Ajouter des morceaux",
+      "uploadHint": "MP3, M4A, OGG ou WAV — 40 Mo max par fichier. Déposez-en plusieurs à la fois.",
+      "preview": "Écouter",
+      "pause": "Pause",
+      "disable": "Désactiver",
+      "enable": "Activer",
+      "deleteTrackConfirm": "Supprimer ce morceau ?",
+      "activate": "Activer",
+      "extend": "Prolonger 30 jours",
+      "cancel": "Annuler",
+      "cancelConfirm": "Annuler cet abonnement ?",
+      "errors": {
+        "audio_type": "Format non pris en charge.",
+        "audio_size": "Fichier de plus de 40 Mo.",
+        "network": "Connexion perdue.",
+        "forbidden": "Accès refusé.",
+        "internal": "Échec de l'envoi.",
+        "duration": "Durée illisible."
+      }
+    }
   }
 }

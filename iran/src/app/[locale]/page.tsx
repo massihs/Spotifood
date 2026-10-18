@@ -78,6 +78,9 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
             <a href="#faq" className="hover:text-fg">
               {t("nav.faq")}
             </a>
+            <Link href="/radio" className="hover:text-fg">
+              {t("nav.radio")}
+            </Link>
           </nav>
           <div className="ms-auto flex items-center gap-2">
             <LanguageSwitcher className="hidden sm:inline-flex" />

@@ -56,3 +56,12 @@ export const complaintCategory = pgEnum("complaint_category", [
 export const complaintStatus = pgEnum("complaint_status", ["new", "in_progress", "resolved", "closed"]);
 
 export const emailStatus = pgEnum("email_status", ["pending", "sending", "sent", "failed"]);
+
+/** Music offer: the playlist is renewed every week or every month. */
+export const musicPlan = pgEnum("music_plan", ["weekly", "monthly"]);
+export const musicSubscriptionStatus = pgEnum("music_subscription_status", [
+  "pending",
+  "active",
+  "cancelled",
+  "expired",
+]);

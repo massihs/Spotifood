@@ -2,7 +2,16 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { StorageDriver } from "./index";
 
-const TYPES: Record<string, string> = { ".webp": "image/webp", ".png": "image/png", ".jpg": "image/jpeg" };
+const TYPES: Record<string, string> = {
+  ".webp": "image/webp",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".mp3": "audio/mpeg",
+  ".m4a": "audio/mp4",
+  ".aac": "audio/aac",
+  ".ogg": "audio/ogg",
+  ".wav": "audio/wav",
+};
 
 /** Development driver: files on disk, served by /api/v1/files/[...key]. */
 export class LocalStorageDriver implements StorageDriver {

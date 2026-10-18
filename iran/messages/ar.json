@@ -34,7 +34,8 @@
     "nav": {
       "features": "المزايا",
       "how": "كيف يعمل",
-      "faq": "الأسئلة"
+      "faq": "الأسئلة",
+      "radio": "راديو"
     },
     "badge": "مصمم للمطاعم والمقاهي في إيران",
     "title": "الزبون يمسح، يطلب، يدفع.",
@@ -215,7 +216,9 @@
     "invoices": "الفواتير",
     "more": "المزيد",
     "close": "إغلاق",
-    "mainNav": "التنقل الرئيسي"
+    "mainNav": "التنقل الرئيسي",
+    "music": "الموسيقى",
+    "adminMusic": "الموسيقى"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -1164,5 +1167,135 @@
     "on": "تنبيهات الطلبات مفعّلة",
     "off": "تنبيهات الطلبات متوقفة",
     "dismiss": "إغلاق"
+  },
+  "music": {
+    "title": "الموسيقى",
+    "subtitle": "موسيقى لمطعمك تتجدد كل أسبوع أو كل شهر.",
+    "heroTitle": "Set the mood with music",
+    "heroBody": "Curated playlists by style that refresh automatically. Just press play.",
+    "popular": "Popular",
+    "perMonth": "month",
+    "chooseTheme": "Choose a music style",
+    "noThemesYet": "Music styles are coming soon.",
+    "subscribe": "طلب الاشتراك",
+    "requestFailed": "Could not send the request. Try again.",
+    "ownerOnly": "Only the owner or an admin can subscribe.",
+    "cancelRequest": "Cancel request",
+    "pendingTitle": "Request received",
+    "pendingBody": "Your “{plan}” subscription with “{theme}” starts once the Spotifood team confirms payment.",
+    "playlistOfWeek": "This week's playlist",
+    "playlistOfMonth": "This month's playlist",
+    "emptyTheme": "This style has no tracks yet.",
+    "theme": "Style",
+    "validUntil": "Valid until",
+    "nextPlaylist": "Next playlist",
+    "nextMonth": "Next month",
+    "changeTheme": "Change style or plan",
+    "radioPromoTitle": "Spotifood live radio",
+    "radioPromoBody": "Anyone can listen to the live radio for free; subscribe for your own playlist.",
+    "allStations": "All stations →",
+    "plans": {
+      "weekly": {
+        "name": "قائمة أسبوعية",
+        "body": "A fresh playlist every Saturday.",
+        "features": [
+          "30 new tracks every week",
+          "No tiring repeats",
+          "Plays on any device"
+        ]
+      },
+      "monthly": {
+        "name": "قائمة شهرية",
+        "body": "A fresh playlist every month.",
+        "features": [
+          "30 new tracks every month",
+          "Ideal for calm venues",
+          "Plays on any device"
+        ]
+      }
+    },
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "player": {
+      "unknownArtist": "Unknown artist",
+      "seek": "Seek",
+      "shuffle": "Shuffle",
+      "previous": "Previous",
+      "next": "Next",
+      "play": "Play",
+      "pause": "Pause",
+      "loop": "Playlist loops",
+      "volume": "Volume",
+      "tracks": "{count} tracks"
+    },
+    "radio": {
+      "pageTitle": "راديو سبوتيفود",
+      "heading": "راديو مباشر",
+      "intro": "Non-stop music for cafés and restaurants. Pick a station and press play.",
+      "live": "مباشر",
+      "station": "Station",
+      "onAir": "On air",
+      "tapToListen": "Press the button to listen live.",
+      "listen": "استمع",
+      "listening": "Playing live",
+      "stop": "Stop",
+      "offAir": "This station is off air for now.",
+      "upNext": "Up next",
+      "stations": "Stations",
+      "noStations": "No station is on air yet."
+    },
+    "admin": {
+      "title": "Music",
+      "subtitle": "Styles, tracks, radio and restaurant subscriptions.",
+      "openRadio": "Radio page",
+      "newTheme": "New style",
+      "themes": "Styles",
+      "noThemes": "No style yet.",
+      "trackCount": "{count, plural, one {# track} other {# tracks}}",
+      "inactive": "Inactive",
+      "active": "Active",
+      "radioOn": "Radio on",
+      "radioOff": "Radio off",
+      "subscribers": "{count} subscribers",
+      "subscriptions": "Subscriptions",
+      "subscriptionsHint": "Activate a subscription (30 days) once payment is received. Weekly: {weekly} · Monthly: {monthly} per month.",
+      "pendingCount": "{count} pending",
+      "noSubscriptions": "No request yet.",
+      "until": "until {date}",
+      "themeName": "Style name",
+      "themeNamePlaceholder": "e.g. Smooth jazz",
+      "themeDescription": "Description",
+      "color": "Colour",
+      "createTheme": "Create style",
+      "delete": "Delete",
+      "deleteThemeConfirm": "Delete this style?",
+      "themeHasSubscribers": "This style has active subscribers and cannot be deleted.",
+      "tracks": "Tracks",
+      "tracksHint": "Active tracks play in playlists and on the radio.",
+      "noTracks": "No track uploaded yet.",
+      "uploadTitle": "Upload tracks",
+      "uploadHint": "MP3, M4A, OGG or WAV — up to 40 MB each. Drop several files at once.",
+      "preview": "Preview",
+      "pause": "Pause",
+      "disable": "Disable",
+      "enable": "Enable",
+      "deleteTrackConfirm": "Delete this track?",
+      "activate": "Activate",
+      "extend": "Extend 30 days",
+      "cancel": "Cancel",
+      "cancelConfirm": "Cancel this subscription?",
+      "errors": {
+        "audio_type": "Unsupported file format.",
+        "audio_size": "File larger than 40 MB.",
+        "network": "Connection lost.",
+        "forbidden": "Not allowed.",
+        "internal": "Upload failed.",
+        "duration": "Could not read the duration."
+      }
+    }
   }
 }

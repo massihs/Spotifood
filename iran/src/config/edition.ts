@@ -27,6 +27,8 @@ export type EditionConfig = {
   platformCurrency: string;
   /** Monthly plan prices (minor units of platformCurrency). Iran prices are placeholders to set. */
   planPrices: Record<"free" | "starter" | "professional" | "enterprise", number>;
+  /** Music offer, per month, platform currency minor units. */
+  musicPrices: Record<"weekly" | "monthly", number>;
   /** Demo data only: converts the seed's euro prices into this edition's currency. */
   demoPrice: (eurCents: number) => number;
   /** Online payment providers this edition can offer (each still needs its credentials). */
@@ -61,6 +63,7 @@ const CONFIGS: Record<Edition, EditionConfig> = {
     ],
     platformCurrency: "EUR",
     planPrices: { free: 0, starter: 2900, professional: 7900, enterprise: 0 },
+    musicPrices: { weekly: 2900, monthly: 1900 },
     demoPrice: (eurCents) => eurCents,
     onlineProviders: ["stripe"],
     restaurantLocales: ["fr", "en"],
@@ -79,6 +82,8 @@ const CONFIGS: Record<Edition, EditionConfig> = {
     platformCurrency: "IRR",
     // 990,000 and 2,490,000 toman per month — placeholders, to be set by the business.
     planPrices: { free: 0, starter: 990_000_000, professional: 2_490_000_000, enterprise: 0 },
+    // 590,000 and 390,000 toman per month — placeholders, to be set by the business.
+    musicPrices: { weekly: 590_000_000, monthly: 390_000_000 },
     // ≈ 400,000 rials per euro, rounded to 10,000 rials (1,000 toman).
     demoPrice: (eurCents) => Math.round((eurCents * 400_000) / 1_000_000) * 1_000_000,
     onlineProviders: ["zarinpal"],

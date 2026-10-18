@@ -6,6 +6,7 @@ import {
   FileText,
   LayoutDashboard,
   LayoutGrid,
+  Music,
   QrCode,
   ReceiptText,
   Settings,
@@ -79,6 +80,7 @@ async function RestaurantShell({
       icon: <FileText />,
     },
     can(ctx, "tables.view") && { href: `${base}/tables`, label: t("nav.tables"), icon: <QrCode /> },
+    can(ctx, "restaurant.view") && { href: `${base}/music`, label: t("nav.music"), icon: <Music /> },
     can(ctx, "members.manage") && { href: `${base}/team`, label: t("nav.team"), icon: <Users /> },
     can(ctx, "restaurant.view") && {
       href: `${base}/settings`,
