@@ -7,6 +7,7 @@ import {
   QrCode,
   ReceiptText,
   ShoppingBag,
+  Store,
   Smartphone,
   SquareMenu,
   Users,
@@ -16,9 +17,9 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { SiteFooter } from "@/components/site/site-footer";
+import { SiteHeader } from "@/components/site/site-header";
 import { buttonClasses } from "@/components/ui/button";
-import { Logo } from "@/components/ui/logo";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 
@@ -64,38 +65,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 
   return (
     <div className="min-h-dvh bg-bg">
-      {/* ── Header ─────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-bg/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
-          <Logo />
-          <nav className="ms-6 hidden items-center gap-6 text-sm font-medium text-fg-muted md:flex">
-            <a href="#how" className="hover:text-fg">
-              {t("nav.how")}
-            </a>
-            <a href="#features" className="hover:text-fg">
-              {t("nav.features")}
-            </a>
-            <a href="#faq" className="hover:text-fg">
-              {t("nav.faq")}
-            </a>
-            <Link href="/radio" className="hover:text-fg">
-              {t("nav.radio")}
-            </Link>
-          </nav>
-          <div className="ms-auto flex items-center gap-2">
-            <LanguageSwitcher className="hidden sm:inline-flex" />
-            <Link
-              href="/login"
-              className="hidden h-9 items-center rounded-full px-4 text-sm font-medium text-fg-muted hover:text-fg sm:inline-flex"
-            >
-              {t("ctaSecondary")}
-            </Link>
-            <Link href="/signup" className={buttonClasses("accent", "sm", "h-9 px-4")}>
-              {t("ctaPrimary")}
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader home />
 
       <main>
         {/* ── Hero ────────────────────────────────────────── */}
@@ -130,6 +100,13 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                   </li>
                 ))}
               </ul>
+              <Link
+                href="/restaurants"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm font-semibold ring-1 ring-border hover:ring-border-strong"
+              >
+                <Store className="size-4 text-accent-text" aria-hidden="true" />
+                {t("findRestaurant")}
+              </Link>
             </div>
             <PhoneMock table={t("mock.table")} featured={t("mock.featured")} cart={t("mock.cart")} />
           </div>
@@ -258,21 +235,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
       </main>
 
-      <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-fg-muted sm:px-6">
-          <Logo />
-          <p>{t("footer.rights")}</p>
-          <nav className="flex items-center gap-4">
-            <Link href="/login" className="hover:text-fg">
-              {t("footer.login")}
-            </Link>
-            <Link href="/signup" className="hover:text-fg">
-              {t("footer.signup")}
-            </Link>
-            <LanguageSwitcher />
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

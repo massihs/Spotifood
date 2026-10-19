@@ -3,7 +3,9 @@
 import { isBrandColor } from "@/lib/brand-colors";
 import { isMenuTheme, type MenuTheme } from "@/lib/menu-themes";
 import { isRestaurantKind, type RestaurantKind } from "@/lib/restaurant-kind";
-import { refresh } from "next/cache";
+import { refresh, updateTag } from "next/cache";
+import { isCuisine } from "@/lib/directory";
+import { DIRECTORY_TAG, updateListing } from "@/server/modules/directory/service";
 import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
 import { AppError } from "@/server/errors";
@@ -55,6 +57,7 @@ export async function updateProfileAction(restaurantId: string, _prev: unknown, 
       timezone: str(fd, "timezone"),
       defaultLocale: str(fd, "defaultLocale") as AppLocale,
     });
+    updateTag(DIRECTORY_TAG);
     refresh();
   });
 }
@@ -76,6 +79,7 @@ export async function updateServiceAction(restaurantId: string, _prev: unknown, 
       enabledLocales: fd.getAll("enabledLocales").map(String) as AppLocale[],
       openingHours,
     });
+    updateTag(DIRECTORY_TAG);
     refresh();
   });
 }
@@ -103,6 +107,7 @@ export async function uploadLogoAction(restaurantId: string, _prev: unknown, fd:
     if (!(file instanceof File) || file.size === 0) throw new AppError("VALIDATION", "image_empty");
     if (file.size > MAX_UPLOAD_BYTES) throw new AppError("VALIDATION", "image_too_large");
     await uploadLogo(db, ctx, Buffer.from(await file.arrayBuffer()));
+    updateTag(DIRECTORY_TAG);
     refresh();
   });
 }
@@ -111,6 +116,7 @@ export async function removeLogoAction(restaurantId: string) {
   return runAction(async () => {
     const ctx = await actionContext(restaurantId, "restaurant.manage");
     await removeLogo(db, ctx);
+    updateTag(DIRECTORY_TAG);
     refresh();
   });
 }
@@ -213,6 +219,24 @@ export async function setCashierAcceptanceAction(restaurantId: string, on: boole
   return runAction(async () => {
     const ctx = await actionContext(restaurantId, "restaurant.manage");
     await setCashierAcceptance(db, ctx, on);
+    refresh();
+  });
+}
+
+export async function updateListingAction(restaurantId: string, _prev: unknown, fd: FormData) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    const level = Number(str(fd, "priceLevel"));
+    await updateListing(db, ctx, {
+      listed: fd.get("listed") === "on",
+      cuisines: fd.getAll("cuisines").map(String).filter(isCuisine),
+      priceLevel: level >= 1 && level <= 4 ? level : null,
+      tagline: str(fd, "tagline"),
+      city: str(fd, "city"),
+      latitude: str(fd, "latitude"),
+      longitude: str(fd, "longitude"),
+    });
+    updateTag(DIRECTORY_TAG);
     refresh();
   });
 }

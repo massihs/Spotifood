@@ -42,7 +42,7 @@ import { uploadLogo } from "@/server/modules/restaurants/settings";
 import { storage } from "@/server/infra/storage";
 import { readFile } from "node:fs/promises";
 import { BRIELLE_MENU } from "./brielle";
-import { assignBrielleJobs, seedBrielleHistory } from "./brielle-history";
+import { assignBrielleJobs, listBrielle, seedBrielleHistory } from "./brielle-history";
 
 const DEMO_OWNER = {
   email: "owner@demo.spotifood.local",
@@ -722,6 +722,12 @@ async function seedBrielleTestData(restaurantId: string, ownerId: string) {
     .transaction((tx) => assignBrielleJobs(tx, restaurantId))
     .catch((e: unknown) => {
       console.warn("! Brielle team jobs not set:", e);
+    });
+  await db
+    .transaction((tx) => listBrielle(tx, restaurantId))
+    .then((listed) => listed && console.log("✓ Brielle listed in the restaurant guide"))
+    .catch((e: unknown) => {
+      console.warn("! Brielle not listed:", e);
     });
   if (res)
     console.log(

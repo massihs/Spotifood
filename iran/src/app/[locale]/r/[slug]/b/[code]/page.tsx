@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CalendarCheck, Clock, Ticket, Users } from "lucide-react";
@@ -9,6 +10,9 @@ import { db } from "@/server/db/client";
 import { getByCode } from "@/server/modules/reservations/service";
 
 type Props = PageProps<"/[locale]/r/[slug]/b/[code]">;
+
+/** A booking's status page is personal: never indexed. */
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default function StatusPage({ params }: Props) {
   return (

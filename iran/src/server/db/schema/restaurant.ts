@@ -3,8 +3,10 @@ import {
   bigint,
   boolean,
   check,
+  doublePrecision,
   index,
   integer,
+  smallint,
   jsonb,
   pgTable,
   primaryKey,
@@ -48,6 +50,16 @@ export const restaurants = pgTable(
     defaultLocale: varchar({ length: 8 }).notNull().default("fr"),
     status: restaurantStatus().notNull().default("active"),
     suspendedReason: text(),
+    /** Public directory (spotifood.ir/restaurants): opt-in listing, themes, price level, position. */
+    listed: boolean().notNull().default(false),
+    cuisines: text()
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    priceLevel: smallint(),
+    tagline: varchar({ length: 200 }),
+    latitude: doublePrecision(),
+    longitude: doublePrecision(),
     ...timestamps,
     ...softDelete,
   },
@@ -55,6 +67,7 @@ export const restaurants = pgTable(
     uniqueIndex("restaurants_slug_uq").on(t.slug),
     index("restaurants_org_idx").on(t.organizationId),
     index("restaurants_status_idx").on(t.status),
+    index("restaurants_listed_city_idx").on(t.listed, t.city),
   ],
 );
 

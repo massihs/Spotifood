@@ -74,7 +74,8 @@
       "radio": "Radio",
       "features": "Fonctionnalités",
       "how": "Comment ça marche",
-      "faq": "FAQ"
+      "faq": "FAQ",
+      "restaurants": "Restaurants"
     },
     "trust": {
       "noApp": "Aucune appli à installer",
@@ -168,7 +169,8 @@
       "rights": "© Spotifood — conçu pour les restaurants d'Iran",
       "login": "Connexion",
       "signup": "Inscription"
-    }
+    },
+    "findRestaurant": "Vous cherchez un restaurant ou un café ? Voir le guide"
   },
   "auth": {
     "loginTitle": "Bon retour",
@@ -447,7 +449,8 @@
     "repayment_too_high": "Montant supérieur au dû.",
     "slot_unavailable": "Ce créneau n’est plus disponible.",
     "party_too_large": "Pour les grands groupes, appelez-nous.",
-    "invalid_station": "Le poste choisi n'est pas valide."
+    "invalid_station": "Le poste choisi n'est pas valide.",
+    "invalid_position": "Position invalide : saisissez la latitude et la longitude."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -736,7 +739,9 @@
       }
     },
     "printers": "Imprimantes et envoi en cuisine",
-    "printersHint": "Acceptation en caisse, tickets cuisine, bar et caisse imprimés automatiquement."
+    "printersHint": "Acceptation en caisse, tickets cuisine, bar et caisse imprimés automatiquement.",
+    "listing": "Présence dans le guide des restaurants",
+    "listingHint": "Votre restaurant apparaît sur spotifood.ir/restaurants avec son menu et la réservation en ligne."
   },
   "guest": {
     "table": "Table {label}",
@@ -2206,5 +2211,111 @@
     "lastFailed": "Dernière impression échouée : {error}",
     "browser": "Impression depuis le navigateur (sans agent)",
     "browserHint": "Activez « impression auto » sur l'écran cuisine et la page Commandes. Pour imprimer sans fenêtre de confirmation, ouvrez Chrome avec :"
+  },
+  "directory": {
+    "metaTitle": "Restaurants et cafés en Iran — menus et réservation en ligne | Spotifood",
+    "metaDescription": "Trouvez les restaurants et cafés de votre ville ou autour de vous, consultez leur menu et réservez une table en ligne.",
+    "eyebrow": "Guide des restaurants",
+    "title": "Où manger ?",
+    "subtitle": "Restaurants et cafés de toutes les villes d'Iran : menus avec prix, horaires et réservation de table en ligne.",
+    "searchPlaceholder": "Nom du restaurant ou du café…",
+    "search": "Rechercher",
+    "nearMe": "Autour de moi",
+    "locating": "Localisation en cours…",
+    "locationDenied": "Accès à la position refusé. Choisissez une ville.",
+    "locationUnsupported": "Votre navigateur ne gère pas la géolocalisation.",
+    "radius": "Rayon",
+    "km": "{n} km",
+    "meters": "{n} m",
+    "allCities": "Toutes les villes",
+    "city": "Ville",
+    "themes": "Style",
+    "allThemes": "Tous",
+    "openNow": "Ouvert maintenant",
+    "bookable": "Réservation en ligne",
+    "results": "{count, plural, =0 {Aucun restaurant} one {# restaurant} other {# restaurants}}",
+    "inCity": "à {city}",
+    "aroundYou": "autour de vous",
+    "clear": "Effacer les filtres",
+    "emptyTitle": "Pas encore de restaurant ici",
+    "emptyBody": "Modifiez les filtres ou choisissez une autre ville.",
+    "ownerTitle": "Vous avez un restaurant ou un café ?",
+    "ownerBody": "Menu digital, commande par QR, réservation en ligne et présence dans ce guide — commencez gratuitement.",
+    "ownerCta": "Inscrire mon restaurant",
+    "open": "Ouvert",
+    "openUntil": "jusqu'à {time}",
+    "closed": "Fermé",
+    "opensAt": "ouvre à {time}",
+    "view": "Menu et infos",
+    "book": "Réserver une table",
+    "queue": "Prendre un ticket",
+    "reviews": "{count, plural, one {# avis} other {# avis}}",
+    "away": "à {distance}",
+    "approx": "centre-ville",
+    "price": {
+      "1": "Économique",
+      "2": "Moyen",
+      "3": "Cher",
+      "4": "Luxe"
+    },
+    "popularCities": "Villes",
+    "cuisine": {
+      "iranian": "Iranien",
+      "kebab": "Kebab",
+      "traditional": "Maison de thé traditionnelle",
+      "cafe": "Café",
+      "fastfood": "Fast-food",
+      "pizza": "Pizza & italien",
+      "steak": "Steakhouse",
+      "seafood": "Poissons & fruits de mer",
+      "asian": "Asiatique",
+      "international": "International",
+      "breakfast": "Petit-déjeuner & brunch",
+      "dessert": "Pâtisserie & glaces",
+      "vegetarian": "Végétarien",
+      "fine": "Gastronomique",
+      "family": "Familial",
+      "garden": "Jardin & terrasse"
+    },
+    "profile": {
+      "back": "Tous les restaurants",
+      "menu": "Menu",
+      "noMenu": "Ce restaurant n'a pas encore publié son menu.",
+      "hours": "Horaires",
+      "closedDay": "Fermé",
+      "info": "Informations",
+      "address": "Adresse",
+      "call": "Appeler",
+      "directions": "Itinéraire",
+      "bookTitle": "Réserver une table",
+      "bookBody": "Choisissez la date, l'heure et le nombre de personnes ; vous recevez une confirmation par SMS.",
+      "noBooking": "Ce restaurant ne prend pas de réservation en ligne ; appelez-le.",
+      "today": "Aujourd'hui",
+      "items": "{count, plural, one {# plat} other {# plats}}",
+      "more": "{count, plural, one {+# autre plat} other {+# autres plats}}",
+      "soldOut": "Épuisé"
+    },
+    "kmUnit": "km"
+  },
+  "listing": {
+    "listed": "Afficher dans le guide des restaurants",
+    "listedHint": "Les clients vous trouvent par ville, style et position.",
+    "city": "Ville",
+    "cityPick": "Choisir une ville",
+    "cuisines": "Styles",
+    "cuisinesHint": "Jusqu'à 5 — utilisés par les clients pour filtrer.",
+    "priceLevel": "Niveau de prix",
+    "priceNone": "Non précisé",
+    "tagline": "Présentation courte",
+    "taglinePlaceholder": "ex. café cosy, café de spécialité et petit-déjeuner",
+    "position": "Position sur la carte",
+    "positionHint": "Utilisée par la recherche « autour de moi ». Appuyez sur le bouton depuis le restaurant ou collez les coordonnées d'une carte.",
+    "useMyPosition": "Utiliser ma position actuelle",
+    "clearPosition": "Retirer",
+    "lat": "Latitude",
+    "lng": "Longitude",
+    "openMap": "Voir sur la carte",
+    "viewPage": "Voir la page publique",
+    "noPosition": "Sans position, le centre-ville est utilisé."
   }
 }

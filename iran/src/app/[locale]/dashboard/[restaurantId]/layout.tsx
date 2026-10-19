@@ -259,11 +259,13 @@ async function RestaurantShell({
     ...sub("delivery", "delivery", ["settlement", "settings"]),
     ...sub("reservations", "reservations", ["queue", "settings"]),
     ...(visible.has(`${base}/settings`)
-      ? (["profile", "service", "payments", "taxes", "legal", "modules", "printers"] as const).map((k) => ({
-          href: `${base}/settings#${k}`,
-          label: t(`settings.${k}`),
-          hint: t("nav.settings"),
-        }))
+      ? (["profile", "service", "payments", "taxes", "legal", "modules", "printers", "listing"] as const).map(
+          (k) => ({
+            href: `${base}/settings#${k}`,
+            label: t(`settings.${k}`),
+            hint: t("nav.settings"),
+          }),
+        )
       : []),
   ];
 

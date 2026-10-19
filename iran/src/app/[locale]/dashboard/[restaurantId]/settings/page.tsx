@@ -2,7 +2,7 @@ import { edition } from "@/config/edition";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
-import { Blocks, Building2, Clock, CreditCard, Percent, Printer, Scale } from "lucide-react";
+import { Blocks, Building2, Clock, CreditCard, Percent, Printer, Scale, Store } from "lucide-react";
 import type { ReactNode } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { requireRestaurant } from "@/server/auth/current";
@@ -19,6 +19,8 @@ import {
   TaxRates,
 } from "./settings-forms";
 import { ModulesForm } from "./modules-form";
+import { ListingForm } from "./listing-form";
+import { getListing } from "@/server/modules/directory/service";
 import { PrintersPanel } from "./printers-panel";
 import { listPrinters } from "@/server/modules/printing/service";
 import { listStations } from "@/server/modules/kitchen/stations";
@@ -40,12 +42,13 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view, payment, printing, setup] = await Promise.all([
+  const [t, view, payment, printing, setup, listing] = await Promise.all([
     getTranslations("settings"),
     getRestaurantSettingsView(db, ctx),
     getPaymentSettingsView(db, ctx),
     listPrinters(db, ctx),
     can(ctx, "orders.view") ? listStations(db, ctx) : { stations: [] },
+    getListing(db, ctx),
   ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
@@ -103,6 +106,15 @@ async function Settings({ params }: { params: Params }) {
                   defaultLocale: r.defaultLocale,
                 }}
               />
+            </div>
+          </Card>
+          <Card id="listing" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<Store />}>{t("listing")}</SectionTitle>}
+              description={t("listingHint")}
+            />
+            <div className="p-5 sm:p-6">
+              <ListingForm restaurantId={rid} disabled={readOnly} values={listing} />
             </div>
           </Card>
           <Card id="modules" className="scroll-mt-24">
@@ -223,6 +235,7 @@ async function Settings({ params }: { params: Params }) {
 
 const SECTIONS = [
   { key: "profile", icon: <Building2 aria-hidden="true" /> },
+  { key: "listing", icon: <Store aria-hidden="true" /> },
   { key: "modules", icon: <Blocks aria-hidden="true" /> },
   { key: "printers", icon: <Printer aria-hidden="true" /> },
   { key: "service", icon: <Clock aria-hidden="true" /> },

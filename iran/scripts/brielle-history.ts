@@ -1753,3 +1753,26 @@ export async function assignBrielleJobs(tx: DbOrTx, restaurantId: string) {
       );
   }
 }
+
+/**
+ * Puts Brielle in the public restaurant guide, once (marker `demo:listing`): what the owner
+ * changes afterwards in Settings › Guide is never overwritten.
+ */
+export async function listBrielle(tx: DbOrTx, restaurantId: string) {
+  const [done] = await tx
+    .select({ id: counters.restaurantId })
+    .from(counters)
+    .where(and(eq(counters.restaurantId, restaurantId), eq(counters.name, "demo:listing")));
+  if (done) return false;
+  await tx
+    .update(restaurants)
+    .set({
+      listed: true,
+      cuisines: ["international", "asian", "pizza", "seafood"],
+      priceLevel: 3,
+      tagline: "آشپزی بین‌المللی: غذاهای آسیایی، پیتزا و پاستا، سالاد و دریایی",
+    })
+    .where(eq(restaurants.id, restaurantId));
+  await tx.insert(counters).values({ restaurantId, name: "demo:listing", value: 1 });
+  return true;
+}

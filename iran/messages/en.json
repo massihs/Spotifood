@@ -35,7 +35,8 @@
       "features": "Features",
       "how": "How it works",
       "faq": "FAQ",
-      "radio": "Radio"
+      "radio": "Radio",
+      "restaurants": "Restaurants"
     },
     "badge": "Built for restaurants and cafés in Iran",
     "title": "Guests scan. Order. Pay.",
@@ -168,7 +169,8 @@
       "rights": "© Spotifood — made for restaurants in Iran",
       "login": "Log in",
       "signup": "Sign up"
-    }
+    },
+    "findRestaurant": "Looking for a restaurant or café? Browse the guide"
   },
   "auth": {
     "loginTitle": "Welcome back",
@@ -447,7 +449,8 @@
     "repayment_too_high": "More than the customer owes.",
     "slot_unavailable": "This time is no longer available; pick another.",
     "party_too_large": "For larger groups, please call us.",
-    "invalid_station": "The selected station is not valid."
+    "invalid_station": "The selected station is not valid.",
+    "invalid_position": "Invalid position: enter both latitude and longitude."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -736,7 +739,9 @@
       }
     },
     "printers": "Printers & kitchen flow",
-    "printersHint": "Acceptance at the till, automatic kitchen, bar and till tickets."
+    "printersHint": "Acceptance at the till, automatic kitchen, bar and till tickets.",
+    "listing": "Restaurant guide listing",
+    "listingHint": "Your restaurant appears on spotifood.ir/restaurants with its menu and online booking."
   },
   "guest": {
     "table": "Table {label}",
@@ -2198,5 +2203,111 @@
     "lastFailed": "Last print failed: {error}",
     "browser": "Printing from the browser (no agent)",
     "browserHint": "Turn on \"auto-print\" on the kitchen screen and the orders page. To print without the confirmation dialog, open Chrome with:"
+  },
+  "directory": {
+    "metaTitle": "Restaurants & cafés in Iran — menus and online booking | Spotifood",
+    "metaDescription": "Find restaurants and cafés in your city or near you, see their menu and book a table online.",
+    "eyebrow": "Restaurant guide",
+    "title": "Where shall we eat?",
+    "subtitle": "Restaurants and cafés across Iran: menus with prices, opening hours and online table booking.",
+    "searchPlaceholder": "Restaurant or café name…",
+    "search": "Search",
+    "nearMe": "Near me",
+    "locating": "Finding your location…",
+    "locationDenied": "Location access was denied. Pick a city instead.",
+    "locationUnsupported": "Your browser does not support geolocation.",
+    "radius": "Radius",
+    "km": "{n} km",
+    "meters": "{n} m",
+    "allCities": "All cities",
+    "city": "City",
+    "themes": "Style",
+    "allThemes": "All",
+    "openNow": "Open now",
+    "bookable": "Online booking",
+    "results": "{count, plural, =0 {No restaurant found} one {# restaurant} other {# restaurants}}",
+    "inCity": "in {city}",
+    "aroundYou": "around you",
+    "clear": "Clear filters",
+    "emptyTitle": "No restaurant here yet",
+    "emptyBody": "Change the filters or pick another city.",
+    "ownerTitle": "Own a restaurant or café?",
+    "ownerBody": "Digital menu, QR ordering, online booking and a place in this guide — start for free.",
+    "ownerCta": "List your restaurant",
+    "open": "Open",
+    "openUntil": "until {time}",
+    "closed": "Closed",
+    "opensAt": "opens {time}",
+    "view": "Menu & info",
+    "book": "Book a table",
+    "queue": "Join the queue",
+    "reviews": "{count, plural, one {# review} other {# reviews}}",
+    "away": "{distance} away",
+    "approx": "city centre",
+    "price": {
+      "1": "Budget",
+      "2": "Moderate",
+      "3": "Pricey",
+      "4": "Luxury"
+    },
+    "popularCities": "Cities",
+    "cuisine": {
+      "iranian": "Persian",
+      "kebab": "Kebab",
+      "traditional": "Traditional teahouse",
+      "cafe": "Café",
+      "fastfood": "Fast food",
+      "pizza": "Pizza & Italian",
+      "steak": "Steakhouse",
+      "seafood": "Seafood",
+      "asian": "Asian",
+      "international": "International",
+      "breakfast": "Breakfast & brunch",
+      "dessert": "Desserts & ice cream",
+      "vegetarian": "Vegetarian",
+      "fine": "Fine dining",
+      "family": "Family",
+      "garden": "Garden & outdoor"
+    },
+    "profile": {
+      "back": "All restaurants",
+      "menu": "Menu",
+      "noMenu": "This restaurant has not published its menu yet.",
+      "hours": "Opening hours",
+      "closedDay": "Closed",
+      "info": "Information",
+      "address": "Address",
+      "call": "Call",
+      "directions": "Directions",
+      "bookTitle": "Book a table",
+      "bookBody": "Pick a date, a time and the number of guests; you get an SMS confirmation.",
+      "noBooking": "This restaurant does not take online bookings; please call.",
+      "today": "Today",
+      "items": "{count, plural, one {# dish} other {# dishes}}",
+      "more": "{count, plural, one {+# more dish} other {+# more dishes}}",
+      "soldOut": "Sold out"
+    },
+    "kmUnit": "km"
+  },
+  "listing": {
+    "listed": "Show in the restaurant guide",
+    "listedHint": "Guests find you by city, style and location.",
+    "city": "City",
+    "cityPick": "Pick a city",
+    "cuisines": "Styles",
+    "cuisinesHint": "Up to 5 — used by guests to filter.",
+    "priceLevel": "Price level",
+    "priceNone": "Not set",
+    "tagline": "Short description",
+    "taglinePlaceholder": "e.g. cosy café with specialty coffee and breakfast",
+    "position": "Map position",
+    "positionHint": "Used by the “near me” search. Tap the button while at the restaurant, or paste coordinates from a map.",
+    "useMyPosition": "Use my current location",
+    "clearPosition": "Remove",
+    "lat": "Latitude",
+    "lng": "Longitude",
+    "openMap": "View on map",
+    "viewPage": "View public page",
+    "noPosition": "Without a position, the city centre is used."
   }
 }
