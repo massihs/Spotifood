@@ -1,12 +1,32 @@
 "use client";
 
-import { Minus, Plus, Trash2 } from "lucide-react";
+import {
+  Award,
+  BadgeCheck,
+  Flame,
+  House,
+  Leaf,
+  Minus,
+  Plus,
+  Sparkles,
+  Sprout,
+  Trash2,
+  TrendingUp,
+  WheatOff,
+  type LucideIcon,
+} from "lucide-react";
+import { CategoryIcon } from "@/components/category-icon";
 import { useTranslations } from "next-intl";
 import type { PricedOptionGroup } from "@/server/modules/pricing";
 import type { PublicProduct } from "@/server/modules/menu/public";
 import { cn } from "@/lib/cn";
 
-export type CartSummary = { itemCount: number; totalCents: number };
+export type CartSummary = {
+  itemCount: number;
+  totalCents: number;
+  /** Units of each product already in the cart (badge on the menu cards). */
+  byProduct: Record<string, number>;
+};
 
 /** Default selections: each group's defaults that are still available, within its maximum. */
 export function initialSelection(groups: PricedOptionGroup[]) {
@@ -28,6 +48,90 @@ export function canQuickAdd(p: PublicProduct) {
 export function discountPct(p: PublicProduct) {
   if (!p.compareAtPriceCents || p.compareAtPriceCents <= p.priceCents) return 0;
   return Math.round((1 - p.priceCents / p.compareAtPriceCents) * 100);
+}
+
+/** Known menu tags: icon and tone. Unknown (custom) tags render as plain text chips. */
+export const TAG_META: Record<string, { Icon: LucideIcon; tone: string }> = {
+  vegetarian: { Icon: Leaf, tone: "bg-tone-emerald/12 text-tone-emerald" },
+  vegan: { Icon: Sprout, tone: "bg-tone-lime/15 text-tone-lime" },
+  spicy: { Icon: Flame, tone: "bg-tone-rose/12 text-tone-rose" },
+  gluten_free: { Icon: WheatOff, tone: "bg-tone-amber/18 text-tone-amber" },
+  new: { Icon: Sparkles, tone: "bg-tone-sky/12 text-tone-sky" },
+  signature: { Icon: Award, tone: "bg-tone-violet/12 text-tone-violet" },
+  halal: { Icon: BadgeCheck, tone: "bg-tone-teal/12 text-tone-teal" },
+  homemade: { Icon: House, tone: "bg-tone-orange/12 text-tone-orange" },
+};
+
+export function tagLabel(t: (k: string) => string, has: (k: string) => boolean, tag: string) {
+  return has(`tags.${tag}`) ? t(`tags.${tag}`) : tag.replace(/_/g, " ");
+}
+
+/** Small tag chip with its icon ("compact" = icon only, label kept for screen readers). */
+export function TagChip({ tag, compact, className }: { tag: string; compact?: boolean; className?: string }) {
+  const t = useTranslations();
+  const meta = TAG_META[tag];
+  const label = tagLabel(t, t.has, tag);
+  if (compact && meta)
+    return (
+      <span title={label} className={cn("grid size-6 place-items-center rounded-full", meta.tone, className)}>
+        <meta.Icon className="size-3.5" aria-hidden="true" />
+        <span className="sr-only">{label}</span>
+      </span>
+    );
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
+        meta?.tone ?? "bg-surface-2 text-fg-muted",
+        className,
+      )}
+    >
+      {meta ? <meta.Icon className="size-3.5" aria-hidden="true" /> : null}
+      {label}
+    </span>
+  );
+}
+
+export function PopularBadge({ className }: { className?: string }) {
+  const t = useTranslations("guest");
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full bg-tone-orange px-2 py-0.5 text-[11px] font-bold text-white shadow-sm",
+        className,
+      )}
+    >
+      <TrendingUp className="size-3" aria-hidden="true" />
+      {t("popular")}
+    </span>
+  );
+}
+
+/** "2×" on a card: how many of this dish are already in the cart. */
+export function InCartBadge({ n, className }: { n: number; className?: string }) {
+  const t = useTranslations("guest");
+  if (!n) return null;
+  return (
+    <span
+      className={cn(
+        "animate-pop-in grid h-6 min-w-6 place-items-center rounded-full bg-fg px-1.5 text-xs font-bold text-bg tabular-nums shadow",
+        className,
+      )}
+      aria-label={t("inCart", { n })}
+      dir="ltr"
+    >
+      {n}×
+    </span>
+  );
+}
+
+/** Photo-less dishes get a soft tile with their category icon, so every card keeps its rhythm. */
+export function DishPlaceholder({ icon, className }: { icon: string; className?: string }) {
+  return (
+    <div className={cn("grid place-items-center bg-accent-soft text-accent-text/70", className)}>
+      <CategoryIcon icon={icon} className="size-1/3 min-h-6 min-w-6" />
+    </div>
+  );
 }
 
 export function ProductImage({

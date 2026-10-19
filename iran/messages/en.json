@@ -861,7 +861,22 @@
       },
       "tooSoon": "Your request is on its way — please wait a moment.",
       "failed": "Could not send, try again."
-    }
+    },
+    "popular": "Popular",
+    "inCart": "{n} in your cart",
+    "filterAll": "All",
+    "viewMode": "Layout",
+    "view": {
+      "list": "List view",
+      "grid": "Photo view"
+    },
+    "noFilterResults": "No dish matches this filter.",
+    "showAll": "Show everything",
+    "goesWith": "Goes well with",
+    "openNow": "Open",
+    "openUntil": "until {time}",
+    "closedNow": "Closed",
+    "opensAt": "opens at {time}"
   },
   "categoryTemplates": {
     "starters": "Starters",

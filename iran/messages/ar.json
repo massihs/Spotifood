@@ -861,7 +861,22 @@
       },
       "tooSoon": "طلبك قيد التنفيذ، انتظر قليلاً.",
       "failed": "تعذر الإرسال، حاول مجدداً."
-    }
+    },
+    "popular": "الأكثر طلبًا",
+    "inCart": "{n} في سلتك",
+    "filterAll": "الكل",
+    "viewMode": "طريقة العرض",
+    "view": {
+      "list": "عرض القائمة",
+      "grid": "عرض الصور"
+    },
+    "noFilterResults": "لا يوجد طبق يطابق هذا الفلتر.",
+    "showAll": "عرض الكل",
+    "goesWith": "يُقدَّم معه",
+    "openNow": "مفتوح",
+    "openUntil": "حتى {time}",
+    "closedNow": "مغلق",
+    "opensAt": "يفتح {time}"
   },
   "categoryTemplates": {
     "starters": "المقبلات",

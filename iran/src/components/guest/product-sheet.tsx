@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Flame, Scale, X } from "lucide-react";
+import { Check, Flame, Plus, Scale, ShoppingBag, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { addToCartAction } from "@/app/[locale]/table/actions";
@@ -8,7 +8,15 @@ import { useMoney } from "@/components/ui/use-money";
 import { cn } from "@/lib/cn";
 import type { PublicProduct } from "@/server/modules/menu/public";
 import { priceLine, type PricedOptionGroup } from "@/server/modules/pricing";
-import { discountPct, initialSelection, ProductImage, QuantityStepper, type CartSummary } from "./parts";
+import {
+  discountPct,
+  initialSelection,
+  PopularBadge,
+  ProductImage,
+  QuantityStepper,
+  TagChip,
+  type CartSummary,
+} from "./parts";
 
 export { QuantityStepper };
 
@@ -18,9 +26,19 @@ export function ProductSheet({
   currency,
   onClose,
   onAdded,
+  popular = false,
+  inCart = 0,
+  suggestions = [],
+  onPick,
 }: {
   product: PublicProduct;
   currency: string;
+  popular?: boolean;
+  /** Units of this dish already in the cart. */
+  inCart?: number;
+  /** Other dishes to suggest with this one (tapping one opens it). */
+  suggestions?: PublicProduct[];
+  onPick?: (id: string) => void;
   onClose: () => void;
   onAdded: (summary: CartSummary) => void;
 }) {
@@ -109,6 +127,7 @@ export function ProductSheet({
 
           <div className="px-5 pt-5 pb-6">
             <header>
+              {popular ? <PopularBadge className="mb-2" /> : null}
               <h2 id="sheet-title" className="text-2xl leading-tight font-semibold tracking-tight">
                 {p.name}
               </h2>
@@ -124,17 +143,18 @@ export function ProductSheet({
                 ) : null}
               </p>
               {p.description ? <p className="mt-2 leading-7 text-fg-muted">{p.description}</p> : null}
+              {inCart ? (
+                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-sm font-medium">
+                  <ShoppingBag className="size-4 text-accent-text" aria-hidden="true" />
+                  {t("guest.inCart", { n: inCart })}
+                </p>
+              ) : null}
             </header>
 
             {p.tags.length || p.caloriesKcal || p.weightGrams ? (
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {p.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent-text"
-                  >
-                    {t.has(`tags.${tag}`) ? t(`tags.${tag}`) : tag.replace(/_/g, " ")}
-                  </span>
+                  <TagChip key={tag} tag={tag} />
                 ))}
                 {p.caloriesKcal ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium">
@@ -272,6 +292,38 @@ export function ProductSheet({
               className="mt-2 w-full resize-none rounded-2xl bg-surface-2 px-4 py-3 text-[16px] placeholder:text-fg-muted focus-visible:bg-surface focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
             />
           </label>
+
+          {suggestions.length && onPick ? (
+            <section className="border-t-8 border-surface-2 pt-5 pb-6" aria-labelledby="sheet-more">
+              <h3 id="sheet-more" className="px-5 text-lg font-bold">
+                {t("guest.goesWith")}
+              </h3>
+              <ul className="no-scrollbar mt-3 flex snap-x scroll-px-5 gap-3 overflow-x-auto px-5">
+                {suggestions.map((x) => (
+                  <li key={x.id} className="w-36 shrink-0 snap-start">
+                    <button
+                      type="button"
+                      onClick={() => onPick(x.id)}
+                      className="block w-full overflow-hidden rounded-2xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] active:scale-[0.98]"
+                    >
+                      <span className="relative block">
+                        <ProductImage product={x} size="sm" className="aspect-square w-full" />
+                        <span className="absolute end-1.5 bottom-1.5 grid size-7 place-items-center rounded-full bg-accent text-accent-fg shadow-accent">
+                          <Plus className="size-4" strokeWidth={2.5} aria-hidden="true" />
+                        </span>
+                      </span>
+                      <span className="block p-2.5">
+                        <span className="line-clamp-1 text-sm font-semibold">{x.name}</span>
+                        <span className="mt-0.5 block text-xs font-bold text-fg-muted tabular-nums">
+                          {money(x.priceCents)}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
         </div>
 
         <footer className="border-t border-border bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">

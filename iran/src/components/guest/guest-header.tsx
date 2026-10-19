@@ -1,4 +1,5 @@
-import { ReceiptText, UserRound } from "lucide-react";
+import { Clock, MapPin, ReceiptText, UserRound } from "lucide-react";
+import type { OpenState } from "@/lib/opening";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { WaiterCall } from "./waiter-call";
@@ -15,7 +16,9 @@ export async function GuestHeader({
   guest,
   orderCount = 0,
   cover,
+  store,
 }: {
+  store?: { open: OpenState; address: string | null };
   guest: GuestContext;
   orderCount?: number;
   cover?: { md: string; lg: string } | null;
@@ -84,6 +87,32 @@ export async function GuestHeader({
           </div>
           <WaiterCall />
         </div>
+        {store && (store.open.status !== "unknown" || store.address) ? (
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-2 text-[13px] text-fg-muted">
+            {store.open.status === "open" ? (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
+                  <span className="relative inline-flex size-2 rounded-full bg-success" />
+                </span>
+                <span className="font-semibold text-success">{t("openNow")}</span>
+                <span className="tabular-nums">{t("openUntil", { time: store.open.until })}</span>
+              </span>
+            ) : store.open.status === "closed" ? (
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="size-3.5" aria-hidden="true" />
+                <span className="font-semibold text-danger">{t("closedNow")}</span>
+                {store.open.from ? <span>{t("opensAt", { time: store.open.from })}</span> : null}
+              </span>
+            ) : null}
+            {store.address ? (
+              <span className="inline-flex min-w-0 items-center gap-1.5">
+                <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
+                <span className="truncate">{store.address}</span>
+              </span>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </header>
   );

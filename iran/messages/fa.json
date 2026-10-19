@@ -861,7 +861,22 @@
       },
       "tooSoon": "درخواست قبلی شما ارسال شده؛ کمی صبر کنید.",
       "failed": "ارسال نشد، دوباره تلاش کنید."
-    }
+    },
+    "popular": "پرفروش",
+    "inCart": "{n} عدد در سبد شما",
+    "filterAll": "همه",
+    "viewMode": "نوع نمایش",
+    "view": {
+      "list": "نمایش فهرستی",
+      "grid": "نمایش تصویری"
+    },
+    "noFilterResults": "غذایی با این فیلتر پیدا نشد.",
+    "showAll": "نمایش همه",
+    "goesWith": "کنارش میل کنید",
+    "openNow": "باز است",
+    "openUntil": "تا {time}",
+    "closedNow": "بسته است",
+    "opensAt": "باز می‌شود {time}"
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",

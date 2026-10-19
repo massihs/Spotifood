@@ -861,7 +861,22 @@
       "preparing": "En préparation",
       "ready": "Prête",
       "served": "Servie"
-    }
+    },
+    "popular": "Populaire",
+    "inCart": "{n} dans votre panier",
+    "filterAll": "Tout",
+    "viewMode": "Affichage",
+    "view": {
+      "list": "Vue liste",
+      "grid": "Vue photos"
+    },
+    "noFilterResults": "Aucun plat ne correspond à ce filtre.",
+    "showAll": "Tout afficher",
+    "goesWith": "À accompagner de",
+    "openNow": "Ouvert",
+    "openUntil": "jusqu'à {time}",
+    "closedNow": "Fermé",
+    "opensAt": "ouvre à {time}"
   },
   "categoryTemplates": {
     "starters": "Entrées",

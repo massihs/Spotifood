@@ -5,7 +5,8 @@ import { getGuest } from "@/server/modules/guest/current";
 import { db } from "@/server/db/client";
 import { getCartView } from "@/server/modules/cart/service";
 import { listGuestOrders } from "@/server/modules/orders/service";
-import { getPublicMenu } from "@/server/modules/menu/public-cache";
+import { getPopularProductIds, getPublicMenu } from "@/server/modules/menu/public-cache";
+import { getStorefront } from "@/server/modules/guest/storefront";
 import { MenuApp } from "@/components/guest/menu-app";
 import { GuestHeader } from "@/components/guest/guest-header";
 import { SessionExpired, GuestSkeleton } from "@/components/guest/states";
@@ -24,12 +25,16 @@ async function GuestMenu() {
   const guest = await getGuest();
   if (!guest) return <SessionExpired />;
   // Menu comes from the tag-invalidated cache; the cart is always read live.
-  const [menu, cart, orders, music] = await Promise.all([
+  const [menu, cart, orders, music, popularIds, store] = await Promise.all([
     getPublicMenu(guest.restaurant.id),
     getCartView(db, guest),
     listGuestOrders(db, guest),
     hasActiveMusic(db, guest.restaurant.id),
+    getPopularProductIds(guest.restaurant.id),
+    getStorefront(db, guest.restaurant.id),
   ]);
+  const byProduct: Record<string, number> = {};
+  for (const l of cart.lines) byProduct[l.productId] = (byProduct[l.productId] ?? 0) + l.quantity;
   const playing = music ? await restaurantNowPlaying(db, guest.restaurant.id) : null;
   // Cover: the first featured dish with a photo, else any dish with a photo.
   const dishes = Object.values(menu.products);
@@ -42,10 +47,11 @@ async function GuestMenu() {
         <MenuApp
           menu={menu}
           currency={guest.restaurant.currency}
-          initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents }}
+          initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents, byProduct }}
+          popularIds={popularIds}
           header={
             <>
-              <GuestHeader guest={guest} orderCount={orders.length} cover={cover} />
+              <GuestHeader guest={guest} orderCount={orders.length} cover={cover} store={store} />
               {music ? <NowPlaying initial={playing} restaurantName={guest.restaurant.name} /> : null}
             </>
           }

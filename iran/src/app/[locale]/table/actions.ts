@@ -36,12 +36,18 @@ async function guest() {
 }
 
 /** Returns the new cart summary so the menu's cart bar updates without a reload. */
+/** Count, total and units per product: what the menu needs to reflect the cart. */
+function cartSummary(cart: Awaited<ReturnType<typeof getCartView>>) {
+  const byProduct: Record<string, number> = {};
+  for (const l of cart.lines) byProduct[l.productId] = (byProduct[l.productId] ?? 0) + l.quantity;
+  return { itemCount: cart.itemCount, totalCents: cart.totals.totalCents, byProduct };
+}
+
 export async function addToCartAction(input: AddItemInput) {
   return runAction(async () => {
     const g = await guest();
     await addToCart(db, g, input);
-    const cart = await getCartView(db, g);
-    return { itemCount: cart.itemCount, totalCents: cart.totals.totalCents };
+    return cartSummary(await getCartView(db, g));
   });
 }
 
