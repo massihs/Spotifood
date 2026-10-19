@@ -5,6 +5,7 @@ import { recordAudit } from "@/server/audit";
 import { AppError, conflict, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { randomToken } from "@/lib/ids";
+import { isModule, MODULES, type ModuleKey } from "@/lib/modules";
 import { LOGO_VARIANTS, processImage } from "@/server/infra/images";
 import { newAssetBase, storage, variantKey } from "@/server/infra/storage";
 import {
@@ -232,5 +233,41 @@ export async function deleteTaxRate(db: Database, ctx: RestaurantContext, id: st
       entityType: "tax_rate",
       entityId: id,
     });
+  });
+}
+
+/** Modules switched off for this restaurant (hidden from navigation). */
+export async function getDisabledModules(db: Database, ctx: RestaurantContext): Promise<ModuleKey[]> {
+  const [row] = await db
+    .select({ m: restaurantSettings.disabledModules })
+    .from(restaurantSettings)
+    .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
+  return (row?.m ?? []).filter(isModule);
+}
+
+export async function setModuleEnabled(db: Database, ctx: RestaurantContext, key: string, enabled: boolean) {
+  assertCan(ctx, "restaurant.manage");
+  if (!isModule(key)) throw new AppError("VALIDATION", "invalid_module", { field: "module" });
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .select({ m: restaurantSettings.disabledModules })
+      .from(restaurantSettings)
+      .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id))
+      .for("update");
+    const current = new Set((row?.m ?? []).filter(isModule));
+    if (enabled) current.delete(key);
+    else current.add(key);
+    const next = MODULES.filter((m) => current.has(m));
+    await tx
+      .update(restaurantSettings)
+      .set({ disabledModules: next })
+      .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
+    await recordAudit(tx, {
+      action: "restaurant.module_toggled",
+      actorUserId: ctx.user.id,
+      restaurantId: ctx.restaurant.id,
+      metadata: { module: key, enabled },
+    });
+    return next;
   });
 }

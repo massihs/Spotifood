@@ -225,13 +225,19 @@
     "reports": "Reports & accounting",
     "branches": "Branches",
     "groups": {
-      "ops": "Daily operations",
+      "sales": "Sales & service",
       "catalog": "Menu & stock",
-      "business": "Sales & customers",
+      "guests": "Guests & experience",
+      "finance": "Finance & reports",
       "manage": "Management"
     },
     "delivery": "Delivery",
-    "reservations": "Bookings & queue"
+    "reservations": "Bookings & queue",
+    "search": "Search",
+    "searchPlaceholder": "Search pages and settings…",
+    "noResults": "Nothing found",
+    "searchMove": "move",
+    "searchOpen": "open"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -268,7 +274,11 @@
       "floor": "Floor plan",
       "menu": "Edit menu",
       "qr": "Print table QR codes",
-      "guestView": "See the guest menu"
+      "guestView": "See the guest menu",
+      "pos": "New sale",
+      "reservations": "Bookings",
+      "reports": "Reports",
+      "modules": "Modules"
     },
     "catalog": "Menu & team",
     "setupDone": "You are all set! 🎉"
@@ -652,7 +662,51 @@
     "zarinpalMerchant": "Zarinpal merchant ID",
     "zarinpalMerchantHint": "Copy it from your Zarinpal panel. Payments go straight to your restaurant's account.",
     "zarinpalMerchantHintFallback": "Copy it from your Zarinpal panel so payments go straight to your account. If empty, the platform account is used.",
-    "registrationNumber": "Registration number"
+    "registrationNumber": "Registration number",
+    "modules": "Modules",
+    "modulesHint": "Keep only what you use switched on; the rest is hidden from the menu.",
+    "moduleList": {
+      "pos": {
+        "title": "Point of sale",
+        "desc": "Counter, takeaway and phone orders, cash drawer."
+      },
+      "kitchen": {
+        "title": "Kitchen display",
+        "desc": "Orders on the kitchen screen by station, with ticket printing."
+      },
+      "floor": {
+        "title": "Live floor",
+        "desc": "Table map, open tables and table moves."
+      },
+      "delivery": {
+        "title": "Delivery",
+        "desc": "Zones and fees, couriers and their settlement."
+      },
+      "reservations": {
+        "title": "Bookings & queue",
+        "desc": "Online table booking and a waiting list with SMS."
+      },
+      "inventory": {
+        "title": "Inventory",
+        "desc": "Ingredients, recipes, purchases and low-stock alerts."
+      },
+      "customers": {
+        "title": "Customer club",
+        "desc": "Points, coupons and SMS campaigns."
+      },
+      "invoices": {
+        "title": "Invoices",
+        "desc": "Official invoices and PDFs."
+      },
+      "branches": {
+        "title": "Branches",
+        "desc": "Group view and menu copy between branches."
+      },
+      "music": {
+        "title": "Music",
+        "desc": "Playlist and radio for the dining room."
+      }
+    }
   },
   "guest": {
     "table": "Table {label}",

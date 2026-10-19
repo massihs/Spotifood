@@ -87,6 +87,11 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   reservationSlotCapacity: integer().notNull().default(40),
   reservationMaxParty: integer().notNull().default(12),
   reservationDurationMin: integer().notNull().default(90),
+  /** Dashboard modules the restaurant switched off (hidden from its navigation). */
+  disabledModules: text()
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
   legalName: varchar({ length: 200 }),
   legalId: varchar({ length: 64 }),
   vatNumber: varchar({ length: 64 }),

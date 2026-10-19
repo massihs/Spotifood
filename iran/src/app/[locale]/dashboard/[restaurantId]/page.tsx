@@ -1,4 +1,8 @@
 import {
+  Blocks,
+  Calculator,
+  CalendarClock,
+  ChartColumn,
   ArrowUpLeft,
   Check,
   ChefHat,
@@ -20,6 +24,8 @@ import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { getSetupOverview, getTodayStats } from "@/server/modules/dashboard/service";
 import { can } from "@/server/tenancy";
+import { getDisabledModules } from "@/server/modules/restaurants/settings";
+import type { ModuleKey } from "@/lib/modules";
 
 export default function OverviewPage({ params }: PageProps<"/[locale]/dashboard/[restaurantId]">) {
   return (
@@ -40,11 +46,12 @@ export default function OverviewPage({ params }: PageProps<"/[locale]/dashboard/
 async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[restaurantId]">["params"] }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId);
-  const [t, locale, overview, today] = await Promise.all([
+  const [t, locale, overview, today, disabled] = await Promise.all([
     getTranslations("dashboard"),
     getLocale(),
     getSetupOverview(db, ctx),
     getTodayStats(db, ctx),
+    getDisabledModules(db, ctx),
   ]);
   const money = (c: number) => formatMoney(c, ctx.restaurant.currency, locale);
   const base = `/dashboard/${ctx.restaurant.id}`;
@@ -71,19 +78,36 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   });
   const max = Math.max(1, ...days.map((d) => d.cents));
 
+  const on = (m: ModuleKey) => !disabled.includes(m);
   const quick = [
-    can(ctx, "orders.view") && {
-      href: `${base}/kitchen`,
-      label: t("quickActions.kitchen"),
-      Icon: ChefHat,
-      tone: "orange" as Tone,
-    },
-    can(ctx, "tables.view") && {
-      href: `${base}/floor`,
-      label: t("quickActions.floor"),
-      Icon: LayoutGrid,
-      tone: "teal" as Tone,
-    },
+    on("pos") &&
+      can(ctx, "orders.create") && {
+        href: `${base}/pos`,
+        label: t("quickActions.pos"),
+        Icon: Calculator,
+        tone: "emerald" as Tone,
+      },
+    on("kitchen") &&
+      can(ctx, "orders.view") && {
+        href: `${base}/kitchen`,
+        label: t("quickActions.kitchen"),
+        Icon: ChefHat,
+        tone: "orange" as Tone,
+      },
+    on("floor") &&
+      can(ctx, "tables.view") && {
+        href: `${base}/floor`,
+        label: t("quickActions.floor"),
+        Icon: LayoutGrid,
+        tone: "teal" as Tone,
+      },
+    on("reservations") &&
+      can(ctx, "orders.view") && {
+        href: `${base}/reservations`,
+        label: t("quickActions.reservations"),
+        Icon: CalendarClock,
+        tone: "fuchsia" as Tone,
+      },
     can(ctx, "menu.view") && {
       href: `${base}/menu`,
       label: t("quickActions.menu"),
@@ -95,6 +119,18 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
       label: t("quickActions.qr"),
       Icon: QrCode,
       tone: "sky" as Tone,
+    },
+    can(ctx, "accounting.manage") && {
+      href: `${base}/reports`,
+      label: t("quickActions.reports"),
+      Icon: ChartColumn,
+      tone: "indigo" as Tone,
+    },
+    can(ctx, "restaurant.manage") && {
+      href: `${base}/settings#modules`,
+      label: t("quickActions.modules"),
+      Icon: Blocks,
+      tone: "amber" as Tone,
     },
   ].filter((x) => !!x);
 

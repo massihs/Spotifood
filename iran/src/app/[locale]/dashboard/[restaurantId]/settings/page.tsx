@@ -2,7 +2,7 @@ import { edition } from "@/config/edition";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
-import { Building2, Clock, CreditCard, Percent, Scale } from "lucide-react";
+import { Blocks, Building2, Clock, CreditCard, Percent, Scale } from "lucide-react";
 import type { ReactNode } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { requireRestaurant } from "@/server/auth/current";
@@ -18,6 +18,8 @@ import {
   ServiceForm,
   TaxRates,
 } from "./settings-forms";
+import { ModulesForm } from "./modules-form";
+import { isModule } from "@/lib/modules";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
 
@@ -95,6 +97,19 @@ async function Settings({ params }: { params: Params }) {
               />
             </div>
           </Card>
+          <Card id="modules" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<Blocks />}>{t("modules")}</SectionTitle>}
+              description={t("modulesHint")}
+            />
+            <div className="p-5 sm:p-6">
+              <ModulesForm
+                restaurantId={rid}
+                readOnly={readOnly}
+                disabled={s.disabledModules.filter(isModule)}
+              />
+            </div>
+          </Card>
           <Card id="service" className="scroll-mt-24">
             <CardHeader
               title={<SectionTitle icon={<Clock />}>{t("service")}</SectionTitle>}
@@ -169,6 +184,7 @@ async function Settings({ params }: { params: Params }) {
 
 const SECTIONS = [
   { key: "profile", icon: <Building2 aria-hidden="true" /> },
+  { key: "modules", icon: <Blocks aria-hidden="true" /> },
   { key: "service", icon: <Clock aria-hidden="true" /> },
   { key: "payments", icon: <CreditCard aria-hidden="true" /> },
   { key: "taxes", icon: <Percent aria-hidden="true" /> },

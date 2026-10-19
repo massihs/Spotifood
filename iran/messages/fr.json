@@ -25,7 +25,8 @@
     "enabled": "Activé",
     "disabled": "Désactivé",
     "selectAll": "Tout sélectionner",
-    "selectNone": "Tout désélectionner"
+    "selectNone": "Tout désélectionner",
+    "clear": "Effacer"
   },
   "landing": {
     "metaTitle": "Spotifood — Commande à table par QR code pour restaurants",
@@ -51,10 +52,122 @@
       "insights": {
         "title": "Ventes & avis",
         "body": "Chiffre d'affaires, produits phares, avis et plaintes au même endroit."
+      },
+      "pay": {
+        "title": "Paiement en ligne Zarinpal",
+        "body": "Paiement depuis la table via la passerelle Zarinpal du restaurant, ou en espèces et par carte."
+      },
+      "invoice": {
+        "title": "Factures officielles",
+        "body": "Factures en persan numérotées par année solaire, avec TVA et PDF imprimable."
+      },
+      "langs": {
+        "title": "Carte multilingue",
+        "body": "Carte en persan, anglais et arabe pour les habitués et les visiteurs."
+      },
+      "team": {
+        "title": "Équipe & rôles",
+        "body": "Gérant, caissier, serveur : chacun ne voit que ce dont il a besoin."
       }
     },
     "nav": {
-      "radio": "Radio"
+      "radio": "Radio",
+      "features": "Fonctionnalités",
+      "how": "Comment ça marche",
+      "faq": "FAQ"
+    },
+    "trust": {
+      "noApp": "Aucune appli à installer",
+      "zarinpal": "Paiement Zarinpal",
+      "invoice": "Factures officielles"
+    },
+    "mock": {
+      "table": "Table 4",
+      "cart": "Voir le panier",
+      "featured": "À la une"
+    },
+    "showcase": "La vraie carte de Brielle, Téhéran, sur Spotifood",
+    "stats": {
+      "setup": {
+        "value": "10 min",
+        "label": "jusqu'à la première commande"
+      },
+      "app": {
+        "value": "0",
+        "label": "appli à installer"
+      },
+      "langs": {
+        "value": "3 langues",
+        "label": "persan, anglais, arabe"
+      },
+      "live": {
+        "value": "En direct",
+        "label": "commandes en cuisine"
+      }
+    },
+    "howTitle": "Trois étapes. C'est tout.",
+    "howSubtitle": "Pas de matériel, pas de longue formation.",
+    "steps": {
+      "menu": {
+        "title": "Créez votre carte",
+        "body": "Catégories, plats, photos, options et prix en tomans en quelques minutes."
+      },
+      "qr": {
+        "title": "Imprimez les QR des tables",
+        "body": "Un QR code unique par table, prêt à imprimer."
+      },
+      "serve": {
+        "title": "Prenez les commandes",
+        "body": "Les clients scannent et commandent ; la cuisine le voit aussitôt."
+      }
+    },
+    "featuresTitle": "Tout ce qu'un restaurant moderne attend",
+    "featuresSubtitle": "De la carte à la facture, sur une seule plateforme.",
+    "split": {
+      "guestTitle": "Pour les clients",
+      "guest": [
+        "Une belle carte en photos, sans téléchargement",
+        "Commander et payer sans attendre le serveur",
+        "Suivi en direct : envoyée, en préparation, prête",
+        "La facture sur son propre téléphone"
+      ],
+      "ownerTitle": "Pour les restaurants",
+      "owner": [
+        "Tables qui tournent plus vite, paniers plus gros",
+        "Moins d'erreurs entre la salle et la cuisine",
+        "Prix et disponibilités modifiés en une seconde",
+        "Une équipe libérée de la prise de commande"
+      ]
+    },
+    "faqTitle": "Questions fréquentes",
+    "faq": {
+      "app": {
+        "q": "Les clients doivent-ils installer une appli ?",
+        "a": "Non. Ils scannent le QR code de la table avec l'appareil photo et la carte s'ouvre dans le navigateur."
+      },
+      "pay": {
+        "q": "Où va l'argent des paiements en ligne ?",
+        "a": "Directement au restaurant : vous saisissez votre propre identifiant marchand Zarinpal dans les réglages."
+      },
+      "cash": {
+        "q": "Et si un client veut payer en espèces ou par carte ?",
+        "a": "Aucun problème : il demande l'addition depuis la table et le serveur est prévenu."
+      },
+      "hardware": {
+        "q": "Faut-il du matériel spécial ?",
+        "a": "Non. Une tablette ou un téléphone en cuisine suffit ; tout fonctionne dans le navigateur."
+      },
+      "menu": {
+        "q": "Les modifications de carte sont-elles rapides ?",
+        "a": "Instantanées. Changez un prix, une photo ou marquez un plat épuisé : les clients le voient aussitôt."
+      }
+    },
+    "finalTitle": "Passez votre restaurant au numérique dès aujourd'hui",
+    "finalBody": "Créer un compte prend quelques minutes. Montez votre carte et prenez votre première commande aujourd'hui.",
+    "footer": {
+      "rights": "© Spotifood — conçu pour les restaurants d'Iran",
+      "login": "Connexion",
+      "signup": "Inscription"
     }
   },
   "auth": {
@@ -109,13 +222,22 @@
     "reports": "Rapports & compta",
     "branches": "Succursales",
     "groups": {
-      "ops": "Opérations",
-      "catalog": "Menu & stock",
-      "business": "Ventes & clients",
+      "sales": "Ventes & service",
+      "catalog": "Carte & stock",
+      "guests": "Clients & expérience",
+      "finance": "Finances & rapports",
       "manage": "Gestion"
     },
     "delivery": "Livraison",
-    "reservations": "Réservations"
+    "reservations": "Réservations",
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher une page, un réglage…",
+    "noResults": "Aucun résultat",
+    "searchMove": "naviguer",
+    "searchOpen": "ouvrir",
+    "more": "Plus",
+    "close": "Fermer",
+    "mainNav": "Navigation principale"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -139,7 +261,27 @@
     "suspendedBody": "Ce restaurant est temporairement suspendu. Contactez le support Spotifood.",
     "noRestaurantTitle": "Aucun restaurant",
     "noRestaurantBody": "Votre compte n'est rattaché à aucun restaurant actif.",
-    "pickRestaurant": "Choisissez un restaurant"
+    "pickRestaurant": "Choisissez un restaurant",
+    "quickActions": {
+      "kitchen": "Écran cuisine",
+      "floor": "Salle en direct",
+      "menu": "Modifier la carte",
+      "qr": "QR codes des tables",
+      "guestView": "Vue client",
+      "pos": "Nouvelle vente",
+      "reservations": "Réservations",
+      "reports": "Rapports",
+      "modules": "Modules"
+    },
+    "today": "Aujourd'hui",
+    "revenueToday": "Chiffre d'affaires du jour",
+    "ordersToday": "Commandes du jour",
+    "openTables": "Tables ouvertes",
+    "inKitchen": "En cuisine",
+    "last7": "Chiffre d'affaires, 7 derniers jours",
+    "quick": "Accès rapide",
+    "catalog": "Carte & équipe",
+    "setupDone": "Tout est prêt ! 🎉"
   },
   "roles": {
     "owner": "Propriétaire",
@@ -520,7 +662,51 @@
     "zarinpalMerchant": "Code marchand Zarinpal",
     "zarinpalMerchantHint": "À copier depuis votre panel Zarinpal. Les paiements arrivent directement sur le compte du restaurant.",
     "zarinpalMerchantHintFallback": "À copier depuis votre panel Zarinpal pour encaisser directement. Laissé vide, le compte de la plateforme est utilisé.",
-    "registrationNumber": "Numéro d'immatriculation (شماره ثبت)"
+    "registrationNumber": "Numéro d'immatriculation (شماره ثبت)",
+    "modules": "Modules",
+    "modulesHint": "Gardez activé seulement ce que vous utilisez ; le reste disparaît du menu.",
+    "moduleList": {
+      "pos": {
+        "title": "Caisse",
+        "desc": "Commandes au comptoir, à emporter et par téléphone, tiroir-caisse."
+      },
+      "kitchen": {
+        "title": "Écran cuisine",
+        "desc": "Commandes à l'écran par poste, avec impression des tickets."
+      },
+      "floor": {
+        "title": "Salle en direct",
+        "desc": "Plan des tables, tables ouvertes et changements de table."
+      },
+      "delivery": {
+        "title": "Livraison",
+        "desc": "Zones et frais, livreurs et leur règlement."
+      },
+      "reservations": {
+        "title": "Réservations & file",
+        "desc": "Réservation en ligne et file d'attente avec SMS."
+      },
+      "inventory": {
+        "title": "Stock",
+        "desc": "Ingrédients, recettes, achats et alertes de rupture."
+      },
+      "customers": {
+        "title": "Club clients",
+        "desc": "Points, coupons et campagnes SMS."
+      },
+      "invoices": {
+        "title": "Factures",
+        "desc": "Factures officielles et PDF."
+      },
+      "branches": {
+        "title": "Succursales",
+        "desc": "Vue groupe et copie de carte entre succursales."
+      },
+      "music": {
+        "title": "Musique",
+        "desc": "Playlist et radio pour la salle."
+      }
+    }
   },
   "guest": {
     "table": "Table {label}",
@@ -651,6 +837,30 @@
       },
       "tooSoon": "Votre demande est déjà partie, patientez un instant.",
       "failed": "Envoi impossible, réessayez."
+    },
+    "tableBadge": "Table {table}",
+    "quickAdd": "Ajouter {name} au panier",
+    "addMore": "Ajouter d'autres plats",
+    "items": "{count, plural, one {# article} other {# articles}}",
+    "discount": "-{pct} %",
+    "addToOrder": "Ajouter à la commande · {price}",
+    "removeItem": "Retirer {name}",
+    "trackTitle": "Suivi de commande",
+    "menuTab": "Carte",
+    "yourCartAt": "Votre panier chez {restaurant}",
+    "checkout": "Commander",
+    "nameShort": "Votre prénom",
+    "namePlaceholder": "ex. Sara",
+    "forKitchen": "Note pour la cuisine",
+    "orderMore": "Ajouter à la commande",
+    "sentTitle": "Votre commande est envoyée",
+    "sentBody": "Suivez son état en direct, ici même.",
+    "stepShort": {
+      "received": "Envoyée",
+      "accepted": "Acceptée",
+      "preparing": "En préparation",
+      "ready": "Prête",
+      "served": "Servie"
     }
   },
   "categoryTemplates": {

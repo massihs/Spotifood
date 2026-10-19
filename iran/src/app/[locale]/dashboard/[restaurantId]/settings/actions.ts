@@ -13,6 +13,7 @@ import {
   createTaxRate,
   deleteTaxRate,
   removeLogo,
+  setModuleEnabled,
   setDefaultTaxRate,
   updateLegal,
   updateProfile,
@@ -131,6 +132,14 @@ export async function updatePaymentSettingsAction(restaurantId: string, _prev: u
       requirePaymentBeforeOrder: fd.get("requirePaymentBeforeOrder") === "on",
       zarinpalMerchantId: fd.has("zarinpalMerchantId") ? String(fd.get("zarinpalMerchantId")) : undefined,
     });
+    refresh();
+  });
+}
+
+export async function setModuleAction(restaurantId: string, module: string, enabled: boolean) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    await setModuleEnabled(db, ctx, module, enabled);
     refresh();
   });
 }

@@ -22,7 +22,10 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { logoUrl } from "@/server/modules/restaurants/settings";
+import { getDisabledModules, logoUrl } from "@/server/modules/restaurants/settings";
+import type { ModuleKey } from "@/lib/modules";
+import type { NavItem } from "@/components/dashboard/sidebar-nav";
+import type { SearchEntry } from "@/components/dashboard/command-palette";
 import { can } from "@/server/tenancy";
 import { requireRestaurant } from "@/server/auth/current";
 import { Link } from "@/i18n/navigation";
@@ -58,137 +61,211 @@ async function RestaurantShell({
   const t = await getTranslations();
   const base = `/dashboard/${ctx.restaurant.id}`;
 
-  const [{ unread }, newOrders, lowStock, undeliveredCount] = await Promise.all([
+  const [{ unread }, newOrders, lowStock, undeliveredCount, disabled] = await Promise.all([
     listNotifications(db, ctx, 1),
     countNewOrders(db, ctx),
     countLowStock(db, ctx),
     countToDispatch(db, ctx),
+    getDisabledModules(db, ctx),
   ]);
+  const off = new Set(disabled);
+  const on = (m: ModuleKey) => !off.has(m);
   const g = {
-    ops: t("nav.groups.ops"),
+    sales: t("nav.groups.sales"),
     catalog: t("nav.groups.catalog"),
-    business: t("nav.groups.business"),
+    guests: t("nav.groups.guests"),
+    finance: t("nav.groups.finance"),
     manage: t("nav.groups.manage"),
   };
-  const nav = [
-    {
-      href: base,
-      label: t("nav.overview"),
-      icon: <LayoutDashboard />,
-      exact: true,
-      primary: true,
-      group: g.ops,
-    },
-    can(ctx, "orders.view") && {
-      href: `${base}/kitchen`,
-      label: t("nav.kitchen"),
-      icon: <ChefHat />,
-      primary: true,
-      badge: newOrders,
-      group: g.ops,
-    },
-    can(ctx, "orders.create") && {
-      href: `${base}/pos`,
-      label: t("nav.pos"),
-      icon: <Calculator />,
-      group: g.ops,
-    },
-    can(ctx, "orders.view") && {
-      href: `${base}/orders`,
-      label: t("nav.orders"),
-      icon: <ReceiptText />,
-      primary: true,
-      badge: newOrders,
-      group: g.ops,
-    },
-    can(ctx, "orders.view") && {
-      href: `${base}/delivery`,
-      label: t("nav.delivery"),
-      icon: <Bike />,
-      group: g.ops,
-      badge: undeliveredCount,
-    },
-    can(ctx, "orders.view") && {
-      href: `${base}/reservations`,
-      label: t("nav.reservations"),
-      icon: <CalendarClock />,
-      group: g.ops,
-    },
-    can(ctx, "tables.view") && {
-      href: `${base}/floor`,
-      label: t("nav.floor"),
-      icon: <LayoutGrid />,
-      group: g.ops,
-    },
-    can(ctx, "menu.view") && {
-      href: `${base}/menu`,
-      label: t("nav.menu"),
-      icon: <UtensilsCrossed />,
-      primary: true,
-      group: g.catalog,
-    },
-    can(ctx, "inventory.view") && {
-      href: `${base}/inventory`,
-      label: t("nav.inventory"),
-      icon: <Boxes />,
-      badge: lowStock,
-      group: g.catalog,
-    },
-    can(ctx, "tables.view") && {
-      href: `${base}/tables`,
-      label: t("nav.tables"),
-      icon: <QrCode />,
-      group: g.catalog,
-    },
-    can(ctx, "customers.view") && {
-      href: `${base}/customers`,
-      label: t("nav.customers"),
-      icon: <HeartHandshake />,
-      group: g.business,
-    },
-    can(ctx, "accounting.manage") && {
-      href: `${base}/reports`,
-      label: t("nav.reports"),
-      icon: <ChartColumn />,
-      group: g.business,
-    },
-    can(ctx, "payments.view") && {
-      href: `${base}/payments`,
-      label: t("nav.payments"),
-      icon: <Wallet />,
-      group: g.business,
-    },
-    can(ctx, "invoices.view") && {
-      href: `${base}/invoices`,
-      label: t("nav.invoices"),
-      icon: <FileText />,
-      group: g.business,
-    },
-    ctx.role !== "staff" && {
-      href: `${base}/branches`,
-      label: t("nav.branches"),
-      icon: <Network />,
-      group: g.manage,
-    },
-    can(ctx, "restaurant.view") && {
-      href: `${base}/music`,
-      label: t("nav.music"),
-      icon: <Music />,
-      group: g.manage,
-    },
-    can(ctx, "members.manage") && {
-      href: `${base}/team`,
-      label: t("nav.team"),
-      icon: <Users />,
-      group: g.manage,
-    },
-    can(ctx, "restaurant.view") && {
-      href: `${base}/settings`,
-      label: t("nav.settings"),
-      icon: <Settings />,
-      group: g.manage,
-    },
-  ].filter((x) => !!x);
+  type Item = NavItem & { show: boolean };
+  const nav: NavItem[] = (
+    [
+      {
+        show: true,
+        href: base,
+        label: t("nav.overview"),
+        icon: <LayoutDashboard />,
+        exact: true,
+        primary: true,
+      },
+      // Sales & service: everything that happens during a shift.
+      {
+        show: on("pos") && can(ctx, "orders.create"),
+        href: `${base}/pos`,
+        label: t("nav.pos"),
+        icon: <Calculator />,
+        primary: true,
+        groupKey: "sales",
+        group: g.sales,
+      },
+      {
+        show: can(ctx, "orders.view"),
+        href: `${base}/orders`,
+        label: t("nav.orders"),
+        icon: <ReceiptText />,
+        primary: true,
+        badge: newOrders,
+        groupKey: "sales",
+        group: g.sales,
+      },
+      {
+        show: on("kitchen") && can(ctx, "orders.view"),
+        href: `${base}/kitchen`,
+        label: t("nav.kitchen"),
+        icon: <ChefHat />,
+        primary: true,
+        badge: newOrders,
+        groupKey: "sales",
+        group: g.sales,
+      },
+      {
+        show: on("floor") && can(ctx, "tables.view"),
+        href: `${base}/floor`,
+        label: t("nav.floor"),
+        icon: <LayoutGrid />,
+        groupKey: "sales",
+        group: g.sales,
+      },
+      {
+        show: on("delivery") && can(ctx, "orders.view"),
+        href: `${base}/delivery`,
+        label: t("nav.delivery"),
+        icon: <Bike />,
+        badge: undeliveredCount,
+        groupKey: "sales",
+        group: g.sales,
+      },
+      {
+        show: on("reservations") && can(ctx, "orders.view"),
+        href: `${base}/reservations`,
+        label: t("nav.reservations"),
+        icon: <CalendarClock />,
+        groupKey: "sales",
+        group: g.sales,
+      },
+      // Menu & stock: what the restaurant sells and where it is served.
+      {
+        show: can(ctx, "menu.view"),
+        href: `${base}/menu`,
+        label: t("nav.menu"),
+        icon: <UtensilsCrossed />,
+        primary: true,
+        groupKey: "catalog",
+        group: g.catalog,
+      },
+      {
+        show: on("inventory") && can(ctx, "inventory.view"),
+        href: `${base}/inventory`,
+        label: t("nav.inventory"),
+        icon: <Boxes />,
+        badge: lowStock,
+        groupKey: "catalog",
+        group: g.catalog,
+      },
+      {
+        show: can(ctx, "tables.view"),
+        href: `${base}/tables`,
+        label: t("nav.tables"),
+        icon: <QrCode />,
+        groupKey: "catalog",
+        group: g.catalog,
+      },
+      // Guests & experience.
+      {
+        show: on("customers") && can(ctx, "customers.view"),
+        href: `${base}/customers`,
+        label: t("nav.customers"),
+        icon: <HeartHandshake />,
+        groupKey: "guests",
+        group: g.guests,
+      },
+      {
+        show: on("music") && can(ctx, "restaurant.view"),
+        href: `${base}/music`,
+        label: t("nav.music"),
+        icon: <Music />,
+        groupKey: "guests",
+        group: g.guests,
+      },
+      // Finance.
+      {
+        show: can(ctx, "accounting.manage"),
+        href: `${base}/reports`,
+        label: t("nav.reports"),
+        icon: <ChartColumn />,
+        groupKey: "finance",
+        group: g.finance,
+      },
+      {
+        show: can(ctx, "payments.view"),
+        href: `${base}/payments`,
+        label: t("nav.payments"),
+        icon: <Wallet />,
+        groupKey: "finance",
+        group: g.finance,
+      },
+      {
+        show: on("invoices") && can(ctx, "invoices.view"),
+        href: `${base}/invoices`,
+        label: t("nav.invoices"),
+        icon: <FileText />,
+        groupKey: "finance",
+        group: g.finance,
+      },
+      // Management.
+      {
+        show: on("branches") && ctx.role !== "staff",
+        href: `${base}/branches`,
+        label: t("nav.branches"),
+        icon: <Network />,
+        groupKey: "manage",
+        group: g.manage,
+      },
+      {
+        show: can(ctx, "members.manage"),
+        href: `${base}/team`,
+        label: t("nav.team"),
+        icon: <Users />,
+        groupKey: "manage",
+        group: g.manage,
+      },
+      {
+        show: can(ctx, "restaurant.view"),
+        href: `${base}/settings`,
+        label: t("nav.settings"),
+        icon: <Settings />,
+        groupKey: "manage",
+        group: g.manage,
+      },
+    ] satisfies Item[]
+  )
+    .filter((i) => i.show)
+    .map(({ show: _show, ...i }) => i);
+
+  // Go-anywhere search also reaches the tabs inside pages and the settings sections.
+  const visible = new Set(nav.map((n) => n.href));
+  const sub = (page: string, ns: string, tabs: readonly string[], key = "tab") =>
+    visible.has(`${base}/${page}`)
+      ? tabs.map((k) => ({
+          href: `${base}/${page}?${key}=${k}`,
+          label: t(`${ns}.tabs.${k}`),
+          hint: t(`nav.${page}`),
+        }))
+      : [];
+  const search: SearchEntry[] = [
+    ...sub("reports", "reports", ["sales", "products", "expenses", "security"]),
+    ...sub("inventory", "inventory", ["purchases", "recipes", "suppliers", "movements"]),
+    ...sub("customers", "customers", ["coupons", "campaigns", "loyalty"]),
+    ...sub("delivery", "delivery", ["settlement", "settings"]),
+    ...sub("reservations", "reservations", ["queue", "settings"]),
+    ...(visible.has(`${base}/settings`)
+      ? (["profile", "service", "payments", "taxes", "legal", "modules"] as const).map((k) => ({
+          href: `${base}/settings#${k}`,
+          label: t(`settings.${k}`),
+          hint: t("nav.settings"),
+        }))
+      : []),
+  ];
 
   return (
     <LiveProvider url={`/api/v1/realtime/restaurant/${ctx.restaurant.id}`}>
@@ -198,6 +275,7 @@ async function RestaurantShell({
         avatar={logoUrl(ctx.restaurant.logoKey)}
         brand={ctx.restaurant.brandColor}
         nav={nav}
+        search={search}
         user={ctx.user}
         headerExtra={
           <>

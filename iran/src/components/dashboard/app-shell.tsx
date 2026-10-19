@@ -5,7 +5,8 @@ import { logoutAction } from "@/app/[locale]/(auth)/actions";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logo, LogoMark } from "@/components/ui/logo";
 import { Link } from "@/i18n/navigation";
-import { MobileTabBar, SidebarNav, type NavItem } from "./sidebar-nav";
+import { CommandPalette, type SearchEntry } from "./command-palette";
+import { MobileTabBar, NavTrail, SidebarNav, type NavItem } from "./sidebar-nav";
 
 /** Shared chrome for the restaurant dashboard and the super-admin console. */
 export async function AppShell({
@@ -17,8 +18,11 @@ export async function AppShell({
   user,
   headerExtra,
   brand,
+  search,
   children,
 }: {
+  /** Extra go-anywhere entries (tabs, settings sections) on top of the navigation. */
+  search?: SearchEntry[];
   /** Restaurant brand color key: scopes the accent (data-brand). */
   brand?: string;
   title: string;
@@ -141,7 +145,16 @@ export async function AppShell({
               <p className="truncate text-sm font-semibold">{title}</p>
               {subtitle ? <p className="truncate text-xs text-fg-muted">{subtitle}</p> : null}
             </div>
-            <div className="ms-auto flex items-center gap-1">{headerExtra}</div>
+            <NavTrail items={nav} />
+            <div className="ms-auto flex items-center gap-1.5">
+              <CommandPalette
+                entries={[
+                  ...nav.map((n) => ({ href: n.href, label: n.label, hint: n.group, icon: n.icon })),
+                  ...(search ?? []),
+                ]}
+              />
+              {headerExtra}
+            </div>
           </div>
         </header>
         <main
