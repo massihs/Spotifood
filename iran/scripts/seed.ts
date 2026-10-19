@@ -711,7 +711,13 @@ async function seedBrielle() {
 async function seedBrielleTestData(restaurantId: string, ownerId: string) {
   if (process.env.SEED_BRIELLE_HISTORY === "false") return;
   const started = Date.now();
-  const res = await db.transaction((tx) => seedBrielleHistory(tx, restaurantId, ownerId));
+  // Test data must never keep the app from starting: on error the transaction leaves nothing behind.
+  const res = await db
+    .transaction((tx) => seedBrielleHistory(tx, restaurantId, ownerId))
+    .catch((e: unknown) => {
+      console.warn("! Brielle history not seeded:", e);
+      return null;
+    });
   if (res)
     console.log(
       `✓ Brielle history: ${res.orders} orders (~${res.guestsPerDay} guests/day), ${res.customers} customers, ` +
