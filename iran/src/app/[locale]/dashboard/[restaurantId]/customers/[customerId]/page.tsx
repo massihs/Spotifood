@@ -2,14 +2,14 @@ import { Suspense } from "react";
 import { ArrowRight, Phone, Star } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
-import { CustomerEditor } from "@/components/customers/customers-ui";
+import { CustomerEditor, HouseAccount } from "@/components/customers/customers-ui";
 import { Card } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
-import { getCustomer, loyaltyConfig } from "@/server/modules/customers/service";
+import { getCustomer, listAccountEntries, loyaltyConfig } from "@/server/modules/customers/service";
 import { can } from "@/server/tenancy";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/customers/[customerId]">;
@@ -25,12 +25,13 @@ export default function CustomerPage({ params }: Props) {
 async function CustomerFile({ params }: Pick<Props, "params">) {
   const { restaurantId, customerId } = await params;
   const ctx = await requireRestaurant(restaurantId, "customers.view");
-  const [t, tOrders, format, file, cfg] = await Promise.all([
+  const [t, tOrders, format, file, cfg, accountEntries] = await Promise.all([
     getTranslations("customers"),
     getTranslations("orderStatus"),
     getFormatter(),
     getCustomer(db, ctx, customerId),
     loyaltyConfig(db, restaurantId),
+    listAccountEntries(db, ctx, customerId),
   ]);
   const { customer: c } = file;
   const money = (v: number) => formatMoney(v, ctx.restaurant.currency, "fa");
@@ -74,7 +75,19 @@ async function CustomerFile({ params }: Pick<Props, "params">) {
         ))}
       </div>
       <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
-        <CustomerEditor rid={ctx.restaurant.id} customer={c} canManage={can(ctx, "customers.manage")} />
+        <div className="space-y-4">
+          <CustomerEditor rid={ctx.restaurant.id} customer={c} canManage={can(ctx, "customers.manage")} />
+          <HouseAccount
+            rid={ctx.restaurant.id}
+            customerId={c.id}
+            currency={ctx.restaurant.currency}
+            creditLimitCents={c.creditLimitCents}
+            balanceCents={c.balanceCents}
+            entries={accountEntries.map((e) => ({ ...e, createdAt: e.createdAt.toISOString() }))}
+            canManage={can(ctx, "customers.manage")}
+            canRecord={can(ctx, "payments.record")}
+          />
+        </div>
         <div className="space-y-4">
           <Card>
             <p className="border-b border-border px-4 py-3 font-semibold">{t("orders")}</p>

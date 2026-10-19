@@ -17,6 +17,8 @@ import {
   setCouponActiveAction,
   updateCustomerAction,
   updateLoyaltyAction,
+  repayAccountAction,
+  setCreditLimitAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/customers/actions";
 
 const pill = "inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold";
@@ -594,6 +596,163 @@ export function LoyaltySettings({
         >
           {saved ? t("saved") : t("save")}
         </button>
+      ) : null}
+    </div>
+  );
+}
+
+// ─── House account ───────────────────────────────────────────────────────────
+
+export function HouseAccount({
+  rid,
+  customerId,
+  currency,
+  creditLimitCents,
+  balanceCents,
+  entries,
+  canManage,
+  canRecord,
+}: {
+  rid: string;
+  customerId: string;
+  currency: string;
+  creditLimitCents: number | null;
+  balanceCents: number;
+  entries: {
+    id: string;
+    kind: string;
+    amountCents: number;
+    method: string | null;
+    createdAt: string;
+    orderNumber: string | null;
+  }[];
+  canManage: boolean;
+  canRecord: boolean;
+}) {
+  const t = useTranslations("customers.account");
+  const locale = useLocale();
+  const money = useMoney(currency);
+  const { pending, error, run } = useRun();
+  const [limit, setLimit] = useState(
+    creditLimitCents != null ? centsToInput(creditLimitCents, locale, currency) : "",
+  );
+  const [amount, setAmount] = useState("");
+  const [method, setMethod] = useState<"cash" | "card" | "transfer">("cash");
+  const pay = parseMoneyInput(amount, currency);
+  const used = creditLimitCents ? Math.min(100, (balanceCents / creditLimitCents) * 100) : 0;
+  return (
+    <div className="rounded-2xl border border-border bg-surface p-4">
+      <p className="mb-3 font-semibold">{t("title")}</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl bg-danger-soft/60 px-3 py-2">
+          <p className="text-xs text-fg-muted">{t("balance")}</p>
+          <p className="text-lg font-bold text-danger tabular-nums">{money(balanceCents)}</p>
+        </div>
+        <div className="rounded-xl bg-surface-2 px-3 py-2">
+          <p className="text-xs text-fg-muted">{t("limit")}</p>
+          <p className="text-lg font-bold tabular-nums">
+            {creditLimitCents != null ? money(creditLimitCents) : t("none")}
+          </p>
+        </div>
+      </div>
+      {creditLimitCents ? (
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
+          <div className="h-full rounded-full bg-danger" style={{ width: `${used}%` }} />
+        </div>
+      ) : null}
+      {canManage ? (
+        <div className="mt-3 flex gap-2">
+          <input
+            value={limit}
+            onChange={(e) => setLimit(e.target.value)}
+            inputMode="numeric"
+            dir="ltr"
+            placeholder={t("limitPlaceholder")}
+            className={cn(field, "h-10")}
+          />
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              run(() =>
+                setCreditLimitAction(
+                  rid,
+                  customerId,
+                  limit.trim() ? (parseMoneyInput(limit, currency) ?? 0) : null,
+                ),
+              )
+            }
+            className={ghost}
+          >
+            {limit.trim() ? t("setLimit") : t("disable")}
+          </button>
+        </div>
+      ) : null}
+      {canRecord && balanceCents > 0 ? (
+        <div className="mt-3 space-y-2 rounded-xl border border-border p-3">
+          <p className="text-sm font-medium">{t("repay")}</p>
+          <div className="flex gap-2">
+            <input
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              inputMode="numeric"
+              dir="ltr"
+              placeholder={String(Math.round(balanceCents / (currency === "IRR" ? 1000 : 100)))}
+              className={cn(field, "h-10")}
+            />
+            <select
+              value={method}
+              onChange={(e) => setMethod(e.target.value as typeof method)}
+              className={cn(field, "h-10 w-32")}
+            >
+              {(["cash", "card", "transfer"] as const).map((m) => (
+                <option key={m} value={m}>
+                  {t(`methods.${m}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="button"
+            disabled={pending || !pay}
+            onClick={() =>
+              run(
+                () => repayAccountAction(rid, customerId, { amountCents: pay!, method, note: "" }),
+                () => setAmount(""),
+              )
+            }
+            className={cn(primary, "w-full justify-center")}
+          >
+            {t("recordRepayment")}
+          </button>
+        </div>
+      ) : null}
+      {error ? <p className="mt-2 text-sm text-danger">{error}</p> : null}
+      {entries.length ? (
+        <ul className="mt-3 divide-y divide-border text-sm">
+          {entries.map((e) => (
+            <li key={e.id} className="flex items-center gap-2 py-2">
+              <span>{t(`kinds.${e.kind}`)}</span>
+              {e.orderNumber ? (
+                <span className="text-xs text-fg-subtle tabular-nums">{e.orderNumber}</span>
+              ) : null}
+              {e.method ? <span className="text-xs text-fg-subtle">{t(`methods.${e.method}`)}</span> : null}
+              <span className="ms-auto text-xs text-fg-subtle">
+                {new Date(e.createdAt).toLocaleDateString(locale === "fa" ? "fa-IR" : locale)}
+              </span>
+              <span
+                dir="ltr"
+                className={cn(
+                  "w-28 text-end font-semibold tabular-nums",
+                  e.amountCents > 0 ? "text-danger" : "text-success",
+                )}
+              >
+                {e.amountCents > 0 ? "+" : "−"}
+                {money(Math.abs(e.amountCents))}
+              </span>
+            </li>
+          ))}
+        </ul>
       ) : null}
     </div>
   );

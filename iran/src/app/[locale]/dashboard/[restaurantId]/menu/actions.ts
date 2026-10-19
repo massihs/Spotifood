@@ -128,6 +128,8 @@ function productFields(fd: FormData, currency: string) {
     description: str(fd, "description"),
     priceCents: money(fd, "price", true, currency)!,
     compareAtPriceCents: money(fd, "compareAt", false, currency),
+    takeawayPriceCents: money(fd, "takeawayPrice", false, currency),
+    deliveryPriceCents: money(fd, "deliveryPrice", false, currency),
     taxRateId: str(fd, "taxRateId") || null,
     ingredients: str(fd, "ingredients"),
     allergens: fd.getAll("allergens").map(String) as Allergen[],

@@ -48,6 +48,9 @@ export const products = pgTable(
     priceCents: money().notNull(),
     /** Original price shown struck-through when a promo price is active. */
     compareAtPriceCents: money(),
+    /** Price lists per sales type (null = same as the menu price). */
+    takeawayPriceCents: money(),
+    deliveryPriceCents: money(),
     taxRateId: uuid().references(() => taxRates.id, { onDelete: "set null" }),
     ingredients: text(),
     /** EU 14 allergens codes: gluten, crustaceans, eggs, fish, peanuts, soy, milk, nuts, celery, mustard, sesame, sulphites, lupin, molluscs. */

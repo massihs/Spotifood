@@ -16,6 +16,9 @@ import { productImageUrls } from "./images";
 export type PublicProduct = PricedProduct & {
   description: string | null;
   compareAtPriceCents: number | null;
+  /** Price lists per sales type (null = menu price). */
+  takeawayPriceCents: number | null;
+  deliveryPriceCents: number | null;
   isFeatured: boolean;
   allergens: string[];
   tags: string[];
@@ -183,6 +186,8 @@ export async function loadPricedProducts(
     description: p.description,
     priceCents: p.priceCents,
     compareAtPriceCents: p.compareAtPriceCents,
+    takeawayPriceCents: p.takeawayPriceCents,
+    deliveryPriceCents: p.deliveryPriceCents,
     isAvailable: p.isAvailable,
     isFeatured: p.isFeatured,
     allergens: p.allergens,
@@ -197,3 +202,5 @@ export async function loadPricedProducts(
     optionGroups: links.filter((l) => l.productId === p.id).map((l) => groupById.get(l.group.id)!),
   }));
 }
+
+export { forChannel } from "@/lib/channel-price";

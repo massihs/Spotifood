@@ -1,5 +1,6 @@
 "use server";
 
+import { callWaiter } from "@/server/modules/guest/waiter";
 import { restaurantNowPlaying } from "@/server/modules/music/service";
 import { findUsableCoupon } from "@/server/modules/customers/service";
 import { validation } from "@/server/errors";
@@ -146,5 +147,13 @@ export async function nowPlayingAction() {
   return runAction(async () => {
     const g = await guest();
     return restaurantNowPlaying(db, g.restaurant.id);
+  });
+}
+
+/** Calls a waiter / asks for the bill / water from the table. */
+export async function callWaiterAction(kind: string) {
+  return runAction(async () => {
+    const g = await guest();
+    await callWaiter(db, g, kind);
   });
 }

@@ -429,7 +429,11 @@
     "nothing_to_settle": "سفارشی برای تسویه نیست.",
     "not_dispatched": "این سفارش هنوز ارسال نشده است.",
     "already_delivered": "این سفارش قبلاً تحویل شده است.",
-    "order_cancelled": "این سفارش لغو شده است."
+    "order_cancelled": "این سفارش لغو شده است.",
+    "too_soon": "درخواست قبلی شما ارسال شده؛ کمی صبر کنید.",
+    "table_occupied": "این میز اشغال است.",
+    "credit_limit_exceeded": "سقف اعتبار این مشتری کافی نیست.",
+    "repayment_too_high": "مبلغ بیشتر از بدهی مشتری است."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -782,6 +786,24 @@
       "unknownArtist": "هنرمند ناشناس",
       "upNext": "آهنگ‌های بعدی",
       "hint": "این موسیقی همین حالا در رستوران پخش می‌شود."
+    },
+    "waiter": {
+      "call": "صدا زدن گارسون",
+      "title": "به چه چیزی نیاز دارید؟",
+      "close": "بستن",
+      "kinds": {
+        "waiter": "گارسون",
+        "bill": "صورتحساب",
+        "water": "آب"
+      },
+      "sent": "درخواست شما ارسال شد",
+      "sentHint": {
+        "waiter": "گارسون به‌زودی سر میز شما می‌آید.",
+        "bill": "صورتحساب را برایتان می‌آوریم.",
+        "water": "آب برایتان می‌آوریم."
+      },
+      "tooSoon": "درخواست قبلی شما ارسال شده؛ کمی صبر کنید.",
+      "failed": "ارسال نشد، دوباره تلاش کنید."
     }
   },
   "categoryTemplates": {
@@ -923,7 +945,10 @@
     "create": "ساخت محصول",
     "created": "محصول ساخته شد.",
     "delete": "حذف محصول",
-    "deleteConfirm": "«{name}» از منو حذف شود؟ سابقه سفارش‌ها حفظ می‌شود."
+    "deleteConfirm": "«{name}» از منو حذف شود؟ سابقه سفارش‌ها حفظ می‌شود.",
+    "takeawayPrice": "قیمت بیرون‌بر",
+    "deliveryPrice": "قیمت ارسال",
+    "channelPriceHint": "خالی = همان قیمت منو"
   },
   "options": {
     "title": "گزینه‌ها و افزودنی‌ها",
@@ -1045,7 +1070,10 @@
     "closeConfirm": "میز {label} آزاد شود؟ مشتریان باید دوباره کد QR را اسکن کنند.",
     "forceConfirm": "این میز هنوز سفارش جاری یا پرداخت‌نشده دارد. با این حال آزاد شود؟ (ثبت می‌شود)",
     "closed": "میز {label} آزاد شد.",
-    "summary": "{free} آزاد · {inProgress} در جریان · {occupied} اشغال"
+    "summary": "{free} آزاد · {inProgress} در جریان · {occupied} اشغال",
+    "move": "جابجایی",
+    "moveTo": "انتقال به…",
+    "tableN": "میز {label}"
   },
   "notifications": {
     "title": "اعلان‌ها",
@@ -1064,6 +1092,9 @@
       },
       "stock": {
         "low": "{name} رو به اتمام است ({quantity} {unit})"
+      },
+      "waiter": {
+        "call": "میز {table}: {kind, select, bill {صورتحساب} water {آب} other {گارسون}}"
       }
     }
   },
@@ -1231,7 +1262,13 @@
     "body": "میز {table}",
     "on": "هشدار سفارش‌ها روشن است",
     "off": "هشدار سفارش‌ها خاموش است",
-    "dismiss": "بستن"
+    "dismiss": "بستن",
+    "waiter": {
+      "waiter": "میز {table} گارسون را صدا زد",
+      "bill": "میز {table} صورتحساب می‌خواهد",
+      "water": "میز {table} آب می‌خواهد",
+      "body": "لطفاً به میز سر بزنید."
+    }
   },
   "music": {
     "title": "موسیقی",
@@ -1408,7 +1445,8 @@
     "toPay": "مبلغ قابل پرداخت",
     "methods": {
       "cash": "نقدی",
-      "on_site_terminal": "کارت‌خوان"
+      "on_site_terminal": "کارت‌خوان",
+      "account": "نسیه (حساب)"
     },
     "tendered": "مبلغ دریافتی (تومان)",
     "confirmPayment": "تأیید پرداخت",
@@ -1445,7 +1483,8 @@
     "deliveryAddress": "آدرس کامل تحویل…",
     "zone": "محدوده ارسال",
     "deliveryNeedsPhone": "برای ارسال، شماره مشتری را وارد کنید.",
-    "deliveryFee": "هزینه ارسال"
+    "deliveryFee": "هزینه ارسال",
+    "accountInfo": "بدهی: {balance} · اعتبار باقی‌مانده: {available}"
   },
   "inventory": {
     "title": "انبار",
@@ -1594,7 +1633,28 @@
     "loyaltyEnabled": "امتیاز وفاداری فعال باشد",
     "spendPerPoint": "به ازای هر … خرید یک امتیاز (تومان)",
     "pointValue": "ارزش هر امتیاز (تومان)",
-    "loyaltyExample": "هر {spend} خرید = ۱ امتیاز به ارزش {value} (حدود {rate}٪ بازگشت)."
+    "loyaltyExample": "هر {spend} خرید = ۱ امتیاز به ارزش {value} (حدود {rate}٪ بازگشت).",
+    "account": {
+      "title": "حساب اعتباری (نسیه)",
+      "balance": "بدهی فعلی",
+      "limit": "سقف اعتبار",
+      "none": "غیرفعال",
+      "limitPlaceholder": "سقف اعتبار (تومان) — خالی = غیرفعال",
+      "setLimit": "ثبت سقف",
+      "disable": "غیرفعال کردن",
+      "repay": "دریافت بدهی",
+      "recordRepayment": "ثبت دریافت",
+      "methods": {
+        "cash": "نقدی",
+        "card": "کارت",
+        "transfer": "انتقال"
+      },
+      "kinds": {
+        "charge": "خرید نسیه",
+        "payment": "پرداخت بدهی",
+        "adjust": "اصلاح"
+      }
+    }
   },
   "reports": {
     "title": "گزارش و حسابداری",
@@ -1614,7 +1674,8 @@
       "overview": "سود و زیان",
       "sales": "فروش",
       "products": "محصولات",
-      "expenses": "هزینه‌ها"
+      "expenses": "هزینه‌ها",
+      "security": "گزارش امنیت"
     },
     "revenue": "فروش",
     "ordersN": "{count} سفارش",
@@ -1642,7 +1703,8 @@
       "on_site_terminal": "کارت‌خوان",
       "zarinpal": "زرین‌پال",
       "stripe": "کارت آنلاین",
-      "pay_later": "بعداً"
+      "pay_later": "بعداً",
+      "account": "نسیه"
     },
     "subtotal": "جمع اقلام",
     "discounts": "تخفیف‌ها",
@@ -1681,6 +1743,32 @@
       "cash": "نقدی",
       "card": "کارت",
       "transfer": "انتقال بانکی"
+    },
+    "security": {
+      "hint": "مرور عملیات حساس: لغو، تخفیف، بازپرداخت، صندوق، تغییر قیمت و دسترسی‌ها. فقط برای مالک.",
+      "empty": "در این بازه رویداد حساسی نیست.",
+      "system": "سیستم",
+      "discount": "تخفیف {amount}",
+      "difference": "اختلاف {amount}",
+      "actions": {
+        "order_cancelled": "لغو سفارش",
+        "order_pos_created": "فروش با تخفیف",
+        "payment_refunded": "بازپرداخت وجه",
+        "payment_cancelled": "لغو پرداخت",
+        "payment_recorded": "ثبت دریافت دستی",
+        "cash_shift_closed": "بستن صندوق",
+        "delivery_courier_settled": "تسویه پیک",
+        "customer_credit_limit_set": "تغییر سقف اعتبار",
+        "customer_account_repaid": "دریافت بدهی مشتری",
+        "product_updated": "ویرایش محصول",
+        "product_deleted": "حذف محصول",
+        "expense_deleted": "حذف هزینه",
+        "table_session_moved": "جابجایی میز",
+        "member_added": "افزودن کارمند",
+        "member_removed": "حذف کارمند",
+        "member_updated": "تغییر دسترسی کارمند",
+        "restaurant_payment_settings_updated": "تغییر تنظیمات پرداخت"
+      }
     }
   },
   "branches": {

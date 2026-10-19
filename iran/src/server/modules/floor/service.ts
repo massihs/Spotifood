@@ -150,3 +150,57 @@ export async function closeTableSession(
     return { sessionId: session.s.id };
   });
 }
+
+/**
+ * Moves the guests of a table to another, free table (جابجایی میز): the open session, its
+ * orders and the guests' phones follow; the old table becomes free.
+ */
+export async function moveTableSession(
+  db: Database,
+  ctx: RestaurantContext,
+  fromTableId: string,
+  toTableId: string,
+) {
+  assertCan(ctx, "sessions.close");
+  if (!isUuid(fromTableId) || !isUuid(toTableId) || fromTableId === toTableId) throw notFound();
+  const rid = ctx.restaurant.id;
+  return db.transaction(async (tx) => {
+    const tables = await tx
+      .select({ id: diningTables.id, label: diningTables.label })
+      .from(diningTables)
+      .where(and(eq(diningTables.restaurantId, rid), isNull(diningTables.deletedAt)));
+    const from = tables.find((t) => t.id === fromTableId);
+    const to = tables.find((t) => t.id === toTableId);
+    if (!from || !to) throw notFound();
+    const open = await tx
+      .select({ id: tableSessions.id, tableId: tableSessions.tableId })
+      .from(tableSessions)
+      .where(
+        and(
+          eq(tableSessions.status, "open"),
+          sql`${tableSessions.tableId} in (${fromTableId}, ${toTableId})`,
+        ),
+      )
+      .for("update");
+    const session = open.find((s) => s.tableId === fromTableId);
+    if (!session) throw notFound("no_open_session");
+    if (open.some((s) => s.tableId === toTableId)) throw new AppError("CONFLICT", "table_occupied");
+    await tx.update(tableSessions).set({ tableId: toTableId }).where(eq(tableSessions.id, session.id));
+    await tx
+      .update(orders)
+      .set({ tableId: toTableId, tableLabel: to.label })
+      .where(eq(orders.tableSessionId, session.id));
+    await recordAudit(tx, {
+      action: "table_session.moved",
+      actorUserId: ctx.user.id,
+      restaurantId: rid,
+      entityType: "table_session",
+      entityId: session.id,
+      metadata: { from: from.label, to: to.label },
+    });
+    for (const tableId of [fromTableId, toTableId])
+      await emit(tx, { topic: topics.restaurant(rid), type: "session.opened", data: { tableId } });
+    await emit(tx, { topic: topics.session(session.id), type: "order.updated" });
+    return { from: from.label, to: to.label };
+  });
+}

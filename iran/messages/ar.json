@@ -429,7 +429,11 @@
     "nothing_to_settle": "لا شيء للتسوية.",
     "not_dispatched": "لم يُرسل الطلب بعد.",
     "already_delivered": "تم التسليم مسبقاً.",
-    "order_cancelled": "الطلب ملغى."
+    "order_cancelled": "الطلب ملغى.",
+    "too_soon": "طلبك قيد التنفيذ، انتظر قليلاً.",
+    "table_occupied": "هذه الطاولة مشغولة.",
+    "credit_limit_exceeded": "سقف ائتمان العميل غير كافٍ.",
+    "repayment_too_high": "المبلغ أكبر من المستحق."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -782,6 +786,24 @@
       "unknownArtist": "فنان غير معروف",
       "upNext": "التالي",
       "hint": "هذه الموسيقى تُعزف في المطعم الآن."
+    },
+    "waiter": {
+      "call": "نداء النادل",
+      "title": "ماذا تحتاج؟",
+      "close": "إغلاق",
+      "kinds": {
+        "waiter": "النادل",
+        "bill": "الفاتورة",
+        "water": "ماء"
+      },
+      "sent": "تم إرسال طلبك",
+      "sentHint": {
+        "waiter": "النادل في الطريق.",
+        "bill": "سنحضر الفاتورة.",
+        "water": "سنحضر الماء."
+      },
+      "tooSoon": "طلبك قيد التنفيذ، انتظر قليلاً.",
+      "failed": "تعذر الإرسال، حاول مجدداً."
     }
   },
   "categoryTemplates": {
@@ -923,7 +945,10 @@
     "create": "إنشاء المنتج",
     "created": "تم إنشاء المنتج.",
     "delete": "حذف المنتج",
-    "deleteConfirm": "إزالة «{name}» من القائمة؟ يُحتفظ بسجل الطلبات."
+    "deleteConfirm": "إزالة «{name}» من القائمة؟ يُحتفظ بسجل الطلبات.",
+    "takeawayPrice": "سعر السفري",
+    "deliveryPrice": "سعر التوصيل",
+    "channelPriceHint": "فارغ = سعر القائمة"
   },
   "options": {
     "title": "الخيارات والإضافات",
@@ -1045,7 +1070,10 @@
     "closeConfirm": "تحرير الطاولة {label}؟ سيحتاج الضيوف إلى مسح رمز QR مجددًا.",
     "forceConfirm": "لا تزال لهذه الطاولة طلبات جارية أو غير مدفوعة. هل تريد تحريرها رغم ذلك؟ (سيتم تسجيل الإجراء)",
     "closed": "تم تحرير الطاولة {label}.",
-    "summary": "{free} متاحة · {inProgress} قيد التنفيذ · {occupied} مشغولة"
+    "summary": "{free} متاحة · {inProgress} قيد التنفيذ · {occupied} مشغولة",
+    "move": "نقل",
+    "moveTo": "نقل إلى…",
+    "tableN": "الطاولة {label}"
   },
   "notifications": {
     "title": "الإشعارات",
@@ -1064,6 +1092,9 @@
       },
       "stock": {
         "low": "{name} على وشك النفاد ({quantity} {unit})"
+      },
+      "waiter": {
+        "call": "الطاولة {table}: {kind, select, bill {فاتورة} water {ماء} other {نادل}}"
       }
     }
   },
@@ -1231,7 +1262,13 @@
     "body": "الطاولة {table}",
     "on": "تنبيهات الطلبات مفعّلة",
     "off": "تنبيهات الطلبات متوقفة",
-    "dismiss": "إغلاق"
+    "dismiss": "إغلاق",
+    "waiter": {
+      "waiter": "الطاولة {table} تنادي النادل",
+      "bill": "الطاولة {table} تطلب الفاتورة",
+      "water": "الطاولة {table} تطلب ماء",
+      "body": "يرجى التوجه إلى الطاولة."
+    }
   },
   "music": {
     "title": "الموسيقى",
@@ -1408,7 +1445,8 @@
     "toPay": "Amount due",
     "methods": {
       "cash": "Cash",
-      "on_site_terminal": "Card terminal"
+      "on_site_terminal": "Card terminal",
+      "account": "آجل (حساب)"
     },
     "tendered": "Cash received",
     "confirmPayment": "Confirm payment",
@@ -1445,7 +1483,8 @@
     "deliveryAddress": "عنوان التسليم الكامل…",
     "zone": "منطقة التوصيل",
     "deliveryNeedsPhone": "أدخل رقم العميل للتوصيل.",
-    "deliveryFee": "رسوم التوصيل"
+    "deliveryFee": "رسوم التوصيل",
+    "accountInfo": "المستحق: {balance} · الرصيد المتاح: {available}"
   },
   "inventory": {
     "title": "المخزون",
@@ -1594,7 +1633,28 @@
     "loyaltyEnabled": "تفعيل نقاط الولاء",
     "spendPerPoint": "نقطة لكل … إنفاق",
     "pointValue": "قيمة النقطة",
-    "loyaltyExample": "كل {spend} = نقطة واحدة بقيمة {value} (حوالي {rate}٪ استرداد)."
+    "loyaltyExample": "كل {spend} = نقطة واحدة بقيمة {value} (حوالي {rate}٪ استرداد).",
+    "account": {
+      "title": "الحساب الآجل",
+      "balance": "المستحق",
+      "limit": "سقف الائتمان",
+      "none": "معطل",
+      "limitPlaceholder": "سقف الائتمان — فارغ = معطل",
+      "setLimit": "تحديد السقف",
+      "disable": "تعطيل",
+      "repay": "استلام سداد",
+      "recordRepayment": "تسجيل السداد",
+      "methods": {
+        "cash": "نقداً",
+        "card": "بطاقة",
+        "transfer": "تحويل"
+      },
+      "kinds": {
+        "charge": "آجل",
+        "payment": "سداد",
+        "adjust": "تعديل"
+      }
+    }
   },
   "reports": {
     "title": "التقارير والمحاسبة",
@@ -1614,7 +1674,8 @@
       "overview": "الأرباح والخسائر",
       "sales": "المبيعات",
       "products": "المنتجات",
-      "expenses": "المصروفات"
+      "expenses": "المصروفات",
+      "security": "الأمان"
     },
     "revenue": "المبيعات",
     "ordersN": "{count} طلب",
@@ -1642,7 +1703,8 @@
       "on_site_terminal": "جهاز البطاقة",
       "zarinpal": "زرين‌بال",
       "stripe": "بطاقة أونلاين",
-      "pay_later": "لاحقاً"
+      "pay_later": "لاحقاً",
+      "account": "آجل"
     },
     "subtotal": "مجموع الأصناف",
     "discounts": "الخصومات",
@@ -1681,6 +1743,32 @@
       "cash": "نقداً",
       "card": "بطاقة",
       "transfer": "تحويل بنكي"
+    },
+    "security": {
+      "hint": "مراجعة العمليات الحساسة: الإلغاء، الخصومات، الاسترداد، الصندوق، الأسعار والصلاحيات. للمالك فقط.",
+      "empty": "لا أحداث حساسة في هذه الفترة.",
+      "system": "النظام",
+      "discount": "خصم {amount}",
+      "difference": "فرق {amount}",
+      "actions": {
+        "order_cancelled": "إلغاء طلب",
+        "order_pos_created": "بيع بخصم",
+        "payment_refunded": "استرداد",
+        "payment_cancelled": "إلغاء دفعة",
+        "payment_recorded": "دفعة يدوية",
+        "cash_shift_closed": "إغلاق الصندوق",
+        "delivery_courier_settled": "تسوية مندوب",
+        "customer_credit_limit_set": "تغيير سقف الائتمان",
+        "customer_account_repaid": "سداد حساب",
+        "product_updated": "تعديل منتج",
+        "product_deleted": "حذف منتج",
+        "expense_deleted": "حذف مصروف",
+        "table_session_moved": "نقل طاولة",
+        "member_added": "إضافة موظف",
+        "member_removed": "إزالة موظف",
+        "member_updated": "تغيير صلاحيات",
+        "restaurant_payment_settings_updated": "تغيير إعدادات الدفع"
+      }
     }
   },
   "branches": {

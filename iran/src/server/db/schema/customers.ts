@@ -36,6 +36,9 @@ export const customers = pgTable(
     totalSpentCents: money().notNull().default(0),
     lastOrderAt: tstz(),
     smsOptOut: boolean().notNull().default(false),
+    /** House account (حساب اعتباری / نسیه): null = not allowed; balance is what the customer owes. */
+    creditLimitCents: money(),
+    balanceCents: money().notNull().default(0),
     ...timestamps,
   },
   (t) => [
@@ -111,4 +114,29 @@ export const smsCampaigns = pgTable(
     createdAt: tstz().notNull().defaultNow(),
   },
   (t) => [index("sms_campaigns_restaurant_idx").on(t.restaurantId, t.createdAt)],
+);
+
+/** House-account ledger: charges (orders put on account) and repayments. */
+export const customerAccountEntries = pgTable(
+  "customer_account_entries",
+  {
+    id: pk(),
+    restaurantId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    customerId: uuid()
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    orderId: uuid().references(() => orders.id, { onDelete: "set null" }),
+    /** charge | payment | adjust */
+    kind: varchar({ length: 12 }).notNull(),
+    /** Signed: positive raises what the customer owes. */
+    amountCents: money().notNull(),
+    /** Repayment method: cash | card | transfer */
+    method: varchar({ length: 16 }),
+    note: text(),
+    actorUserId: uuid().references(() => users.id, { onDelete: "set null" }),
+    createdAt: tstz().notNull().defaultNow(),
+  },
+  (t) => [index("customer_account_entries_customer_idx").on(t.customerId, t.createdAt)],
 );

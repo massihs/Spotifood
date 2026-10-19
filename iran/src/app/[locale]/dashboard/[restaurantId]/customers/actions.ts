@@ -12,6 +12,8 @@ import {
   setCouponActive,
   updateCustomer,
   updateLoyaltySettings,
+  repayAccount,
+  setCreditLimit,
   type Audience,
 } from "@/server/modules/customers/service";
 
@@ -98,5 +100,26 @@ export async function updateLoyaltyAction(
     const ctx = await actionContext(rid, "customers.manage");
     await updateLoyaltySettings(db, ctx, input);
     refresh();
+  });
+}
+
+export async function setCreditLimitAction(rid: string, id: string, limitCents: number | null) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "customers.manage");
+    await setCreditLimit(db, ctx, id, limitCents);
+    refresh();
+  });
+}
+
+export async function repayAccountAction(
+  rid: string,
+  id: string,
+  input: { amountCents: number; method: "cash" | "card" | "transfer"; note: string },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "payments.record");
+    const res = await repayAccount(db, ctx, id, input);
+    refresh();
+    return res;
   });
 }

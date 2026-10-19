@@ -1,7 +1,7 @@
-import { and, desc, eq, gte, lt, notInArray, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lt, notInArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
-import { expenses, orderItems, orders, payments, purchases } from "@/server/db/schema";
+import { auditLogs, expenses, orderItems, orders, payments, purchases, users } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import { notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
@@ -299,4 +299,57 @@ export async function profitAndLoss(db: DbOrTx, ctx: RestaurantContext, r: Range
       marginPct: netSales > 0 ? ((gross - expensesCents) / netSales) * 100 : 0,
     },
   };
+}
+
+// ─── Security review (گزارش مرور امنیت) ──────────────────────────────────────
+
+/** Actions a manager reviews: cancellations, discounts, refunds, cash, price and stock edits… */
+export const SENSITIVE_ACTIONS = [
+  "order.cancelled",
+  "order.pos_created",
+  "payment.refunded",
+  "payment.cancelled",
+  "payment.recorded",
+  "cash.shift_closed",
+  "delivery.courier_settled",
+  "customer.credit_limit_set",
+  "customer.account_repaid",
+  "product.updated",
+  "product.deleted",
+  "expense.deleted",
+  "table_session.moved",
+  "member.added",
+  "member.removed",
+  "member.updated",
+  "restaurant.payment_settings_updated",
+] as const;
+
+export async function listSecurityEvents(db: DbOrTx, ctx: RestaurantContext, r: Range, action?: string) {
+  assertCan(ctx, "audit.view");
+  const actions = (SENSITIVE_ACTIONS as readonly string[]).includes(action ?? "")
+    ? [action!]
+    : [...SENSITIVE_ACTIONS];
+  const rows = await db
+    .select({
+      id: auditLogs.id,
+      action: auditLogs.action,
+      metadata: auditLogs.metadata,
+      createdAt: auditLogs.createdAt,
+      actorType: auditLogs.actorType,
+      actorName: users.fullName,
+    })
+    .from(auditLogs)
+    .leftJoin(users, eq(users.id, auditLogs.actorUserId))
+    .where(
+      and(
+        eq(auditLogs.restaurantId, ctx.restaurant.id),
+        inArray(auditLogs.action, actions),
+        gte(auditLogs.createdAt, r.from),
+        lt(auditLogs.createdAt, r.to),
+      ),
+    )
+    .orderBy(desc(auditLogs.createdAt))
+    .limit(500);
+  // POS sales only matter here when a discount was given.
+  return rows.filter((e) => e.action !== "order.pos_created" || Number(e.metadata.discountCents ?? 0) > 0);
 }

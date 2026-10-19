@@ -2,7 +2,10 @@ import { and, desc, eq, gte, ilike, inArray, isNull, lt, or, sql, type SQL } fro
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
+  cashMovements,
+  cashShifts,
   coupons,
+  customerAccountEntries,
   customers,
   loyaltyEntries,
   orders,
@@ -357,6 +360,8 @@ export async function lookupCustomer(db: DbOrTx, ctx: RestaurantContext, phone: 
       name: customers.name,
       points: customers.points,
       ordersCount: customers.ordersCount,
+      creditLimitCents: customers.creditLimitCents,
+      balanceCents: customers.balanceCents,
     })
     .from(customers)
     .where(and(eq(customers.restaurantId, ctx.restaurant.id), eq(customers.phone, n)));
@@ -585,5 +590,154 @@ export async function listCampaigns(db: DbOrTx, ctx: RestaurantContext) {
     .from(smsCampaigns)
     .where(eq(smsCampaigns.restaurantId, ctx.restaurant.id))
     .orderBy(desc(smsCampaigns.createdAt))
+    .limit(50);
+}
+
+// ─── House accounts (حساب اعتباری / نسیه) ──────────────────────────────────────
+
+/** Puts an order on the customer's account, within the credit limit. */
+export async function chargeAccount(
+  tx: DbOrTx,
+  rid: string,
+  customerId: string,
+  orderId: string,
+  amountCents: number,
+  actorUserId: string | null,
+) {
+  const res = await tx
+    .update(customers)
+    .set({ balanceCents: sql`${customers.balanceCents} + ${amountCents}` })
+    .where(
+      and(
+        eq(customers.id, customerId),
+        eq(customers.restaurantId, rid),
+        sql`${customers.creditLimitCents} is not null`,
+        sql`${customers.balanceCents} + ${amountCents} <= ${customers.creditLimitCents}`,
+      ),
+    )
+    .returning({ id: customers.id });
+  if (!res.length) throw conflict("credit_limit_exceeded");
+  await tx.insert(customerAccountEntries).values({
+    restaurantId: rid,
+    customerId,
+    orderId,
+    kind: "charge",
+    amountCents,
+    actorUserId,
+  });
+}
+
+export async function setCreditLimit(
+  db: Database,
+  ctx: RestaurantContext,
+  id: string,
+  limitCents: number | null,
+) {
+  assertCan(ctx, "customers.manage");
+  if (!isUuid(id)) throw notFound();
+  const limit = limitCents == null ? null : cents.parse(limitCents);
+  const res = await db
+    .update(customers)
+    .set({ creditLimitCents: limit })
+    .where(and(eq(customers.id, id), eq(customers.restaurantId, ctx.restaurant.id)))
+    .returning({ id: customers.id });
+  if (!res.length) throw notFound();
+  await recordAudit(db, {
+    action: "customer.credit_limit_set",
+    actorUserId: ctx.user.id,
+    restaurantId: ctx.restaurant.id,
+    entityType: "customer",
+    entityId: id,
+    metadata: { limitCents: limit },
+  });
+}
+
+export const repaymentSchema = z.object({
+  amountCents: cents.min(1),
+  method: z.enum(["cash", "card", "transfer"]).default("cash"),
+  note: z.string().trim().max(200).default(""),
+});
+
+/** The customer pays back (part of) their account. Cash goes into the open drawer. */
+export async function repayAccount(
+  db: Database,
+  ctx: RestaurantContext,
+  id: string,
+  raw: z.input<typeof repaymentSchema>,
+) {
+  assertCan(ctx, "payments.record");
+  if (!isUuid(id)) throw notFound();
+  const input = repaymentSchema.parse(raw);
+  const rid = ctx.restaurant.id;
+  return db.transaction(async (tx) => {
+    const [c] = await tx
+      .select()
+      .from(customers)
+      .where(and(eq(customers.id, id), eq(customers.restaurantId, rid)))
+      .for("update");
+    if (!c) throw notFound();
+    if (input.amountCents > c.balanceCents)
+      throw validation("repayment_too_high", { amountCents: c.balanceCents });
+    await tx
+      .update(customers)
+      .set({ balanceCents: sql`${customers.balanceCents} - ${input.amountCents}` })
+      .where(eq(customers.id, id));
+    await tx.insert(customerAccountEntries).values({
+      restaurantId: rid,
+      customerId: id,
+      kind: "payment",
+      amountCents: -input.amountCents,
+      method: input.method,
+      note: input.note || null,
+      actorUserId: ctx.user.id,
+    });
+    if (input.method === "cash") {
+      const [shift] = await tx
+        .select({ id: cashShifts.id })
+        .from(cashShifts)
+        .where(and(eq(cashShifts.restaurantId, rid), isNull(cashShifts.closedAt)));
+      if (shift)
+        await tx.insert(cashMovements).values({
+          restaurantId: rid,
+          shiftId: shift.id,
+          direction: "in",
+          amountCents: input.amountCents,
+          reason: `حساب ${c.name ?? c.phone}`.slice(0, 200),
+          userId: ctx.user.id,
+        });
+    }
+    await recordAudit(tx, {
+      action: "customer.account_repaid",
+      actorUserId: ctx.user.id,
+      restaurantId: rid,
+      entityType: "customer",
+      entityId: id,
+      metadata: { amountCents: input.amountCents, method: input.method },
+    });
+    return { balanceCents: c.balanceCents - input.amountCents };
+  });
+}
+
+export async function listAccountEntries(db: DbOrTx, ctx: RestaurantContext, customerId: string) {
+  assertCan(ctx, "customers.view");
+  return db
+    .select({
+      id: customerAccountEntries.id,
+      kind: customerAccountEntries.kind,
+      amountCents: customerAccountEntries.amountCents,
+      method: customerAccountEntries.method,
+      note: customerAccountEntries.note,
+      createdAt: customerAccountEntries.createdAt,
+      orderNumber: orders.number,
+    })
+    .from(customerAccountEntries)
+    .leftJoin(orders, eq(orders.id, customerAccountEntries.orderId))
+    .where(
+      and(
+        eq(customerAccountEntries.customerId, customerId),
+        eq(customerAccountEntries.restaurantId, ctx.restaurant.id),
+      ),
+    )
+    .orderBy(desc(customerAccountEntries.createdAt))
     .limit(50);
 }

@@ -69,6 +69,8 @@ export const productSchema = z
     priceCents: cents,
     /** Original price, shown struck through: must be higher than the current price. */
     compareAtPriceCents: cents.nullable().optional(),
+    takeawayPriceCents: cents.nullable().optional(),
+    deliveryPriceCents: cents.nullable().optional(),
     taxRateId: z.uuid().nullable().optional(),
     ingredients: text(1000),
     allergens: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length).default([]),

@@ -34,6 +34,8 @@ export type ProductValues = {
   description: string | null;
   priceCents: number | null;
   compareAtPriceCents: number | null;
+  takeawayPriceCents: number | null;
+  deliveryPriceCents: number | null;
   taxRateId: string | null;
   ingredients: string | null;
   allergens: string[];
@@ -140,6 +142,22 @@ export function ProductForm({
               defaultValue={centsToInput(values.compareAtPriceCents, locale, currency)}
               hint={t("product.compareAtHint")}
               error={err("compareAt") ?? err("compareAtPriceCents")}
+            />
+            <Field
+              label={t("product.takeawayPrice")}
+              name="takeawayPrice"
+              inputMode="decimal"
+              defaultValue={centsToInput(values.takeawayPriceCents, locale, currency)}
+              hint={t("product.channelPriceHint")}
+              error={err("takeawayPrice") ?? err("takeawayPriceCents")}
+            />
+            <Field
+              label={t("product.deliveryPrice")}
+              name="deliveryPrice"
+              inputMode="decimal"
+              defaultValue={centsToInput(values.deliveryPriceCents, locale, currency)}
+              hint={t("product.channelPriceHint")}
+              error={err("deliveryPrice") ?? err("deliveryPriceCents")}
             />
             <SelectField
               label={t("product.taxRate")}

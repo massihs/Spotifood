@@ -21,11 +21,16 @@ import { AppError, conflict, forbidden, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { MAX_AMOUNT_CENTS, taxFromGross, taxFromNet } from "@/lib/money";
 import { normalizeIranMobile } from "@/lib/phone";
-import { loadPricedProducts } from "@/server/modules/menu/public";
+import { forChannel, loadPricedProducts } from "@/server/modules/menu/public";
 import { computeTotals, priceLine, type PricedLine } from "@/server/modules/pricing";
 import { nextCounterValue } from "@/server/modules/restaurants/service";
 import { applyOrderToStock } from "@/server/modules/inventory/service";
-import { commitDiscounts, computeDiscounts, linkOrderCustomer } from "@/server/modules/customers/service";
+import {
+  chargeAccount,
+  commitDiscounts,
+  computeDiscounts,
+  linkOrderCustomer,
+} from "@/server/modules/customers/service";
 import { getZone, rememberAddress } from "@/server/modules/delivery/service";
 import { emitPaymentUpdate, paymentConfig, settleAllocations } from "@/server/modules/payments/service";
 
@@ -69,7 +74,11 @@ export const posOrderSchema = z.object({
   redeemPoints: z.number().int().min(0).max(1_000_000).default(0),
   /** Set → the order is paid on the spot. */
   payment: z
-    .object({ provider: z.enum(["cash", "on_site_terminal"]), tenderedCents: amount.nullable().optional() })
+    .object({
+      /** "account": put on the customer's house account (نسیه), within their credit limit. */
+      provider: z.enum(["cash", "on_site_terminal", "account"]),
+      tenderedCents: amount.nullable().optional(),
+    })
     .nullable()
     .optional(),
   idempotencyKey: z.string().regex(/^[A-Za-z0-9_-]{16,64}$/),
@@ -88,7 +97,9 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
   const rid = ctx.restaurant.id;
   if (input.payment) {
     const config = await paymentConfig(db, rid);
-    if (!config.offline.includes(input.payment.provider)) throw forbidden("payment_method_disabled");
+    if (input.payment.provider === "account") {
+      if (!input.customerPhone) throw new AppError("VALIDATION", "phone_required", { field: "phone" });
+    } else if (!config.offline.includes(input.payment.provider)) throw forbidden("payment_method_disabled");
   }
 
   if (input.channel === "delivery") {
@@ -132,7 +143,8 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       categoryName: string;
     }[] = [];
     for (const item of input.lines) {
-      const product = byId.get(item.productId);
+      const base = byId.get(item.productId);
+      const product = base ? forChannel(base, input.channel) : undefined;
       const priced = product ? priceLine(product, item.optionValueIds, item.quantity) : null;
       if (!product || !priced?.ok) throw conflict("product_unavailable", { productId: item.productId });
       lines.push({
@@ -257,6 +269,8 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       const tendered = input.payment.tenderedCents ?? null;
       if (input.payment.provider === "cash" && tendered != null && tendered < totalCents)
         throw new AppError("VALIDATION", "tendered_too_low", { amountCents: totalCents });
+      if (input.payment.provider === "account")
+        await chargeAccount(tx, rid, customer!.id, order!.id, totalCents, ctx.user.id);
       [payment] = await tx
         .insert(payments)
         .values({

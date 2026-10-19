@@ -51,7 +51,7 @@ export function chime(ctx: AudioContext) {
   });
 }
 
-type Alert = { id: string; number: string; table: string };
+type Alert = { id: string; title: string; body: string; href: string; waiter?: boolean };
 
 /**
  * Team-wide new-order alerts on every dashboard page: a sound, a card linking to the orders,
@@ -93,22 +93,35 @@ export function OrderAlerts({ restaurantId, newOrders }: { restaurantId: string;
 
   useLiveEvent((type, data) => {
     if (type === "order.updated") return refreshSoon();
-    if (type !== "order.created") return;
-    refreshSoon();
-    if (data.source === "pos") return; // rung up by the team itself
-    const alert: Alert = {
-      id: String(data.orderId ?? Date.now()),
-      number: String(data.number ?? ""),
-      table: String(data.tableLabel ?? ""),
-    };
+    let alert: Alert;
+    if (type === "waiter.called") {
+      const kind = data.kind === "bill" ? "bill" : data.kind === "water" ? "water" : "waiter";
+      alert = {
+        id: `w-${data.tableLabel}-${Date.now()}`,
+        title: t(`waiter.${kind}`, { table: String(data.tableLabel ?? "") }),
+        body: t("waiter.body"),
+        href: `/dashboard/${restaurantId}/floor`,
+        waiter: true,
+      };
+    } else {
+      if (type !== "order.created") return;
+      refreshSoon();
+      if (data.source === "pos") return; // rung up by the team itself
+      alert = {
+        id: String(data.orderId ?? Date.now()),
+        title: t("title", { number: String(data.number ?? "") }),
+        body: t("body", { table: String(data.tableLabel ?? "") }),
+        href: `/dashboard/${restaurantId}/orders`,
+      };
+    }
     setAlerts((a) => [alert, ...a.filter((x) => x.id !== alert.id)].slice(0, 3));
     setTimeout(() => dismiss(alert.id), 8000);
     if (!enabled) return;
     if (audio.current) chime(audio.current);
     navigator.vibrate?.([120, 60, 120]);
     if (document.hidden && "Notification" in window && Notification.permission === "granted") {
-      new Notification(t("title", { number: alert.number }), {
-        body: t("body", { table: alert.table }),
+      new Notification(alert.title, {
+        body: alert.body,
         tag: `order-${alert.id}`,
         icon: "/icons/icon-192.png",
       });
@@ -161,13 +174,9 @@ export function OrderAlerts({ restaurantId, newOrders }: { restaurantId: string;
               <BellRing className="size-5" aria-hidden="true" />
               <span className="absolute -end-1 -top-1 size-3 animate-ping rounded-full bg-danger" />
             </span>
-            <Link
-              href={`/dashboard/${restaurantId}/orders`}
-              onClick={() => dismiss(a.id)}
-              className="min-w-0 flex-1"
-            >
-              <p className="truncate font-bold">{t("title", { number: a.number })}</p>
-              <p className="truncate text-sm text-fg-muted">{t("body", { table: a.table })}</p>
+            <Link href={a.href} onClick={() => dismiss(a.id)} className="min-w-0 flex-1">
+              <p className="truncate font-bold">{a.title}</p>
+              <p className="truncate text-sm text-fg-muted">{a.body}</p>
             </Link>
             <button
               type="button"

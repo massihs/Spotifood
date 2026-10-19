@@ -99,6 +99,13 @@
       "when": 1792362557865,
       "tag": "0013_delivery",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792363171686,
+      "tag": "0014_pos_advanced",
+      "breakpoints": true
     }
   ]
 }

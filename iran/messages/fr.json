@@ -297,7 +297,11 @@
     "nothing_to_settle": "Rien à régler.",
     "not_dispatched": "Commande pas encore partie.",
     "already_delivered": "Déjà livrée.",
-    "order_cancelled": "Commande annulée."
+    "order_cancelled": "Commande annulée.",
+    "too_soon": "Votre demande est déjà partie, patientez un instant.",
+    "table_occupied": "Cette table est occupée.",
+    "credit_limit_exceeded": "Le plafond de crédit du client est insuffisant.",
+    "repayment_too_high": "Montant supérieur au dû."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -626,6 +630,24 @@
       "unknownArtist": "Artiste inconnu",
       "upNext": "À suivre",
       "hint": "La musique diffusée dans le restaurant en ce moment."
+    },
+    "waiter": {
+      "call": "Appeler le serveur",
+      "title": "De quoi avez-vous besoin ?",
+      "close": "Fermer",
+      "kinds": {
+        "waiter": "Serveur",
+        "bill": "L’addition",
+        "water": "De l’eau"
+      },
+      "sent": "Demande envoyée",
+      "sentHint": {
+        "waiter": "Un serveur arrive.",
+        "bill": "Nous apportons l’addition.",
+        "water": "Nous apportons de l’eau."
+      },
+      "tooSoon": "Votre demande est déjà partie, patientez un instant.",
+      "failed": "Envoi impossible, réessayez."
     }
   },
   "categoryTemplates": {
@@ -767,7 +789,10 @@
     "create": "Créer le produit",
     "created": "Produit créé.",
     "delete": "Supprimer le produit",
-    "deleteConfirm": "Supprimer « {name} » du menu ? L'historique des commandes est conservé."
+    "deleteConfirm": "Supprimer « {name} » du menu ? L'historique des commandes est conservé.",
+    "takeawayPrice": "Prix à emporter",
+    "deliveryPrice": "Prix livraison",
+    "channelPriceHint": "Vide = prix du menu"
   },
   "options": {
     "title": "Options & suppléments",
@@ -889,7 +914,10 @@
     "closeConfirm": "Libérer la table {label} ? Les clients devront rescanner le QR code.",
     "forceConfirm": "La table a encore des commandes en cours ou impayées. Libérer quand même ? (action enregistrée)",
     "closed": "Table {label} libérée.",
-    "summary": "{free} libres · {inProgress} en cours · {occupied} occupées"
+    "summary": "{free} libres · {inProgress} en cours · {occupied} occupées",
+    "move": "Déplacer",
+    "moveTo": "Déplacer vers…",
+    "tableN": "Table {label}"
   },
   "notifications": {
     "title": "Notifications",
@@ -908,6 +936,9 @@
       },
       "stock": {
         "low": "{name} est presque épuisé ({quantity} {unit})"
+      },
+      "waiter": {
+        "call": "Table {table} : {kind, select, bill {addition} water {eau} other {serveur}}"
       }
     }
   },
@@ -1075,7 +1106,13 @@
     "body": "Table {table}",
     "on": "Alertes commandes activées",
     "off": "Alertes commandes coupées",
-    "dismiss": "Fermer"
+    "dismiss": "Fermer",
+    "waiter": {
+      "waiter": "Table {table} appelle un serveur",
+      "bill": "Table {table} demande l’addition",
+      "water": "Table {table} demande de l’eau",
+      "body": "Merci de passer à la table."
+    }
   },
   "music": {
     "title": "Musique",
@@ -1252,7 +1289,8 @@
     "toPay": "À encaisser",
     "methods": {
       "cash": "Espèces",
-      "on_site_terminal": "Carte"
+      "on_site_terminal": "Carte",
+      "account": "Sur compte"
     },
     "tendered": "Montant reçu",
     "confirmPayment": "Valider le paiement",
@@ -1289,7 +1327,8 @@
     "deliveryAddress": "Adresse de livraison complète…",
     "zone": "Zone de livraison",
     "deliveryNeedsPhone": "Saisissez le téléphone du client pour une livraison.",
-    "deliveryFee": "Frais de livraison"
+    "deliveryFee": "Frais de livraison",
+    "accountInfo": "Dû : {balance} · crédit restant : {available}"
   },
   "inventory": {
     "title": "Stocks",
@@ -1438,7 +1477,28 @@
     "loyaltyEnabled": "Points de fidélité activés",
     "spendPerPoint": "Un point tous les … dépensés",
     "pointValue": "Valeur d'un point",
-    "loyaltyExample": "Chaque {spend} dépensé = 1 point valant {value} (environ {rate} % reversés)."
+    "loyaltyExample": "Chaque {spend} dépensé = 1 point valant {value} (environ {rate} % reversés).",
+    "account": {
+      "title": "Compte client (crédit)",
+      "balance": "Dû",
+      "limit": "Plafond de crédit",
+      "none": "Désactivé",
+      "limitPlaceholder": "Plafond — vide = désactivé",
+      "setLimit": "Définir",
+      "disable": "Désactiver",
+      "repay": "Encaisser un remboursement",
+      "recordRepayment": "Enregistrer",
+      "methods": {
+        "cash": "Espèces",
+        "card": "Carte",
+        "transfer": "Virement"
+      },
+      "kinds": {
+        "charge": "Sur compte",
+        "payment": "Remboursement",
+        "adjust": "Ajustement"
+      }
+    }
   },
   "reports": {
     "title": "Rapports & comptabilité",
@@ -1458,7 +1518,8 @@
       "overview": "Résultat",
       "sales": "Ventes",
       "products": "Produits",
-      "expenses": "Dépenses"
+      "expenses": "Dépenses",
+      "security": "Sécurité"
     },
     "revenue": "Chiffre d'affaires",
     "ordersN": "{count} commandes",
@@ -1486,7 +1547,8 @@
       "on_site_terminal": "TPE",
       "zarinpal": "Zarinpal",
       "stripe": "Carte en ligne",
-      "pay_later": "Plus tard"
+      "pay_later": "Plus tard",
+      "account": "Sur compte"
     },
     "subtotal": "Total articles",
     "discounts": "Remises",
@@ -1525,6 +1587,32 @@
       "cash": "Espèces",
       "card": "Carte",
       "transfer": "Virement"
+    },
+    "security": {
+      "hint": "Revue des actions sensibles : annulations, remises, remboursements, caisse, prix et accès. Propriétaire uniquement.",
+      "empty": "Aucun événement sensible sur la période.",
+      "system": "Système",
+      "discount": "remise {amount}",
+      "difference": "écart {amount}",
+      "actions": {
+        "order_cancelled": "Commande annulée",
+        "order_pos_created": "Vente avec remise",
+        "payment_refunded": "Remboursement",
+        "payment_cancelled": "Paiement annulé",
+        "payment_recorded": "Encaissement manuel",
+        "cash_shift_closed": "Caisse clôturée",
+        "delivery_courier_settled": "Coursier réglé",
+        "customer_credit_limit_set": "Plafond de crédit modifié",
+        "customer_account_repaid": "Remboursement client",
+        "product_updated": "Produit modifié",
+        "product_deleted": "Produit supprimé",
+        "expense_deleted": "Dépense supprimée",
+        "table_session_moved": "Table déplacée",
+        "member_added": "Employé ajouté",
+        "member_removed": "Employé retiré",
+        "member_updated": "Accès employé modifié",
+        "restaurant_payment_settings_updated": "Réglages de paiement modifiés"
+      }
     }
   },
   "branches": {

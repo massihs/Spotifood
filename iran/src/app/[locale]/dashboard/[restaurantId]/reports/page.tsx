@@ -10,10 +10,11 @@ import { formatMoney } from "@/lib/money";
 import { localDay, PRESETS, resolvePeriod } from "@/lib/period";
 import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
-import { profitAndLoss } from "@/server/modules/reports/service";
+import { listSecurityEvents, profitAndLoss } from "@/server/modules/reports/service";
+import { can } from "@/server/tenancy";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/reports">;
-const TABS = ["overview", "sales", "products", "expenses"] as const;
+const TABS = ["overview", "sales", "products", "expenses", "security"] as const;
 
 export default function ReportsPage({ params, searchParams }: Props) {
   return (
@@ -95,7 +96,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
         className="-mx-4 mb-5 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
         aria-label={t("title")}
       >
-        {TABS.map((k) => (
+        {TABS.filter((k) => k !== "security" || can(ctx, "audit.view")).map((k) => (
           <Link
             key={k}
             href={tabHref(k)}
@@ -304,6 +305,70 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
           </Card>
         </div>
       ) : null}
+
+      {tab === "security" && can(ctx, "audit.view")
+        ? await (async () => {
+            const events = await listSecurityEvents(db, ctx, period);
+            const detail = (m: Record<string, unknown>) =>
+              [
+                m.number ? String(m.number) : null,
+                Array.isArray(m.orders) ? (m.orders as string[]).join("، ") : null,
+                typeof m.totalCents === "number" ? money(m.totalCents) : null,
+                typeof m.amountCents === "number" ? money(m.amountCents) : null,
+                typeof m.discountCents === "number" && m.discountCents > 0
+                  ? t("security.discount", { amount: money(m.discountCents) })
+                  : null,
+                typeof m.differenceCents === "number"
+                  ? t("security.difference", { amount: money(m.differenceCents) })
+                  : null,
+                m.reason ? String(m.reason) : null,
+                m.from && m.to ? `${String(m.from)} → ${String(m.to)}` : null,
+                m.provider
+                  ? t.has(`providers.${String(m.provider)}`)
+                    ? t(`providers.${String(m.provider)}`)
+                    : String(m.provider)
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(" · ");
+            return (
+              <Card>
+                <p className="border-b border-border px-4 py-3 text-sm text-fg-muted">{t("security.hint")}</p>
+                {events.length === 0 ? (
+                  <p className="py-12 text-center text-fg-muted">{t("security.empty")}</p>
+                ) : (
+                  <ul className="divide-y divide-border">
+                    {events.map((e) => (
+                      <li key={e.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm">
+                        <span
+                          className={cn(
+                            "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                            /cancel|refund|deleted|removed/.test(e.action)
+                              ? "bg-danger-soft text-danger"
+                              : "bg-warning-soft text-warning",
+                          )}
+                        >
+                          {t.has(`security.actions.${e.action.replace(".", "_")}`)
+                            ? t(`security.actions.${e.action.replace(".", "_")}`)
+                            : e.action}
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-fg-muted">{detail(e.metadata)}</span>
+                        <span className="text-xs font-medium">{e.actorName ?? t("security.system")}</span>
+                        <span className="w-32 text-end text-xs text-fg-subtle">
+                          {format.dateTime(e.createdAt, {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                            timeZone: tz,
+                          })}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
+            );
+          })()
+        : null}
 
       {tab === "expenses" ? (
         <div className="space-y-4">

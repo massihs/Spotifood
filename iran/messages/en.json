@@ -429,7 +429,11 @@
     "nothing_to_settle": "Nothing to settle.",
     "not_dispatched": "This order has not left yet.",
     "already_delivered": "Already delivered.",
-    "order_cancelled": "This order is cancelled."
+    "order_cancelled": "This order is cancelled.",
+    "too_soon": "Your request is on its way — please wait a moment.",
+    "table_occupied": "That table is occupied.",
+    "credit_limit_exceeded": "This customer’s credit limit is not enough.",
+    "repayment_too_high": "More than the customer owes."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -782,6 +786,24 @@
       "unknownArtist": "Unknown artist",
       "upNext": "Up next",
       "hint": "This is the music playing in the restaurant right now."
+    },
+    "waiter": {
+      "call": "Call the waiter",
+      "title": "What do you need?",
+      "close": "Close",
+      "kinds": {
+        "waiter": "Waiter",
+        "bill": "The bill",
+        "water": "Water"
+      },
+      "sent": "Request sent",
+      "sentHint": {
+        "waiter": "A waiter is on the way.",
+        "bill": "We’ll bring your bill.",
+        "water": "We’ll bring water."
+      },
+      "tooSoon": "Your request is on its way — please wait a moment.",
+      "failed": "Could not send, try again."
     }
   },
   "categoryTemplates": {
@@ -923,7 +945,10 @@
     "create": "Create product",
     "created": "Product created.",
     "delete": "Delete product",
-    "deleteConfirm": "Remove “{name}” from the menu? Order history is kept."
+    "deleteConfirm": "Remove “{name}” from the menu? Order history is kept.",
+    "takeawayPrice": "Takeaway price",
+    "deliveryPrice": "Delivery price",
+    "channelPriceHint": "Empty = menu price"
   },
   "options": {
     "title": "Options & extras",
@@ -1045,7 +1070,10 @@
     "closeConfirm": "Free table {label}? Guests will need to scan the QR code again.",
     "forceConfirm": "This table still has orders in progress or unpaid. Free it anyway? (this is logged)",
     "closed": "Table {label} freed.",
-    "summary": "{free} free · {inProgress} in progress · {occupied} occupied"
+    "summary": "{free} free · {inProgress} in progress · {occupied} occupied",
+    "move": "Move",
+    "moveTo": "Move to…",
+    "tableN": "Table {label}"
   },
   "notifications": {
     "title": "Notifications",
@@ -1064,6 +1092,9 @@
       },
       "stock": {
         "low": "{name} is running low ({quantity} {unit})"
+      },
+      "waiter": {
+        "call": "Table {table}: {kind, select, bill {bill} water {water} other {waiter}}"
       }
     }
   },
@@ -1231,7 +1262,13 @@
     "body": "Table {table}",
     "on": "Order alerts on",
     "off": "Order alerts off",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "waiter": {
+      "waiter": "Table {table} is calling a waiter",
+      "bill": "Table {table} wants the bill",
+      "water": "Table {table} wants water",
+      "body": "Please go to the table."
+    }
   },
   "music": {
     "title": "Music",
@@ -1408,7 +1445,8 @@
     "toPay": "Amount due",
     "methods": {
       "cash": "Cash",
-      "on_site_terminal": "Card terminal"
+      "on_site_terminal": "Card terminal",
+      "account": "On account"
     },
     "tendered": "Cash received",
     "confirmPayment": "Confirm payment",
@@ -1445,7 +1483,8 @@
     "deliveryAddress": "Full delivery address…",
     "zone": "Delivery zone",
     "deliveryNeedsPhone": "Enter the customer phone for a delivery.",
-    "deliveryFee": "Delivery fee"
+    "deliveryFee": "Delivery fee",
+    "accountInfo": "Owed: {balance} · credit left: {available}"
   },
   "inventory": {
     "title": "Stock",
@@ -1594,7 +1633,28 @@
     "loyaltyEnabled": "Loyalty points enabled",
     "spendPerPoint": "One point for every … spent",
     "pointValue": "Value of one point",
-    "loyaltyExample": "Every {spend} spent = 1 point worth {value} (about {rate}% back)."
+    "loyaltyExample": "Every {spend} spent = 1 point worth {value} (about {rate}% back).",
+    "account": {
+      "title": "House account",
+      "balance": "Owed",
+      "limit": "Credit limit",
+      "none": "Off",
+      "limitPlaceholder": "Credit limit — empty = off",
+      "setLimit": "Set limit",
+      "disable": "Turn off",
+      "repay": "Receive a repayment",
+      "recordRepayment": "Record repayment",
+      "methods": {
+        "cash": "Cash",
+        "card": "Card",
+        "transfer": "Transfer"
+      },
+      "kinds": {
+        "charge": "On account",
+        "payment": "Repayment",
+        "adjust": "Adjustment"
+      }
+    }
   },
   "reports": {
     "title": "Reports & accounting",
@@ -1614,7 +1674,8 @@
       "overview": "Profit & loss",
       "sales": "Sales",
       "products": "Products",
-      "expenses": "Expenses"
+      "expenses": "Expenses",
+      "security": "Security"
     },
     "revenue": "Revenue",
     "ordersN": "{count} orders",
@@ -1642,7 +1703,8 @@
       "on_site_terminal": "Card terminal",
       "zarinpal": "Zarinpal",
       "stripe": "Online card",
-      "pay_later": "Later"
+      "pay_later": "Later",
+      "account": "On account"
     },
     "subtotal": "Items total",
     "discounts": "Discounts",
@@ -1681,6 +1743,32 @@
       "cash": "Cash",
       "card": "Card",
       "transfer": "Bank transfer"
+    },
+    "security": {
+      "hint": "Review of sensitive actions: cancellations, discounts, refunds, till, price and access changes. Owners only.",
+      "empty": "No sensitive events in this period.",
+      "system": "System",
+      "discount": "discount {amount}",
+      "difference": "difference {amount}",
+      "actions": {
+        "order_cancelled": "Order cancelled",
+        "order_pos_created": "Sale with discount",
+        "payment_refunded": "Refund",
+        "payment_cancelled": "Payment cancelled",
+        "payment_recorded": "Manual payment",
+        "cash_shift_closed": "Till closed",
+        "delivery_courier_settled": "Courier settled",
+        "customer_credit_limit_set": "Credit limit changed",
+        "customer_account_repaid": "Account repayment",
+        "product_updated": "Product edited",
+        "product_deleted": "Product deleted",
+        "expense_deleted": "Expense deleted",
+        "table_session_moved": "Table moved",
+        "member_added": "Staff added",
+        "member_removed": "Staff removed",
+        "member_updated": "Staff access changed",
+        "restaurant_payment_settings_updated": "Payment settings changed"
+      }
     }
   },
   "branches": {

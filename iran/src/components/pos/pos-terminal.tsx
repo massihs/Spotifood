@@ -13,6 +13,7 @@ import {
   Search,
   ShoppingBag,
   Bike,
+  BookUser,
   MapPin,
   Smartphone,
   Star,
@@ -29,6 +30,7 @@ import { cn } from "@/lib/cn";
 import { couponDiscount } from "@/lib/coupon";
 import { parseMoneyInput } from "@/lib/money";
 import { normalizeIranMobile } from "@/lib/phone";
+import { forChannel } from "@/lib/channel-price";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
 import {
   checkCouponAction,
@@ -77,7 +79,12 @@ export function PosTerminal({
   const [discount, setDiscount] = useState(0);
   const [club, setClub] = useState<{
     phone: string;
-    customer: { name: string | null; points: number } | null;
+    customer: {
+      name: string | null;
+      points: number;
+      creditLimitCents: number | null;
+      balanceCents: number;
+    } | null;
     addresses: { id: string; label: string | null; address: string; zoneId: string | null }[];
     enabled: boolean;
     pointValueCents: number;
@@ -109,7 +116,10 @@ export function PosTerminal({
     return ids.map((id) => menu.products[id]!).filter((p) => !q || p.name.toLowerCase().includes(q));
   }, [menu, category, query]);
 
-  const subtotal = lines.reduce((s, l) => s + unitPrice(l.product, l.optionValueIds) * l.quantity, 0);
+  const subtotal = lines.reduce(
+    (s, l) => s + unitPrice(forChannel(l.product, channel), l.optionValueIds) * l.quantity,
+    0,
+  );
   const manualCents = Math.round(subtotal * (discount / 100));
   const afterManual = subtotal - manualCents;
   const couponCents = coupon && afterManual >= coupon.minOrderCents ? couponDiscount(coupon, afterManual) : 0;
@@ -176,7 +186,9 @@ export function PosTerminal({
       q <= 0 ? ls.filter((l) => l.key !== key) : ls.map((l) => (l.key === key ? { ...l, quantity: q } : l)),
     );
 
-  const submit = (payment: { provider: "cash" | "on_site_terminal"; tenderedCents: number | null } | null) =>
+  const submit = (
+    payment: { provider: "cash" | "on_site_terminal" | "account"; tenderedCents: number | null } | null,
+  ) =>
     start(async () => {
       setError(null);
       const res = await createPosOrderAction(restaurantId, {
@@ -347,7 +359,7 @@ export function PosTerminal({
                     />
                   </div>
                   <span className="shrink-0 text-sm font-bold tabular-nums">
-                    {money(unitPrice(l.product, l.optionValueIds) * l.quantity)}
+                    {money(unitPrice(forChannel(l.product, channel), l.optionValueIds) * l.quantity)}
                   </span>
                 </div>
                 <div className="mt-1 flex items-center gap-1">
@@ -608,7 +620,7 @@ export function PosTerminal({
               <span className="block p-2.5">
                 <span className="line-clamp-1 text-sm font-semibold">{p.name}</span>
                 <span className="mt-0.5 block text-sm font-bold text-accent-text tabular-nums">
-                  {money(p.priceCents)}
+                  {money(forChannel(p, channel).priceCents)}
                 </span>
               </span>
             </button>
@@ -669,6 +681,14 @@ export function PosTerminal({
           total={total}
           currency={currency}
           methods={methods}
+          account={
+            member?.customer?.creditLimitCents != null
+              ? {
+                  available: member.customer.creditLimitCents - member.customer.balanceCents,
+                  balance: member.customer.balanceCents,
+                }
+              : null
+          }
           pending={pending}
           onClose={() => setPaying(false)}
           onPay={(provider, tendered) => submit({ provider, tenderedCents: tendered })}
@@ -771,6 +791,7 @@ function PayDialog({
   total,
   currency,
   methods,
+  account,
   pending,
   onClose,
   onPay,
@@ -778,13 +799,16 @@ function PayDialog({
   total: number;
   currency: string;
   methods: ("cash" | "on_site_terminal")[];
+  /** The customer has a house account: what is left on their credit. */
+  account: { available: number; balance: number } | null;
   pending: boolean;
   onClose: () => void;
-  onPay: (provider: "cash" | "on_site_terminal", tendered: number | null) => void;
+  onPay: (provider: "cash" | "on_site_terminal" | "account", tendered: number | null) => void;
 }) {
   const t = useTranslations("pos");
   const money = useMoney(currency);
-  const [method, setMethod] = useState(methods[0]!);
+  const all = [...methods, ...(account ? (["account"] as const) : [])];
+  const [method, setMethod] = useState<(typeof all)[number]>(all[0]!);
   const [tendered, setTendered] = useState("");
   const tenderedCents = tendered ? parseMoneyInput(tendered, currency) : null;
   const unit = currency === "IRR" ? 1000 : 100;
@@ -809,7 +833,7 @@ function PayDialog({
         <p className="text-sm text-fg-muted">{t("toPay")}</p>
         <p className="text-3xl font-bold tabular-nums">{money(total)}</p>
         <div className="mt-4 grid grid-cols-2 gap-2">
-          {methods.map((m) => (
+          {all.map((m) => (
             <button
               key={m}
               type="button"
@@ -819,11 +843,29 @@ function PayDialog({
                 method === m ? "bg-accent-soft text-accent-text ring-accent" : "ring-border",
               )}
             >
-              {m === "cash" ? <Banknote className="size-5" /> : <CreditCard className="size-5" />}
+              {m === "cash" ? (
+                <Banknote className="size-5" />
+              ) : m === "account" ? (
+                <BookUser className="size-5" />
+              ) : (
+                <CreditCard className="size-5" />
+              )}
               {t(`methods.${m}`)}
             </button>
           ))}
         </div>
+        {method === "account" && account ? (
+          <p
+            className={cn(
+              "mt-4 rounded-xl px-4 py-3 text-sm",
+              account.available >= total
+                ? "bg-tone-indigo/10 text-tone-indigo"
+                : "bg-danger-soft text-danger",
+            )}
+          >
+            {t("accountInfo", { balance: money(account.balance), available: money(account.available) })}
+          </p>
+        ) : null}
         {method === "cash" ? (
           <div className="mt-4">
             <label className="text-sm font-medium" htmlFor="tendered">

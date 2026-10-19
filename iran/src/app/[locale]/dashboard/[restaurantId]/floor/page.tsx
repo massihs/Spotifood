@@ -3,6 +3,7 @@ import { formatMoney } from "@/lib/money";
 import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { CloseTableButton } from "@/components/dashboard/close-table-button";
+import { MoveTableButton } from "@/components/dashboard/move-table-button";
 import { LiveIndicator, LiveRefresh } from "@/components/realtime/live";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { Link } from "@/i18n/navigation";
@@ -114,14 +115,23 @@ async function Floor({ params }: { params: Params }) {
                 </dl>
               )}
             </Link>
-            {canClose && tbl.state === "occupied" ? (
-              <div className="mt-1.5 flex justify-end">
-                <CloseTableButton
+            {canClose && tbl.state !== "free" ? (
+              <div className="mt-1.5 flex items-start justify-end gap-2">
+                <MoveTableButton
                   restaurantId={ctx.restaurant.id}
                   tableId={tbl.id}
-                  label={tbl.label}
-                  canForce={canForce}
+                  freeTables={floor
+                    .filter((x) => x.state === "free")
+                    .map((x) => ({ id: x.id, label: x.label }))}
                 />
+                {tbl.state === "occupied" ? (
+                  <CloseTableButton
+                    restaurantId={ctx.restaurant.id}
+                    tableId={tbl.id}
+                    label={tbl.label}
+                    canForce={canForce}
+                  />
+                ) : null}
               </div>
             ) : null}
           </li>

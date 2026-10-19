@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
-import { closeTableSession } from "@/server/modules/floor/service";
+import { closeTableSession, moveTableSession } from "@/server/modules/floor/service";
 import { listNotifications, markNotificationsRead } from "@/server/modules/notifications/service";
 
 export async function listNotificationsAction(restaurantId: string) {
@@ -35,5 +35,14 @@ export async function closeTableAction(restaurantId: string, tableId: string, fo
     const ctx = await actionContext(restaurantId, "sessions.close");
     await closeTableSession(db, ctx, tableId, { force });
     refresh();
+  });
+}
+
+export async function moveTableAction(restaurantId: string, fromTableId: string, toTableId: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "sessions.close");
+    const res = await moveTableSession(db, ctx, fromTableId, toTableId);
+    refresh();
+    return res;
   });
 }

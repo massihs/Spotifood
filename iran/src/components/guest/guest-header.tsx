@@ -1,6 +1,7 @@
 import { ReceiptText, UserRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { WaiterCall } from "./waiter-call";
 import { Link } from "@/i18n/navigation";
 import { isLocale, type AppLocale } from "@/i18n/config";
 import type { GuestContext } from "@/server/modules/guest/sessions";
@@ -81,6 +82,7 @@ export async function GuestHeader({
               </span>
             </p>
           </div>
+          <WaiterCall />
         </div>
       </div>
     </header>
