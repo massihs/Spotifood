@@ -1051,7 +1051,36 @@
     "fullscreen": "ملء الشاشة",
     "waiting": "{min} د",
     "empty": "—",
-    "newOrder": "طلب جديد {number}"
+    "newOrder": "طلب جديد {number}",
+    "autoPrintOn": "طباعة تلقائية: تشغيل",
+    "autoPrintOff": "طباعة تلقائية: إيقاف",
+    "printTicket": "طباعة تذكرة المطبخ",
+    "channel": {
+      "takeaway": "سفري",
+      "delivery": "توصيل"
+    },
+    "stations": {
+      "manage": "المحطات",
+      "all": "الكل",
+      "title": "محطات المطبخ",
+      "hint": "كل محطة (مشويات، بار، سلطات…) ترى وتطبع فئاتها فقط.",
+      "noCategories": "بلا فئات",
+      "new": "محطة جديدة",
+      "name": "اسم المحطة",
+      "namePlaceholder": "مثلاً المشويات أو البار",
+      "categories": "الفئات التي تحضرها المحطة",
+      "deleteConfirm": "حذف هذه المحطة؟",
+      "delete": "حذف",
+      "back": "رجوع",
+      "save": "حفظ"
+    },
+    "ticket": {
+      "delivery": "توصيل",
+      "takeaway": "سفري",
+      "table": "الطاولة {table}",
+      "nothing": "لا شيء لهذه المحطة.",
+      "note": "ملاحظة: {note}"
+    }
   },
   "floor": {
     "title": "الصالة",

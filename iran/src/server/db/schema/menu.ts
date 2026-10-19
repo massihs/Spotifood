@@ -13,6 +13,23 @@ import {
 import { pk, softDelete, timestamps, money } from "./_helpers";
 import { restaurants, taxRates } from "./restaurant";
 
+/** Kitchen station (پخت، بار، سالاد…): its screen and printer get only its categories' items. */
+export const kitchenStations = pgTable(
+  "kitchen_stations",
+  {
+    id: pk(),
+    restaurantId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    name: varchar({ length: 60 }).notNull(),
+    color: varchar({ length: 16 }).notNull().default("orange"),
+    sortOrder: integer().notNull().default(0),
+    ...timestamps,
+    ...softDelete,
+  },
+  (t) => [index("kitchen_stations_restaurant_idx").on(t.restaurantId)],
+);
+
 export const categories = pgTable(
   "categories",
   {
@@ -25,6 +42,8 @@ export const categories = pgTable(
     icon: varchar({ length: 32 }),
     /** Set when created from a global template (keeps analytics comparable across tenants). */
     templateKey: varchar({ length: 48 }),
+    /** Kitchen station preparing this category (null = every screen). */
+    stationId: uuid(),
     sortOrder: integer().notNull().default(0),
     isActive: boolean().notNull().default(true),
     ...timestamps,

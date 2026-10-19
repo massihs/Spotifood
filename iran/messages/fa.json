@@ -1051,7 +1051,36 @@
     "fullscreen": "تمام‌صفحه",
     "waiting": "{min} دقیقه",
     "empty": "—",
-    "newOrder": "سفارش جدید {number}"
+    "newOrder": "سفارش جدید {number}",
+    "autoPrintOn": "چاپ خودکار: روشن",
+    "autoPrintOff": "چاپ خودکار: خاموش",
+    "printTicket": "چاپ فیش آشپزخانه",
+    "channel": {
+      "takeaway": "بیرون‌بر",
+      "delivery": "ارسال"
+    },
+    "stations": {
+      "manage": "ایستگاه‌ها",
+      "all": "همه",
+      "title": "ایستگاه‌های آشپزخانه",
+      "hint": "هر ایستگاه (کباب، بار، سالاد…) فقط آیتم‌های دسته‌های خودش را روی صفحه و فیش می‌بیند.",
+      "noCategories": "بدون دسته",
+      "new": "ایستگاه جدید",
+      "name": "نام ایستگاه",
+      "namePlaceholder": "مثلاً کباب‌پزی یا بار",
+      "categories": "دسته‌هایی که این ایستگاه آماده می‌کند",
+      "deleteConfirm": "این ایستگاه حذف شود؟",
+      "delete": "حذف",
+      "back": "بازگشت",
+      "save": "ذخیره"
+    },
+    "ticket": {
+      "delivery": "ارسال با پیک",
+      "takeaway": "بیرون‌بر",
+      "table": "میز {table}",
+      "nothing": "آیتمی برای این ایستگاه نیست.",
+      "note": "توضیح: {note}"
+    }
   },
   "floor": {
     "title": "سالن",

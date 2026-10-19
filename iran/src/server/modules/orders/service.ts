@@ -290,6 +290,8 @@ export async function listActiveOrders(
       currency: orders.currency,
       note: orders.note,
       placedAt: orders.placedAt,
+      acceptedAt: orders.acceptedAt,
+      channel: orders.channel,
       customerPhone: orders.customerPhone,
       participantSeq: participantLabel,
       participantName: sessionParticipants.displayName,

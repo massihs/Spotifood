@@ -4,7 +4,7 @@ import { formatMoney } from "@/lib/money";
 import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { ArrowRight, Clock, MessageSquareText, Phone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,8 +25,10 @@ export type OrderCardData = {
   customerPhone?: string | null;
   participantSeq: number | null;
   participantName: string | null;
+  channel?: string;
   items: {
     id: string;
+    categoryId?: string | null;
     quantity: number;
     productName: string;
     options: { valueName: string }[];
@@ -80,7 +82,11 @@ export function OrderCard({
 
   const tone = TONE[o.status];
   const isNew = o.status === "received" || o.status === "pending_payment";
-  const [now] = useState(() => Date.now());
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
   // Waiting more than 10 minutes without being ready: shown in orange.
   const late =
     ["received", "accepted", "preparing", "pending_payment"].includes(o.status) &&

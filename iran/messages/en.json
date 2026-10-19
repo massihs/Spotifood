@@ -1051,7 +1051,36 @@
     "fullscreen": "Full screen",
     "waiting": "{min} min",
     "empty": "—",
-    "newOrder": "New order {number}"
+    "newOrder": "New order {number}",
+    "autoPrintOn": "Auto print: on",
+    "autoPrintOff": "Auto print: off",
+    "printTicket": "Print kitchen ticket",
+    "channel": {
+      "takeaway": "Takeaway",
+      "delivery": "Delivery"
+    },
+    "stations": {
+      "manage": "Stations",
+      "all": "All",
+      "title": "Kitchen stations",
+      "hint": "Each station (grill, bar, salads…) only sees and prints its own categories.",
+      "noCategories": "No categories",
+      "new": "New station",
+      "name": "Station name",
+      "namePlaceholder": "e.g. Grill or Bar",
+      "categories": "Categories this station prepares",
+      "deleteConfirm": "Delete this station?",
+      "delete": "Delete",
+      "back": "Back",
+      "save": "Save"
+    },
+    "ticket": {
+      "delivery": "Delivery",
+      "takeaway": "Takeaway",
+      "table": "Table {table}",
+      "nothing": "Nothing for this station.",
+      "note": "Note: {note}"
+    }
   },
   "floor": {
     "title": "Floor",

@@ -895,7 +895,36 @@
     "fullscreen": "Plein écran",
     "waiting": "{min} min",
     "empty": "—",
-    "newOrder": "Nouvelle commande {number}"
+    "newOrder": "Nouvelle commande {number}",
+    "autoPrintOn": "Impression auto : oui",
+    "autoPrintOff": "Impression auto : non",
+    "printTicket": "Imprimer le bon cuisine",
+    "channel": {
+      "takeaway": "À emporter",
+      "delivery": "Livraison"
+    },
+    "stations": {
+      "manage": "Postes",
+      "all": "Tous",
+      "title": "Postes de cuisine",
+      "hint": "Chaque poste (grill, bar, salades…) ne voit et n’imprime que ses catégories.",
+      "noCategories": "Aucune catégorie",
+      "new": "Nouveau poste",
+      "name": "Nom du poste",
+      "namePlaceholder": "ex. Grill ou Bar",
+      "categories": "Catégories préparées par ce poste",
+      "deleteConfirm": "Supprimer ce poste ?",
+      "delete": "Supprimer",
+      "back": "Retour",
+      "save": "Enregistrer"
+    },
+    "ticket": {
+      "delivery": "Livraison",
+      "takeaway": "À emporter",
+      "table": "Table {table}",
+      "nothing": "Rien pour ce poste.",
+      "note": "Note : {note}"
+    }
   },
   "floor": {
     "title": "Salle",
