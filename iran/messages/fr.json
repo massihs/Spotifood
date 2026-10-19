@@ -446,7 +446,8 @@
     "credit_limit_exceeded": "Le plafond de crédit du client est insuffisant.",
     "repayment_too_high": "Montant supérieur au dû.",
     "slot_unavailable": "Ce créneau n’est plus disponible.",
-    "party_too_large": "Pour les grands groupes, appelez-nous."
+    "party_too_large": "Pour les grands groupes, appelez-nous.",
+    "invalid_station": "Le poste choisi n'est pas valide."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -521,6 +522,33 @@
     "roleHelp": {
       "admin": "Gère tout le restaurant sauf l'audit.",
       "staff": "Service : commandes, tables, encaissement."
+    },
+    "jobs": {
+      "label": "Poste",
+      "none": "Sans poste",
+      "station": "Poste de cuisine",
+      "allStations": "Tous les postes",
+      "owner": "Propriétaire",
+      "manager": {
+        "name": "Directeur",
+        "desc": "Tout : rapports, carte, équipe et réglages."
+      },
+      "cashier": {
+        "name": "Caisse",
+        "desc": "Accepte les commandes clients, tient la caisse, les paiements et les tickets."
+      },
+      "waiter": {
+        "name": "Serveur",
+        "desc": "Salle et tables, prend les commandes et les paiements, sans tiroir-caisse."
+      },
+      "bar": {
+        "name": "Bar / café",
+        "desc": "Ne voit que les commandes acceptées de son poste, avec son et ticket."
+      },
+      "kitchen": {
+        "name": "Cuisine",
+        "desc": "Ne voit que les commandes acceptées de son poste, avec son et ticket."
+      }
     }
   },
   "permissions": {
@@ -706,7 +734,9 @@
         "title": "Musique",
         "desc": "Playlist et radio pour la salle."
       }
-    }
+    },
+    "printers": "Imprimantes et envoi en cuisine",
+    "printersHint": "Acceptation en caisse, tickets cuisine, bar et caisse imprimés automatiquement."
   },
   "guest": {
     "table": "Table {label}",
@@ -1156,8 +1186,16 @@
       "takeaway": "À emporter",
       "table": "Table {table}",
       "nothing": "Rien pour ce poste.",
-      "note": "Note : {note}"
-    }
+      "note": "Note : {note}",
+      "tillCopy": "Ticket caisse",
+      "discount": "Remise",
+      "deliveryFee": "Frais de livraison",
+      "total": "Total",
+      "paid": "Payé",
+      "unpaid": "Non payé"
+    },
+    "tillPrintOn": "Impression auto du ticket caisse : activée",
+    "tillPrintOff": "Impression auto du ticket caisse"
   },
   "floor": {
     "title": "Salle",
@@ -1385,7 +1423,8 @@
       "bill": "Table {table} demande l’addition",
       "water": "Table {table} demande de l’eau",
       "body": "Merci de passer à la table."
-    }
+    },
+    "kitchenTitle": "Commande {number} à préparer"
   },
   "music": {
     "title": "Musique",
@@ -2119,5 +2158,53 @@
     },
     "shortPrices": "Afficher les prix en milliers de tomans",
     "shortPricesHint": "Par exemple 1 319 au lieu de 1 319 000 tomans ; l'unité est indiquée une fois par section."
+  },
+  "printers": {
+    "acceptance": "Les commandes QR sont d'abord acceptées en caisse",
+    "acceptanceHint": "Une fois acceptée, la commande part automatiquement en cuisine et au bar, avec son et ticket imprimé. Désactivé : elle part directement en cuisine.",
+    "agent": "Agent d'impression (sur un ordinateur du restaurant)",
+    "agentOnline": "Connecté",
+    "agentSeen": "Dernière connexion {when}",
+    "agentWaiting": "En attente de la première connexion…",
+    "agentNone": "Pas encore connecté",
+    "pendingJobs": "{n} tickets en attente",
+    "download": "Télécharger l'agent",
+    "connect": "Connecter l'agent d'impression",
+    "newToken": "Nouvelle clé",
+    "tokenOnce": "Lancez cette commande sur l'ordinateur du restaurant (la clé n'est affichée qu'une fois) :",
+    "copy": "Copier",
+    "copied": "Copié",
+    "step1": "Installez Node.js sur un ordinateur du réseau du restaurant qui reste allumé.",
+    "step2": "Téléchargez l'agent et lancez la commande ci-dessus dans le même dossier.",
+    "step3": "Ajoutez ici les imprimantes thermiques réseau (port 9100) et faites un test.",
+    "list": "Imprimantes",
+    "add": "Ajouter une imprimante",
+    "empty": "Aucune imprimante pour le moment.",
+    "name": "Nom",
+    "namePlaceholder": "ex. Imprimante cuisine",
+    "target": "Ce qu'elle imprime",
+    "station": "Poste",
+    "allStations": "Tous les postes",
+    "targets": {
+      "station": "Ticket cuisine / bar (articles de son poste)",
+      "cashier": "Ticket caisse (avec prix et total)",
+      "all": "Commande entière (sans prix)"
+    },
+    "host": "Adresse IP",
+    "port": "Port",
+    "paper": "Largeur du papier",
+    "copies": "Exemplaires",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "preview": "Aperçu",
+    "test": "Impression test",
+    "edit": "Modifier",
+    "disable": "Désactiver",
+    "enable": "Activer",
+    "delete": "Supprimer",
+    "lastOk": "Dernière impression réussie",
+    "lastFailed": "Dernière impression échouée : {error}",
+    "browser": "Impression depuis le navigateur (sans agent)",
+    "browserHint": "Activez « impression auto » sur l'écran cuisine et la page Commandes. Pour imprimer sans fenêtre de confirmation, ouvrez Chrome avec :"
   }
 }

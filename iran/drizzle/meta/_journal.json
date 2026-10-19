@@ -141,6 +141,13 @@
       "when": 1792424635286,
       "tag": "0019_menu_short_prices",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792433138704,
+      "tag": "0020_kitchen_flow_printing",
+      "breakpoints": true
     }
   ]
 }

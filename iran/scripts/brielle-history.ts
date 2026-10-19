@@ -52,6 +52,7 @@ import {
   type InvoiceSnapshot,
 } from "@/server/db/schema";
 import { hashPassword } from "@/server/auth/password";
+import { JOB_PRESETS } from "@/server/auth/permissions";
 import { dayStart, localDay } from "@/lib/period";
 import { jalaliYear } from "@/lib/jalali";
 import { taxFromGross } from "@/lib/money";
@@ -1709,4 +1710,46 @@ export async function seedBrielleHistory(tx: DbOrTx, restaurantId: string, owner
 
 function round3(n: number) {
   return Math.round(n * 1000) / 1000;
+}
+
+/** Jobs of the Brielle test team (set once; the owner can change them afterwards). */
+export async function assignBrielleJobs(tx: DbOrTx, restaurantId: string) {
+  const JOBS_BY_EMAIL: Record<string, "manager" | "cashier" | "waiter" | "kitchen"> = {
+    "negar.karimi@brielle.demo": "manager",
+    "maryam.ahmadi@brielle.demo": "cashier",
+    "reza.mohammadi@brielle.demo": "waiter",
+    "amir.hosseini@brielle.demo": "waiter",
+    "hamid.rostami@brielle.demo": "kitchen",
+  };
+  // The hot line if the history created it, otherwise the first station.
+  const stations = await tx
+    .select({ id: kitchenStations.id, name: kitchenStations.name })
+    .from(kitchenStations)
+    .where(eq(kitchenStations.restaurantId, restaurantId))
+    .orderBy(kitchenStations.sortOrder);
+  const hot = stations.find((s) => s.name === "گرم‌خانه") ?? stations[0];
+  for (const [email, job] of Object.entries(JOBS_BY_EMAIL)) {
+    const [u] = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(sql`lower(${users.email}) = ${email}`);
+    if (!u) continue;
+    const p = JOB_PRESETS[job];
+    await tx
+      .update(restaurantMembers)
+      .set({
+        job,
+        role: p.role,
+        grantedPermissions: p.granted,
+        revokedPermissions: p.revoked,
+        stationId: job === "kitchen" ? (hot?.id ?? null) : null,
+      })
+      .where(
+        and(
+          eq(restaurantMembers.restaurantId, restaurantId),
+          eq(restaurantMembers.userId, u.id),
+          isNull(restaurantMembers.job),
+        ),
+      );
+  }
 }

@@ -31,6 +31,9 @@ export type RestaurantContext = {
   permissions: ReadonlySet<Permission>;
   /** True when a super admin accesses a restaurant they are not a member of. */
   viaSuperAdmin: boolean;
+  /** The member's job (manager, cashier, waiter, bar, kitchen) and station, when set. */
+  job?: string | null;
+  stationId?: string | null;
 };
 
 const restaurantColumns = {
@@ -63,6 +66,8 @@ export async function loadRestaurantContext(
         status: restaurantMembers.status,
         granted: restaurantMembers.grantedPermissions,
         revoked: restaurantMembers.revokedPermissions,
+        job: restaurantMembers.job,
+        stationId: restaurantMembers.stationId,
       },
     })
     .from(restaurants)
@@ -98,6 +103,8 @@ export async function loadRestaurantContext(
     role: activeMember.role,
     permissions: resolvePermissions(activeMember.role, activeMember.granted, activeMember.revoked),
     viaSuperAdmin: false,
+    job: activeMember.job,
+    stationId: activeMember.stationId,
   };
 }
 

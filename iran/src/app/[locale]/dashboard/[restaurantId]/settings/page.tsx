@@ -2,7 +2,7 @@ import { edition } from "@/config/edition";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
-import { Blocks, Building2, Clock, CreditCard, Percent, Scale } from "lucide-react";
+import { Blocks, Building2, Clock, CreditCard, Percent, Printer, Scale } from "lucide-react";
 import type { ReactNode } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { requireRestaurant } from "@/server/auth/current";
@@ -19,6 +19,10 @@ import {
   TaxRates,
 } from "./settings-forms";
 import { ModulesForm } from "./modules-form";
+import { PrintersPanel } from "./printers-panel";
+import { listPrinters } from "@/server/modules/printing/service";
+import { listStations } from "@/server/modules/kitchen/stations";
+import { env } from "@/server/env";
 import { isModule } from "@/lib/modules";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
@@ -36,10 +40,12 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view, payment] = await Promise.all([
+  const [t, view, payment, printing, setup] = await Promise.all([
     getTranslations("settings"),
     getRestaurantSettingsView(db, ctx),
     getPaymentSettingsView(db, ctx),
+    listPrinters(db, ctx),
+    can(ctx, "orders.view") ? listStations(db, ctx) : { stations: [] },
   ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
@@ -66,7 +72,7 @@ async function Settings({ params }: { params: Params }) {
             </a>
           ))}
         </nav>
-        <div className="grid min-w-0 gap-6">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6">
           <Card id="profile" className="scroll-mt-24">
             <CardHeader
               title={<SectionTitle icon={<Building2 />}>{t("profile")}</SectionTitle>}
@@ -109,6 +115,37 @@ async function Settings({ params }: { params: Params }) {
                 restaurantId={rid}
                 readOnly={readOnly}
                 disabled={s.disabledModules.filter(isModule)}
+              />
+            </div>
+          </Card>
+          <Card id="printers" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<Printer />}>{t("printers")}</SectionTitle>}
+              description={t("printersHint")}
+            />
+            <div className="p-5 sm:p-6">
+              <PrintersPanel
+                restaurantId={rid}
+                readOnly={readOnly}
+                appUrl={env().APP_URL}
+                stations={setup.stations.map((s) => ({ id: s.id, name: s.name }))}
+                data={{
+                  ...printing,
+                  agentSeenAt: printing.agentSeenAt?.toISOString() ?? null,
+                  printers: printing.printers.map((p) => ({
+                    id: p.id,
+                    name: p.name,
+                    host: p.host,
+                    port: p.port,
+                    paperMm: p.paperMm,
+                    target: p.target,
+                    stationId: p.stationId,
+                    copies: p.copies,
+                    isActive: p.isActive,
+                    lastStatus: p.lastStatus,
+                    lastError: p.lastError,
+                  })),
+                }}
               />
             </div>
           </Card>
@@ -187,6 +224,7 @@ async function Settings({ params }: { params: Params }) {
 const SECTIONS = [
   { key: "profile", icon: <Building2 aria-hidden="true" /> },
   { key: "modules", icon: <Blocks aria-hidden="true" /> },
+  { key: "printers", icon: <Printer aria-hidden="true" /> },
   { key: "service", icon: <Clock aria-hidden="true" /> },
   { key: "payments", icon: <CreditCard aria-hidden="true" /> },
   { key: "taxes", icon: <Percent aria-hidden="true" /> },

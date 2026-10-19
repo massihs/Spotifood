@@ -61,7 +61,13 @@ export function KitchenBoard({
   stations,
   categories,
   canManage,
+  acceptAtTill,
+  defaultStation,
 }: {
+  /** Guest orders reach this screen only once the till accepted them. */
+  acceptAtTill: boolean;
+  /** Station of the bar / kitchen member signed in (their screen opens on it). */
+  defaultStation: string | null;
   restaurantId: string;
   orders: OrderCardData[];
   timeZone: string;
@@ -74,14 +80,16 @@ export function KitchenBoard({
   const t = useTranslations("kitchen");
   const stationKey = `sf-kitchen-station-${restaurantId}`;
   const printKey = `sf-kitchen-autoprint-${restaurantId}`;
-  const stored = usePref(stationKey, "all");
+  const stored = usePref(stationKey, defaultStation ?? "all");
   const station = stored === "all" || stations.some((s) => s.id === stored) ? stored : "all";
   const autoPrint = usePref(printKey, "off") === "on";
   const [managing, setManaging] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
 
   const catStation = new Map(categories.map((c) => [c.id, c.stationId]));
+  const columns = acceptAtTill ? COLUMNS.filter((c) => c !== "received") : COLUMNS;
   const visible = orders
+    .filter((o) => !acceptAtTill || (o.status !== "received" && o.status !== "pending_payment"))
     .map((o) =>
       station === "all"
         ? o
@@ -92,9 +100,9 @@ export function KitchenBoard({
   const ticketUrl = (orderId: string, auto = false) =>
     `/print/kitchen/${restaurantId}/${orderId}?${station === "all" ? "" : `station=${station}&`}${auto ? "auto=1" : ""}`;
 
-  // New order + auto print on this screen: print its ticket in a hidden frame.
+  // Order sent to the kitchen + auto print on this screen: print its ticket in a hidden frame.
   useLiveEvent((type, data) => {
-    if (type !== "order.created" || !autoPrint || !data.orderId || !frame.current) return;
+    if (type !== "order.accepted" || !autoPrint || !data.orderId || !frame.current) return;
     frame.current.src = ticketUrl(String(data.orderId), true);
   });
 
@@ -105,7 +113,7 @@ export function KitchenBoard({
 
   return (
     <div className="flex h-[calc(100dvh-8rem)] min-h-[32rem] flex-col">
-      <LiveRefresh types={["order.created", "order.updated"]} />
+      <LiveRefresh types={["order.created", "order.accepted", "order.updated"]} />
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("title")}</h1>
@@ -173,7 +181,7 @@ export function KitchenBoard({
         </div>
       ) : null}
       <div className="-mx-4 grid min-h-0 flex-1 snap-x snap-mandatory scroll-px-4 auto-cols-[min(20rem,85vw)] grid-flow-col gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:auto-cols-[minmax(17rem,1fr)] sm:px-0">
-        {COLUMNS.map((col) => {
+        {columns.map((col) => {
           const list = byStatus(col);
           return (
             <section

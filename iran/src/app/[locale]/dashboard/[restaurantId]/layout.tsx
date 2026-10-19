@@ -259,7 +259,7 @@ async function RestaurantShell({
     ...sub("delivery", "delivery", ["settlement", "settings"]),
     ...sub("reservations", "reservations", ["queue", "settings"]),
     ...(visible.has(`${base}/settings`)
-      ? (["profile", "service", "payments", "taxes", "legal", "modules"] as const).map((k) => ({
+      ? (["profile", "service", "payments", "taxes", "legal", "modules", "printers"] as const).map((k) => ({
           href: `${base}/settings#${k}`,
           label: t(`settings.${k}`),
           hint: t("nav.settings"),
@@ -279,7 +279,11 @@ async function RestaurantShell({
         user={ctx.user}
         headerExtra={
           <>
-            <OrderAlerts restaurantId={ctx.restaurant.id} newOrders={newOrders} />
+            <OrderAlerts
+              restaurantId={ctx.restaurant.id}
+              newOrders={newOrders}
+              kitchen={ctx.job === "kitchen" || ctx.job === "bar"}
+            />
             <NotificationBell
               restaurantId={ctx.restaurant.id}
               timeZone={ctx.restaurant.timezone}

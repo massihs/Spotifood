@@ -17,6 +17,7 @@ import {
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import { emit, topics } from "@/server/infra/realtime";
+import { sendToKitchen } from "@/server/modules/printing/service";
 import { AppError, conflict, forbidden, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { MAX_AMOUNT_CENTS, taxFromGross, taxFromNet } from "@/lib/money";
@@ -312,6 +313,8 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
         source: "pos",
       },
     });
+    // Rung up at the till: already accepted, straight to the kitchen and bar.
+    await sendToKitchen(tx, rid, { id: order!.id, number, tableLabel: table?.label ?? null });
     await recordAudit(tx, {
       action: "order.pos_created",
       actorUserId: ctx.user.id,

@@ -1,10 +1,13 @@
 import { and, asc, eq, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
-import { authSessions, restaurantMembers, users } from "@/server/db/schema";
+import { authSessions, kitchenStations, restaurantMembers, users } from "@/server/db/schema";
+import type { DbOrTx } from "@/server/db/client";
+import { STATION_JOBS, type Job } from "@/lib/jobs";
 import { recordAudit } from "@/server/audit";
 import { hashPassword } from "@/server/auth/password";
 import {
   canAssignRole,
+  JOB_PRESETS,
   resolvePermissions,
   ROLE_PERMISSIONS,
   type MemberRole,
@@ -12,7 +15,14 @@ import {
 import { assertStaffQuota, lockRestaurant } from "@/server/entitlements";
 import { AppError, forbidden, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
-import { addMemberSchema, updateMemberSchema, type AddMemberInput, type UpdateMemberInput } from "./schemas";
+import {
+  addMemberSchema,
+  memberJobSchema,
+  updateMemberSchema,
+  type AddMemberInput,
+  type MemberJobInput,
+  type UpdateMemberInput,
+} from "./schemas";
 
 export async function listMembers(db: Database, ctx: RestaurantContext) {
   assertCan(ctx, "members.manage");
@@ -26,6 +36,8 @@ export async function listMembers(db: Database, ctx: RestaurantContext) {
       status: restaurantMembers.status,
       grantedPermissions: restaurantMembers.grantedPermissions,
       revokedPermissions: restaurantMembers.revokedPermissions,
+      job: restaurantMembers.job,
+      stationId: restaurantMembers.stationId,
       lastLoginAt: users.lastLoginAt,
       createdAt: restaurantMembers.createdAt,
     })
@@ -49,7 +61,9 @@ export async function listMembers(db: Database, ctx: RestaurantContext) {
 export async function addMember(db: Database, ctx: RestaurantContext, raw: AddMemberInput) {
   assertCan(ctx, "members.manage");
   const input = addMemberSchema.parse(raw);
-  if (!canAssignRole(ctx.role, input.role)) throw forbidden("role_not_assignable");
+  const preset = input.job ? jobValues(ctx, input.job) : null;
+  const role = preset?.role ?? input.role;
+  if (!canAssignRole(ctx.role, role)) throw forbidden("role_not_assignable");
 
   const passwordHash = input.password ? await hashPassword(input.password) : null;
 
@@ -83,7 +97,18 @@ export async function addMember(db: Database, ctx: RestaurantContext, raw: AddMe
 
     const [member] = await tx
       .insert(restaurantMembers)
-      .values({ restaurantId: ctx.restaurant.id, userId: user!.id, role: input.role })
+      .values({
+        restaurantId: ctx.restaurant.id,
+        userId: user!.id,
+        role,
+        ...(preset && input.job
+          ? {
+              ...preset,
+              job: input.job,
+              stationId: await stationOf(tx, ctx, input.job, input.stationId ?? null),
+            }
+          : {}),
+      })
       .returning();
     await recordAudit(tx, {
       action: "member.added",
@@ -91,7 +116,7 @@ export async function addMember(db: Database, ctx: RestaurantContext, raw: AddMe
       restaurantId: ctx.restaurant.id,
       entityType: "restaurant_member",
       entityId: member!.id,
-      metadata: { role: input.role, email: input.email, accountCreated: created },
+      metadata: { role, job: input.job ?? null, email: input.email, accountCreated: created },
     });
     return { member: member!, accountCreated: created };
   });
@@ -178,5 +203,60 @@ export async function removeMember(db: Database, ctx: RestaurantContext, memberI
       entityId: memberId,
       metadata: { userId: m.userId, role: m.role },
     });
+  });
+}
+
+/** Role and permission deltas of a job, limited to what the actor may grant. */
+function jobValues(ctx: RestaurantContext, job: Job) {
+  const p = JOB_PRESETS[job];
+  return {
+    role: p.role,
+    grantedPermissions: p.granted.filter((x) => ctx.permissions.has(x)),
+    revokedPermissions: [...p.revoked],
+  };
+}
+
+/** Bar / kitchen members may be tied to one of the restaurant's stations. */
+async function stationOf(tx: DbOrTx, ctx: RestaurantContext, job: Job | null, stationId: string | null) {
+  if (!job || !STATION_JOBS.includes(job) || !stationId) return null;
+  const [s] = await tx
+    .select({ id: kitchenStations.id })
+    .from(kitchenStations)
+    .where(and(eq(kitchenStations.id, stationId), eq(kitchenStations.restaurantId, ctx.restaurant.id)));
+  if (!s) throw new AppError("VALIDATION", "invalid_station", { field: "stationId" });
+  return s.id;
+}
+
+/**
+ * Gives a member a job: its permission preset (role, grants, revocations) and, for bar and
+ * kitchen, the station whose tickets they see. `null` keeps their permissions and clears the job.
+ */
+export async function setMemberJob(
+  db: Database,
+  ctx: RestaurantContext,
+  memberId: string,
+  raw: MemberJobInput,
+) {
+  assertCan(ctx, "members.manage");
+  const input = memberJobSchema.parse(raw);
+  const current = await loadManageableMember(db, ctx, memberId);
+  const preset = input.job ? jobValues(ctx, input.job) : null;
+  if (preset && !canAssignRole(ctx.role, preset.role)) throw forbidden("role_not_assignable");
+  return db.transaction(async (tx) => {
+    const stationId = await stationOf(tx, ctx, input.job, input.stationId);
+    const [updated] = await tx
+      .update(restaurantMembers)
+      .set({ ...(preset ?? {}), job: input.job, stationId })
+      .where(eq(restaurantMembers.id, memberId))
+      .returning();
+    await recordAudit(tx, {
+      action: "member.updated",
+      actorUserId: ctx.user.id,
+      restaurantId: ctx.restaurant.id,
+      entityType: "restaurant_member",
+      entityId: memberId,
+      metadata: { from: { job: current.job, role: current.role }, to: { job: input.job, stationId } },
+    });
+    return updated!;
   });
 }

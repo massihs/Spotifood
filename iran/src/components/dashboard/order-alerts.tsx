@@ -57,7 +57,16 @@ type Alert = { id: string; title: string; body: string; href: string; waiter?: b
  * Team-wide new-order alerts on every dashboard page: a sound, a card linking to the orders,
  * a system notification when the tab is in the background, and fresh badges (router refresh).
  */
-export function OrderAlerts({ restaurantId, newOrders }: { restaurantId: string; newOrders: number }) {
+export function OrderAlerts({
+  restaurantId,
+  newOrders,
+  kitchen = false,
+}: {
+  restaurantId: string;
+  newOrders: number;
+  /** Bar / kitchen screens ring when the till sends an order, not when a guest places it. */
+  kitchen?: boolean;
+}) {
   const t = useTranslations("alerts");
   const router = useRouter();
   const enabled = useSyncExternalStore(subscribePref, readPref, () => true);
@@ -94,6 +103,7 @@ export function OrderAlerts({ restaurantId, newOrders }: { restaurantId: string;
   useLiveEvent((type, data) => {
     if (type === "order.updated") return refreshSoon();
     let alert: Alert;
+    if (kitchen && type === "waiter.called") return;
     if (type === "waiter.called") {
       const kind = data.kind === "bill" ? "bill" : data.kind === "water" ? "water" : "waiter";
       alert = {
@@ -102,6 +112,15 @@ export function OrderAlerts({ restaurantId, newOrders }: { restaurantId: string;
         body: t("waiter.body"),
         href: `/dashboard/${restaurantId}/floor`,
         waiter: true,
+      };
+    } else if (kitchen) {
+      if (type !== "order.accepted") return;
+      refreshSoon();
+      alert = {
+        id: `k-${String(data.orderId ?? Date.now())}`,
+        title: t("kitchenTitle", { number: String(data.number ?? "") }),
+        body: t("body", { table: String(data.tableLabel ?? "") }),
+        href: `/dashboard/${restaurantId}/kitchen`,
       };
     } else {
       if (type !== "order.created") return;

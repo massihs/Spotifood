@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { OrderCard } from "@/components/dashboard/order-card";
 import { LiveRefresh } from "@/components/realtime/live";
+import { TillAutoPrint } from "@/components/kitchen/till-auto-print";
 import { Card } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
@@ -42,8 +43,14 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
 
   return (
     <>
-      <LiveRefresh types={["order.created", "order.updated", "session.opened", "session.closed"]} />
-      <PageHeader title={t("title")} description={t("subtitle")} />
+      <LiveRefresh
+        types={["order.created", "order.accepted", "order.updated", "session.opened", "session.closed"]}
+      />
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        actions={can(ctx, "orders.update_status") ? <TillAutoPrint restaurantId={ctx.restaurant.id} /> : null}
+      />
       <nav
         className="-mx-4 mb-5 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
         aria-label={t("title")}

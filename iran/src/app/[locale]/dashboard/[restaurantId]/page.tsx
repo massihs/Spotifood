@@ -17,7 +17,7 @@ import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { Card, CardHeader, StatCard, TONE_TILE, type Tone } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { requireRestaurant } from "@/server/auth/current";
@@ -46,6 +46,10 @@ export default function OverviewPage({ params }: PageProps<"/[locale]/dashboard/
 async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[restaurantId]">["params"] }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId);
+  // Each job lands on its own screen: the kitchen and bar on their tickets, the till on the
+  // orders to accept, waiters on the floor.
+  const home = { kitchen: "kitchen", bar: "kitchen", cashier: "orders", waiter: "floor" }[ctx.job ?? ""];
+  if (home) redirect({ href: `/dashboard/${ctx.restaurant.id}/${home}`, locale: await getLocale() });
   const [t, locale, overview, today, disabled] = await Promise.all([
     getTranslations("dashboard"),
     getLocale(),

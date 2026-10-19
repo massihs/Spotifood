@@ -8,6 +8,7 @@ import {
   jsonb,
   pgTable,
   primaryKey,
+  timestamp,
   text,
   uniqueIndex,
   uuid,
@@ -91,6 +92,11 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   reservationSlotCapacity: integer().notNull().default(40),
   reservationMaxParty: integer().notNull().default(12),
   reservationDurationMin: integer().notNull().default(90),
+  /** Guest (QR) orders wait for the till to accept them before going to the kitchen. */
+  cashierAcceptance: boolean().notNull().default(true),
+  /** Local print agent (network ticket printers): token hash and last contact. */
+  printAgentTokenHash: varchar({ length: 64 }),
+  printAgentSeenAt: timestamp({ withTimezone: true, mode: "date" }),
   /** Dashboard modules the restaurant switched off (hidden from its navigation). */
   disabledModules: text()
     .array()
@@ -132,6 +138,10 @@ export const restaurantMembers = pgTable(
       .notNull()
       .default(sql`ARRAY[]::text[]`),
     status: memberStatus().notNull().default("active"),
+    /** Job in the restaurant (manager, cashier, waiter, bar, kitchen): permission preset and home screen. */
+    job: varchar({ length: 16 }),
+    /** Kitchen station a bar / kitchen member works at (their screen shows only its items). */
+    stationId: uuid(),
     ...timestamps,
   },
   (t) => [

@@ -23,6 +23,15 @@ import {
 } from "@/server/modules/restaurants/settings";
 import type { AppLocale } from "@/i18n/config";
 import { updatePaymentSettings } from "@/server/modules/payments/service";
+import {
+  deletePrinter,
+  newAgentToken,
+  previewTicket,
+  savePrinter,
+  setCashierAcceptance,
+  setPrinterActive,
+  testPrinter,
+} from "@/server/modules/printing/service";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "");
 
@@ -143,6 +152,67 @@ export async function setModuleAction(restaurantId: string, module: string, enab
   return runAction(async () => {
     const ctx = await actionContext(restaurantId, "restaurant.manage");
     await setModuleEnabled(db, ctx, module, enabled);
+    refresh();
+  });
+}
+
+// ─── Printers ────────────────────────────────────────────────────────────────
+
+export async function savePrinterAction(
+  restaurantId: string,
+  printerId: string | null,
+  _prev: unknown,
+  fd: FormData,
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    await savePrinter(db, ctx, printerId, {
+      name: str(fd, "name"),
+      host: str(fd, "host"),
+      port: Number(str(fd, "port") || 9100),
+      paperMm: str(fd, "paperMm") === "58" ? 58 : 80,
+      target: (["cashier", "station", "all"].includes(str(fd, "target"))
+        ? str(fd, "target")
+        : "station") as "station",
+      stationId: str(fd, "stationId") || null,
+      copies: Number(str(fd, "copies") || 1),
+    });
+    refresh();
+  });
+}
+
+export async function printerCommandAction(restaurantId: string, printerId: string, command: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    if (command === "test") await testPrinter(db, ctx, printerId);
+    else if (command === "delete") await deletePrinter(db, ctx, printerId);
+    else if (command === "on" || command === "off")
+      await setPrinterActive(db, ctx, printerId, command === "on");
+    refresh();
+  });
+}
+
+export async function previewPrinterAction(restaurantId: string, printerId: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.view");
+    const png = await previewTicket(db, ctx, printerId);
+    return `data:image/png;base64,${png.toString("base64")}`;
+  });
+}
+
+export async function newAgentTokenAction(restaurantId: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    const token = await newAgentToken(db, ctx);
+    refresh();
+    return token;
+  });
+}
+
+export async function setCashierAcceptanceAction(restaurantId: string, on: boolean) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    await setCashierAcceptance(db, ctx, on);
     refresh();
   });
 }

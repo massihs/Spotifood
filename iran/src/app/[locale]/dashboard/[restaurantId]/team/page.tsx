@@ -8,6 +8,9 @@ import { canAssignRole, PERMISSIONS, ROLE_PERMISSIONS } from "@/server/auth/perm
 import { db } from "@/server/db/client";
 import { listMembers } from "@/server/modules/members/service";
 import { AddMemberDialog, EditMemberDialog } from "./member-forms";
+import { JobPicker } from "./job-picker";
+import { JobGuide } from "./job-guide";
+import { listStations } from "@/server/modules/kitchen/stations";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/team">["params"];
 
@@ -22,7 +25,13 @@ export default function TeamPage({ params }: { params: Params }) {
 async function Team({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "members.manage");
-  const [t, format, members] = await Promise.all([getTranslations(), getFormatter(), listMembers(db, ctx)]);
+  const [t, format, members, { stations }] = await Promise.all([
+    getTranslations(),
+    getFormatter(),
+    listMembers(db, ctx),
+    listStations(db, ctx),
+  ]);
+  const stationList = stations.map((s) => ({ id: s.id, name: s.name }));
   const roles = (["admin", "staff"] as const).filter((r) => canAssignRole(ctx.role, r));
   const roleDefaults = { admin: [...ROLE_PERMISSIONS.admin], staff: [...ROLE_PERMISSIONS.staff] };
 
@@ -31,13 +40,17 @@ async function Team({ params }: { params: Params }) {
       <PageHeader
         title={t("team.title")}
         description={t("team.subtitle")}
-        actions={<AddMemberDialog restaurantId={ctx.restaurant.id} roles={[...roles]} />}
+        actions={
+          <AddMemberDialog restaurantId={ctx.restaurant.id} roles={[...roles]} stations={stationList} />
+        }
       />
+      <JobGuide />
       <Card className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-border text-fg-muted">
             <tr>
               <th className="px-5 py-3 text-start font-medium">{t("team.fullName")}</th>
+              <th className="px-5 py-3 text-start font-medium">{t("team.jobs.label")}</th>
               <th className="px-5 py-3 text-start font-medium">{t("team.role")}</th>
               <th className="px-5 py-3 text-start font-medium">{t("team.lastLogin")}</th>
               <th className="px-5 py-3 text-start font-medium">{t("team.status")}</th>
@@ -57,6 +70,22 @@ async function Team({ params }: { params: Params }) {
                       {m.fullName} {isSelf ? <span className="text-fg-subtle">({t("team.you")})</span> : null}
                     </p>
                     <p className="text-xs text-fg-subtle">{m.email}</p>
+                  </td>
+                  <td className="px-5 py-3">
+                    {editable ? (
+                      <JobPicker
+                        restaurantId={ctx.restaurant.id}
+                        memberId={m.id}
+                        job={m.job}
+                        stationId={m.stationId}
+                        stations={stationList}
+                        allowManager={roles.includes("admin")}
+                      />
+                    ) : (
+                      <span className="text-fg-subtle">
+                        {m.role === "owner" ? t("team.jobs.owner") : "—"}
+                      </span>
+                    )}
                   </td>
                   <td className="px-5 py-3">
                     <Badge tone={m.role === "owner" ? "accent" : "neutral"}>{t(`roles.${m.role}`)}</Badge>

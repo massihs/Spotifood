@@ -11,6 +11,7 @@ export type RealtimeEvent = {
   topic: string;
   type:
     | "order.created"
+    | "order.accepted"
     | "order.updated"
     | "session.opened"
     | "session.closed"

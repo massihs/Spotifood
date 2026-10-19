@@ -79,3 +79,44 @@ export function canAssignRole(actorRole: MemberRole, target: MemberRole): boolea
   if (actorRole === "owner") return true;
   return actorRole === "admin" && target === "staff";
 }
+
+/**
+ * Permission preset of each job, as role + grants/revocations on top of the role defaults
+ * (the owner can still fine-tune a member afterwards).
+ */
+export const JOB_PRESETS: Record<
+  "manager" | "cashier" | "waiter" | "bar" | "kitchen",
+  { role: Exclude<MemberRole, "owner">; granted: Permission[]; revoked: Permission[] }
+> = {
+  manager: { role: "admin", granted: [], revoked: [] },
+  cashier: { role: "staff", granted: ["orders.cancel", "customers.manage"], revoked: [] },
+  waiter: { role: "staff", granted: [], revoked: ["cash.manage", "inventory.view"] },
+  bar: {
+    role: "staff",
+    granted: [],
+    revoked: [
+      "orders.create",
+      "cash.manage",
+      "payments.view",
+      "payments.record",
+      "invoices.view",
+      "customers.view",
+      "sessions.close",
+      "tables.view",
+    ],
+  },
+  kitchen: {
+    role: "staff",
+    granted: [],
+    revoked: [
+      "orders.create",
+      "cash.manage",
+      "payments.view",
+      "payments.record",
+      "invoices.view",
+      "customers.view",
+      "sessions.close",
+      "tables.view",
+    ],
+  },
+};

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { JOBS } from "@/lib/jobs";
 import { PERMISSIONS } from "@/server/auth/permissions";
 import { emailSchema, passwordSchema } from "@/server/modules/auth/schemas";
 
@@ -14,6 +15,9 @@ export const addMemberSchema = z.object({
     .optional()
     .transform((v) => (v ? v : undefined)),
   role: assignableRole,
+  /** Job preset (sets the role and permissions); the role field is ignored when set. */
+  job: z.enum(JOBS).optional(),
+  stationId: z.uuid().nullable().optional(),
   /** Initial password, only used when the account does not exist yet. */
   password: passwordSchema.optional(),
 });
@@ -26,3 +30,9 @@ export const updateMemberSchema = z.object({
   status: z.enum(["active", "disabled"]),
 });
 export type UpdateMemberInput = z.infer<typeof updateMemberSchema>;
+
+export const memberJobSchema = z.object({
+  job: z.enum(JOBS).nullable(),
+  stationId: z.uuid().nullable(),
+});
+export type MemberJobInput = z.infer<typeof memberJobSchema>;

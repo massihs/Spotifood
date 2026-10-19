@@ -446,7 +446,8 @@
     "credit_limit_exceeded": "This customer’s credit limit is not enough.",
     "repayment_too_high": "More than the customer owes.",
     "slot_unavailable": "This time is no longer available; pick another.",
-    "party_too_large": "For larger groups, please call us."
+    "party_too_large": "For larger groups, please call us.",
+    "invalid_station": "The selected station is not valid."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -521,6 +522,33 @@
     "roleHelp": {
       "admin": "Manages the whole restaurant except the audit log.",
       "staff": "Service: orders, tables, payments."
+    },
+    "jobs": {
+      "label": "Job",
+      "none": "No job",
+      "station": "Station",
+      "allStations": "All stations",
+      "owner": "Owner",
+      "manager": {
+        "name": "Manager",
+        "desc": "Everything: reports, menu, team and settings."
+      },
+      "cashier": {
+        "name": "Till",
+        "desc": "Accepts guest orders, runs the till, payments and receipts."
+      },
+      "waiter": {
+        "name": "Waiter",
+        "desc": "Floor and tables, takes orders and payments, no cash drawer."
+      },
+      "bar": {
+        "name": "Bar / café",
+        "desc": "Sees only the accepted orders of their station, with sound and ticket."
+      },
+      "kitchen": {
+        "name": "Kitchen",
+        "desc": "Sees only the accepted orders of their station, with sound and ticket."
+      }
     }
   },
   "permissions": {
@@ -706,7 +734,9 @@
         "title": "Music",
         "desc": "Playlist and radio for the dining room."
       }
-    }
+    },
+    "printers": "Printers & kitchen flow",
+    "printersHint": "Acceptance at the till, automatic kitchen, bar and till tickets."
   },
   "guest": {
     "table": "Table {label}",
@@ -1156,8 +1186,16 @@
       "takeaway": "Takeaway",
       "table": "Table {table}",
       "nothing": "Nothing for this station.",
-      "note": "Note: {note}"
-    }
+      "note": "Note: {note}",
+      "tillCopy": "Till copy",
+      "discount": "Discount",
+      "deliveryFee": "Delivery fee",
+      "total": "Total",
+      "paid": "Paid",
+      "unpaid": "Not paid"
+    },
+    "tillPrintOn": "Till ticket auto-print: on",
+    "tillPrintOff": "Auto-print till ticket"
   },
   "floor": {
     "title": "Floor",
@@ -1385,7 +1423,8 @@
       "bill": "Table {table} wants the bill",
       "water": "Table {table} wants water",
       "body": "Please go to the table."
-    }
+    },
+    "kitchenTitle": "Order {number} to prepare"
   },
   "music": {
     "title": "Music",
@@ -2111,5 +2150,53 @@
     },
     "shortPrices": "Show prices in thousand tomans",
     "shortPricesHint": "e.g. 1,319 instead of 1,319,000 tomans; the unit is shown once per section."
+  },
+  "printers": {
+    "acceptance": "QR orders are accepted at the till first",
+    "acceptanceHint": "Once accepted, the order goes to the kitchen and bar automatically, with sound and a printed ticket. Off: orders go straight to the kitchen.",
+    "agent": "Print agent (on a restaurant computer)",
+    "agentOnline": "Connected",
+    "agentSeen": "Last seen {when}",
+    "agentWaiting": "Waiting for the first connection…",
+    "agentNone": "Not connected yet",
+    "pendingJobs": "{n} tickets queued",
+    "download": "Download the agent",
+    "connect": "Connect the print agent",
+    "newToken": "New key",
+    "tokenOnce": "Run this command on the restaurant computer (the key is shown only once):",
+    "copy": "Copy",
+    "copied": "Copied",
+    "step1": "Install Node.js on a computer of the restaurant network that stays on.",
+    "step2": "Download the agent and run the command above in the same folder.",
+    "step3": "Add the network thermal printers (port 9100) here and print a test.",
+    "list": "Printers",
+    "add": "Add a printer",
+    "empty": "No printer yet.",
+    "name": "Name",
+    "namePlaceholder": "e.g. Kitchen printer",
+    "target": "What it prints",
+    "station": "Station",
+    "allStations": "All stations",
+    "targets": {
+      "station": "Kitchen / bar ticket (its station's items)",
+      "cashier": "Till ticket (with prices and total)",
+      "all": "Whole order (no prices)"
+    },
+    "host": "IP address",
+    "port": "Port",
+    "paper": "Paper width",
+    "copies": "Copies",
+    "save": "Save",
+    "cancel": "Cancel",
+    "preview": "Preview",
+    "test": "Test print",
+    "edit": "Edit",
+    "disable": "Disable",
+    "enable": "Enable",
+    "delete": "Delete",
+    "lastOk": "Last print succeeded",
+    "lastFailed": "Last print failed: {error}",
+    "browser": "Printing from the browser (no agent)",
+    "browserHint": "Turn on \"auto-print\" on the kitchen screen and the orders page. To print without the confirmation dialog, open Chrome with:"
   }
 }

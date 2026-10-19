@@ -128,6 +128,7 @@ export async function getTicket(
       productName: orderItems.productName,
       options: orderItems.options,
       note: orderItems.note,
+      lineTotalCents: orderItems.lineTotalCents,
       stationId: categories.stationId,
     })
     .from(orderItems)

@@ -4,10 +4,14 @@ import { AutoPrint } from "@/components/kitchen/auto-print";
 import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { getTicket } from "@/server/modules/kitchen/stations";
+import { formatMoney } from "@/lib/money";
 
 type Props = PageProps<"/[locale]/print/kitchen/[restaurantId]/[orderId]">;
 
-/** 80 mm kitchen ticket (thermal printer). `?station=` keeps that station's items; `?auto=1` prints. */
+/**
+ * 80 mm ticket (thermal printer). Kitchen copy by default; `?station=` keeps that station's items;
+ * `?copy=cashier` is the till copy with prices and total; `?auto=1` prints.
+ */
 export default function TicketPage({ params, searchParams }: Props) {
   return (
     <Suspense fallback={null}>
@@ -21,6 +25,7 @@ async function Ticket({ params, searchParams }: Pick<Props, "params" | "searchPa
   const sp = await searchParams;
   const ctx = await requireRestaurant(restaurantId, "orders.view");
   const station = typeof sp.station === "string" ? sp.station : null;
+  const till = sp.copy === "cashier";
   const [t, format, ticket] = await Promise.all([
     getTranslations("kitchen.ticket"),
     getFormatter(),
@@ -32,7 +37,11 @@ async function Ticket({ params, searchParams }: Pick<Props, "params" | "searchPa
       <style>{`@page { size: 80mm auto; margin: 4mm; } @media print { body { background: white } }`}</style>
       <div className="border-b-2 border-dashed border-black pb-2 text-center">
         <p className="text-sm font-bold">{ctx.restaurant.name}</p>
-        {ticket.station ? <p className="text-xs">{ticket.station.name}</p> : null}
+        {till ? (
+          <p className="text-xs">{t("tillCopy")}</p>
+        ) : ticket.station ? (
+          <p className="text-xs">{ticket.station.name}</p>
+        ) : null}
         <p className="mt-1 text-3xl font-black tabular-nums">{o.number}</p>
         <p className="text-base font-bold">
           {o.channel === "delivery"
@@ -54,7 +63,12 @@ async function Ticket({ params, searchParams }: Pick<Props, "params" | "searchPa
           <li key={i.id} className="py-1.5">
             <p className="flex gap-2 text-base font-bold">
               <span className="tabular-nums">{i.quantity}×</span>
-              <span>{i.productName}</span>
+              <span className="flex-1">{i.productName}</span>
+              {till ? (
+                <span className="text-sm font-semibold tabular-nums">
+                  {formatMoney(i.lineTotalCents, o.currency, "fa")}
+                </span>
+              ) : null}
             </p>
             {i.options.length ? (
               <p className="ps-6 text-xs">{i.options.map((x) => x.valueName).join("، ")}</p>
@@ -74,6 +88,27 @@ async function Ticket({ params, searchParams }: Pick<Props, "params" | "searchPa
           {o.deliveryAddress}
           {o.customerPhone ? ` · ${o.customerPhone}` : ""}
         </p>
+      ) : null}
+      {till ? (
+        <div className="mt-1 space-y-0.5 border-t-2 border-dashed border-black pt-1 text-sm">
+          {o.discountCents > 0 ? (
+            <p className="flex justify-between">
+              <span>{t("discount")}</span>
+              <span className="tabular-nums">-{formatMoney(o.discountCents, o.currency, "fa")}</span>
+            </p>
+          ) : null}
+          {o.deliveryFeeCents > 0 ? (
+            <p className="flex justify-between">
+              <span>{t("deliveryFee")}</span>
+              <span className="tabular-nums">{formatMoney(o.deliveryFeeCents, o.currency, "fa")}</span>
+            </p>
+          ) : null}
+          <p className="flex justify-between text-lg font-black">
+            <span>{t("total")}</span>
+            <span className="tabular-nums">{formatMoney(o.totalCents, o.currency, "fa")}</span>
+          </p>
+          <p className="text-center text-xs">{o.paymentStatus === "paid" ? t("paid") : t("unpaid")}</p>
+        </div>
       ) : null}
       <AutoPrint enabled={sp.auto === "1" && items.length > 0} />
     </div>

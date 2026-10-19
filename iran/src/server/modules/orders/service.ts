@@ -16,6 +16,7 @@ import {
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import { emit, topics } from "@/server/infra/realtime";
+import { sendToKitchen } from "@/server/modules/printing/service";
 import { AppError, conflict, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { isUuid } from "@/lib/ids";
@@ -222,6 +223,9 @@ export async function placeOrder(
       type: "order.created",
       data: { orderId: created!.id, number, tableId: guest.table.id, tableLabel: guest.table.label },
     });
+    // Without acceptance at the till, a guest order goes straight to the kitchen.
+    if (status === "received" && settings && !settings.cashierAcceptance)
+      await sendToKitchen(tx, rid, { id: created!.id, number, tableLabel: guest.table.label });
     await emit(tx, {
       topic: topics.participant(guest.participant.id),
       type: "order.updated",
@@ -371,6 +375,8 @@ export async function updateOrderStatus(
         data: { orderId, status: to, number: current.number },
       });
     }
+    // First time past "received": the order leaves the till for the kitchen and bar.
+    if (!current.acceptedAt && to !== "cancelled") await sendToKitchen(tx, ctx.restaurant.id, current);
     if (to === "ready") {
       await tx.insert(notifications).values({
         restaurantId: ctx.restaurant.id,

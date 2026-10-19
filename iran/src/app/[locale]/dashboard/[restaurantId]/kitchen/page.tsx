@@ -5,6 +5,7 @@ import { db } from "@/server/db/client";
 import { can } from "@/server/tenancy";
 import { listActiveOrders } from "@/server/modules/orders/service";
 import { listStations } from "@/server/modules/kitchen/stations";
+import { cashierAcceptanceOf } from "@/server/modules/printing/service";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/kitchen">["params"];
 
@@ -20,9 +21,10 @@ async function Kitchen({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "orders.view");
   // Active orders + those served/cancelled in the last 30 minutes.
-  const [active, setup] = await Promise.all([
+  const [active, setup, acceptAtTill] = await Promise.all([
     listActiveOrders(db, ctx, { includeRecentMinutes: 30 }),
     listStations(db, ctx),
+    cashierAcceptanceOf(db, ctx.restaurant.id),
   ]);
   const orders = active.filter((o) => o.status !== "cancelled");
   return (
@@ -35,6 +37,8 @@ async function Kitchen({ params }: { params: Params }) {
       stations={setup.stations.map((s) => ({ id: s.id, name: s.name, color: s.color }))}
       categories={setup.categories}
       canManage={can(ctx, "menu.manage")}
+      acceptAtTill={acceptAtTill}
+      defaultStation={ctx.stationId ?? null}
     />
   );
 }

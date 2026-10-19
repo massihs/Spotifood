@@ -9,6 +9,7 @@ export type LiveStatus = "connecting" | "live" | "reconnecting";
 
 const EVENT_TYPES = [
   "order.created",
+  "order.accepted",
   "order.updated",
   "session.opened",
   "session.closed",

@@ -16,6 +16,7 @@ import {
   useActionForm,
 } from "@/components/ui/form";
 import { addMemberAction, removeMemberAction, updateMemberAction } from "./actions";
+import { JOBS, STATION_JOBS, type Job } from "@/lib/jobs";
 
 export type MemberView = {
   id: string;
@@ -26,12 +27,21 @@ export type MemberView = {
   effectivePermissions: string[];
 };
 
-function AddMemberForm({ restaurantId, roles }: { restaurantId: string; roles: ("admin" | "staff")[] }) {
+function AddMemberForm({
+  restaurantId,
+  roles,
+  stations,
+}: {
+  restaurantId: string;
+  roles: ("admin" | "staff")[];
+  stations: { id: string; name: string }[];
+}) {
   const t = useTranslations();
   const form = useActionForm(addMemberAction.bind(null, restaurantId));
   const state = form.state;
   useCloseOnSuccess(state);
   const err = useFieldError(state);
+  const [job, setJob] = useState<string>("waiter");
   return (
     <ActionForm form={form} className="space-y-4">
       <FormFeedback state={state} />
@@ -45,13 +55,30 @@ function AddMemberForm({ restaurantId, roles }: { restaurantId: string; roles: (
         autoFocus
       />
       <Field label={t("team.fullName")} name="fullName" autoComplete="off" error={err("fullName")} />
-      <SelectField label={t("team.role")} name="role" defaultValue="staff">
-        {roles.map((r) => (
-          <option key={r} value={r}>
-            {t(`roles.${r}`)} — {t(`team.roleHelp.${r}`)}
+      <input type="hidden" name="role" value="staff" />
+      <SelectField
+        label={t("team.jobs.label")}
+        name="job"
+        value={job}
+        onChange={(e) => setJob(e.target.value)}
+        hint={t(`team.jobs.${job as "waiter"}.desc`)}
+      >
+        {JOBS.filter((j) => roles.includes("admin") || j !== "manager").map((j) => (
+          <option key={j} value={j}>
+            {t(`team.jobs.${j}.name`)}
           </option>
         ))}
       </SelectField>
+      {STATION_JOBS.includes(job as Job) && stations.length ? (
+        <SelectField label={t("team.jobs.station")} name="stationId" defaultValue="">
+          <option value="">{t("team.jobs.allStations")}</option>
+          {stations.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </SelectField>
+      ) : null}
       <Field
         label={`${t("team.password")} (${t("common.optional")})`}
         name="password"
@@ -71,14 +98,16 @@ function AddMemberForm({ restaurantId, roles }: { restaurantId: string; roles: (
 export function AddMemberDialog({
   restaurantId,
   roles,
+  stations,
 }: {
   restaurantId: string;
   roles: ("admin" | "staff")[];
+  stations: { id: string; name: string }[];
 }) {
   const t = useTranslations("team");
   return (
     <Dialog title={t("add")} trigger={(open) => <Button onClick={open}>+ {t("add")}</Button>}>
-      <AddMemberForm restaurantId={restaurantId} roles={roles} />
+      <AddMemberForm restaurantId={restaurantId} roles={roles} stations={stations} />
     </Dialog>
   );
 }
