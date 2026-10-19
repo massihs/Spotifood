@@ -51,6 +51,10 @@ async function GuestMenu() {
             currency={guest.restaurant.currency}
             initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents, byProduct }}
             popularIds={popularIds}
+            restaurantName={guest.restaurant.name}
+            tableLabel={guest.table.label}
+            theme={menuThemeOf(guest.restaurant.menuTheme)}
+            shortPrices={guest.restaurant.menuShortPrices}
             header={
               <>
                 <GuestHeader guest={guest} orderCount={orders.length} cover={cover} store={store} />

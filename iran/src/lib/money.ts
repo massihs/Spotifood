@@ -103,6 +103,11 @@ export function formatMoney(cents: Cents, currency: string, locale = "fa"): stri
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(cents / 100);
 }
 
+/** Short menu price in thousand tomans: 1 319 000 tomans → "۱٬۳۱۹" (the unit is shown once). */
+export function formatThousandTomans(cents: Cents, locale = "fa"): string {
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(cents / 1_000_000);
+}
+
 /** Value for a money <input>: 12000000 IRR minor units → "12000" (tomans); 1990 EUR → "19,90". */
 export function centsToInput(cents: number | null | undefined, locale: string, currency = "IRR"): string {
   if (cents == null) return "";

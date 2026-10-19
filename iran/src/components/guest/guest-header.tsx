@@ -1,4 +1,4 @@
-import { Clock, MapPin, ReceiptText, UserRound } from "lucide-react";
+import { Clock, ReceiptText, UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 import type { OpenState } from "@/lib/opening";
 import { getTranslations } from "next-intl/server";
@@ -76,19 +76,23 @@ export async function GuestHeader({
         <UserRound className="size-3.5 shrink-0" aria-hidden="true" />
         <span className="truncate">{who}</span>
       </span>
+      <OpenBadge t={t} store={store} />
     </>
   );
 
   if (theme === "atelier")
     return (
-      <header className="mx-auto max-w-3xl px-6 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 text-center">
-        {actions}
-        {logoTile("mx-auto mt-4 size-16 rounded-full ring-1 ring-border")}
-        <h1 className="mt-4 font-menu-display text-[44px] leading-[0.95] font-medium text-balance">{name}</h1>
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-sm">{guestLine}</div>
-        <StoreLine t={t} store={store} className="justify-center" />
-        <div className="mt-4 flex justify-center">
+      <header className="mx-auto max-w-3xl px-5 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <div className="flex items-center justify-between gap-2">
           <WaiterCall />
+          {actions}
+        </div>
+        <div className="mt-1 flex flex-col items-center text-center">
+          {logoTile("size-12 rounded-full ring-1 ring-border")}
+          <h1 className="mt-2 font-menu-display text-[36px] leading-none font-medium text-balance">{name}</h1>
+          <div className="mt-2.5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px]">
+            {guestLine}
+          </div>
         </div>
       </header>
     );
@@ -96,7 +100,7 @@ export async function GuestHeader({
   if (theme === "nuit")
     return (
       <header className="relative">
-        <div className="relative h-80 overflow-hidden sm:h-96">
+        <div className="relative h-60 overflow-hidden sm:h-72">
           {cover ? (
             <img
               src={cover.lg}
@@ -114,24 +118,25 @@ export async function GuestHeader({
           <div className="relative mx-auto max-w-3xl px-4 pt-[max(0.75rem,env(safe-area-inset-top))]">
             {actions}
           </div>
-          <div className="absolute inset-x-0 bottom-0 mx-auto flex max-w-3xl items-end gap-4 px-5 pb-4">
+          <div className="absolute inset-x-0 bottom-0 mx-auto flex max-w-3xl items-end gap-3 px-4 pb-3">
             <div className="min-w-0 flex-1">
-              {logoTile("mb-3 size-12 rounded-xl")}
-              <h1 className="font-menu-display text-4xl leading-tight font-medium">{name}</h1>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">{guestLine}</div>
+              <div className="flex items-center gap-3">
+                {logoTile("size-11 rounded-xl")}
+                <h1 className="min-w-0 truncate font-menu-display text-[32px] leading-tight font-medium">
+                  {name}
+                </h1>
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">{guestLine}</div>
             </div>
             <WaiterCall />
           </div>
-        </div>
-        <div className="mx-auto max-w-3xl px-5">
-          <StoreLine t={t} store={store} />
         </div>
       </header>
     );
 
   return (
     <header className="relative">
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-accent to-accent-hover sm:h-60">
+      <div className="relative h-32 overflow-hidden bg-gradient-to-br from-accent to-accent-hover sm:h-44">
         {cover ? (
           <img
             src={cover.lg}
@@ -150,61 +155,45 @@ export async function GuestHeader({
           {actions}
         </div>
       </div>
-      <div className="relative mx-auto -mt-12 max-w-3xl px-4">
-        <div className="flex items-center gap-4 rounded-3xl border border-border bg-surface p-4 shadow-[var(--shadow-float)]">
-          {logoTile("size-16 rounded-2xl ring-1 ring-border")}
+      <div className="relative mx-auto -mt-10 max-w-3xl px-4">
+        <div className="flex items-center gap-3 rounded-3xl border border-border bg-surface p-3 shadow-[var(--shadow-float)]">
+          {logoTile("size-14 rounded-2xl ring-1 ring-border")}
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-xl leading-tight font-bold tracking-tight">{name}</h1>
-            <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">{guestLine}</p>
+            <h1 className="truncate text-lg leading-tight font-bold tracking-tight">{name}</h1>
+            <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px]">{guestLine}</p>
           </div>
           <WaiterCall />
         </div>
-        <StoreLine t={t} store={store} className="px-2" />
       </div>
     </header>
   );
 }
 
-/** Open now / closed, and the address. */
-function StoreLine({
+/** Open now (until when) or closed (opens at). */
+function OpenBadge({
   t,
   store,
-  className,
 }: {
   t: (key: string, values?: Record<string, string>) => string;
   store?: Store;
-  className?: string;
 }): ReactNode {
-  if (!store || (store.open.status === "unknown" && !store.address)) return null;
+  if (!store || store.open.status === "unknown") return null;
+  if (store.open.status === "open")
+    return (
+      <span className="inline-flex items-center gap-1.5 text-fg-muted">
+        <span className="relative flex size-2">
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
+          <span className="relative inline-flex size-2 rounded-full bg-success" />
+        </span>
+        <span className="font-semibold text-success">{t("openNow")}</span>
+        <span className="tabular-nums">{t("openUntil", { time: store.open.until })}</span>
+      </span>
+    );
   return (
-    <div
-      className={cn(
-        "mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-fg-muted",
-        className,
-      )}
-    >
-      {store.open.status === "open" ? (
-        <span className="inline-flex items-center gap-1.5">
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
-            <span className="relative inline-flex size-2 rounded-full bg-success" />
-          </span>
-          <span className="font-semibold text-success">{t("openNow")}</span>
-          <span className="tabular-nums">{t("openUntil", { time: store.open.until })}</span>
-        </span>
-      ) : store.open.status === "closed" ? (
-        <span className="inline-flex items-center gap-1.5">
-          <Clock className="size-3.5" aria-hidden="true" />
-          <span className="font-semibold text-danger">{t("closedNow")}</span>
-          {store.open.from ? <span>{t("opensAt", { time: store.open.from })}</span> : null}
-        </span>
-      ) : null}
-      {store.address ? (
-        <span className="inline-flex min-w-0 items-center gap-1.5">
-          <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
-          <span className="truncate">{store.address}</span>
-        </span>
-      ) : null}
-    </div>
+    <span className="inline-flex items-center gap-1.5 text-fg-muted">
+      <Clock className="size-3.5" aria-hidden="true" />
+      <span className="font-semibold text-danger">{t("closedNow")}</span>
+      {store.open.from ? <span>{t("opensAt", { time: store.open.from })}</span> : null}
+    </span>
   );
 }

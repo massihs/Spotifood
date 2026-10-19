@@ -836,7 +836,8 @@
         "water": "Nous apportons de l’eau."
       },
       "tooSoon": "Votre demande est déjà partie, patientez un instant.",
-      "failed": "Envoi impossible, réessayez."
+      "failed": "Envoi impossible, réessayez.",
+      "short": "Serveur"
     },
     "tableBadge": "Table {table}",
     "quickAdd": "Ajouter {name} au panier",
@@ -876,7 +877,11 @@
     "openNow": "Ouvert",
     "openUntil": "jusqu'à {time}",
     "closedNow": "Fermé",
-    "opensAt": "ouvre à {time}"
+    "opensAt": "ouvre à {time}",
+    "filters": "Filtrer et afficher",
+    "filtered": "Filtre :",
+    "show": "Afficher",
+    "priceUnit": "Prix en milliers de tomans"
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -2111,6 +2116,8 @@
     "doux": {
       "name": "Doux",
       "desc": "Arrondi et convivial, à la couleur de votre marque."
-    }
+    },
+    "shortPrices": "Afficher les prix en milliers de tomans",
+    "shortPricesHint": "Par exemple 1 319 au lieu de 1 319 000 tomans ; l'unité est indiquée une fois par section."
   }
 }

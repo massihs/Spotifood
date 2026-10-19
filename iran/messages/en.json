@@ -860,7 +860,8 @@
         "water": "We’ll bring water."
       },
       "tooSoon": "Your request is on its way — please wait a moment.",
-      "failed": "Could not send, try again."
+      "failed": "Could not send, try again.",
+      "short": "Waiter"
     },
     "popular": "Popular",
     "inCart": "{n} in your cart",
@@ -876,7 +877,11 @@
     "openNow": "Open",
     "openUntil": "until {time}",
     "closedNow": "Closed",
-    "opensAt": "opens at {time}"
+    "opensAt": "opens at {time}",
+    "filters": "Filter & view",
+    "filtered": "Filter:",
+    "show": "Show",
+    "priceUnit": "Prices in thousand tomans"
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -2103,6 +2108,8 @@
     "doux": {
       "name": "Soft",
       "desc": "Rounded and friendly, in the restaurant's brand color."
-    }
+    },
+    "shortPrices": "Show prices in thousand tomans",
+    "shortPricesHint": "e.g. 1,319 instead of 1,319,000 tomans; the unit is shown once per section."
   }
 }

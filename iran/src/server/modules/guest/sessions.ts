@@ -151,6 +151,7 @@ export type GuestContext = {
     kind: "restaurant" | "cafe" | "food_court";
     brandColor: string;
     menuTheme: string;
+    menuShortPrices: boolean;
   };
 };
 
@@ -192,6 +193,7 @@ export async function loadGuestContext(
         kind: restaurants.kind,
         brandColor: restaurants.brandColor,
         menuTheme: restaurants.menuTheme,
+        menuShortPrices: restaurants.menuShortPrices,
         pricesIncludeTax: restaurantSettings.pricesIncludeTax,
         enabledLocales: restaurantSettings.enabledLocales,
       },

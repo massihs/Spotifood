@@ -84,6 +84,7 @@ async function Settings({ params }: { params: Params }) {
                   kind: r.kind,
                   brandColor: r.brandColor,
                   menuTheme: r.menuTheme,
+                  menuShortPrices: r.menuShortPrices,
                   email: r.email,
                   phone: r.phone,
                   addressLine1: r.addressLine1,

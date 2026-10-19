@@ -21,6 +21,7 @@ export const profileSchema = z.object({
   kind: z.enum(RESTAURANT_KINDS).optional(),
   brandColor: z.enum(BRAND_COLORS.map((b) => b.key) as [string, ...string[]]).optional(),
   menuTheme: z.enum(MENU_THEMES).optional(),
+  menuShortPrices: z.boolean().optional(),
   email: z
     .string()
     .trim()

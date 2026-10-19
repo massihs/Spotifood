@@ -33,6 +33,8 @@ export const restaurants = pgTable(
     brandColor: varchar({ length: 16 }).notNull().default("violet"),
     /** Guest menu look: atelier | nuit | doux. */
     menuTheme: varchar({ length: 16 }).notNull().default("doux"),
+    /** Guest menu shows prices in thousand tomans (1 319 instead of 1 319 000 tomans). */
+    menuShortPrices: boolean().notNull().default(false),
     email: varchar({ length: 320 }),
     phone: varchar({ length: 32 }),
     addressLine1: varchar({ length: 200 }),

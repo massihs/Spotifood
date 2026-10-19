@@ -14,6 +14,7 @@ import {
   PopularBadge,
   ProductImage,
   QuantityStepper,
+  splitDescription,
   TagChip,
   type CartSummary,
 } from "./parts";
@@ -63,6 +64,7 @@ export function ProductSheet({
       ? p.optionGroups.find((g) => g.id === (priced.error as { groupId: string }).groupId)
       : undefined;
   const pct = discountPct(p);
+  const desc = splitDescription(p.description, p.name);
 
   const toggle = (g: PricedOptionGroup, valueId: string) =>
     setSelected((prev) => {
@@ -145,7 +147,16 @@ export function ProductSheet({
                   </>
                 ) : null}
               </p>
-              {p.description ? <p className="mt-2 leading-7 text-fg-muted">{p.description}</p> : null}
+              {desc.latin ? (
+                <p
+                  className="mt-1 text-sm tracking-wide text-fg-subtle"
+                  dir="ltr"
+                  style={{ textAlign: "end" }}
+                >
+                  {desc.latin}
+                </p>
+              ) : null}
+              {desc.text ? <p className="mt-2 leading-7 text-fg-muted">{desc.text}</p> : null}
               {inCart ? (
                 <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-sm font-medium">
                   <ShoppingBag className="size-4 text-accent-text" aria-hidden="true" />

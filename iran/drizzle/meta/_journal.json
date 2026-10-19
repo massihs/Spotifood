@@ -134,6 +134,13 @@
       "when": 1792423468534,
       "tag": "0018_menu_theme",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792424635286,
+      "tag": "0019_menu_short_prices",
+      "breakpoints": true
     }
   ]
 }

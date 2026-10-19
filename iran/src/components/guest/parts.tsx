@@ -45,6 +45,22 @@ export function canQuickAdd(p: PublicProduct) {
   return p.optionGroups.every((g) => (sel.get(g.id)?.size ?? 0) >= g.minSelect);
 }
 
+/**
+ * Splits a description that starts with the dish's Latin name ("Rock Shrimp · میگو، هویج…")
+ * into that name (shown on its own small line) and the rest.
+ */
+export function splitDescription(
+  desc: string | null,
+  name: string,
+): { latin: string | null; text: string | null } {
+  // Only a Persian/Arabic dish name has a Latin translation worth its own line.
+  if (!desc || !/[\u0600-\u06FF]/.test(name)) return { latin: null, text: desc };
+  const m = /^([A-Za-z0-9&'’.,\-\s]+?)\s*(?:·\s*([\s\S]*))?$/.exec(desc.trim());
+  if (m && /[A-Za-z]/.test(m[1]!) && !/[\u0600-\u06FF]/.test(m[1]!))
+    return { latin: m[1]!.trim(), text: m[2]?.trim() || null };
+  return { latin: null, text: desc };
+}
+
 export function discountPct(p: PublicProduct) {
   if (!p.compareAtPriceCents || p.compareAtPriceCents <= p.priceCents) return 0;
   return Math.round((1 - p.priceCents / p.compareAtPriceCents) * 100);
@@ -217,8 +233,8 @@ export function AddButton({
         onClick();
       }}
       className={cn(
-        "grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-fg shadow-accent ring-[3px] ring-surface",
-        "atelier:size-8 atelier:bg-surface atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-fg nuit:shadow-none nuit:ring-bg",
+        "grid size-11 shrink-0 place-items-center rounded-full bg-accent text-accent-fg shadow-accent",
+        "atelier:bg-transparent atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-fg nuit:shadow-none",
         "transition-transform active:scale-90 disabled:opacity-60",
         className,
       )}

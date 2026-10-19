@@ -37,6 +37,7 @@ export type ProfileValues = {
   kind: RestaurantKind;
   brandColor: string;
   menuTheme: string;
+  menuShortPrices: boolean;
   email: string | null;
   phone: string | null;
   addressLine1: string | null;
@@ -78,7 +79,11 @@ export function ProfileForm({
         />
         <KindPicker defaultValue={values.kind} />
         <BrandPicker defaultValue={values.brandColor} />
-        <MenuThemePicker defaultValue={values.menuTheme} />
+        <MenuThemePicker
+          defaultValue={values.menuTheme}
+          shortPrices={values.menuShortPrices}
+          toman={values.currency === "IRR"}
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             label={t("settings.email")}

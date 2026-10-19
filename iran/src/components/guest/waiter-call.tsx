@@ -13,7 +13,7 @@ const KINDS = [
 ] as const;
 
 /** "Call the waiter" button on the identity card: waiter, the bill, or water. */
-export function WaiterCall() {
+export function WaiterCall({ className }: { className?: string }) {
   const t = useTranslations("guest.waiter");
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState<string | null>(null);
@@ -24,11 +24,15 @@ export function WaiterCall() {
       <button
         type="button"
         onClick={() => (setOpen(true), setSent(null), setError(null))}
-        className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent text-accent-fg shadow-accent atelier:size-11 atelier:rounded-full atelier:bg-transparent atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-border-strong nuit:rounded-full nuit:shadow-none"
-        aria-label={t("call")}
+        className={cn(
+          "inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-accent ps-3.5 pe-4 text-sm font-semibold text-accent-fg shadow-accent",
+          "atelier:bg-transparent atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-border-strong nuit:shadow-none",
+          className,
+        )}
         title={t("call")}
       >
-        <BellRing className="size-5" aria-hidden="true" />
+        <BellRing className="size-[18px]" aria-hidden="true" />
+        {t("short")}
       </button>
       {open ? (
         <div

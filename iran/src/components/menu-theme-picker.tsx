@@ -63,10 +63,15 @@ export function MenuThemePicker({
   name = "menuTheme",
   defaultValue,
   disabled,
+  shortPrices,
+  toman,
 }: {
   name?: string;
   defaultValue: string;
   disabled?: boolean;
+  /** Current "prices in thousand tomans" choice (shown for toman menus only). */
+  shortPrices?: boolean;
+  toman?: boolean;
 }) {
   const t = useTranslations("menuThemes");
   const [value, setValue] = useState(defaultValue);
@@ -105,6 +110,20 @@ export function MenuThemePicker({
           </label>
         ))}
       </div>
+      {toman ? (
+        <label className="mt-3 flex items-start gap-2.5 text-sm">
+          <input
+            type="checkbox"
+            name="menuShortPrices"
+            defaultChecked={shortPrices}
+            className="mt-0.5 size-4 accent-[var(--accent)]"
+          />
+          <span>
+            {t("shortPrices")}
+            <span className="block text-xs text-fg-muted">{t("shortPricesHint")}</span>
+          </span>
+        </label>
+      ) : null}
     </fieldset>
   );
 }
