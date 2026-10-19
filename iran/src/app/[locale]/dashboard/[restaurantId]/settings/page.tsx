@@ -83,6 +83,7 @@ async function Settings({ params }: { params: Params }) {
                   name: r.name,
                   kind: r.kind,
                   brandColor: r.brandColor,
+                  menuTheme: r.menuTheme,
                   email: r.email,
                   phone: r.phone,
                   addressLine1: r.addressLine1,

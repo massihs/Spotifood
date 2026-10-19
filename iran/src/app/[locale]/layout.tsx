@@ -53,6 +53,22 @@ const persianDigits = localFont({
   preload: false,
 });
 
+// Display faces of the guest menu themes (Atelier: Persian serif, Nuit: modern Kufi).
+const menuSerif = localFont({
+  src: "../../../node_modules/@fontsource-variable/markazi-text/files/markazi-text-arabic-wght-normal.woff2",
+  weight: "400 700",
+  variable: "--font-menu-serif",
+  display: "swap",
+  preload: false,
+});
+const menuKufi = localFont({
+  src: "../../../node_modules/@fontsource-variable/reem-kufi/files/reem-kufi-arabic-wght-normal.woff2",
+  weight: "400 700",
+  variable: "--font-menu-kufi",
+  display: "swap",
+  preload: false,
+});
+
 export const metadata: Metadata = {
   title: { default: "Spotifood", template: "%s · Spotifood" },
   applicationName: "Spotifood",
@@ -85,7 +101,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <html
       lang={locale}
       dir={localeDirection(locale)}
-      className={`${sans.variable} ${persian.variable} ${persianDigits.variable}`}
+      className={`${sans.variable} ${persian.variable} ${persianDigits.variable} ${menuSerif.variable} ${menuKufi.variable}`}
       data-scroll-behavior="smooth"
     >
       <body className="min-h-dvh">

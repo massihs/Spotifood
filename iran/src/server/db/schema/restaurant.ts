@@ -31,6 +31,8 @@ export const restaurants = pgTable(
     logoKey: text(),
     /** Brand color key (lib/brand-colors): menu and dashboard accent. */
     brandColor: varchar({ length: 16 }).notNull().default("violet"),
+    /** Guest menu look: atelier | nuit | doux. */
+    menuTheme: varchar({ length: 16 }).notNull().default("doux"),
     email: varchar({ length: 320 }),
     phone: varchar({ length: 32 }),
     addressLine1: varchar({ length: 200 }),

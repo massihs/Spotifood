@@ -9,6 +9,7 @@ import {
   Utensils,
 } from "lucide-react";
 import { Suspense } from "react";
+import { menuThemeOf } from "@/lib/menu-themes";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { GuestTopBar } from "@/components/guest/cart-view";
 import { PaymentPanel } from "@/components/guest/payment-panel";
@@ -58,211 +59,216 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
   return (
     <LiveProvider url="/api/v1/realtime/guest">
       <div data-brand={guest.restaurant.brandColor} className="contents">
-        <LiveRefresh types={["order.updated", "session.closed", "payment.updated"]} />
-        <GuestTopBar
-          title={t("guest.myOrders")}
-          subtitle={`${guest.restaurant.name} · ${t("guest.tableBadge", { table: guest.table.label })}`}
-          extra={<LiveIndicator className="rounded-full bg-surface-2 px-3 py-1.5" />}
-        />
-        <main className="mx-auto max-w-2xl px-4 pt-4 pb-32">
-          {orders.length > 0 ? <ReadyWatcher /> : null}
-          {sp.placed ? (
-            <div
-              role="status"
-              className="animate-pop-in mb-4 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent-soft p-4"
-            >
-              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-accent text-accent-fg">
-                <CircleCheck className="size-7" aria-hidden="true" />
-              </span>
-              <div>
-                <p className="text-lg font-semibold">{t("guest.sentTitle")}</p>
-                <p className="text-sm text-fg-muted">{t("guest.sentBody")}</p>
-              </div>
-            </div>
-          ) : null}
-
-          {orders.length === 0 ? (
-            <div className="py-16 text-center">
-              <div className="mx-auto grid size-20 place-items-center rounded-full bg-surface-2">
-                <ReceiptText className="size-9 text-fg-muted" aria-hidden="true" />
-              </div>
-              <p className="mt-5 text-lg font-bold">{t("guest.noOrders")}</p>
-              <Link
-                href="/table"
-                className="mt-7 inline-flex h-12 items-center rounded-full bg-accent px-7 font-bold text-accent-fg"
+        <div data-menu-theme={menuThemeOf(guest.restaurant.menuTheme)}>
+          <LiveRefresh types={["order.updated", "session.closed", "payment.updated"]} />
+          <GuestTopBar
+            title={t("guest.myOrders")}
+            subtitle={`${guest.restaurant.name} · ${t("guest.tableBadge", { table: guest.table.label })}`}
+            extra={<LiveIndicator className="rounded-full bg-surface-2 px-3 py-1.5" />}
+          />
+          <main className="mx-auto max-w-2xl px-4 pt-4 pb-32">
+            {orders.length > 0 ? <ReadyWatcher /> : null}
+            {sp.placed ? (
+              <div
+                role="status"
+                className="animate-pop-in mb-4 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent-soft p-4"
               >
-                {t("guest.backToMenu")}
-              </Link>
-            </div>
-          ) : (
-            <ul className="space-y-4">
-              {orders.map((o) => {
-                const stepIndex = STEPS.findIndex((s) => s.key === o.status);
-                return (
-                  <li
-                    key={o.id}
-                    className={cn(
-                      "rounded-2xl border bg-surface p-4 shadow-[var(--shadow-soft)]",
-                      o.status === "ready" ? "border-accent ring-4 ring-accent/15" : "border-border",
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-lg font-semibold">
-                          {t("guest.orderNumber", { number: o.number })}
-                        </p>
-                        <p className="text-sm text-fg-muted">
-                          {t("guest.placedAt", {
-                            time: format.dateTime(o.placedAt, {
-                              timeStyle: "short",
-                              timeZone: guest.restaurant.timezone,
-                            }),
+                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-accent text-accent-fg">
+                  <CircleCheck className="size-7" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-lg font-semibold">{t("guest.sentTitle")}</p>
+                  <p className="text-sm text-fg-muted">{t("guest.sentBody")}</p>
+                </div>
+              </div>
+            ) : null}
+
+            {orders.length === 0 ? (
+              <div className="py-16 text-center">
+                <div className="mx-auto grid size-20 place-items-center rounded-full bg-surface-2">
+                  <ReceiptText className="size-9 text-fg-muted" aria-hidden="true" />
+                </div>
+                <p className="mt-5 text-lg font-bold">{t("guest.noOrders")}</p>
+                <Link
+                  href="/table"
+                  className="mt-7 inline-flex h-12 items-center rounded-full bg-accent px-7 font-bold text-accent-fg"
+                >
+                  {t("guest.backToMenu")}
+                </Link>
+              </div>
+            ) : (
+              <ul className="space-y-4">
+                {orders.map((o) => {
+                  const stepIndex = STEPS.findIndex((s) => s.key === o.status);
+                  return (
+                    <li
+                      key={o.id}
+                      className={cn(
+                        "rounded-2xl border bg-surface p-4 shadow-[var(--shadow-soft)]",
+                        o.status === "ready" ? "border-accent ring-4 ring-accent/15" : "border-border",
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-lg font-semibold">
+                            {t("guest.orderNumber", { number: o.number })}
+                          </p>
+                          <p className="text-sm text-fg-muted">
+                            {t("guest.placedAt", {
+                              time: format.dateTime(o.placedAt, {
+                                timeStyle: "short",
+                                timeZone: guest.restaurant.timezone,
+                              }),
+                            })}
+                          </p>
+                        </div>
+                        <span
+                          className={cn(
+                            "shrink-0 rounded-full px-3 py-1.5 text-sm font-bold",
+                            o.status === "ready" || o.status === "served"
+                              ? "bg-accent text-accent-fg"
+                              : o.status === "cancelled"
+                                ? "bg-danger-soft text-danger"
+                                : "bg-accent-soft text-accent-text",
+                          )}
+                        >
+                          {t(`orderStatus.${o.status}`)}
+                        </span>
+                      </div>
+
+                      {stepIndex >= 0 ? (
+                        <ol className="mt-5 flex items-start" aria-label={t("guest.trackTitle")}>
+                          {STEPS.map(({ key, Icon }, i) => {
+                            const done = i < stepIndex;
+                            const current = i === stepIndex;
+                            return (
+                              <li
+                                key={key}
+                                aria-current={current ? "step" : undefined}
+                                className="relative flex flex-1 flex-col items-center text-center"
+                              >
+                                {i > 0 ? (
+                                  <span
+                                    aria-hidden="true"
+                                    className={cn(
+                                      "absolute end-1/2 top-[18px] h-1 w-full -translate-y-1/2 rounded-full",
+                                      i <= stepIndex ? "bg-accent" : "bg-surface-2",
+                                    )}
+                                  />
+                                ) : null}
+                                <span
+                                  className={cn(
+                                    "relative z-10 grid size-9 place-items-center rounded-full",
+                                    current
+                                      ? "bg-accent text-accent-fg ring-4 ring-accent/20"
+                                      : done
+                                        ? "bg-accent text-accent-fg"
+                                        : "bg-surface-2 text-fg-subtle",
+                                  )}
+                                >
+                                  <Icon className="size-[18px]" aria-hidden="true" />
+                                </span>
+                                <span
+                                  className={cn(
+                                    "mt-1.5 text-[11px] leading-tight",
+                                    current ? "font-bold text-fg" : "text-fg-muted",
+                                  )}
+                                >
+                                  {t(`guest.stepShort.${key}`)}
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      ) : null}
+                      <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-sm font-medium">
+                        {t(`guest.statusHint.${o.status}`)}
+                      </p>
+                      {guest.restaurant.kind === "food_court" &&
+                      o.customerPhone &&
+                      !["ready", "served", "cancelled"].includes(o.status) ? (
+                        <p className="mt-2 flex items-center gap-2 px-1 text-xs text-fg-muted">
+                          <Smartphone className="size-3.5 shrink-0 text-accent-text" aria-hidden="true" />
+                          {t("guest.smsSent", {
+                            phone: `${o.customerPhone.slice(0, 4)}•••${o.customerPhone.slice(-3)}`,
                           })}
                         </p>
-                      </div>
-                      <span
-                        className={cn(
-                          "shrink-0 rounded-full px-3 py-1.5 text-sm font-bold",
-                          o.status === "ready" || o.status === "served"
-                            ? "bg-accent text-accent-fg"
-                            : o.status === "cancelled"
-                              ? "bg-danger-soft text-danger"
-                              : "bg-accent-soft text-accent-text",
-                        )}
-                      >
-                        {t(`orderStatus.${o.status}`)}
-                      </span>
-                    </div>
+                      ) : null}
 
-                    {stepIndex >= 0 ? (
-                      <ol className="mt-5 flex items-start" aria-label={t("guest.trackTitle")}>
-                        {STEPS.map(({ key, Icon }, i) => {
-                          const done = i < stepIndex;
-                          const current = i === stepIndex;
-                          return (
-                            <li
-                              key={key}
-                              aria-current={current ? "step" : undefined}
-                              className="relative flex flex-1 flex-col items-center text-center"
-                            >
-                              {i > 0 ? (
-                                <span
-                                  aria-hidden="true"
-                                  className={cn(
-                                    "absolute end-1/2 top-[18px] h-1 w-full -translate-y-1/2 rounded-full",
-                                    i <= stepIndex ? "bg-accent" : "bg-surface-2",
-                                  )}
-                                />
-                              ) : null}
-                              <span
-                                className={cn(
-                                  "relative z-10 grid size-9 place-items-center rounded-full",
-                                  current
-                                    ? "bg-accent text-accent-fg ring-4 ring-accent/20"
-                                    : done
-                                      ? "bg-accent text-accent-fg"
-                                      : "bg-surface-2 text-fg-subtle",
-                                )}
-                              >
-                                <Icon className="size-[18px]" aria-hidden="true" />
+                      <ul className="mt-4 space-y-2.5 text-[15px]">
+                        {o.items.map((i) => (
+                          <li key={i.id} className="flex justify-between gap-3">
+                            <span className="flex gap-2">
+                              <span className="grid h-6 min-w-6 place-items-center rounded-md bg-surface-2 px-1 text-xs font-bold tabular-nums">
+                                {i.quantity}
                               </span>
-                              <span
-                                className={cn(
-                                  "mt-1.5 text-[11px] leading-tight",
-                                  current ? "font-bold text-fg" : "text-fg-muted",
-                                )}
-                              >
-                                {t(`guest.stepShort.${key}`)}
+                              <span>
+                                <span className="font-medium">{i.productName}</span>
+                                {i.options.length ? (
+                                  <span className="block text-sm text-fg-muted">
+                                    {i.options.map((x) => x.valueName).join("، ")}
+                                  </span>
+                                ) : null}
+                                {i.note ? (
+                                  <span className="block text-xs text-fg-subtle">« {i.note} »</span>
+                                ) : null}
                               </span>
-                            </li>
-                          );
-                        })}
-                      </ol>
-                    ) : null}
-                    <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-sm font-medium">
-                      {t(`guest.statusHint.${o.status}`)}
-                    </p>
-                    {guest.restaurant.kind === "food_court" &&
-                    o.customerPhone &&
-                    !["ready", "served", "cancelled"].includes(o.status) ? (
-                      <p className="mt-2 flex items-center gap-2 px-1 text-xs text-fg-muted">
-                        <Smartphone className="size-3.5 shrink-0 text-accent-text" aria-hidden="true" />
-                        {t("guest.smsSent", {
-                          phone: `${o.customerPhone.slice(0, 4)}•••${o.customerPhone.slice(-3)}`,
-                        })}
+                            </span>
+                            <span className="shrink-0 tabular-nums">{money(i.lineTotalCents)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="mt-4 flex items-center justify-between border-t border-border pt-3 font-semibold">
+                        <span className="flex items-center gap-2">
+                          {t("guest.total")}
+                          {o.paymentStatus !== "unpaid" && o.status !== "cancelled" ? (
+                            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text">
+                              {t(`paymentStatus.${o.paymentStatus}`)}
+                            </span>
+                          ) : null}
+                        </span>
+                        <span
+                          className={cn(
+                            "tabular-nums",
+                            o.status === "cancelled" && "line-through opacity-60",
+                          )}
+                        >
+                          {money(o.totalCents)}
+                        </span>
                       </p>
-                    ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
 
-                    <ul className="mt-4 space-y-2.5 text-[15px]">
-                      {o.items.map((i) => (
-                        <li key={i.id} className="flex justify-between gap-3">
-                          <span className="flex gap-2">
-                            <span className="grid h-6 min-w-6 place-items-center rounded-md bg-surface-2 px-1 text-xs font-bold tabular-nums">
-                              {i.quantity}
-                            </span>
-                            <span>
-                              <span className="font-medium">{i.productName}</span>
-                              {i.options.length ? (
-                                <span className="block text-sm text-fg-muted">
-                                  {i.options.map((x) => x.valueName).join("، ")}
-                                </span>
-                              ) : null}
-                              {i.note ? (
-                                <span className="block text-xs text-fg-subtle">« {i.note} »</span>
-                              ) : null}
-                            </span>
-                          </span>
-                          <span className="shrink-0 tabular-nums">{money(i.lineTotalCents)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-4 flex items-center justify-between border-t border-border pt-3 font-semibold">
-                      <span className="flex items-center gap-2">
-                        {t("guest.total")}
-                        {o.paymentStatus !== "unpaid" && o.status !== "cancelled" ? (
-                          <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text">
-                            {t(`paymentStatus.${o.paymentStatus}`)}
-                          </span>
-                        ) : null}
-                      </span>
-                      <span
-                        className={cn("tabular-nums", o.status === "cancelled" && "line-through opacity-60")}
-                      >
-                        {money(o.totalCents)}
-                      </span>
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+            {orders.length > 0 ? (
+              <>
+                <div className="mt-4 flex items-center justify-between rounded-2xl bg-surface-2 px-5 py-4">
+                  <span className="font-semibold">{t("guest.yourTotal")}</span>
+                  <span className="text-lg font-semibold tabular-nums">{money(total)}</span>
+                </div>
+                <PaymentPanel
+                  state={payState}
+                  currency={guest.restaurant.currency}
+                  returned={returned?.status ?? null}
+                />
+              </>
+            ) : null}
 
-          {orders.length > 0 ? (
-            <>
-              <div className="mt-4 flex items-center justify-between rounded-2xl bg-surface-2 px-5 py-4">
-                <span className="font-semibold">{t("guest.yourTotal")}</span>
-                <span className="text-lg font-semibold tabular-nums">{money(total)}</span>
+            {orders.length > 0 ? (
+              <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl border-t border-border bg-bg/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
+                <Link
+                  href="/table"
+                  className="flex h-14 items-center justify-center gap-2 rounded-full bg-surface-2 text-base font-bold active:bg-surface-3"
+                >
+                  <Plus className="size-5" strokeWidth={2.5} aria-hidden="true" />
+                  {t("guest.orderMore")}
+                </Link>
               </div>
-              <PaymentPanel
-                state={payState}
-                currency={guest.restaurant.currency}
-                returned={returned?.status ?? null}
-              />
-            </>
-          ) : null}
-
-          {orders.length > 0 ? (
-            <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl border-t border-border bg-bg/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
-              <Link
-                href="/table"
-                className="flex h-14 items-center justify-center gap-2 rounded-full bg-surface-2 text-base font-bold active:bg-surface-3"
-              >
-                <Plus className="size-5" strokeWidth={2.5} aria-hidden="true" />
-                {t("guest.orderMore")}
-              </Link>
-            </div>
-          ) : null}
-        </main>
+            ) : null}
+          </main>
+        </div>
       </div>
     </LiveProvider>
   );

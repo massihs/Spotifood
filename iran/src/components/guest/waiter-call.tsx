@@ -24,7 +24,7 @@ export function WaiterCall() {
       <button
         type="button"
         onClick={() => (setOpen(true), setSent(null), setError(null))}
-        className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent text-accent-fg shadow-accent"
+        className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent text-accent-fg shadow-accent atelier:size-11 atelier:rounded-full atelier:bg-transparent atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-border-strong nuit:rounded-full nuit:shadow-none"
         aria-label={t("call")}
         title={t("call")}
       >

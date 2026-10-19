@@ -1,6 +1,7 @@
 "use server";
 
 import { isBrandColor } from "@/lib/brand-colors";
+import { isMenuTheme, type MenuTheme } from "@/lib/menu-themes";
 import { isRestaurantKind, type RestaurantKind } from "@/lib/restaurant-kind";
 import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
@@ -32,6 +33,7 @@ export async function updateProfileAction(restaurantId: string, _prev: unknown, 
       name: str(fd, "name"),
       kind: isRestaurantKind(str(fd, "kind")) ? (str(fd, "kind") as RestaurantKind) : undefined,
       brandColor: isBrandColor(str(fd, "brandColor")) ? str(fd, "brandColor") : undefined,
+      menuTheme: isMenuTheme(str(fd, "menuTheme")) ? (str(fd, "menuTheme") as MenuTheme) : undefined,
       email: str(fd, "email"),
       phone: str(fd, "phone"),
       addressLine1: str(fd, "addressLine1"),

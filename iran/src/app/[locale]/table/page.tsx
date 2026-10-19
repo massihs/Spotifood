@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { menuThemeOf } from "@/lib/menu-themes";
 import { NowPlaying } from "@/components/guest/now-playing";
 import { hasActiveMusic, restaurantNowPlaying } from "@/server/modules/music/service";
 import { getGuest } from "@/server/modules/guest/current";
@@ -43,19 +44,21 @@ async function GuestMenu() {
   return (
     <LiveProvider url="/api/v1/realtime/guest">
       <div data-brand={guest.restaurant.brandColor} className="contents">
-        <LiveRefresh types={["session.closed"]} />
-        <MenuApp
-          menu={menu}
-          currency={guest.restaurant.currency}
-          initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents, byProduct }}
-          popularIds={popularIds}
-          header={
-            <>
-              <GuestHeader guest={guest} orderCount={orders.length} cover={cover} store={store} />
-              {music ? <NowPlaying initial={playing} restaurantName={guest.restaurant.name} /> : null}
-            </>
-          }
-        />
+        <div data-menu-theme={menuThemeOf(guest.restaurant.menuTheme)}>
+          <LiveRefresh types={["session.closed"]} />
+          <MenuApp
+            menu={menu}
+            currency={guest.restaurant.currency}
+            initialCart={{ itemCount: cart.itemCount, totalCents: cart.totals.totalCents, byProduct }}
+            popularIds={popularIds}
+            header={
+              <>
+                <GuestHeader guest={guest} orderCount={orders.length} cover={cover} store={store} />
+                {music ? <NowPlaying initial={playing} restaurantName={guest.restaurant.name} /> : null}
+              </>
+            }
+          />
+        </div>
       </div>
     </LiveProvider>
   );

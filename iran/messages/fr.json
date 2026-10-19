@@ -2096,5 +2096,21 @@
     },
     "cancel": "Annuler la réservation",
     "cancelConfirm": "Annuler cette réservation ?"
+  },
+  "menuThemes": {
+    "label": "Apparence du menu client",
+    "hint": "Ce que voient les clients en scannant le QR code. Appliqué dès l'enregistrement.",
+    "atelier": {
+      "name": "Atelier",
+      "desc": "Sobre et élégant, comme une carte imprimée : blanc et typographie fine."
+    },
+    "nuit": {
+      "name": "Nuit",
+      "desc": "Sombre et chaleureux, grande photo et détails dorés ; idéal le soir."
+    },
+    "doux": {
+      "name": "Doux",
+      "desc": "Arrondi et convivial, à la couleur de votre marque."
+    }
   }
 }

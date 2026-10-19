@@ -127,6 +127,13 @@
       "when": 1792411589198,
       "tag": "0017_modules",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792423468534,
+      "tag": "0018_menu_theme",
+      "breakpoints": true
     }
   ]
 }

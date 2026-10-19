@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { menuThemeOf } from "@/lib/menu-themes";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/server/db/client";
 import { getGuest } from "@/server/modules/guest/current";
@@ -28,19 +29,21 @@ async function GuestCart() {
   return (
     <LiveProvider url="/api/v1/realtime/guest">
       <div data-brand={guest.restaurant.brandColor} className="contents">
-        <LiveRefresh types={["session.closed"]} />
-        <CartView
-          lines={cart.lines}
-          totals={cart.totals}
-          currency={guest.restaurant.currency}
-          pricesIncludeTax={guest.restaurant.pricesIncludeTax}
-          seatLabel={t("tableBadge", { table: guest.table.label })}
-          restaurantName={guest.restaurant.name}
-          displayName={guest.participant.displayName}
-          hasIssues={cart.hasIssues}
-          orderCount={orders.length}
-          requirePhone={guest.restaurant.kind === "food_court"}
-        />
+        <div data-menu-theme={menuThemeOf(guest.restaurant.menuTheme)}>
+          <LiveRefresh types={["session.closed"]} />
+          <CartView
+            lines={cart.lines}
+            totals={cart.totals}
+            currency={guest.restaurant.currency}
+            pricesIncludeTax={guest.restaurant.pricesIncludeTax}
+            seatLabel={t("tableBadge", { table: guest.table.label })}
+            restaurantName={guest.restaurant.name}
+            displayName={guest.participant.displayName}
+            hasIssues={cart.hasIssues}
+            orderCount={orders.length}
+            requirePhone={guest.restaurant.kind === "food_court"}
+          />
+        </div>
       </div>
     </LiveProvider>
   );

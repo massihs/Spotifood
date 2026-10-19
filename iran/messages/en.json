@@ -2088,5 +2088,21 @@
     },
     "cancel": "Cancel booking",
     "cancelConfirm": "Cancel this booking?"
+  },
+  "menuThemes": {
+    "label": "Guest menu look",
+    "hint": "What guests see when they scan the QR code. Applies as soon as you save.",
+    "atelier": {
+      "name": "Atelier",
+      "desc": "Quiet and elegant, like a printed menu: white with fine typography."
+    },
+    "nuit": {
+      "name": "Night",
+      "desc": "Dark and warm, with a large photo and gold details; made for dinner."
+    },
+    "doux": {
+      "name": "Soft",
+      "desc": "Rounded and friendly, in the restaurant's brand color."
+    }
   }
 }

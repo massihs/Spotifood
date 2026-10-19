@@ -128,7 +128,10 @@ export function ProductSheet({
           <div className="px-5 pt-5 pb-6">
             <header>
               {popular ? <PopularBadge className="mb-2" /> : null}
-              <h2 id="sheet-title" className="text-2xl leading-tight font-semibold tracking-tight">
+              <h2
+                id="sheet-title"
+                className="font-menu-display text-2xl leading-tight font-semibold tracking-tight atelier:text-[34px] atelier:font-medium"
+              >
                 {p.name}
               </h2>
               <p className="mt-2 flex flex-wrap items-center gap-2 text-lg">

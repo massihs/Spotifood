@@ -1,5 +1,10 @@
 @import "tailwindcss";
 @import "./brands.css";
+@import "./menu-themes.css";
+
+@custom-variant atelier (&:where([data-menu-theme="atelier"] *));
+@custom-variant nuit (&:where([data-menu-theme="nuit"] *));
+@custom-variant doux (&:where([data-menu-theme="doux"] *));
 
 /*
  * Spotifood design tokens: "palette".

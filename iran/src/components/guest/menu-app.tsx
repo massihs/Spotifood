@@ -211,7 +211,7 @@ export function MenuApp({
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("guest.search")}
                 enterKeyHint="search"
-                className="h-11 w-full rounded-2xl border border-border bg-surface ps-11 pe-11 text-[16px] shadow-[var(--shadow-soft)] placeholder:text-fg-subtle focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
+                className="h-11 w-full rounded-2xl border border-border bg-surface ps-11 pe-11 text-[16px] shadow-[var(--shadow-soft)] placeholder:text-fg-subtle focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none atelier:rounded-full atelier:border-transparent atelier:bg-surface-2 nuit:rounded-full [&::-webkit-search-cancel-button]:hidden"
               />
               {query ? (
                 <button
@@ -227,7 +227,10 @@ export function MenuApp({
           </div>
           {!q ? (
             <nav aria-label={t("guest.categoriesNav")} className="mt-2.5 border-b border-border">
-              <div ref={tabsRef} className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-2.5">
+              <div
+                ref={tabsRef}
+                className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-2.5 atelier:gap-6 atelier:px-6 atelier:pb-0"
+              >
                 {sections.map((c) => (
                   <a
                     key={c.id}
@@ -236,15 +239,16 @@ export function MenuApp({
                     aria-current={active === c.id ? "true" : undefined}
                     onClick={() => setActive(c.id)}
                     className={cn(
-                      "flex h-10 shrink-0 items-center gap-2 rounded-full ps-1.5 pe-4 text-sm font-semibold whitespace-nowrap transition-colors",
+                      "flex h-10 shrink-0 items-center gap-2 rounded-full ps-1.5 pe-4 text-sm font-semibold whitespace-nowrap transition-colors nuit:px-4",
+                      "atelier:h-11 atelier:rounded-none atelier:border-b-2 atelier:px-0 atelier:font-medium atelier:shadow-none atelier:ring-0",
                       active === c.id
-                        ? "bg-fg text-bg shadow-sm"
-                        : "bg-surface text-fg-muted ring-1 ring-border hover:text-fg",
+                        ? "bg-fg text-bg shadow-sm atelier:border-fg atelier:bg-transparent atelier:text-fg nuit:bg-accent nuit:text-accent-fg"
+                        : "bg-surface text-fg-muted ring-1 ring-border hover:text-fg atelier:border-transparent atelier:bg-transparent",
                     )}
                   >
                     <span
                       className={cn(
-                        "grid size-7 place-items-center rounded-full",
+                        "grid size-7 place-items-center rounded-full atelier:hidden nuit:hidden",
                         active === c.id ? "bg-accent text-accent-fg" : "bg-accent-soft text-accent-text",
                       )}
                     >
@@ -322,8 +326,11 @@ export function MenuApp({
           {featured.length > 0 ? (
             <section className="pt-5" aria-labelledby="featured-title">
               <div className="flex items-center gap-2 px-4">
-                <Sparkles className="size-5 text-accent" aria-hidden="true" />
-                <h2 id="featured-title" className="text-lg font-bold tracking-tight">
+                <Sparkles className="size-5 text-accent atelier:hidden" aria-hidden="true" />
+                <h2
+                  id="featured-title"
+                  className="font-menu-display text-lg font-bold tracking-tight atelier:text-[26px] atelier:font-medium nuit:font-medium nuit:text-accent-text"
+                >
                   {t("guest.featured")}
                 </h2>
               </div>
@@ -335,14 +342,17 @@ export function MenuApp({
                       tabIndex={0}
                       onClick={() => setOpenId(p.id)}
                       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setOpenId(p.id)}
-                      className="block h-full w-full cursor-pointer overflow-hidden rounded-3xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.985]"
+                      className="block h-full w-full cursor-pointer overflow-hidden rounded-3xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.985] atelier:rounded-none atelier:border-0 atelier:bg-transparent nuit:border-0 nuit:bg-transparent"
                     >
                       <div className="relative">
                         {p.images[0] ? (
                           <ProductImage
                             product={p}
                             size="md"
-                            className={cn("aspect-[4/3] w-full", !p.isAvailable && "grayscale")}
+                            className={cn(
+                              "aspect-[4/3] w-full atelier:rounded-lg nuit:rounded-3xl",
+                              !p.isAvailable && "grayscale",
+                            )}
                             eager
                           />
                         ) : (
@@ -356,9 +366,11 @@ export function MenuApp({
                         </div>
                         <InCartBadge n={cart.byProduct[p.id] ?? 0} className="absolute end-3 top-3" />
                       </div>
-                      <div className="flex items-end justify-between gap-2 p-3.5">
+                      <div className="flex items-end justify-between gap-2 p-3.5 atelier:px-0.5 nuit:px-0.5">
                         <div className="min-w-0">
-                          <p className="truncate font-bold">{p.name}</p>
+                          <p className="truncate font-menu-display font-bold atelier:text-xl atelier:font-medium nuit:[font-family:var(--app-font)]">
+                            {p.name}
+                          </p>
                           <Price product={p} money={money} className="mt-1" />
                         </div>
                         {p.isAvailable ? (
@@ -404,12 +416,15 @@ export function MenuApp({
                 className="scroll-mt-36 pt-7"
                 aria-labelledby={`h-${c.id}`}
               >
-                <div className="flex items-center gap-3 px-4">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                <div className="flex items-center gap-3 px-4 atelier:px-6">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text atelier:hidden nuit:hidden">
                     <CategoryIcon icon={c.icon} className="size-5" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <h2 id={`h-${c.id}`} className="text-lg leading-tight font-bold tracking-tight">
+                    <h2
+                      id={`h-${c.id}`}
+                      className="font-menu-display text-lg leading-tight font-bold tracking-tight atelier:text-[30px] atelier:font-medium nuit:text-2xl nuit:font-medium nuit:text-accent-text"
+                    >
                       {c.name}
                     </h2>
                     <p className="text-xs text-fg-subtle">{t("guest.items", { count: c.items.length })}</p>
@@ -419,7 +434,7 @@ export function MenuApp({
                   <p className="mt-2 px-4 text-sm leading-6 text-fg-muted">{c.description}</p>
                 ) : null}
                 {view === "grid" ? (
-                  <ul className="mt-3 grid grid-cols-2 gap-3 px-4 sm:grid-cols-3">
+                  <ul className="mt-3 grid grid-cols-2 gap-3 px-4 sm:grid-cols-3 atelier:gap-x-4 atelier:gap-y-6 atelier:px-6">
                     {c.items.map((p, pi) => (
                       <li key={p.id}>
                         <GridCard p={p} eager={ci === 0 && pi < 4} {...card} />
@@ -427,7 +442,7 @@ export function MenuApp({
                     ))}
                   </ul>
                 ) : (
-                  <ul className="mt-3 grid gap-3 px-4 sm:grid-cols-2">
+                  <ul className="mt-3 grid gap-3 px-4 sm:grid-cols-2 atelier:mt-1 atelier:gap-0 atelier:px-6 atelier:sm:gap-x-8 nuit:gap-1">
                     {c.items.map((p, pi) => (
                       <li key={p.id}>
                         <ListCard p={p} eager={ci === 0 && pi < 4} {...card} />
@@ -446,7 +461,7 @@ export function MenuApp({
           <Link
             key={cart.itemCount}
             href="/table/cart"
-            className="animate-pop-in flex h-14 items-center gap-3 rounded-full bg-accent ps-2 pe-5 font-semibold text-accent-fg shadow-[var(--shadow-float)] transition-transform active:scale-[0.98]"
+            className="animate-pop-in flex h-14 items-center gap-3 rounded-full bg-accent ps-2 pe-5 font-semibold text-accent-fg shadow-[var(--shadow-float)] transition-transform active:scale-[0.98] atelier:rounded-2xl"
           >
             <span className="relative grid size-10 place-items-center rounded-full bg-black/10">
               <ShoppingBag className="size-5" aria-hidden="true" />
@@ -512,12 +527,16 @@ function ListCard({ p, eager, money, popular, cart, adding, quickAdd, open, cate
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && open(p.id)}
       className={cn(
         "flex h-full w-full cursor-pointer gap-3 rounded-2xl border border-border bg-surface p-3 text-start shadow-[var(--shadow-soft)] transition-[transform,border-color] hover:border-border-strong active:scale-[0.99]",
+        "atelier:items-center atelier:gap-4 atelier:rounded-none atelier:border-0 atelier:border-b atelier:bg-transparent atelier:px-0 atelier:py-5 atelier:hover:border-border",
+        "nuit:items-center nuit:border-0 nuit:bg-transparent nuit:px-0 nuit:py-2.5",
         !p.isAvailable && "opacity-60",
       )}
     >
       <div className="flex min-w-0 flex-1 flex-col py-0.5">
         {popular.has(p.id) ? <PopularBadge className="mb-1.5 self-start" /> : null}
-        <p className="line-clamp-2 leading-snug font-bold">{p.name}</p>
+        <p className="line-clamp-2 font-menu-display leading-snug font-bold atelier:text-[22px] atelier:leading-tight atelier:font-medium nuit:[font-family:var(--app-font)] nuit:font-semibold">
+          {p.name}
+        </p>
         {p.description ? (
           <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-fg-muted">{p.description}</p>
         ) : null}
@@ -542,11 +561,17 @@ function ListCard({ p, eager, money, popular, cart, adding, quickAdd, open, cate
           <ProductImage
             product={p}
             size="sm"
-            className={cn("size-28 rounded-xl", !p.isAvailable && "grayscale")}
+            className={cn(
+              "size-28 rounded-xl atelier:size-[76px] atelier:rounded-full nuit:size-24 nuit:rounded-2xl",
+              !p.isAvailable && "grayscale",
+            )}
             eager={eager}
           />
         ) : (
-          <DishPlaceholder icon={categoryIcon.get(p.id) ?? ""} className="size-28 rounded-xl" />
+          <DishPlaceholder
+            icon={categoryIcon.get(p.id) ?? ""}
+            className="size-28 rounded-xl atelier:size-[76px] atelier:rounded-full nuit:size-24 nuit:rounded-2xl"
+          />
         )}
         <InCartBadge n={cart.byProduct[p.id] ?? 0} className="absolute -start-1.5 -top-1.5" />
         {p.isAvailable ? (
@@ -573,6 +598,7 @@ function GridCard({ p, eager, money, popular, cart, adding, quickAdd, open, cate
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && open(p.id)}
       className={cn(
         "flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.985]",
+        "atelier:overflow-visible atelier:rounded-none atelier:border-0 atelier:bg-transparent nuit:overflow-visible nuit:border-0 nuit:bg-transparent",
         !p.isAvailable && "opacity-60",
       )}
     >
@@ -581,11 +607,17 @@ function GridCard({ p, eager, money, popular, cart, adding, quickAdd, open, cate
           <ProductImage
             product={p}
             size="md"
-            className={cn("aspect-square w-full", !p.isAvailable && "grayscale")}
+            className={cn(
+              "aspect-square w-full atelier:rounded-lg nuit:rounded-2xl",
+              !p.isAvailable && "grayscale",
+            )}
             eager={eager}
           />
         ) : (
-          <DishPlaceholder icon={categoryIcon.get(p.id) ?? ""} className="aspect-square w-full" />
+          <DishPlaceholder
+            icon={categoryIcon.get(p.id) ?? ""}
+            className="aspect-square w-full atelier:rounded-lg nuit:rounded-2xl"
+          />
         )}
         <div className="absolute start-2 top-2 flex flex-col items-start gap-1">
           {popular.has(p.id) ? <PopularBadge /> : null}
@@ -603,8 +635,10 @@ function GridCard({ p, eager, money, popular, cart, adding, quickAdd, open, cate
           />
         ) : null}
       </div>
-      <div className="flex flex-1 flex-col p-3 pt-2.5">
-        <p className="line-clamp-2 pe-8 text-[15px] leading-snug font-bold">{p.name}</p>
+      <div className="flex flex-1 flex-col p-3 pt-2.5 atelier:px-0.5 nuit:px-0.5">
+        <p className="line-clamp-2 pe-8 font-menu-display text-[15px] leading-snug font-bold atelier:text-lg atelier:leading-tight atelier:font-medium nuit:[font-family:var(--app-font)]">
+          {p.name}
+        </p>
         <div className="mt-auto pt-2">
           <Price product={p} money={money} className="text-sm" />
         </div>

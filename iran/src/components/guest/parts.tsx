@@ -97,7 +97,7 @@ export function PopularBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full bg-tone-orange px-2 py-0.5 text-[11px] font-bold text-white shadow-sm",
+        "inline-flex items-center gap-1 rounded-full bg-tone-orange px-2 py-0.5 text-[11px] font-bold text-white shadow-sm atelier:bg-fg atelier:text-bg atelier:shadow-none nuit:bg-accent nuit:text-accent-fg",
         className,
       )}
     >
@@ -174,7 +174,9 @@ export function Price({
   const pct = discountPct(p);
   return (
     <span className={cn("flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px]", className)}>
-      <span className="font-bold text-fg tabular-nums">{money(p.priceCents)}</span>
+      <span className="font-bold text-fg tabular-nums atelier:font-medium nuit:text-accent-text">
+        {money(p.priceCents)}
+      </span>
       {pct ? (
         <>
           <s className="text-sm text-fg-subtle tabular-nums">{money(p.compareAtPriceCents!)}</s>
@@ -216,6 +218,7 @@ export function AddButton({
       }}
       className={cn(
         "grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-fg shadow-accent ring-[3px] ring-surface",
+        "atelier:size-8 atelier:bg-surface atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-fg nuit:shadow-none nuit:ring-bg",
         "transition-transform active:scale-90 disabled:opacity-60",
         className,
       )}
