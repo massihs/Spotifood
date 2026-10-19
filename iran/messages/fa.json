@@ -230,7 +230,8 @@
       "business": "فروش و مشتریان",
       "manage": "مدیریت"
     },
-    "delivery": "ارسال و پیک"
+    "delivery": "ارسال و پیک",
+    "reservations": "رزرو و نوبت"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -433,7 +434,9 @@
     "too_soon": "درخواست قبلی شما ارسال شده؛ کمی صبر کنید.",
     "table_occupied": "این میز اشغال است.",
     "credit_limit_exceeded": "سقف اعتبار این مشتری کافی نیست.",
-    "repayment_too_high": "مبلغ بیشتر از بدهی مشتری است."
+    "repayment_too_high": "مبلغ بیشتر از بدهی مشتری است.",
+    "slot_unavailable": "این ساعت دیگر خالی نیست؛ ساعت دیگری انتخاب کنید.",
+    "party_too_large": "برای گروه‌های بزرگ‌تر لطفاً تماس بگیرید."
   },
   "tables": {
     "title": "میزها و کدهای QR",
@@ -480,7 +483,7 @@
     "selected": "{count, plural, =0 {میزی انتخاب نشده} other {# میز انتخاب شده}}",
     "table": "میز",
     "scan": "برای سفارش اسکن کنید",
-    "scanSub": "منو · سفارش · پرداخت",
+    "scanSub": "منو، سفارش، پرداخت",
     "back": "بازگشت به میزها",
     "qrDisabledNote": "QR غیرفعال — چاپ نمی‌شود"
   },
@@ -658,7 +661,7 @@
     "unavailableBody": "این کد QR دیگر معتبر نیست. از کارکنان رستوران کمک بخواهید.",
     "menuSoon": "سفارش آنلاین به‌زودی برای این میز فعال می‌شود.",
     "you": "مشتری {n}",
-    "seatOf": "میز {table} · {who}",
+    "seatOf": "میز {table}، {who}",
     "search": "جستجوی غذا یا ماده اولیه…",
     "noResults": "غذایی با «{q}» پیدا نشد.",
     "featured": "پیشنهاد ویژه",
@@ -669,7 +672,7 @@
     "pickExactly": "{n} گزینه انتخاب کنید",
     "pickUpTo": "{max, plural, other {تا # انتخاب}}",
     "pickBetween": "بین {min} تا {max} انتخاب",
-    "add": "افزودن · {price}",
+    "add": "افزودن، {price}",
     "added": "به سبد اضافه شد",
     "quantity": "تعداد",
     "decrease": "کم کردن",
@@ -710,7 +713,7 @@
     },
     "tagLabel": "برچسب‌ها",
     "categoriesNav": "دسته‌های منو",
-    "placeOrder": "سفارش · {price}",
+    "placeOrder": "سفارش، {price}",
     "orderNote": "توضیحی برای آشپزخانه؟",
     "orderNotePlaceholder": "مثلاً حساسیت غذایی، سرو هم‌زمان…",
     "orderPlaced": "سفارش به آشپزخانه ارسال شد!",
@@ -737,7 +740,7 @@
     "addMore": "افزودن آیتم دیگر",
     "items": "{count, plural, other {# آیتم}}",
     "discount": "{pct}٪ تخفیف",
-    "addToOrder": "افزودن به سفارش · {price}",
+    "addToOrder": "افزودن به سفارش، {price}",
     "removeItem": "حذف {name}",
     "trackTitle": "وضعیت سفارش",
     "menuTab": "منو",
@@ -962,7 +965,7 @@
     "max": "حداکثر انتخاب",
     "required": "اجباری",
     "optional": "اختیاری",
-    "rule": "{min, plural, =0 {اختیاری} other {اجباری}} · {max, plural, one {۱ انتخاب} other {تا # انتخاب}}",
+    "rule": "{min, plural, =0 {اختیاری} other {اجباری}}، {max, plural, one {۱ انتخاب} other {تا # انتخاب}}",
     "values": "انتخاب‌ها",
     "valueName": "نام",
     "delta": "هزینه اضافه",
@@ -1099,7 +1102,7 @@
     "closeConfirm": "میز {label} آزاد شود؟ مشتریان باید دوباره کد QR را اسکن کنند.",
     "forceConfirm": "این میز هنوز سفارش جاری یا پرداخت‌نشده دارد. با این حال آزاد شود؟ (ثبت می‌شود)",
     "closed": "میز {label} آزاد شد.",
-    "summary": "{free} آزاد · {inProgress} در جریان · {occupied} اشغال",
+    "summary": "{free} آزاد، {inProgress} در جریان، {occupied} اشغال",
     "move": "جابجایی",
     "moveTo": "انتقال به…",
     "tableN": "میز {label}"
@@ -1111,19 +1114,23 @@
     "open": "اعلان‌ها ({count} خوانده‌نشده)",
     "types": {
       "order": {
-        "created": "سفارش جدید {number} · میز {table}",
-        "ready": "سفارش {number} آماده است · میز {table}"
+        "created": "سفارش جدید {number}، میز {table}",
+        "ready": "سفارش {number} آماده است، میز {table}"
       },
       "payment": {
-        "received": "پرداخت دریافت شد {amount} · میز {table}",
-        "requested": "میز {table} · مشتری {client} می‌خواهد {amount} پرداخت کند ({method, select, cash {نقدی} card {کارت} other {سر میز}})",
-        "needs_review": "پرداخت نیازمند بررسی · میز {table}"
+        "received": "پرداخت دریافت شد {amount}، میز {table}",
+        "requested": "میز {table}، مشتری {client} می‌خواهد {amount} پرداخت کند ({method, select, cash {نقدی} card {کارت} other {سر میز}})",
+        "needs_review": "پرداخت نیازمند بررسی، میز {table}"
       },
       "stock": {
         "low": "{name} رو به اتمام است ({quantity} {unit})"
       },
       "waiter": {
         "call": "میز {table}: {kind, select, bill {صورتحساب} water {آب} other {گارسون}}"
+      },
+      "reservation": {
+        "created": "رزرو جدید: {name}، {partySize} نفر",
+        "cancelled": "رزرو لغو شد: {name}"
       }
     }
   },
@@ -1181,7 +1188,7 @@
     "confirmCollected": "تأیید دریافت",
     "collect": "دریافت وجه",
     "collectTable": "دریافت وجه کل میز {label}",
-    "collectFor": "دریافت وجه · {name}",
+    "collectFor": "دریافت وجه، {name}",
     "collectedSoFar": "دریافت‌شده تاکنون: {amount}",
     "onlineInProgress": "پرداخت آنلاین در جریان: {amount}",
     "cancelPending": "لغو",
@@ -1284,7 +1291,14 @@
     "foodCourtHint": "در فودکورت، وقتی سفارش آماده شد برای مشتری پیامک ارسال می‌شود."
   },
   "sms": {
-    "orderReady": "سفارش {number} شما در {restaurant} آماده است. لطفاً برای تحویل مراجعه کنید."
+    "orderReady": "سفارش {number} شما در {restaurant} آماده است. لطفاً برای تحویل مراجعه کنید.",
+    "reservation": {
+      "confirmed": "رزرو شما در {restaurant} تأیید شد: {when}، {people} نفر. مشاهده یا لغو: {link}",
+      "requested": "درخواست رزرو شما در {restaurant} برای {when} ({people} نفر) ثبت شد و به‌زودی تأیید می‌شود. {link}",
+      "queued": "نوبت شما در {restaurant}: شماره {number}. وضعیت نوبت: {link}",
+      "tableReady": "{name} عزیز، میز شما در {restaurant} آماده است. لطفاً تشریف بیاورید.",
+      "reminder": "یادآوری: رزرو شما امروز ساعت {time} در {restaurant}. {link}"
+    }
   },
   "alerts": {
     "title": "سفارش جدید {number}",
@@ -1329,20 +1343,12 @@
       "weekly": {
         "name": "پلی‌لیست هفتگی",
         "body": "هر شنبه یک پلی‌لیست تازه.",
-        "features": [
-          "۳۰ آهنگ تازه هر هفته",
-          "بدون تکرار خسته‌کننده",
-          "پخش روی هر دستگاه"
-        ]
+        "features": ["۳۰ آهنگ تازه هر هفته", "بدون تکرار خسته‌کننده", "پخش روی هر دستگاه"]
       },
       "monthly": {
         "name": "پلی‌لیست ماهانه",
         "body": "هر ماه یک پلی‌لیست تازه.",
-        "features": [
-          "۳۰ آهنگ تازه هر ماه",
-          "ایده‌آل برای فضای آرام",
-          "پخش روی هر دستگاه"
-        ]
+        "features": ["۳۰ آهنگ تازه هر ماه", "ایده‌آل برای فضای آرام", "پخش روی هر دستگاه"]
       }
     },
     "status": {
@@ -1381,7 +1387,7 @@
       "upNext": "بعدی",
       "stations": "ایستگاه‌ها",
       "noStations": "هنوز ایستگاهی روی آنتن نیست.",
-      "stationMeta": "رادیو · {count} آهنگ",
+      "stationMeta": "رادیو، {count} آهنگ",
       "liveStation": "ایستگاه رادیویی زنده",
       "minutes": "{count} دقیقه",
       "titleCol": "عنوان",
@@ -1403,7 +1409,7 @@
       "radioOff": "رادیو خاموش",
       "subscribers": "{count} مشترک",
       "subscriptions": "اشتراک‌ها",
-      "subscriptionsHint": "پس از دریافت پرداخت، اشتراک را فعال کنید (۳۰ روز). هفتگی: {weekly} · ماهانه: {monthly} در ماه.",
+      "subscriptionsHint": "پس از دریافت پرداخت، اشتراک را فعال کنید (۳۰ روز). هفتگی: {weekly}، ماهانه: {monthly} در ماه.",
       "pendingCount": "{count} در انتظار",
       "noSubscriptions": "هنوز درخواستی نیامده است.",
       "until": "تا {date}",
@@ -1485,7 +1491,7 @@
       "open": "باز کردن صندوق",
       "float": "موجودی اولیه صندوق (تومان)",
       "openSince": "صندوق باز از {time}",
-      "salesLine": "فروش: {sales} · نقد در صندوق: {cash}",
+      "salesLine": "فروش: {sales}، نقد در صندوق: {cash}",
       "payIn": "ورود وجه",
       "payOut": "خروج وجه",
       "close": "بستن صندوق",
@@ -1513,7 +1519,7 @@
     "zone": "محدوده ارسال",
     "deliveryNeedsPhone": "برای ارسال، شماره مشتری را وارد کنید.",
     "deliveryFee": "هزینه ارسال",
-    "accountInfo": "بدهی: {balance} · اعتبار باقی‌مانده: {available}"
+    "accountInfo": "بدهی: {balance}، اعتبار باقی‌مانده: {available}"
   },
   "inventory": {
     "title": "انبار",
@@ -1652,7 +1658,7 @@
     "newCampaign": "ارسال پیامک به مشتریان",
     "people": "{count} نفر",
     "messagePlaceholder": "مثلاً: این آخر هفته ۲۰٪ تخفیف با کد NOWRUZ",
-    "smsParts": "{chars} نویسه · {parts} پیامک",
+    "smsParts": "{chars} نویسه، {parts} پیامک",
     "send": "ارسال",
     "sending": "در حال ارسال…",
     "confirmSend": "پیامک برای {count} نفر ارسال شود؟",
@@ -1687,7 +1693,7 @@
   },
   "reports": {
     "title": "گزارش و حسابداری",
-    "periodLabel": "{from} تا {to} · {days} روز",
+    "periodLabel": "{from} تا {to}، {days} روز",
     "exportCsv": "خروجی اکسل (CSV)",
     "presets": {
       "today": "امروز",
@@ -1724,8 +1730,8 @@
     "channels": "کانال فروش",
     "channel": {
       "qr": "سفارش QR",
-      "pos_takeaway": "صندوق · بیرون‌بر",
-      "pos_table": "صندوق · سر میز"
+      "pos_takeaway": "صندوق، بیرون‌بر",
+      "pos_table": "صندوق، سر میز"
     },
     "providers": {
       "cash": "نقدی",
@@ -1802,7 +1808,7 @@
   },
   "branches": {
     "title": "شعبه‌ها",
-    "subtitle": "{count} شعبه · نمای کلی گروه",
+    "subtitle": "{count} شعبه، نمای کلی گروه",
     "newBranch": "شعبه جدید",
     "branchName": "نام شعبه",
     "branchNamePlaceholder": "مثلاً {name} - ونک",
@@ -1903,5 +1909,115 @@
     "etaLabel": "زمان (دقیقه)",
     "deleteZone": "این محدوده حذف شود؟",
     "save": "ذخیره"
+  },
+  "reservations": {
+    "title": "رزرو و نوبت‌دهی",
+    "subtitle": "رزرو میز (تلفنی و آنلاین) و صف انتظار حضوری با پیامک.",
+    "tabs": {
+      "bookings": "رزروها",
+      "queue": "صف انتظار",
+      "settings": "تنظیمات"
+    },
+    "noBookings": "برای این روز رزروی نیست.",
+    "tableN": "میز {label}",
+    "noTable": "بدون میز",
+    "sources": {
+      "online": "آنلاین",
+      "phone": "تلفنی",
+      "walk_in": "حضوری"
+    },
+    "status": {
+      "pending": "در انتظار تأیید",
+      "confirmed": "تأیید شده",
+      "notified": "پیامک داده شد",
+      "seated": "نشسته",
+      "completed": "تمام شد",
+      "cancelled": "لغو شده",
+      "no_show": "نیامد"
+    },
+    "actions": {
+      "confirmed": "تأیید",
+      "seated": "نشاندن",
+      "no_show": "نیامد",
+      "cancelled": "لغو",
+      "completed": "پایان",
+      "notified": "پیامک میز آماده"
+    },
+    "waiting": "{count} دقیقه انتظار",
+    "notifiedAgo": "پیامک {count} دقیقه پیش",
+    "queueEmpty": "صف خالی است.",
+    "queueDone": "امروز {count} نفر از صف نشسته‌اند.",
+    "addWalkIn": "افزودن به صف",
+    "name": "نام",
+    "party": "تعداد نفرات",
+    "giveTicket": "صدور نوبت (پیامک)",
+    "newBooking": "رزرو جدید",
+    "date": "تاریخ",
+    "time": "ساعت",
+    "areas": {
+      "any": "فرقی ندارد",
+      "indoor": "داخل سالن",
+      "outdoor": "فضای باز"
+    },
+    "note": "توضیح (اختیاری)",
+    "save": "ثبت رزرو",
+    "prevDay": "روز قبل",
+    "nextDay": "روز بعد",
+    "today": "امروز",
+    "statBookings": "رزرو",
+    "statCovers": "نفر",
+    "statNoShow": "نیامده",
+    "settings": {
+      "enabled": "رزرو آنلاین و صف آنلاین فعال باشد",
+      "autoConfirm": "رزروهای آنلاین خودکار تأیید شوند",
+      "slotCapacity": "ظرفیت هر نیم‌ساعت (نفر)",
+      "maxParty": "حداکثر نفرات آنلاین",
+      "durationMin": "مدت هر رزرو (دقیقه)",
+      "hint": "ساعت‌ها از ساعات کاری رستوران ساخته می‌شوند. میز مناسب خودکار انتخاب می‌شود.",
+      "save": "ذخیره",
+      "saved": "ذخیره شد ✓",
+      "links": "لینک‌های عمومی",
+      "bookLink": "صفحه رزرو آنلاین (در اینستاگرام و گوگل‌مپ بگذارید)",
+      "queueLink": "صف انتظار (QR آن را دم در بگذارید)",
+      "linksHint": "مشتری لینک وضعیت را با پیامک دریافت می‌کند و می‌تواند لغو کند.",
+      "copy": "کپی"
+    }
+  },
+  "booking": {
+    "people": "تعداد نفرات",
+    "day": "روز",
+    "time": "ساعت",
+    "noSlots": "برای این روز ساعت خالی نیست.",
+    "areas": {
+      "any": "فرقی ندارد",
+      "indoor": "داخل سالن",
+      "outdoor": "فضای باز"
+    },
+    "name": "نام و نام خانوادگی",
+    "note": "توضیح (تولد، صندلی کودک…)",
+    "confirm": "ثبت رزرو",
+    "todayShort": "امروز",
+    "bookTitle": "رزرو آنلاین میز",
+    "queueTitle": "گرفتن نوبت",
+    "queueHint": "نوبت بگیرید؛ وقتی میزتان آماده شد پیامک می‌گیرید.",
+    "takeTicket": "گرفتن نوبت",
+    "yourTicket": "نوبت شما",
+    "yourBooking": "رزرو شما",
+    "ticketNumber": "شماره نوبت",
+    "tableReady": "میز شما آماده است! لطفاً تشریف بیاورید.",
+    "youAreNext": "نفر بعدی شما هستید",
+    "ahead": "{count} نوبت جلوتر از شما",
+    "forPeople": "{count} نفر، {name}",
+    "status": {
+      "pending": "در انتظار تأیید",
+      "confirmed": "تأیید شد",
+      "notified": "میز آماده است",
+      "seated": "خوش آمدید",
+      "completed": "پایان یافت",
+      "cancelled": "لغو شد",
+      "no_show": "منقضی شد"
+    },
+    "cancel": "لغو رزرو",
+    "cancelConfirm": "رزرو لغو شود؟"
   }
 }

@@ -14,7 +14,11 @@ describe("kitchen stations", () => {
     const drinks = await createCategory(db, ctx, { name: "Drinks" });
     const k = await createProduct(db, ctx, { categoryId: kebabs.id, name: "Koobideh", priceCents: 1500 });
     const d = await createProduct(db, ctx, { categoryId: drinks.id, name: "Doogh", priceCents: 300 });
-    const grill = await saveStation(db, ctx, null, { name: "Grill", color: "orange", categoryIds: [kebabs.id] });
+    const grill = await saveStation(db, ctx, null, {
+      name: "Grill",
+      color: "orange",
+      categoryIds: [kebabs.id],
+    });
     const bar = await saveStation(db, ctx, null, { name: "Bar", color: "sky", categoryIds: [drinks.id] });
 
     const { order } = await createPosOrder(db, ctx, {

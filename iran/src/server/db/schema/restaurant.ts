@@ -81,6 +81,12 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   loyaltySpendPerPointCents: money().notNull().default(10_000_000),
   loyaltyPointValueCents: money().notNull().default(500_000),
   openingHours: jsonb().$type<OpeningHours>(),
+  /** Bookings & queue: online booking page, auto-confirm, guests per 30-minute slot. */
+  reservationsEnabled: boolean().notNull().default(true),
+  reservationAutoConfirm: boolean().notNull().default(true),
+  reservationSlotCapacity: integer().notNull().default(40),
+  reservationMaxParty: integer().notNull().default(12),
+  reservationDurationMin: integer().notNull().default(90),
   legalName: varchar({ length: 200 }),
   legalId: varchar({ length: 64 }),
   vatNumber: varchar({ length: 64 }),

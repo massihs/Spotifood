@@ -114,7 +114,8 @@
       "business": "Ventes & clients",
       "manage": "Gestion"
     },
-    "delivery": "Livraison"
+    "delivery": "Livraison",
+    "reservations": "Réservations"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -301,7 +302,9 @@
     "too_soon": "Votre demande est déjà partie, patientez un instant.",
     "table_occupied": "Cette table est occupée.",
     "credit_limit_exceeded": "Le plafond de crédit du client est insuffisant.",
-    "repayment_too_high": "Montant supérieur au dû."
+    "repayment_too_high": "Montant supérieur au dû.",
+    "slot_unavailable": "Ce créneau n’est plus disponible.",
+    "party_too_large": "Pour les grands groupes, appelez-nous."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -968,6 +971,10 @@
       },
       "waiter": {
         "call": "Table {table} : {kind, select, bill {addition} water {eau} other {serveur}}"
+      },
+      "reservation": {
+        "created": "Nouvelle réservation : {name} · {partySize} pers.",
+        "cancelled": "Réservation annulée : {name}"
       }
     }
   },
@@ -1128,7 +1135,14 @@
     "foodCourtHint": "En food court, le client reçoit un SMS quand sa commande est prête."
   },
   "sms": {
-    "orderReady": "Votre commande {number} chez {restaurant} est prête. Venez la récupérer."
+    "orderReady": "Votre commande {number} chez {restaurant} est prête. Venez la récupérer.",
+    "reservation": {
+      "confirmed": "Votre réservation chez {restaurant} est confirmée : {when}, {people} pers. Voir ou annuler : {link}",
+      "requested": "Votre demande de réservation chez {restaurant} pour {when} ({people} pers.) est enregistrée. {link}",
+      "queued": "Votre place chez {restaurant} : numéro {number}. Suivi : {link}",
+      "tableReady": "{name}, votre table chez {restaurant} est prête. Vous pouvez venir.",
+      "reminder": "Rappel : votre réservation aujourd’hui à {time} chez {restaurant}. {link}"
+    }
   },
   "alerts": {
     "title": "Nouvelle commande {number}",
@@ -1747,5 +1761,115 @@
     "etaLabel": "Délai (min)",
     "deleteZone": "Supprimer cette zone ?",
     "save": "Enregistrer"
+  },
+  "reservations": {
+    "title": "Réservations & file d’attente",
+    "subtitle": "Réservations (téléphone et en ligne) et file d’attente sur place avec SMS.",
+    "tabs": {
+      "bookings": "Réservations",
+      "queue": "File d’attente",
+      "settings": "Réglages"
+    },
+    "noBookings": "Aucune réservation ce jour.",
+    "tableN": "Table {label}",
+    "noTable": "Sans table",
+    "sources": {
+      "online": "En ligne",
+      "phone": "Téléphone",
+      "walk_in": "Sur place"
+    },
+    "status": {
+      "pending": "À confirmer",
+      "confirmed": "Confirmée",
+      "notified": "SMS envoyé",
+      "seated": "Installée",
+      "completed": "Terminée",
+      "cancelled": "Annulée",
+      "no_show": "Absent"
+    },
+    "actions": {
+      "confirmed": "Confirmer",
+      "seated": "Installer",
+      "no_show": "Absent",
+      "cancelled": "Annuler",
+      "completed": "Terminer",
+      "notified": "SMS : table prête"
+    },
+    "waiting": "attend depuis {count} min",
+    "notifiedAgo": "SMS il y a {count} min",
+    "queueEmpty": "Personne n’attend.",
+    "queueDone": "{count} installés depuis la file aujourd’hui.",
+    "addWalkIn": "Ajouter à la file",
+    "name": "Nom",
+    "party": "Couverts",
+    "giveTicket": "Donner un ticket (SMS)",
+    "newBooking": "Nouvelle réservation",
+    "date": "Date",
+    "time": "Heure",
+    "areas": {
+      "any": "Indifférent",
+      "indoor": "Salle",
+      "outdoor": "Terrasse"
+    },
+    "note": "Note (facultatif)",
+    "save": "Réserver",
+    "prevDay": "Jour précédent",
+    "nextDay": "Jour suivant",
+    "today": "Aujourd’hui",
+    "statBookings": "Réservations",
+    "statCovers": "Couverts",
+    "statNoShow": "Absents",
+    "settings": {
+      "enabled": "Réservation et file d’attente en ligne actives",
+      "autoConfirm": "Confirmer automatiquement les réservations en ligne",
+      "slotCapacity": "Couverts par 30 min",
+      "maxParty": "Max couverts en ligne",
+      "durationMin": "Durée (min)",
+      "hint": "Les créneaux suivent vos horaires d’ouverture. La table est choisie automatiquement.",
+      "save": "Enregistrer",
+      "saved": "Enregistré ✓",
+      "links": "Liens publics",
+      "bookLink": "Page de réservation (Instagram, Google Maps)",
+      "queueLink": "File d’attente (QR à l’entrée)",
+      "linksHint": "Le client reçoit un lien de suivi par SMS et peut annuler.",
+      "copy": "Copier"
+    }
+  },
+  "booking": {
+    "people": "Couverts",
+    "day": "Jour",
+    "time": "Heure",
+    "noSlots": "Aucun créneau libre ce jour.",
+    "areas": {
+      "any": "Indifférent",
+      "indoor": "Salle",
+      "outdoor": "Terrasse"
+    },
+    "name": "Nom complet",
+    "note": "Note (anniversaire, chaise bébé…)",
+    "confirm": "Réserver",
+    "todayShort": "Auj.",
+    "bookTitle": "Réserver une table",
+    "queueTitle": "File d’attente",
+    "queueHint": "Prenez un ticket ; on vous envoie un SMS quand la table est prête.",
+    "takeTicket": "Prendre un ticket",
+    "yourTicket": "Votre ticket",
+    "yourBooking": "Votre réservation",
+    "ticketNumber": "Numéro",
+    "tableReady": "Votre table est prête ! Vous pouvez venir.",
+    "youAreNext": "Vous êtes le prochain",
+    "ahead": "{count} avant vous",
+    "forPeople": "{count} pers. · {name}",
+    "status": {
+      "pending": "En attente de confirmation",
+      "confirmed": "Confirmée",
+      "notified": "Table prête",
+      "seated": "Bienvenue",
+      "completed": "Terminée",
+      "cancelled": "Annulée",
+      "no_show": "Expirée"
+    },
+    "cancel": "Annuler la réservation",
+    "cancelConfirm": "Annuler cette réservation ?"
   }
 }

@@ -230,7 +230,8 @@
       "business": "المبيعات والعملاء",
       "manage": "الإدارة"
     },
-    "delivery": "التوصيل"
+    "delivery": "التوصيل",
+    "reservations": "الحجوزات والدور"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -433,7 +434,9 @@
     "too_soon": "طلبك قيد التنفيذ، انتظر قليلاً.",
     "table_occupied": "هذه الطاولة مشغولة.",
     "credit_limit_exceeded": "سقف ائتمان العميل غير كافٍ.",
-    "repayment_too_high": "المبلغ أكبر من المستحق."
+    "repayment_too_high": "المبلغ أكبر من المستحق.",
+    "slot_unavailable": "هذا الوقت لم يعد متاحاً.",
+    "party_too_large": "للمجموعات الكبيرة اتصل بنا."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -1124,6 +1127,10 @@
       },
       "waiter": {
         "call": "الطاولة {table}: {kind, select, bill {فاتورة} water {ماء} other {نادل}}"
+      },
+      "reservation": {
+        "created": "حجز جديد: {name} · {partySize}",
+        "cancelled": "إلغاء حجز: {name}"
       }
     }
   },
@@ -1284,7 +1291,14 @@
     "foodCourtHint": "في ردهة الطعام يتلقى العميل رسالة نصية عند جاهزية طلبه."
   },
   "sms": {
-    "orderReady": "طلبك رقم {number} في {restaurant} جاهز. يرجى الحضور لاستلامه."
+    "orderReady": "طلبك رقم {number} في {restaurant} جاهز. يرجى الحضور لاستلامه.",
+    "reservation": {
+      "confirmed": "تم تأكيد حجزك في {restaurant}: {when}، {people} أشخاص. عرض أو إلغاء: {link}",
+      "requested": "تم استلام طلب حجزك في {restaurant} ليوم {when} ({people} أشخاص). {link}",
+      "queued": "دورك في {restaurant}: رقم {number}. الحالة: {link}",
+      "tableReady": "{name}، طاولتك في {restaurant} جاهزة.",
+      "reminder": "تذكير: حجزك اليوم الساعة {time} في {restaurant}. {link}"
+    }
   },
   "alerts": {
     "title": "طلب جديد {number}",
@@ -1329,20 +1343,12 @@
       "weekly": {
         "name": "قائمة أسبوعية",
         "body": "A fresh playlist every Saturday.",
-        "features": [
-          "30 new tracks every week",
-          "No tiring repeats",
-          "Plays on any device"
-        ]
+        "features": ["30 new tracks every week", "No tiring repeats", "Plays on any device"]
       },
       "monthly": {
         "name": "قائمة شهرية",
         "body": "A fresh playlist every month.",
-        "features": [
-          "30 new tracks every month",
-          "Ideal for calm venues",
-          "Plays on any device"
-        ]
+        "features": ["30 new tracks every month", "Ideal for calm venues", "Plays on any device"]
       }
     },
     "status": {
@@ -1903,5 +1909,115 @@
     "etaLabel": "المدة (دقيقة)",
     "deleteZone": "حذف هذه المنطقة؟",
     "save": "حفظ"
+  },
+  "reservations": {
+    "title": "الحجوزات وقائمة الانتظار",
+    "subtitle": "حجوزات الطاولات (هاتفياً وأونلاين) وقائمة انتظار مع SMS.",
+    "tabs": {
+      "bookings": "الحجوزات",
+      "queue": "قائمة الانتظار",
+      "settings": "الإعدادات"
+    },
+    "noBookings": "لا حجوزات لهذا اليوم.",
+    "tableN": "الطاولة {label}",
+    "noTable": "بلا طاولة",
+    "sources": {
+      "online": "أونلاين",
+      "phone": "هاتف",
+      "walk_in": "حضوري"
+    },
+    "status": {
+      "pending": "بانتظار التأكيد",
+      "confirmed": "مؤكد",
+      "notified": "أُرسلت رسالة",
+      "seated": "جالس",
+      "completed": "انتهى",
+      "cancelled": "ملغى",
+      "no_show": "لم يحضر"
+    },
+    "actions": {
+      "confirmed": "تأكيد",
+      "seated": "إجلاس",
+      "no_show": "لم يحضر",
+      "cancelled": "إلغاء",
+      "completed": "إنهاء",
+      "notified": "رسالة: الطاولة جاهزة"
+    },
+    "waiting": "ينتظر {count} دقيقة",
+    "notifiedAgo": "رسالة قبل {count} دقيقة",
+    "queueEmpty": "لا أحد ينتظر.",
+    "queueDone": "جلس {count} من القائمة اليوم.",
+    "addWalkIn": "إضافة للقائمة",
+    "name": "الاسم",
+    "party": "عدد الأشخاص",
+    "giveTicket": "إصدار دور (SMS)",
+    "newBooking": "حجز جديد",
+    "date": "التاريخ",
+    "time": "الساعة",
+    "areas": {
+      "any": "لا يهم",
+      "indoor": "داخلي",
+      "outdoor": "خارجي"
+    },
+    "note": "ملاحظة",
+    "save": "حجز",
+    "prevDay": "اليوم السابق",
+    "nextDay": "اليوم التالي",
+    "today": "اليوم",
+    "statBookings": "حجوزات",
+    "statCovers": "أشخاص",
+    "statNoShow": "لم يحضروا",
+    "settings": {
+      "enabled": "تفعيل الحجز والدور أونلاين",
+      "autoConfirm": "تأكيد الحجوزات الأونلاين تلقائياً",
+      "slotCapacity": "الأشخاص لكل نصف ساعة",
+      "maxParty": "الحد الأقصى أونلاين",
+      "durationMin": "مدة الحجز (دقيقة)",
+      "hint": "الأوقات من ساعات العمل. تُختار الطاولة تلقائياً.",
+      "save": "حفظ",
+      "saved": "تم ✓",
+      "links": "الروابط العامة",
+      "bookLink": "صفحة الحجز الأونلاين",
+      "queueLink": "قائمة الانتظار (QR عند الباب)",
+      "linksHint": "يتلقى العميل رابط الحالة برسالة ويمكنه الإلغاء.",
+      "copy": "نسخ"
+    }
+  },
+  "booking": {
+    "people": "الأشخاص",
+    "day": "اليوم",
+    "time": "الساعة",
+    "noSlots": "لا أوقات متاحة.",
+    "areas": {
+      "any": "لا يهم",
+      "indoor": "داخلي",
+      "outdoor": "خارجي"
+    },
+    "name": "الاسم الكامل",
+    "note": "ملاحظة",
+    "confirm": "احجز الطاولة",
+    "todayShort": "اليوم",
+    "bookTitle": "حجز طاولة",
+    "queueTitle": "قائمة الانتظار",
+    "queueHint": "خذ دوراً وسنرسل لك رسالة عند جاهزية الطاولة.",
+    "takeTicket": "خذ دوراً",
+    "yourTicket": "دورك",
+    "yourBooking": "حجزك",
+    "ticketNumber": "رقم الدور",
+    "tableReady": "طاولتك جاهزة!",
+    "youAreNext": "أنت التالي",
+    "ahead": "{count} قبلك",
+    "forPeople": "{count} أشخاص · {name}",
+    "status": {
+      "pending": "بانتظار التأكيد",
+      "confirmed": "مؤكد",
+      "notified": "الطاولة جاهزة",
+      "seated": "مرحباً",
+      "completed": "انتهى",
+      "cancelled": "ملغى",
+      "no_show": "منتهٍ"
+    },
+    "cancel": "إلغاء الحجز",
+    "cancelConfirm": "إلغاء هذا الحجز؟"
   }
 }

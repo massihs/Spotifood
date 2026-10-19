@@ -70,6 +70,7 @@ export function NotificationBell({
           method: String(n.payload.method ?? "any"),
           kind: String(n.payload.kind ?? "waiter"),
           name: String(n.payload.name ?? ""),
+          partySize: String(n.payload.partySize ?? ""),
           quantity: String(n.payload.quantity ?? ""),
           unit: String(n.payload.unit ?? ""),
           amount:

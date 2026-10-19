@@ -11,4 +11,5 @@ export * from "./inventory";
 export * from "./customers";
 export * from "./accounting";
 export * from "./delivery";
+export * from "./reservations";
 export * from "./relations";

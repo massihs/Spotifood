@@ -230,7 +230,8 @@
       "business": "Sales & customers",
       "manage": "Management"
     },
-    "delivery": "Delivery"
+    "delivery": "Delivery",
+    "reservations": "Bookings & queue"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -433,7 +434,9 @@
     "too_soon": "Your request is on its way — please wait a moment.",
     "table_occupied": "That table is occupied.",
     "credit_limit_exceeded": "This customer’s credit limit is not enough.",
-    "repayment_too_high": "More than the customer owes."
+    "repayment_too_high": "More than the customer owes.",
+    "slot_unavailable": "This time is no longer available; pick another.",
+    "party_too_large": "For larger groups, please call us."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1124,6 +1127,10 @@
       },
       "waiter": {
         "call": "Table {table}: {kind, select, bill {bill} water {water} other {waiter}}"
+      },
+      "reservation": {
+        "created": "New booking: {name} · {partySize} people",
+        "cancelled": "Booking cancelled: {name}"
       }
     }
   },
@@ -1284,7 +1291,14 @@
     "foodCourtHint": "In a food court, guests get a text message when their order is ready."
   },
   "sms": {
-    "orderReady": "Your order {number} at {restaurant} is ready. Please come and pick it up."
+    "orderReady": "Your order {number} at {restaurant} is ready. Please come and pick it up.",
+    "reservation": {
+      "confirmed": "Your booking at {restaurant} is confirmed: {when}, {people} people. View or cancel: {link}",
+      "requested": "Your booking request at {restaurant} for {when} ({people} people) was received. {link}",
+      "queued": "Your place in line at {restaurant}: number {number}. Status: {link}",
+      "tableReady": "{name}, your table at {restaurant} is ready. Please come in.",
+      "reminder": "Reminder: your booking today at {time} at {restaurant}. {link}"
+    }
   },
   "alerts": {
     "title": "New order {number}",
@@ -1329,20 +1343,12 @@
       "weekly": {
         "name": "Weekly playlist",
         "body": "A fresh playlist every Saturday.",
-        "features": [
-          "30 new tracks every week",
-          "No tiring repeats",
-          "Plays on any device"
-        ]
+        "features": ["30 new tracks every week", "No tiring repeats", "Plays on any device"]
       },
       "monthly": {
         "name": "Monthly playlist",
         "body": "A fresh playlist every month.",
-        "features": [
-          "30 new tracks every month",
-          "Ideal for calm venues",
-          "Plays on any device"
-        ]
+        "features": ["30 new tracks every month", "Ideal for calm venues", "Plays on any device"]
       }
     },
     "status": {
@@ -1903,5 +1909,115 @@
     "etaLabel": "ETA (min)",
     "deleteZone": "Delete this zone?",
     "save": "Save"
+  },
+  "reservations": {
+    "title": "Bookings & queue",
+    "subtitle": "Table bookings (phone and online) and a walk-in waitlist with SMS.",
+    "tabs": {
+      "bookings": "Bookings",
+      "queue": "Waitlist",
+      "settings": "Settings"
+    },
+    "noBookings": "No bookings for this day.",
+    "tableN": "Table {label}",
+    "noTable": "No table",
+    "sources": {
+      "online": "Online",
+      "phone": "Phone",
+      "walk_in": "Walk-in"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "notified": "Texted",
+      "seated": "Seated",
+      "completed": "Done",
+      "cancelled": "Cancelled",
+      "no_show": "No-show"
+    },
+    "actions": {
+      "confirmed": "Confirm",
+      "seated": "Seat",
+      "no_show": "No-show",
+      "cancelled": "Cancel",
+      "completed": "Done",
+      "notified": "Text: table ready"
+    },
+    "waiting": "waiting {count} min",
+    "notifiedAgo": "texted {count} min ago",
+    "queueEmpty": "Nobody is waiting.",
+    "queueDone": "{count} seated from the waitlist today.",
+    "addWalkIn": "Add to waitlist",
+    "name": "Name",
+    "party": "Party size",
+    "giveTicket": "Issue ticket (SMS)",
+    "newBooking": "New booking",
+    "date": "Date",
+    "time": "Time",
+    "areas": {
+      "any": "No preference",
+      "indoor": "Indoor",
+      "outdoor": "Outdoor"
+    },
+    "note": "Note (optional)",
+    "save": "Book",
+    "prevDay": "Previous day",
+    "nextDay": "Next day",
+    "today": "Today",
+    "statBookings": "Bookings",
+    "statCovers": "Covers",
+    "statNoShow": "No-shows",
+    "settings": {
+      "enabled": "Online booking and online waitlist on",
+      "autoConfirm": "Confirm online bookings automatically",
+      "slotCapacity": "Guests per 30 min",
+      "maxParty": "Max party online",
+      "durationMin": "Booking length (min)",
+      "hint": "Times come from your opening hours. The best table is picked automatically.",
+      "save": "Save",
+      "saved": "Saved ✓",
+      "links": "Public links",
+      "bookLink": "Online booking page (Instagram, Google Maps)",
+      "queueLink": "Waitlist (print its QR at the door)",
+      "linksHint": "Guests get a status link by SMS and can cancel.",
+      "copy": "Copy"
+    }
+  },
+  "booking": {
+    "people": "Guests",
+    "day": "Day",
+    "time": "Time",
+    "noSlots": "No free time on this day.",
+    "areas": {
+      "any": "No preference",
+      "indoor": "Indoor",
+      "outdoor": "Outdoor"
+    },
+    "name": "Full name",
+    "note": "Note (birthday, high chair…)",
+    "confirm": "Book the table",
+    "todayShort": "Today",
+    "bookTitle": "Book a table",
+    "queueTitle": "Join the waitlist",
+    "queueHint": "Take a ticket; we text you when your table is ready.",
+    "takeTicket": "Take a ticket",
+    "yourTicket": "Your ticket",
+    "yourBooking": "Your booking",
+    "ticketNumber": "Ticket number",
+    "tableReady": "Your table is ready! Please come in.",
+    "youAreNext": "You are next",
+    "ahead": "{count} ahead of you",
+    "forPeople": "{count} people · {name}",
+    "status": {
+      "pending": "Awaiting confirmation",
+      "confirmed": "Confirmed",
+      "notified": "Table ready",
+      "seated": "Welcome",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "Expired"
+    },
+    "cancel": "Cancel booking",
+    "cancelConfirm": "Cancel this booking?"
   }
 }

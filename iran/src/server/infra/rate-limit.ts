@@ -46,6 +46,8 @@ export const RATE_LIMITS = {
   upload: { limit: 20, windowMs: 10 * 60_000 },
   /** "Call the waiter to pay": a few per guest, so the team is not spammed. */
   paymentRequest: { limit: 3, windowMs: 5 * 60_000 },
+  /** Public booking / queue forms (each sends an SMS). */
+  booking: { limit: 6, windowMs: 10 * 60_000 },
 } as const;
 
 export async function enforceRateLimit(

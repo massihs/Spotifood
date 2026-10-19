@@ -6,6 +6,7 @@ import {
   HeartHandshake,
   ChartColumn,
   Bike,
+  CalendarClock,
   Network,
   Calculator,
   ChefHat,
@@ -106,6 +107,12 @@ async function RestaurantShell({
       icon: <Bike />,
       group: g.ops,
       badge: undeliveredCount,
+    },
+    can(ctx, "orders.view") && {
+      href: `${base}/reservations`,
+      label: t("nav.reservations"),
+      icon: <CalendarClock />,
+      group: g.ops,
     },
     can(ctx, "tables.view") && {
       href: `${base}/floor`,

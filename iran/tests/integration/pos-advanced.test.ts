@@ -78,7 +78,9 @@ describe("advanced till", () => {
     await expect(repayAccount(db, ctx, c.id, { amountCents: 5000 })).rejects.toMatchObject({
       message: "repayment_too_high",
     });
-    expect(await repayAccount(db, ctx, c.id, { amountCents: 1500, method: "card" })).toEqual({ balanceCents: 500 });
+    expect(await repayAccount(db, ctx, c.id, { amountCents: 1500, method: "card" })).toEqual({
+      balanceCents: 500,
+    });
     [row] = await db.select().from(customers).where(eq(customers.id, c.id));
     expect(row!.balanceCents).toBe(500);
   });
@@ -108,7 +110,9 @@ describe("advanced till", () => {
     expect(o).toMatchObject({ tableId: t2.id, tableLabel: "2" });
     const [s] = await db.select().from(tableSessions).where(eq(tableSessions.id, guest.session.id));
     expect(s!.tableId).toBe(t2.id);
-    await expect(moveTableSession(db, ctx, t1.id, t2.id)).rejects.toMatchObject({ message: "no_open_session" });
+    await expect(moveTableSession(db, ctx, t1.id, t2.id)).rejects.toMatchObject({
+      message: "no_open_session",
+    });
 
     const events = await listSecurityEvents(db, ctx, {
       from: new Date(Date.now() - 60_000),
