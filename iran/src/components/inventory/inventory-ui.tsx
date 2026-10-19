@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle, ClipboardCheck, Pencil, Plus, Trash2, Truck, X } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useMoney } from "@/components/ui/use-money";
 import { Sheet, field, num, useRun } from "@/components/ui/sheet-kit";
@@ -44,6 +44,7 @@ export function StockTable({
   canManage: boolean;
 }) {
   const t = useTranslations("inventory");
+  const format = useFormatter();
   const money = useMoney(currency);
   const [edit, setEdit] = useState<StockRow | "new" | null>(null);
   const [adjust, setAdjust] = useState<{ item: StockRow; kind: "count" | "waste" } | null>(null);
@@ -98,12 +99,12 @@ export function StockTable({
                   <p className="mt-1 text-xs text-fg-muted">
                     {t("avgCost", { amount: money(i.avgCostCents), unit: t(`units.${i.unit}`) })}
                     {i.lowStockThreshold > 0
-                      ? ` · ${t("threshold", { qty: i.lowStockThreshold, unit: t(`units.${i.unit}`) })}`
+                      ? ` · ${t("threshold", { qty: format.number(i.lowStockThreshold, { maximumFractionDigits: 2 }), unit: t(`units.${i.unit}`) })}`
                       : ""}
                   </p>
                 </div>
                 <p className={cn("text-lg font-bold tabular-nums", low && "text-danger")}>
-                  {i.quantity.toLocaleString()}{" "}
+                  {format.number(i.quantity, { maximumFractionDigits: i.unit === "piece" ? 0 : 2 })}{" "}
                   <span className="text-sm font-medium text-fg-muted">{t(`units.${i.unit}`)}</span>
                 </p>
                 {canManage ? (

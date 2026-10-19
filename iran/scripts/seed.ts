@@ -42,6 +42,7 @@ import { uploadLogo } from "@/server/modules/restaurants/settings";
 import { storage } from "@/server/infra/storage";
 import { readFile } from "node:fs/promises";
 import { BRIELLE_MENU } from "./brielle";
+import { seedBrielleHistory } from "./brielle-history";
 
 const DEMO_OWNER = {
   email: "owner@demo.spotifood.local",
@@ -649,6 +650,7 @@ async function seedBrielle() {
       console.log(`✓ Brielle menu: ${added.categories} categories, ${added.products} dishes added`);
     // Photos/logo may be missing (earlier boot interrupted, or storage reset): fill the gaps.
     await seedBrielleMedia(existing.id, owner);
+    await seedBrielleTestData(existing.id, owner.id);
     return;
   }
   const restaurantId = await db.transaction(async (tx) => {
@@ -702,6 +704,19 @@ async function seedBrielle() {
     `✓ Brielle ${restaurantId}: 12 tables, ${BRIELLE_MENU.length} categories (owner ${owner.email})`,
   );
   await seedBrielleMedia(restaurantId, owner);
+  await seedBrielleTestData(restaurantId, owner.id);
+}
+
+/** 30 days of activity on Brielle (test data for every dashboard section), once per database. */
+async function seedBrielleTestData(restaurantId: string, ownerId: string) {
+  if (process.env.SEED_BRIELLE_HISTORY === "false") return;
+  const started = Date.now();
+  const res = await db.transaction((tx) => seedBrielleHistory(tx, restaurantId, ownerId));
+  if (res)
+    console.log(
+      `✓ Brielle history: ${res.orders} orders (~${res.guestsPerDay} guests/day), ${res.customers} customers, ` +
+        `${res.reservations} bookings, ${res.purchases} purchases, ${res.invoices} invoices in ${Date.now() - started} ms`,
+    );
 }
 
 /**
