@@ -414,7 +414,9 @@ export type Live = {
   station: { slug: string; name: string; color: string; cover?: string | null };
   track: PlayerTrack;
   offsetSec: number;
+  remainingSec?: number;
   upNext: PlayerTrack[];
+  queue?: PlayerTrack[];
 };
 
 /** Tunes into a station: asks the clock what is on air and joins the song at the right second. */

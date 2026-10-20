@@ -79,7 +79,12 @@ export function radioNow<T extends RotationTrack>(tracks: T[], epoch: Date, now:
     const track = playable[i]!;
     if (pos < track.durationSec) {
       const upNext = [1, 2, 3].map((k) => playable[(i + k) % playable.length]!);
-      return { track, offsetSec: pos, remainingSec: track.durationSec - pos, upNext };
+      // The rest of the loop, in air order: the station's queue.
+      const queue = Array.from(
+        { length: Math.min(playable.length - 1, 50) },
+        (_, k) => playable[(i + k + 1) % playable.length]!,
+      );
+      return { track, offsetSec: pos, remainingSec: track.durationSec - pos, upNext, queue };
     }
     pos -= track.durationSec;
   }

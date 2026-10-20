@@ -575,6 +575,7 @@ export async function listStations(db: Database) {
       mosaic: covers as string[],
       trackCount: tracks.length,
       minutes,
+      tracks: tracks.map(({ coverKey: k, ...t }) => ({ ...t, cover: coverUrl(k) })),
     });
   }
   return out;
@@ -597,6 +598,7 @@ export async function nowPlaying(db: Database, slug: string, now = new Date()) {
     offsetSec: live.offsetSec,
     remainingSec: live.remainingSec,
     upNext: live.upNext.map(view),
+    queue: live.queue.map(view),
     serverTime: now.toISOString(),
   };
 }
