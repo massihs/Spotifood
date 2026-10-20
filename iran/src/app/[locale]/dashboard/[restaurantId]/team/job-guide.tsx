@@ -7,11 +7,15 @@ import { JOB_ICONS, JOB_TONES } from "./job-meta";
 export async function JobGuide() {
   const t = await getTranslations("team.jobs");
   return (
-    <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    // Phones: one swipeable row instead of five full-width cards before the team list.
+    <div className="-mx-4 mb-6 flex snap-x [scrollbar-width:none] gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-5">
       {JOBS.map((j) => {
         const Icon = JOB_ICONS[j];
         return (
-          <div key={j} className="rounded-2xl border border-border bg-surface p-4">
+          <div
+            key={j}
+            className="w-56 shrink-0 snap-start rounded-2xl border border-border bg-surface p-4 sm:w-auto"
+          >
             <span
               className={cn("grid size-10 place-items-center rounded-xl", JOB_TONES[j])}
               aria-hidden="true"

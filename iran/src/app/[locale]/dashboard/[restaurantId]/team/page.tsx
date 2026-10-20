@@ -46,8 +46,9 @@ async function Team({ params }: { params: Params }) {
       />
       <JobGuide />
       <Card className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border text-fg-muted">
+        {/* Phones: each member is a card (the table rows turn into small grids). */}
+        <table className="w-full text-sm max-sm:block">
+          <thead className="border-b border-border text-fg-muted max-sm:hidden">
             <tr>
               <th className="px-5 py-3 text-start font-medium">{t("team.fullName")}</th>
               <th className="px-5 py-3 text-start font-medium">{t("team.jobs.label")}</th>
@@ -59,19 +60,22 @@ async function Team({ params }: { params: Params }) {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border max-sm:block">
             {members.map((m) => {
               const isSelf = m.userId === ctx.user.id;
               const editable = !isSelf && m.role !== "owner" && canAssignRole(ctx.role, m.role);
               return (
-                <tr key={m.id}>
-                  <td className="px-5 py-3">
+                <tr
+                  key={m.id}
+                  className="max-sm:grid max-sm:grid-cols-[1fr_auto] max-sm:items-center max-sm:gap-x-3 max-sm:gap-y-2 max-sm:p-4 max-sm:[&>td]:p-0"
+                >
+                  <td className="px-5 py-3 max-sm:col-span-2">
                     <p className="font-medium">
                       {m.fullName} {isSelf ? <span className="text-fg-subtle">({t("team.you")})</span> : null}
                     </p>
                     <p className="text-xs text-fg-subtle">{m.email}</p>
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="px-5 py-3 max-sm:col-span-2">
                     {editable ? (
                       <JobPicker
                         restaurantId={ctx.restaurant.id}
@@ -90,7 +94,7 @@ async function Team({ params }: { params: Params }) {
                   <td className="px-5 py-3">
                     <Badge tone={m.role === "owner" ? "accent" : "neutral"}>{t(`roles.${m.role}`)}</Badge>
                   </td>
-                  <td className="px-5 py-3 text-fg-muted">
+                  <td className="px-5 py-3 text-fg-muted max-sm:order-last max-sm:col-span-2 max-sm:text-xs">
                     {m.lastLoginAt
                       ? format.dateTime(m.lastLoginAt, {
                           dateStyle: "medium",

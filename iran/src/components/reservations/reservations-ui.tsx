@@ -114,10 +114,15 @@ export function BookingList({
                 {r.note ? <span className="text-fg">« {r.note} »</span> : null}
               </p>
             </div>
-            <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", STATUS_TONE[r.status])}>
-              {t(`status.${r.status}`)}
-            </span>
-            <div className="flex gap-1">
+            <div className="flex w-full items-center gap-1 ps-[4.75rem] sm:w-auto sm:ps-0">
+              <span
+                className={cn(
+                  "me-auto rounded-full px-2.5 py-0.5 text-xs font-semibold sm:me-2",
+                  STATUS_TONE[r.status],
+                )}
+              >
+                {t(`status.${r.status}`)}
+              </span>
               {(NEXT[r.status] ?? []).map((to) => (
                 <button
                   key={to}

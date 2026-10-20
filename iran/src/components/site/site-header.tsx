@@ -12,7 +12,7 @@ export async function SiteHeader({ home = false, active }: { home?: boolean; act
   const anchor = (id: string) => (home ? `#${id}` : `/#${id}`);
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-bg/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-3 sm:px-6">
         <Logo />
         <nav className="ms-6 hidden items-center gap-6 text-sm font-medium text-fg-muted md:flex">
           <Link
@@ -44,7 +44,7 @@ export async function SiteHeader({ home = false, active }: { home?: boolean; act
             )}
           >
             <Store className="size-4" aria-hidden="true" />
-            {t("nav.restaurants")}
+            <span className="max-[420px]:sr-only">{t("nav.restaurants")}</span>
           </Link>
           <LanguageSwitcher className="hidden sm:inline-flex" />
           <Link

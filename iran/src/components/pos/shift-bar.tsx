@@ -130,7 +130,7 @@ export function ShiftBar({
       <span className="grid size-10 place-items-center rounded-xl bg-accent-soft text-accent-text">
         <LockOpen className="size-5" aria-hidden="true" />
       </span>
-      <div className="min-w-0 flex-1 text-sm">
+      <div className="min-w-[12rem] flex-1 text-sm">
         <p className="font-semibold">{t("openSince", { time: timeLabel ?? "" })}</p>
         {summary ? (
           <p className="text-fg-muted">

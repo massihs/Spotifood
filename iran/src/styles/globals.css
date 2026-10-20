@@ -318,3 +318,14 @@ dialog[open]::backdrop {
     height: 0.6rem;
   }
 }
+
+/*
+ * A grid without columns sizes its single implicit column to the widest content (a row of
+ * chips, a long title), which pushes the page wider than a phone. Default every grid to one
+ * column that may shrink; any grid-cols-* utility (utilities layer) still wins.
+ */
+@layer base {
+  .grid:not([class*="grid-flow-col"]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

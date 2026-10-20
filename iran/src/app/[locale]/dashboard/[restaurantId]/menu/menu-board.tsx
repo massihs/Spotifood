@@ -429,7 +429,7 @@ function ProductItem({
   const locale = useLocale();
   const price = (c: number) => formatMoney(c, currency, locale);
   return (
-    <div className="flex items-center gap-2 bg-surface px-1 py-3 sm:gap-3">
+    <div className="flex flex-wrap items-center gap-2 bg-surface px-1 py-3 sm:flex-nowrap sm:gap-3">
       {handle}
       <div className="min-w-0 flex-1">
         <Link
@@ -451,7 +451,8 @@ function ProductItem({
           ) : null}
         </div>
       </div>
-      <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">
+      {/* Phones: the switches get their own row, so the dish name keeps the width. */}
+      <div className="order-last flex w-full shrink-0 items-center gap-4 ps-7 sm:order-none sm:w-auto sm:gap-3 sm:ps-0">
         <FlagSwitch
           restaurantId={restaurantId}
           productId={p.id}
