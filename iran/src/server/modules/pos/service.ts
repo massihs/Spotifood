@@ -125,11 +125,7 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
         );
       if (!t) throw notFound();
       table = t;
-      const [open] = await tx
-        .select({ id: tableSessions.id })
-        .from(tableSessions)
-        .where(and(eq(tableSessions.tableId, t.id), eq(tableSessions.status, "open")));
-      sessionId = open?.id ?? null;
+      sessionId = await seatTable(tx, rid, t.id);
     }
 
     const products = await loadPricedProducts(tx, rid, {
@@ -331,6 +327,34 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
     });
     return { order: order!, payment };
   });
+}
+
+/**
+ * The table's open session, opened when the waiter or the till orders for a free table: the
+ * table shows as occupied, and its bill gathers every round until it is closed.
+ */
+async function seatTable(tx: DbOrTx, restaurantId: string, tableId: string) {
+  const current = async () =>
+    (
+      await tx
+        .select({ id: tableSessions.id })
+        .from(tableSessions)
+        .where(and(eq(tableSessions.tableId, tableId), eq(tableSessions.status, "open")))
+    )[0]?.id ?? null;
+  const open = await current();
+  if (open) {
+    await tx.update(tableSessions).set({ lastActivityAt: new Date() }).where(eq(tableSessions.id, open));
+    return open;
+  }
+  // A guest scanning the QR at the same instant may win the one-open-session index.
+  const [created] = await tx
+    .insert(tableSessions)
+    .values({ restaurantId, tableId })
+    .onConflictDoNothing()
+    .returning({ id: tableSessions.id });
+  if (created)
+    await emit(tx, { topic: topics.restaurant(restaurantId), type: "session.opened", data: { tableId } });
+  return created?.id ?? (await current());
 }
 
 // ─── Cash drawer ─────────────────────────────────────────────────────────────

@@ -48,7 +48,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const ctx = await requireRestaurant(restaurantId);
   // Each job lands on its own screen: the kitchen and bar on their tickets, the till on the
   // orders to accept, waiters on the floor.
-  const home = { kitchen: "kitchen", bar: "kitchen", cashier: "orders", waiter: "floor" }[ctx.job ?? ""];
+  const home = { kitchen: "kitchen", bar: "kitchen", cashier: "orders", waiter: "waiter" }[ctx.job ?? ""];
   if (home) redirect({ href: `/dashboard/${ctx.restaurant.id}/${home}`, locale: await getLocale() });
   const [t, locale, overview, today, disabled] = await Promise.all([
     getTranslations("dashboard"),

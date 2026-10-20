@@ -698,7 +698,7 @@ export function PosTerminal({
   );
 }
 
-function OptionPicker({
+export function OptionPicker({
   product,
   money,
   onClose,
