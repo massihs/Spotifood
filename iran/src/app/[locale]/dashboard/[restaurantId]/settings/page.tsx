@@ -20,7 +20,8 @@ import {
 } from "./settings-forms";
 import { ModulesForm } from "./modules-form";
 import { ListingForm } from "./listing-form";
-import { getListing } from "@/server/modules/directory/service";
+import { getCoverChoices, getListing } from "@/server/modules/directory/service";
+import { CoverPicker } from "./cover-picker";
 import { PrintersPanel } from "./printers-panel";
 import { listPrinters } from "@/server/modules/printing/service";
 import { listStations } from "@/server/modules/kitchen/stations";
@@ -42,13 +43,14 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view, payment, printing, setup, listing] = await Promise.all([
+  const [t, view, payment, printing, setup, listing, cover] = await Promise.all([
     getTranslations("settings"),
     getRestaurantSettingsView(db, ctx),
     getPaymentSettingsView(db, ctx),
     listPrinters(db, ctx),
     can(ctx, "orders.view") ? listStations(db, ctx) : { stations: [] },
     getListing(db, ctx),
+    getCoverChoices(db, ctx),
   ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
@@ -113,7 +115,8 @@ async function Settings({ params }: { params: Params }) {
               title={<SectionTitle icon={<Store />}>{t("listing")}</SectionTitle>}
               description={t("listingHint")}
             />
-            <div className="p-5 sm:p-6">
+            <div className="space-y-6 p-5 sm:p-6">
+              <CoverPicker restaurantId={rid} disabled={readOnly} choices={cover} />
               <ListingForm restaurantId={rid} disabled={readOnly} values={listing} />
             </div>
           </Card>

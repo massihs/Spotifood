@@ -8,6 +8,10 @@ import { CUISINES, cityOf, distanceKm, type City, type Cuisine, isCuisine } from
 import { openState, type OpenState } from "@/lib/opening";
 import type { OpeningHours } from "@/server/db/schema/restaurant";
 import { productImageUrls } from "@/server/modules/menu/images";
+import { COVER_VARIANTS, processImage } from "@/server/infra/images";
+import { newAssetBase, storage, variantKey } from "@/server/infra/storage";
+import { randomToken } from "@/lib/ids";
+import { notFound } from "@/server/errors";
 import { logoUrl } from "@/server/modules/restaurants/settings";
 
 export const DIRECTORY_TAG = "directory";
@@ -48,6 +52,7 @@ export async function loadDirectory(db: DbOrTx): Promise<DirectoryEntry[]> {
       brandColor: restaurants.brandColor,
       logoKey: restaurants.logoKey,
       tagline: restaurants.tagline,
+      coverKey: restaurants.coverKey,
       cuisines: restaurants.cuisines,
       priceLevel: restaurants.priceLevel,
       city: restaurants.city,
@@ -101,7 +106,15 @@ export async function loadDirectory(db: DbOrTx): Promise<DirectoryEntry[]> {
       ),
   ]);
   const ratingOf = new Map(ratings.map((r) => [r.id, r]));
-  const coverOf = new Map(covers.map((c) => [c.id, productImageUrls(c.key)]));
+  const coverOf = new Map<string, { md: string; lg: string }>(
+    covers.map((c) => [c.id, productImageUrls(c.key)]),
+  );
+  // The owner's choice wins, as long as a chosen dish photo still exists.
+  const chosen = await liveCoverKeys(
+    db,
+    rows.map((r) => r.coverKey),
+  );
+  for (const r of rows) if (r.coverKey && chosen.has(r.coverKey)) coverOf.set(r.id, coverUrls(r.coverKey));
 
   return rows.map((r) => {
     const city = cityOf(r.city);
@@ -251,4 +264,108 @@ export async function updateListing(db: Database, ctx: RestaurantContext, raw: L
       metadata: { listed: input.listed },
     });
   });
+}
+
+// ─── Guide photo ─────────────────────────────────────────────────────────────
+
+const isUploadedCover = (key: string) => key.split("/")[2] === "cover";
+
+function coverUrls(key: string) {
+  const s = storage();
+  return {
+    md: s.publicUrl(variantKey(key, "md", "image/webp")),
+    lg: s.publicUrl(variantKey(key, "lg", "image/webp")),
+  };
+}
+
+/** Chosen keys still backed by files: uploaded covers, or dish photos not deleted since. */
+async function liveCoverKeys(db: DbOrTx, keys: (string | null)[]) {
+  const wanted = keys.filter((k): k is string => Boolean(k));
+  const live = new Set(wanted.filter(isUploadedCover));
+  const dish = wanted.filter((k) => !isUploadedCover(k));
+  if (dish.length) {
+    const rows = await db
+      .select({ key: productImages.storageKey })
+      .from(productImages)
+      .where(inArray(productImages.storageKey, dish));
+    for (const r of rows) live.add(r.key);
+  }
+  return live;
+}
+
+/** The guide photo as the owner sees it in settings, and the dish photos it can be picked from. */
+export async function getCoverChoices(db: DbOrTx, ctx: RestaurantContext) {
+  assertCan(ctx, "restaurant.view");
+  const [r] = await db
+    .select({ coverKey: restaurants.coverKey })
+    .from(restaurants)
+    .where(eq(restaurants.id, ctx.restaurant.id));
+  const photos = await db
+    .select({ id: productImages.id, key: productImages.storageKey, name: products.name })
+    .from(productImages)
+    .innerJoin(products, eq(products.id, productImages.productId))
+    .where(
+      and(
+        eq(productImages.restaurantId, ctx.restaurant.id),
+        eq(products.isActive, true),
+        isNull(products.deletedAt),
+      ),
+    )
+    .orderBy(desc(products.isFeatured), asc(products.sortOrder), asc(productImages.sortOrder))
+    .limit(48);
+  const key = r?.coverKey && (await liveCoverKeys(db, [r.coverKey])).has(r.coverKey) ? r.coverKey : null;
+  return {
+    mode: !key ? ("auto" as const) : isUploadedCover(key) ? ("upload" as const) : ("dish" as const),
+    current: key ? coverUrls(key).md : photos[0] ? productImageUrls(photos[0].key).md : null,
+    selectedKey: key,
+    photos: photos.map((p) => ({ id: p.id, key: p.key, name: p.name, url: productImageUrls(p.key).sm })),
+  };
+}
+
+async function setCover(db: Database, ctx: RestaurantContext, key: string | null) {
+  const [prev] = await db
+    .select({ coverKey: restaurants.coverKey })
+    .from(restaurants)
+    .where(eq(restaurants.id, ctx.restaurant.id));
+  await db.transaction(async (tx) => {
+    await tx.update(restaurants).set({ coverKey: key }).where(eq(restaurants.id, ctx.restaurant.id));
+    await recordAudit(tx, {
+      action: "restaurant.cover_updated",
+      actorUserId: ctx.user.id,
+      restaurantId: ctx.restaurant.id,
+      metadata: { mode: !key ? "auto" : isUploadedCover(key) ? "upload" : "dish" },
+    });
+  });
+  // An uploaded cover belongs to the restaurant alone: its files go once it is replaced.
+  if (prev?.coverKey && prev.coverKey !== key && isUploadedCover(prev.coverKey))
+    await storage()
+      .delete(COVER_VARIANTS.map((v) => variantKey(prev.coverKey!, v.suffix, "image/webp")))
+      .catch((e) => console.error("[storage] failed to delete old cover", e));
+}
+
+export async function uploadCover(db: Database, ctx: RestaurantContext, file: Buffer) {
+  assertCan(ctx, "restaurant.manage");
+  const image = await processImage(file, COVER_VARIANTS);
+  const base = newAssetBase(ctx.restaurant.id, "cover", randomToken(16));
+  const store = storage();
+  await Promise.all(
+    image.variants.map((v) => store.put(variantKey(base, v.suffix, v.contentType), v.body, v.contentType)),
+  );
+  await setCover(db, ctx, base);
+  return coverUrls(base);
+}
+
+export async function chooseDishCover(db: Database, ctx: RestaurantContext, imageId: string) {
+  assertCan(ctx, "restaurant.manage");
+  const [img] = await db
+    .select({ key: productImages.storageKey })
+    .from(productImages)
+    .where(and(eq(productImages.id, imageId), eq(productImages.restaurantId, ctx.restaurant.id)));
+  if (!img) throw notFound();
+  await setCover(db, ctx, img.key);
+}
+
+export async function resetCover(db: Database, ctx: RestaurantContext) {
+  assertCan(ctx, "restaurant.manage");
+  await setCover(db, ctx, null);
 }

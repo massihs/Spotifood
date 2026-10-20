@@ -58,6 +58,8 @@ export const restaurants = pgTable(
       .default(sql`ARRAY[]::text[]`),
     priceLevel: smallint(),
     tagline: varchar({ length: 200 }),
+    /** Guide photo chosen by the owner: an uploaded cover or one of the dish photos (null = automatic). */
+    coverKey: text(),
     latitude: doublePrecision(),
     longitude: doublePrecision(),
     ...timestamps,

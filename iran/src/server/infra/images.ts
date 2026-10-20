@@ -13,6 +13,12 @@ export const PRODUCT_VARIANTS: ImageVariant[] = [
   { suffix: "lg", width: 1280, format: "webp" },
 ];
 
+/** Same suffixes as dish photos, so a dish photo can serve as the guide cover as is. */
+export const COVER_VARIANTS: ImageVariant[] = [
+  { suffix: "md", width: 640, format: "webp" },
+  { suffix: "lg", width: 1600, format: "webp" },
+];
+
 export const LOGO_VARIANTS: ImageVariant[] = [
   { suffix: "256", width: 256, format: "webp" },
   { suffix: "512", width: 512, format: "png" }, // PNG for PDFs and print

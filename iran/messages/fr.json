@@ -2316,6 +2316,19 @@
     "lng": "Longitude",
     "openMap": "Voir sur la carte",
     "viewPage": "Voir la page publique",
-    "noPosition": "Sans position, le centre-ville est utilisé."
+    "noPosition": "Sans position, le centre-ville est utilisé.",
+    "cover": "Image dans le guide",
+    "coverHint": "Affichée aux clients sur la carte du restaurant et en haut de votre page publique.",
+    "coverUpload": "Importer une image",
+    "coverFromMenu": "Choisir une photo du menu",
+    "coverAuto": "Choix automatique",
+    "coverSize": "Format paysage, au moins 1600 px de large ; JPG, PNG ou WebP jusqu'à 8 Mo.",
+    "coverSaved": "Image enregistrée.",
+    "coverError": "L'image n'a pas été enregistrée. Réessayez.",
+    "coverMode": {
+      "auto": "Automatique : plat vedette",
+      "upload": "Votre image",
+      "dish": "Photo du menu"
+    }
   }
 }

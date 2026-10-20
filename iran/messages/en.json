@@ -2308,6 +2308,19 @@
     "lng": "Longitude",
     "openMap": "View on map",
     "viewPage": "View public page",
-    "noPosition": "Without a position, the city centre is used."
+    "noPosition": "Without a position, the city centre is used.",
+    "cover": "Guide photo",
+    "coverHint": "Shown to guests on your guide card and at the top of your public page.",
+    "coverUpload": "Upload a photo",
+    "coverFromMenu": "Pick a menu photo",
+    "coverAuto": "Automatic",
+    "coverSize": "Landscape, at least 1600 px wide; JPG, PNG or WebP up to 8 MB.",
+    "coverSaved": "Photo saved.",
+    "coverError": "The photo was not saved. Please try again.",
+    "coverMode": {
+      "auto": "Automatic: featured dish",
+      "upload": "Your photo",
+      "dish": "Menu photo"
+    }
   }
 }

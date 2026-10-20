@@ -5,7 +5,13 @@ import { isMenuTheme, type MenuTheme } from "@/lib/menu-themes";
 import { isRestaurantKind, type RestaurantKind } from "@/lib/restaurant-kind";
 import { refresh, updateTag } from "next/cache";
 import { isCuisine } from "@/lib/directory";
-import { DIRECTORY_TAG, updateListing } from "@/server/modules/directory/service";
+import {
+  DIRECTORY_TAG,
+  chooseDishCover,
+  resetCover,
+  updateListing,
+  uploadCover,
+} from "@/server/modules/directory/service";
 import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
 import { AppError } from "@/server/errors";
@@ -236,6 +242,30 @@ export async function updateListingAction(restaurantId: string, _prev: unknown, 
       latitude: str(fd, "latitude"),
       longitude: str(fd, "longitude"),
     });
+    updateTag(DIRECTORY_TAG);
+    refresh();
+  });
+}
+
+export async function uploadCoverAction(restaurantId: string, _prev: unknown, fd: FormData) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    await enforceRateLimit("upload", ctx.user.id);
+    const file = fd.get("cover");
+    if (!(file instanceof File) || file.size === 0) throw new AppError("VALIDATION", "image_empty");
+    if (file.size > MAX_UPLOAD_BYTES) throw new AppError("VALIDATION", "image_too_large");
+    await uploadCover(db, ctx, Buffer.from(await file.arrayBuffer()));
+    updateTag(DIRECTORY_TAG);
+    refresh();
+  });
+}
+
+/** `imageId` = a dish photo; null = back to the automatic choice. */
+export async function chooseCoverAction(restaurantId: string, imageId: string | null) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    if (imageId) await chooseDishCover(db, ctx, imageId);
+    else await resetCover(db, ctx);
     updateTag(DIRECTORY_TAG);
     refresh();
   });
