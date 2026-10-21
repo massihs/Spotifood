@@ -34,6 +34,8 @@ import { isModule } from "@/lib/modules";
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
 
 const COMMON_CURRENCIES = edition.currencies;
+/** "Seen 3 min ago" is computed against the render time, the same on server and client. */
+const renderedAt = () => Date.now();
 
 export default function SettingsPage({ params }: { params: Params }) {
   return (
@@ -151,6 +153,7 @@ async function Settings({ params }: { params: Params }) {
                 data={{
                   ...printing,
                   agentSeenAt: printing.agentSeenAt?.toISOString() ?? null,
+                  now: renderedAt(),
                   printers: printing.printers.map((p) => ({
                     id: p.id,
                     name: p.name,
@@ -178,6 +181,7 @@ async function Settings({ params }: { params: Params }) {
                 restaurantId={rid}
                 readOnly={readOnly}
                 downloads={desktopDownloads()}
+                now={renderedAt()}
                 devices={devices.map((d) => ({
                   id: d.id,
                   name: d.name,

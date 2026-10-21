@@ -16,7 +16,7 @@ export type DeviceView = {
 };
 
 /** The app checks in every minute while it has internet. */
-const online = (iso: string | null) => !!iso && Date.now() - Date.parse(iso) < 5 * 60_000;
+const online = (iso: string | null, now: number) => !!iso && now - Date.parse(iso) < 5 * 60_000;
 
 /** Settings → Desktop app: what it does, where to get it, and the PCs linked to the restaurant. */
 export function DesktopPanel({
@@ -24,11 +24,14 @@ export function DesktopPanel({
   readOnly,
   devices,
   downloads,
+  now,
 }: {
   restaurantId: string;
   readOnly: boolean;
   devices: DeviceView[];
   downloads: { windows: string | null; mac: string | null };
+  /** Server render time: the same "seen 5 min ago" on the server and in the browser. */
+  now: number;
 }) {
   const t = useTranslations("settings.desktop");
   const format = useFormatter();
@@ -83,7 +86,7 @@ export function DesktopPanel({
             {devices.map((d) => (
               <li key={d.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
                 <span
-                  className={`size-2.5 shrink-0 rounded-full ${online(d.lastSeenAt) ? "bg-success" : "bg-fg-subtle"}`}
+                  className={`size-2.5 shrink-0 rounded-full ${online(d.lastSeenAt, now) ? "bg-success" : "bg-fg-subtle"}`}
                   aria-hidden="true"
                 />
                 <div className="min-w-0 flex-1">
@@ -95,9 +98,9 @@ export function DesktopPanel({
                   </p>
                   <p className="text-xs text-fg-muted">
                     {d.lastSeenAt
-                      ? online(d.lastSeenAt)
+                      ? online(d.lastSeenAt, now)
                         ? t("connected")
-                        : t("seen", { when: format.relativeTime(new Date(d.lastSeenAt)) })
+                        : t("seen", { when: format.relativeTime(new Date(d.lastSeenAt), now) })
                       : t("neverSeen")}
                     {" · "}
                     {t("synced", { n: d.syncedOrders })}

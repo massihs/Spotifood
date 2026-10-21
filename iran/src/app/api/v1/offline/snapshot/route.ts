@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { db } from "@/server/db/client";
 import { errorResponse } from "@/server/actions";
 import { authenticateDevice, bearer, getSnapshot } from "@/server/modules/offline/service";
@@ -7,6 +8,7 @@ import { authenticateDevice, bearer, getSnapshot } from "@/server/modules/offlin
  * refreshed while online so it can keep working when the internet drops. Device token auth.
  */
 export async function GET(req: Request) {
+  await connection();
   try {
     const auth = await authenticateDevice(db, bearer(req), req.headers.get("x-app-version"));
     if (!auth) return Response.json({ error: "unauthorized" }, { status: 401 });

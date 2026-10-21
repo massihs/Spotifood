@@ -149,6 +149,8 @@ export function PrintersPanel({
     printers: PrinterView[];
     pending: number;
     agentSeenAt: string | null;
+    /** Server render time, for relative times that hydrate cleanly. */
+    now: number;
     agentOnline: boolean;
     agentConfigured: boolean;
     cashierAcceptance: boolean;
@@ -204,7 +206,7 @@ export function PrintersPanel({
                 {online
                   ? t("agentOnline")
                   : data.agentSeenAt
-                    ? t("agentSeen", { when: format.relativeTime(new Date(data.agentSeenAt)) })
+                    ? t("agentSeen", { when: format.relativeTime(new Date(data.agentSeenAt), data.now) })
                     : data.agentConfigured
                       ? t("agentWaiting")
                       : t("agentNone")}
