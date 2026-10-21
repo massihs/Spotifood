@@ -472,7 +472,11 @@
     "party_too_large": "Pour les grands groupes, appelez-nous.",
     "invalid_station": "Le poste choisi n'est pas valide.",
     "invalid_position": "Position invalide : saisissez la latitude et la longitude.",
-    "invalid_percent": "Pourcentage invalide."
+    "invalid_percent": "Pourcentage invalide.",
+    "duplicate_booking": "Ce client a déjà une réservation à ce moment-là.",
+    "table_taken": "Cette table est déjà réservée sur ce créneau.",
+    "table_too_small": "Cette table est trop petite pour ce groupe.",
+    "slot_full": "Ce créneau est complet."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -2176,9 +2180,10 @@
     "title": "Réservations & file d’attente",
     "subtitle": "Réservations (téléphone et en ligne) et file d’attente sur place avec SMS.",
     "tabs": {
-      "bookings": "Réservations",
+      "bookings": "Liste",
       "queue": "File d’attente",
-      "settings": "Réglages"
+      "settings": "Réglages",
+      "agenda": "Agenda"
     },
     "noBookings": "Aucune réservation ce jour.",
     "tableN": "Table {label}",
@@ -2247,7 +2252,31 @@
     "statPending": "À confirmer",
     "lunch": "Déjeuner",
     "dinner": "Dîner",
-    "covers": "{count, plural, one {# couvert} other {# couverts}}"
+    "covers": "{count, plural, one {# couvert} other {# couverts}}",
+    "agenda": {
+      "editBooking": "Réservation",
+      "call": "Appeler",
+      "phone": "Mobile",
+      "known": "Client connu · {bookings, plural, one {# réservation} other {# réservations}}",
+      "noShows": "{n, plural, one {# absence} other {# absences}}",
+      "duration": "Durée",
+      "minutes": "{n} min",
+      "table": "Table",
+      "tableAuto": "Automatique",
+      "tableNone": "Sans table",
+      "free": "Libre",
+      "small": "Trop petite",
+      "seats": "{n} pl.",
+      "taken": "Prise par {name} à {time}",
+      "seatsLeft": "{n} places libres sur ce créneau",
+      "duplicate": "Ce numéro a déjà une réservation à {time} ({name}).",
+      "unassigned": "Sans table",
+      "noTables": "Ajoutez des tables",
+      "closed": "Fermé ce jour : horaires indicatifs.",
+      "tapToBook": "Touchez un créneau libre pour réserver une table.",
+      "clash": "Réservations en conflit",
+      "clashes": "{n, plural, one {# réservation partage sa table avec une autre : déplacez-la.} other {# réservations partagent une table au même moment : déplacez-les.}}"
+    }
   },
   "booking": {
     "people": "Couverts",

@@ -472,7 +472,11 @@
     "party_too_large": "للمجموعات الكبيرة اتصل بنا.",
     "invalid_station": "المحطة المختارة غير صالحة.",
     "invalid_position": "موقع غير صالح: أدخل خط العرض وخط الطول معًا.",
-    "invalid_percent": "نسبة غير صالحة."
+    "invalid_percent": "نسبة غير صالحة.",
+    "duplicate_booking": "لدى هذا العميل حجز في الوقت نفسه.",
+    "table_taken": "هذه الطاولة محجوزة في هذا الموعد.",
+    "table_too_small": "هذه الطاولة صغيرة جدًا لهذا العدد.",
+    "slot_full": "هذا الموعد ممتلئ."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -2168,9 +2172,10 @@
     "title": "الحجوزات وقائمة الانتظار",
     "subtitle": "حجوزات الطاولات (هاتفياً وأونلاين) وقائمة انتظار مع SMS.",
     "tabs": {
-      "bookings": "الحجوزات",
+      "bookings": "القائمة",
       "queue": "قائمة الانتظار",
-      "settings": "الإعدادات"
+      "settings": "الإعدادات",
+      "agenda": "الأجندة"
     },
     "noBookings": "لا حجوزات لهذا اليوم.",
     "tableN": "الطاولة {label}",
@@ -2239,7 +2244,31 @@
     "statPending": "بانتظار التأكيد",
     "lunch": "الغداء",
     "dinner": "العشاء",
-    "covers": "{count, plural, other {# شخص}}"
+    "covers": "{count, plural, other {# شخص}}",
+    "agenda": {
+      "editBooking": "الحجز",
+      "call": "اتصال",
+      "phone": "الجوال",
+      "known": "عميل معروف · {bookings, plural, one {حجز واحد} other {# حجوزات}}",
+      "noShows": "{n, plural, one {غياب واحد} other {# غيابات}}",
+      "duration": "المدة",
+      "minutes": "{n} د",
+      "table": "الطاولة",
+      "tableAuto": "تلقائي",
+      "tableNone": "بدون طاولة",
+      "free": "متاحة",
+      "small": "صغيرة جدًا",
+      "seats": "{n} مقاعد",
+      "taken": "محجوزة لـ{name} الساعة {time}",
+      "seatsLeft": "{n} مقاعد متبقية في هذا الموعد",
+      "duplicate": "لهذا الرقم حجز آخر الساعة {time} ({name}).",
+      "unassigned": "بدون طاولة",
+      "noTables": "أضف طاولات",
+      "closed": "مغلق هذا اليوم: الساعات للإرشاد.",
+      "tapToBook": "اضغط على موعد متاح لحجز طاولة.",
+      "clash": "حجز متعارض",
+      "clashes": "{n, plural, one {حجز واحد يتشارك طاولته مع آخر: انقله.} other {# حجوزات تتشارك طاولة في الوقت نفسه: انقلها.}}"
+    }
   },
   "booking": {
     "people": "الأشخاص",

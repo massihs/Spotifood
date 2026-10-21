@@ -30,6 +30,14 @@ export function dayStart(day: string, tz: string) {
   return new Date(guess - offsetMs(guess - offsetMs(guess, tz), tz));
 }
 
+/** A local wall-clock time ("2026-03-21", "20:30") as an instant, DST-safe. */
+export function wallTime(day: string, hhmm: string, tz: string) {
+  const [h, m] = hhmm.split(":").map(Number);
+  const midnight = dayStart(day, tz).getTime();
+  const guess = midnight + ((h ?? 0) * 60 + (m ?? 0)) * 60_000;
+  return new Date(guess + offsetMs(midnight, tz) - offsetMs(guess, tz));
+}
+
 export function localDay(at: Date, tz: string) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(at);
 }

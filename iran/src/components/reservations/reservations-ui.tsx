@@ -3,11 +3,11 @@
 import { Bell, CalendarPlus, Check, Clock, Copy, Phone, UserPlus, Users, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { Sheet, field, num, useRun } from "@/components/ui/sheet-kit";
+import { field, num, useRun } from "@/components/ui/sheet-kit";
 import { cn } from "@/lib/cn";
+import { BookingSheet, NEXT, STATUS_TONE } from "./booking-sheet";
 import {
   addToQueueAction,
-  createBookingAction,
   setReservationStatusAction,
   updateReservationSettingsAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/reservations/actions";
@@ -27,15 +27,6 @@ export type ReservationRow = {
   notifiedAt: string | null;
 };
 
-const STATUS_TONE: Record<string, string> = {
-  pending: "bg-warning-soft text-warning",
-  confirmed: "bg-tone-sky/12 text-tone-sky",
-  notified: "bg-tone-fuchsia/12 text-tone-fuchsia",
-  seated: "bg-success-soft text-success",
-  completed: "bg-surface-2 text-fg-muted",
-  cancelled: "bg-danger-soft text-danger",
-  no_show: "bg-danger-soft text-danger",
-};
 const STATUS_STRIPE: Record<string, string> = {
   pending: "border-s-warning",
   confirmed: "border-s-tone-sky",
@@ -44,12 +35,6 @@ const STATUS_STRIPE: Record<string, string> = {
   completed: "border-s-border-strong",
   cancelled: "border-s-danger",
   no_show: "border-s-danger",
-};
-const NEXT: Record<string, string[]> = {
-  pending: ["confirmed", "cancelled"],
-  confirmed: ["seated", "no_show", "cancelled"],
-  notified: ["seated", "no_show", "cancelled"],
-  seated: ["completed"],
 };
 const QUEUE_NEXT: Record<string, string[]> = {
   confirmed: ["notified", "seated", "cancelled"],
@@ -314,17 +299,19 @@ export function QueueBoard({ rid, rows }: { rid: string; rows: ReservationRow[] 
   );
 }
 
-export function NewBookingButton({ rid, day }: { rid: string; day: string }) {
+export function NewBookingButton({
+  rid,
+  day,
+  timeZone,
+  defaultDuration,
+}: {
+  rid: string;
+  day: string;
+  timeZone: string;
+  defaultDuration: number;
+}) {
   const t = useTranslations("reservations");
   const [open, setOpen] = useState(false);
-  const { pending, error, run } = useRun();
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [size, setSize] = useState("2");
-  const [date, setDate] = useState(day);
-  const [time, setTime] = useState("20:00");
-  const [area, setArea] = useState<"any" | "indoor" | "outdoor">("any");
-  const [note, setNote] = useState("");
   return (
     <>
       <button
@@ -336,98 +323,13 @@ export function NewBookingButton({ rid, day }: { rid: string; day: string }) {
         {t("newBooking")}
       </button>
       {open ? (
-        <Sheet title={t("newBooking")} onClose={() => setOpen(false)}>
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t("name")}
-                className={field}
-                autoFocus
-              />
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="09…"
-                inputMode="tel"
-                dir="ltr"
-                className={field}
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                dir="ltr"
-                className={field}
-                aria-label={t("date")}
-              />
-              <input
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                dir="ltr"
-                className={field}
-                aria-label={t("time")}
-              />
-              <input
-                value={size}
-                onChange={(e) => setSize(e.target.value)}
-                inputMode="numeric"
-                dir="ltr"
-                className={field}
-                aria-label={t("party")}
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-1 rounded-xl bg-surface-2 p-1">
-              {(["any", "indoor", "outdoor"] as const).map((a) => (
-                <button
-                  key={a}
-                  type="button"
-                  onClick={() => setArea(a)}
-                  className={cn(
-                    "h-9 rounded-lg text-sm font-semibold",
-                    area === a ? "bg-surface shadow-sm" : "text-fg-muted",
-                  )}
-                >
-                  {t(`areas.${a}`)}
-                </button>
-              ))}
-            </div>
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder={t("note")}
-              maxLength={500}
-              className={field}
-            />
-            {error ? <p className="text-sm text-danger">{error}</p> : null}
-            <button
-              type="button"
-              disabled={pending || !name.trim() || !phone.trim()}
-              onClick={() =>
-                run(
-                  () =>
-                    createBookingAction(rid, {
-                      name,
-                      phone,
-                      partySize: Math.trunc(num(size)) || 1,
-                      // Local wall time of the restaurant = browser time for staff on site.
-                      startsAt: new Date(`${date}T${time}:00`).toISOString(),
-                      note,
-                      area,
-                    }),
-                  () => setOpen(false),
-                )
-              }
-              className="inline-flex h-11 w-full items-center justify-center rounded-full bg-accent font-semibold text-accent-fg disabled:opacity-50"
-            >
-              {t("save")}
-            </button>
-          </div>
-        </Sheet>
+        <BookingSheet
+          rid={rid}
+          timeZone={timeZone}
+          defaultDuration={defaultDuration}
+          initial={{ day, time: "20:00" }}
+          onClose={() => setOpen(false)}
+        />
       ) : null}
     </>
   );

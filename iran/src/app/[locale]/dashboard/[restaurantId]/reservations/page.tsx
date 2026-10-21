@@ -3,6 +3,7 @@ import { CalendarCheck, ChevronLeft, ChevronRight, Hourglass, Users, UserX } fro
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { LiveRefresh } from "@/components/realtime/live";
+import { Agenda } from "@/components/reservations/agenda";
 import {
   BookingList,
   NewBookingButton,
@@ -15,11 +16,16 @@ import { localDay } from "@/lib/period";
 import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { env } from "@/server/env";
-import { getReservationSettings, listDay, weekCounts } from "@/server/modules/reservations/service";
+import {
+  agendaDay,
+  getReservationSettings,
+  listDay,
+  weekCounts,
+} from "@/server/modules/reservations/service";
 import { can } from "@/server/tenancy";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/reservations">;
-const TABS = ["bookings", "queue", "settings"] as const;
+const TABS = ["agenda", "bookings", "queue", "settings"] as const;
 
 export default function ReservationsPage({ params, searchParams }: Props) {
   return (
@@ -39,18 +45,19 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
   const tz = ctx.restaurant.timezone;
   const tab = (TABS as readonly string[]).includes(String(sp.tab))
     ? (sp.tab as (typeof TABS)[number])
-    : "bookings";
+    : "agenda";
   const today = localDay(new Date(), tz);
   const day = typeof sp.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.day) ? sp.day : today;
   // The strip shows the selected day in a week, starting a little before it.
   const stripStart = shift(day, -2);
-  const [t, format, locale, data, settings, week] = await Promise.all([
+  const [t, format, locale, data, settings, week, agenda] = await Promise.all([
     getTranslations("reservations"),
     getFormatter(),
     getLocale(),
     listDay(db, ctx, tab === "queue" ? today : day),
     getReservationSettings(db, ctx),
     weekCounts(db, ctx, stripStart),
+    tab === "agenda" ? agendaDay(db, ctx, day) : null,
   ]);
   const rid = ctx.restaurant.id;
   const base = `/dashboard/${rid}/reservations`;
@@ -60,6 +67,7 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
   const active = data.bookings.filter((b) => !["cancelled", "no_show"].includes(b.status));
   const waiting = data.queue.filter((q) => q.status === "confirmed" || q.status === "notified").length;
   const prefix = locale === "fa" ? "" : `/${locale}`;
+  const tabQs = tab === "agenda" ? "" : `tab=${tab}&`;
   const appUrl = env().APP_URL;
 
   return (
@@ -68,7 +76,11 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
       <PageHeader
         title={t("title")}
         description={t("subtitle")}
-        actions={tab === "bookings" ? <NewBookingButton rid={rid} day={day} /> : null}
+        actions={
+          tab === "bookings" || tab === "agenda" ? (
+            <NewBookingButton rid={rid} day={day} timeZone={tz} defaultDuration={settings.durationMin} />
+          ) : null
+        }
       />
       <nav
         className="-mx-4 mb-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
@@ -77,7 +89,7 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
         {TABS.filter((k) => k !== "settings" || can(ctx, "restaurant.manage")).map((k) => (
           <Link
             key={k}
-            href={k === "bookings" ? base : `${base}?tab=${k}`}
+            href={k === "agenda" ? base : `${base}?tab=${k}`}
             aria-current={tab === k ? "page" : undefined}
             className={cn(
               "shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
@@ -94,11 +106,11 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
         ))}
       </nav>
 
-      {tab === "bookings" ? (
+      {tab === "bookings" || tab === "agenda" ? (
         <>
           <div className="mb-4 flex items-center gap-2">
             <Link
-              href={`${base}?day=${shift(day, -7)}`}
+              href={`${base}?${tabQs}day=${shift(day, -7)}`}
               className="grid size-10 shrink-0 place-items-center rounded-full bg-surface ring-1 ring-border"
               aria-label={t("prevDay")}
             >
@@ -112,7 +124,11 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
                 return (
                   <li key={d} className="min-w-16 flex-1">
                     <Link
-                      href={d === today ? base : `${base}?day=${d}`}
+                      href={
+                        d === today
+                          ? `${base}${tabQs ? `?${tabQs.slice(0, -1)}` : ""}`
+                          : `${base}?${tabQs}day=${d}`
+                      }
                       aria-current={selected ? "date" : undefined}
                       className={cn(
                         "flex flex-col items-center gap-0.5 rounded-2xl px-2 py-2 transition-colors",
@@ -147,7 +163,7 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
               })}
             </ol>
             <Link
-              href={`${base}?day=${shift(day, 7)}`}
+              href={`${base}?${tabQs}day=${shift(day, 7)}`}
               className="grid size-10 shrink-0 place-items-center rounded-full bg-surface ring-1 ring-border"
               aria-label={t("nextDay")}
             >
@@ -164,7 +180,10 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
               })}
             </h2>
             {day !== today ? (
-              <Link href={base} className="text-sm font-semibold text-accent-text hover:underline">
+              <Link
+                href={`${base}${tabQs ? `?${tabQs.slice(0, -1)}` : ""}`}
+                className="text-sm font-semibold text-accent-text hover:underline"
+              >
                 {t("today")}
               </Link>
             ) : null}
@@ -210,7 +229,32 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
               </div>
             ))}
           </div>
-          <BookingList rid={rid} rows={rows(data.bookings)} timeZone={tz} locale={locale} />
+          {tab === "agenda" && agenda ? (
+            <Agenda
+              rid={rid}
+              day={day}
+              isToday={day === today}
+              timeZone={tz}
+              dayStartsAt={agenda.dayStartsAt.toISOString()}
+              tables={agenda.tables}
+              bookings={agenda.bookings.map((b) => ({
+                id: b.id,
+                name: b.name,
+                phone: b.phone,
+                partySize: b.partySize,
+                startsAt: b.startsAt.toISOString(),
+                durationMin: b.durationMin,
+                status: b.status,
+                tableId: b.tableId,
+                note: b.note,
+                source: b.source,
+              }))}
+              ranges={agenda.ranges}
+              durationMin={agenda.durationMin}
+            />
+          ) : (
+            <BookingList rid={rid} rows={rows(data.bookings)} timeZone={tz} locale={locale} />
+          )}
         </>
       ) : null}
       {tab === "queue" ? <QueueBoard rid={rid} rows={rows(data.queue)} /> : null}

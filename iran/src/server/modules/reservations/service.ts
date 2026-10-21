@@ -142,6 +142,7 @@ async function pickTable(
   durationMin: number,
   partySize: number,
   area: string,
+  excludeId?: string,
 ) {
   const tables = await tx
     .select({ id: diningTables.id, capacity: diningTables.capacity, zone: diningTables.zone })
@@ -158,6 +159,7 @@ async function pickTable(
         sql`${reservations.tableId} is not null`,
         lt(reservations.startsAt, end),
         sql`${reservations.startsAt} + make_interval(mins => ${reservations.durationMin}) > ${at}`,
+        ...(excludeId ? [ne(reservations.id, excludeId)] : []),
       ),
     );
   const taken = new Set(busy.map((b) => b.tableId));
@@ -204,8 +206,98 @@ export const bookingSchema = z.object({
   startsAt: z.coerce.date(),
   area: z.enum(["any", "indoor", "outdoor"]).default("any"),
   note: z.string().trim().max(500).default(""),
+  /** undefined = pick a free table, null = no table (staff only), uuid = this table. */
   tableId: z.uuid().nullable().optional(),
+  /** Staff may book a longer or shorter sitting than the default. */
+  durationMin: z.coerce.number().int().min(15).max(480).optional(),
 });
+
+type Slot = {
+  startsAt: Date;
+  durationMin: number;
+  partySize: number;
+  phone: string;
+  tableId: string | null | undefined;
+  area: string;
+};
+
+/**
+ * One booking at a time per restaurant: the checks below and the insert run under this lock, so
+ * two people taking the last table at the same second cannot both get it.
+ */
+const lockBookings = (tx: DbOrTx, rid: string) =>
+  tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"reservations:" + rid}, 0))`);
+
+/** Active bookings overlapping [at, at + duration), other than `excludeId`. */
+async function overlapping(tx: DbOrTx, rid: string, at: Date, durationMin: number, excludeId?: string) {
+  const end = new Date(at.getTime() + durationMin * 60_000);
+  return tx
+    .select({
+      id: reservations.id,
+      name: reservations.name,
+      phone: reservations.phone,
+      partySize: reservations.partySize,
+      tableId: reservations.tableId,
+      startsAt: reservations.startsAt,
+      durationMin: reservations.durationMin,
+    })
+    .from(reservations)
+    .where(
+      and(
+        eq(reservations.restaurantId, rid),
+        eq(reservations.kind, "booking"),
+        inArray(reservations.status, [...ACTIVE]),
+        lt(reservations.startsAt, end),
+        sql`${reservations.startsAt} + make_interval(mins => ${reservations.durationMin}) > ${at}`,
+        ...(excludeId ? [ne(reservations.id, excludeId)] : []),
+      ),
+    );
+}
+
+/**
+ * The double-booking rules, shared by online, phone and edits:
+ * - the same mobile cannot hold two bookings at overlapping times;
+ * - a table holds one booking at a time and must seat the party;
+ * - with no table given, a free one is picked; when none fits (or there are no tables) the slot
+ *   capacity decides, and a staff "no table" booking also counts against it.
+ * Returns the table to store.
+ */
+async function resolveSlot(tx: DbOrTx, place: Place, slot: Slot, excludeId?: string) {
+  const others = await overlapping(tx, place.id, slot.startsAt, slot.durationMin, excludeId);
+  if (others.some((o) => o.phone === slot.phone)) throw conflict("duplicate_booking");
+  if (slot.tableId) {
+    const [table] = await tx
+      .select({ id: diningTables.id, capacity: diningTables.capacity })
+      .from(diningTables)
+      .where(
+        and(
+          eq(diningTables.id, slot.tableId),
+          eq(diningTables.restaurantId, place.id),
+          isNull(diningTables.deletedAt),
+        ),
+      );
+    if (!table) throw notFound();
+    if (table.capacity != null && table.capacity < slot.partySize) throw conflict("table_too_small");
+    if (others.some((o) => o.tableId === table.id)) throw conflict("table_taken");
+    return table.id;
+  }
+  if (slot.tableId === undefined) {
+    const picked = await pickTable(
+      tx,
+      place.id,
+      slot.startsAt,
+      slot.durationMin,
+      slot.partySize,
+      slot.area,
+      excludeId,
+    );
+    if (picked) return picked;
+  }
+  // No table: the slot capacity is the only guard left.
+  const used = others.reduce((sum, o) => sum + o.partySize, 0);
+  if (used + slot.partySize > place.slotCapacity) throw conflict("slot_full");
+  return null;
+}
 
 async function upsertCustomer(tx: DbOrTx, rid: string, phone: string, name: string) {
   const [c] = await tx
@@ -232,10 +324,23 @@ async function create(
     );
     if (!ok) throw conflict("slot_unavailable");
   }
+  const durationMin = opts.source === "phone" ? (input.durationMin ?? place.durationMin) : place.durationMin;
   const res = await db.transaction(async (tx) => {
-    const tableId =
-      input.tableId ??
-      (await pickTable(tx, place.id, input.startsAt, place.durationMin, input.partySize, input.area));
+    await lockBookings(tx, place.id);
+    let tableId: string | null;
+    try {
+      tableId = await resolveSlot(tx, place, {
+        ...input,
+        durationMin,
+        // Guests never choose "no table": that is the team's call.
+        tableId: opts.source === "online" ? (input.tableId ?? undefined) : input.tableId,
+      });
+    } catch (e) {
+      // A guest only needs to know the time is gone.
+      if (opts.source === "online" && e instanceof AppError && e.message !== "duplicate_booking")
+        throw conflict("slot_unavailable");
+      throw e;
+    }
     const [r] = await tx
       .insert(reservations)
       .values({
@@ -246,7 +351,7 @@ async function create(
         phone: input.phone,
         partySize: input.partySize,
         startsAt: input.startsAt,
-        durationMin: place.durationMin,
+        durationMin,
         area: input.area,
         tableId,
         status: opts.source === "online" && !place.autoConfirm ? "pending" : "confirmed",
@@ -298,6 +403,220 @@ export async function createBooking(
   const place = await placeById(db, ctx.restaurant.id);
   if (!place) throw notFound();
   return create(db, place, raw, { source: "phone", actorUserId: ctx.user.id });
+}
+
+export const bookingEditSchema = z.object({
+  name: z.string().trim().min(1).max(120).optional(),
+  phone: bookingSchema.shape.phone.optional(),
+  partySize: z.coerce.number().int().min(1).max(200).optional(),
+  startsAt: z.coerce.date().optional(),
+  durationMin: z.coerce.number().int().min(15).max(480).optional(),
+  tableId: z.uuid().nullable().optional(),
+  note: z.string().trim().max(500).optional(),
+});
+
+/** Moves or edits a booking (time, length, party, table…) under the same double-booking rules. */
+export async function updateBooking(
+  db: Database,
+  ctx: RestaurantContext,
+  id: string,
+  raw: z.input<typeof bookingEditSchema>,
+) {
+  assertCan(ctx, "orders.create");
+  if (!isUuid(id)) throw notFound();
+  const input = bookingEditSchema.parse(raw);
+  const place = await placeById(db, ctx.restaurant.id);
+  if (!place) throw notFound();
+  return db.transaction(async (tx) => {
+    await lockBookings(tx, place.id);
+    const [r] = await tx
+      .select()
+      .from(reservations)
+      .where(
+        and(
+          eq(reservations.id, id),
+          eq(reservations.restaurantId, place.id),
+          eq(reservations.kind, "booking"),
+        ),
+      );
+    if (!r) throw notFound();
+    if (!(ACTIVE as readonly string[]).includes(r.status)) throw conflict("invalid_transition");
+    const next = {
+      startsAt: input.startsAt ?? r.startsAt,
+      durationMin: input.durationMin ?? r.durationMin,
+      partySize: input.partySize ?? r.partySize,
+      phone: input.phone ?? r.phone,
+      area: r.area,
+      // Keep the table unless asked; re-check it like a new booking would.
+      tableId: input.tableId !== undefined ? input.tableId : r.tableId,
+    };
+    const tableId = await resolveSlot(tx, place, next, r.id);
+    const [updated] = await tx
+      .update(reservations)
+      .set({
+        startsAt: next.startsAt,
+        durationMin: next.durationMin,
+        partySize: next.partySize,
+        phone: next.phone,
+        tableId,
+        ...(input.name ? { name: input.name } : {}),
+        ...(input.note !== undefined ? { note: input.note || null } : {}),
+        // Moved to a new time: the reminder goes out again.
+        ...(next.startsAt.getTime() !== r.startsAt.getTime() ? { reminderSentAt: null } : {}),
+      })
+      .where(eq(reservations.id, r.id))
+      .returning();
+    await recordAudit(tx, {
+      action: "reservation.updated",
+      actorUserId: ctx.user.id,
+      restaurantId: place.id,
+      entityType: "reservation",
+      entityId: r.id,
+      metadata: {
+        from: { startsAt: r.startsAt.toISOString(), tableId: r.tableId, partySize: r.partySize },
+        to: { startsAt: next.startsAt.toISOString(), tableId, partySize: next.partySize },
+      },
+    });
+    await emit(tx, { topic: topics.restaurant(place.id), type: "notification.created" });
+    return updated!;
+  });
+}
+
+/**
+ * What the booking form shows while the team is on the phone: each table free, taken (by whom)
+ * or too small for the party, the seats left in the slot, and whether this mobile already has a
+ * booking at that time.
+ */
+export async function availability(
+  db: Database,
+  ctx: RestaurantContext,
+  q: { startsAt: Date; durationMin?: number; partySize: number; phone?: string; excludeId?: string },
+) {
+  assertCan(ctx, "orders.view");
+  const place = await placeById(db, ctx.restaurant.id);
+  if (!place) throw notFound();
+  const durationMin = q.durationMin ?? place.durationMin;
+  const excludeId = q.excludeId && isUuid(q.excludeId) ? q.excludeId : undefined;
+  const [tables, others] = await Promise.all([
+    db
+      .select({
+        id: diningTables.id,
+        label: diningTables.label,
+        capacity: diningTables.capacity,
+        zone: diningTables.zone,
+      })
+      .from(diningTables)
+      .where(and(eq(diningTables.restaurantId, place.id), isNull(diningTables.deletedAt)))
+      .orderBy(asc(diningTables.sortOrder), asc(diningTables.label)),
+    overlapping(db, place.id, q.startsAt, durationMin, excludeId),
+  ]);
+  const phone = q.phone ? normalizeIranMobile(q.phone) : null;
+  const holder = new Map(others.filter((o) => o.tableId).map((o) => [o.tableId!, o]));
+  return {
+    durationMin,
+    seatsLeft: Math.max(0, place.slotCapacity - others.reduce((s, o) => s + o.partySize, 0)),
+    duplicate: phone ? (others.find((o) => o.phone === phone) ?? null) : null,
+    tables: tables.map((t) => {
+      const by = holder.get(t.id);
+      return {
+        ...t,
+        state: by
+          ? ("taken" as const)
+          : t.capacity != null && t.capacity < q.partySize
+            ? ("small" as const)
+            : ("free" as const),
+        takenBy: by ? { name: by.name, startsAt: by.startsAt, durationMin: by.durationMin } : null,
+      };
+    }),
+  };
+}
+
+/** A known guest's name and history, to fill the form from the mobile number. */
+export async function customerByPhone(db: DbOrTx, ctx: RestaurantContext, raw: string) {
+  assertCan(ctx, "orders.view");
+  const phone = normalizeIranMobile(raw);
+  if (!phone) return null;
+  const [c] = await db
+    .select({ name: customers.name, ordersCount: customers.ordersCount })
+    .from(customers)
+    .where(and(eq(customers.restaurantId, ctx.restaurant.id), eq(customers.phone, phone)));
+  if (!c) return null;
+  const [b] = await db
+    .select({ n: sql<number>`count(*)`.mapWith(Number) })
+    .from(reservations)
+    .where(
+      and(
+        eq(reservations.restaurantId, ctx.restaurant.id),
+        eq(reservations.phone, phone),
+        eq(reservations.kind, "booking"),
+      ),
+    );
+  const [noShows] = await db
+    .select({ n: sql<number>`count(*)`.mapWith(Number) })
+    .from(reservations)
+    .where(
+      and(
+        eq(reservations.restaurantId, ctx.restaurant.id),
+        eq(reservations.phone, phone),
+        eq(reservations.status, "no_show"),
+      ),
+    );
+  return { name: c.name, orders: c.ordersCount, bookings: b?.n ?? 0, noShows: noShows?.n ?? 0 };
+}
+
+/**
+ * The agenda of a day: tables as rows, bookings as blocks, and the opening hours that frame the
+ * timeline (minutes after local midnight; a service past midnight goes beyond 1440).
+ */
+export async function agendaDay(db: Database, ctx: RestaurantContext, day: string) {
+  assertCan(ctx, "orders.view");
+  const place = await placeById(db, ctx.restaurant.id);
+  if (!place) throw notFound();
+  const from = dayStart(day, place.timezone);
+  const weekday = DAYS[new Date(`${day}T12:00:00Z`).getUTCDay()]!;
+  const ranges = (
+    place.openingHours ? (place.openingHours[weekday] ?? []) : [{ open: "12:00", close: "23:00" }]
+  ).map((r) => {
+    const open = toMin(r.open);
+    let close = toMin(r.close);
+    if (close <= open) close += 24 * 60;
+    return { open, close };
+  });
+  const end = Math.max(0, ...ranges.map((r) => r.close));
+  const [tables, rows] = await Promise.all([
+    db
+      .select({
+        id: diningTables.id,
+        label: diningTables.label,
+        capacity: diningTables.capacity,
+        zone: diningTables.zone,
+      })
+      .from(diningTables)
+      .where(and(eq(diningTables.restaurantId, place.id), isNull(diningTables.deletedAt)))
+      .orderBy(asc(diningTables.sortOrder), asc(diningTables.label)),
+    db
+      .select()
+      .from(reservations)
+      .where(
+        and(
+          eq(reservations.restaurantId, place.id),
+          eq(reservations.kind, "booking"),
+          notInArray(reservations.status, ["cancelled"]),
+          gte(reservations.startsAt, from),
+          lt(reservations.startsAt, new Date(from.getTime() + 30 * 3600_000)),
+        ),
+      )
+      .orderBy(asc(reservations.startsAt)),
+  ]);
+  return {
+    tables,
+    // The day, plus the late part of a service that runs past midnight.
+    bookings: rows.filter((r) => r.startsAt.getTime() < from.getTime() + Math.max(1440, end) * 60_000),
+    ranges,
+    durationMin: place.durationMin,
+    slotCapacity: place.slotCapacity,
+    dayStartsAt: from,
+  };
 }
 
 export async function bookOnline(db: Database, slug: string, raw: z.input<typeof bookingSchema>) {

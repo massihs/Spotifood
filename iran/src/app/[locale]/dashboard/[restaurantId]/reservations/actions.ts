@@ -3,12 +3,26 @@
 import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
+import { validation } from "@/server/errors";
 import {
   addToQueue,
+  availability,
   createBooking,
+  customerByPhone,
   setReservationStatus,
+  updateBooking,
   updateReservationSettings,
 } from "@/server/modules/reservations/service";
+import { wallTime } from "@/lib/period";
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+const TIME = /^\d{2}:\d{2}$/;
+
+/** Day and time are the restaurant's wall clock, whatever the device's time zone. */
+function at(ctx: { restaurant: { timezone: string } }, day: string, time: string) {
+  if (!DAY.test(day) || !TIME.test(time)) throw validation("invalid_time");
+  return wallTime(day, time, ctx.restaurant.timezone);
+}
 
 export async function createBookingAction(
   rid: string,
@@ -16,15 +30,79 @@ export async function createBookingAction(
     name: string;
     phone: string;
     partySize: number;
-    startsAt: string;
+    day: string;
+    time: string;
+    durationMin?: number;
+    /** undefined = automatic, null = no table. */
+    tableId?: string | null;
     note: string;
     area: "any" | "indoor" | "outdoor";
   },
 ) {
   return runAction(async () => {
     const ctx = await actionContext(rid, "orders.create");
-    await createBooking(db, ctx, input);
+    const { day, time, ...rest } = input;
+    await createBooking(db, ctx, { ...rest, startsAt: at(ctx, day, time) });
     refresh();
+  });
+}
+
+export async function updateBookingAction(
+  rid: string,
+  id: string,
+  input: {
+    name?: string;
+    phone?: string;
+    partySize?: number;
+    day?: string;
+    time?: string;
+    durationMin?: number;
+    tableId?: string | null;
+    note?: string;
+  },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "orders.create");
+    const { day, time, ...rest } = input;
+    await updateBooking(db, ctx, id, {
+      ...rest,
+      ...(day && time ? { startsAt: at(ctx, day, time) } : {}),
+    });
+    refresh();
+  });
+}
+
+export async function availabilityAction(
+  rid: string,
+  q: {
+    day: string;
+    time: string;
+    durationMin?: number;
+    partySize: number;
+    phone?: string;
+    excludeId?: string;
+  },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "orders.view");
+    const res = await availability(db, ctx, { ...q, startsAt: at(ctx, q.day, q.time) });
+    return {
+      ...res,
+      duplicate: res.duplicate
+        ? { name: res.duplicate.name, startsAt: res.duplicate.startsAt.toISOString() }
+        : null,
+      tables: res.tables.map((t) => ({
+        ...t,
+        takenBy: t.takenBy ? { name: t.takenBy.name, startsAt: t.takenBy.startsAt.toISOString() } : null,
+      })),
+    };
+  });
+}
+
+export async function customerByPhoneAction(rid: string, phone: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "orders.view");
+    return customerByPhone(db, ctx, phone);
   });
 }
 

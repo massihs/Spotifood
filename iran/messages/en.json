@@ -472,7 +472,11 @@
     "party_too_large": "For larger groups, please call us.",
     "invalid_station": "The selected station is not valid.",
     "invalid_position": "Invalid position: enter both latitude and longitude.",
-    "invalid_percent": "Invalid percentage."
+    "invalid_percent": "Invalid percentage.",
+    "duplicate_booking": "This guest already has a booking at that time.",
+    "table_taken": "This table is already booked for that time.",
+    "table_too_small": "This table is too small for the party.",
+    "slot_full": "This slot is full."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -2168,9 +2172,10 @@
     "title": "Bookings & queue",
     "subtitle": "Table bookings (phone and online) and a walk-in waitlist with SMS.",
     "tabs": {
-      "bookings": "Bookings",
+      "bookings": "List",
       "queue": "Waitlist",
-      "settings": "Settings"
+      "settings": "Settings",
+      "agenda": "Agenda"
     },
     "noBookings": "No bookings for this day.",
     "tableN": "Table {label}",
@@ -2239,7 +2244,31 @@
     "statPending": "To confirm",
     "lunch": "Lunch",
     "dinner": "Dinner",
-    "covers": "{count, plural, one {# guest} other {# guests}}"
+    "covers": "{count, plural, one {# guest} other {# guests}}",
+    "agenda": {
+      "editBooking": "Booking",
+      "call": "Call",
+      "phone": "Mobile",
+      "known": "Known guest · {bookings, plural, one {# booking} other {# bookings}}",
+      "noShows": "{n, plural, one {# no-show} other {# no-shows}}",
+      "duration": "Length",
+      "minutes": "{n} min",
+      "table": "Table",
+      "tableAuto": "Automatic",
+      "tableNone": "No table",
+      "free": "Free",
+      "small": "Too small",
+      "seats": "{n} seats",
+      "taken": "Taken by {name} at {time}",
+      "seatsLeft": "{n} seats left in this slot",
+      "duplicate": "This number already has a booking at {time} ({name}).",
+      "unassigned": "No table",
+      "noTables": "Add tables",
+      "closed": "Closed that day: hours shown as a guide.",
+      "tapToBook": "Tap a free slot to book a table.",
+      "clash": "Clashing booking",
+      "clashes": "{n, plural, one {# booking shares its table with another: move it.} other {# bookings share a table at the same time: move them.}}"
+    }
   },
   "booking": {
     "people": "Guests",
