@@ -84,10 +84,10 @@ Les établissements de type **فودکورت / food court** envoient un SMS au c
 
 Variables Liara à ajouter :
 
-| Variable | Valeur |
-| --- | --- |
-| `SMS_PROVIDER` | `kavenegar` (`console` = journal uniquement) |
+| Variable            | Valeur                                                       |
+| ------------------- | ------------------------------------------------------------ |
+| `SMS_PROVIDER`      | `kavenegar` (`console` = journal uniquement)                 |
 | `KAVENEGAR_API_KEY` | clé API du panneau Kavenegar (Compte → Paramètres → API Key) |
-| `KAVENEGAR_SENDER` | facultatif : numéro de ligne d'envoi |
+| `KAVENEGAR_SENDER`  | facultatif : numéro de ligne d'envoi                         |
 
 Sans clé, rien n'est envoyé : le message apparaît seulement dans les journaux (`[sms:console]`).
