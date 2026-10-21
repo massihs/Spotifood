@@ -10,7 +10,8 @@ function render(s) {
   document.documentElement.dir = isRtl(s.locale) ? "rtl" : "ltr";
   $("name").textContent = s.restaurantName ?? "Spotifood";
   const online = s.status.online;
-  $("pill").className = `pill ${online ? "on" : "off"}`;
+  // Before the PC is linked there is no connection to report.
+  $("pill").className = `pill ${online ? "on" : "off"}${s.linked ? "" : " hidden"}`;
   $("pillText").textContent = online ? t("online") : t("offline");
   const msg = $("msg");
   if (s.toast && Date.now() - s.toast.at < 8000) {

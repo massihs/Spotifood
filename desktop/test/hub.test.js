@@ -211,3 +211,14 @@ function setupOrder() {
     note: "<script>alert(1)</script>",
   };
 }
+
+test("screens load their scripts from files (the pages' CSP blocks inline scripts)", () => {
+  for (const dir of ["setup", "offline"])
+    for (const f of fs.readdirSync(path.join(root, dir)).filter((x) => x.endsWith(".html"))) {
+      const html = fs.readFileSync(path.join(root, dir, f), "utf8");
+      const inline = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].filter(
+        ([, attrs, body]) => !/\bsrc=/.test(attrs) || body.trim(),
+      );
+      assert.equal(inline.length, 0, `${dir}/${f} has an inline script`);
+    }
+});
