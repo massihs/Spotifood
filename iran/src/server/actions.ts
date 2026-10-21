@@ -67,6 +67,8 @@ export function errorResponse(e: unknown): Response {
   if (isAppError(e)) {
     return Response.json({ error: { code: e.code, message: e.message } }, { status: e.status });
   }
+  if (e instanceof z.ZodError || e instanceof SyntaxError)
+    return Response.json({ error: { code: "VALIDATION", message: "invalid" } }, { status: 400 });
   console.error("[api] unexpected error", e);
   return Response.json({ error: { code: "INTERNAL", message: "Internal error" } }, { status: 500 });
 }

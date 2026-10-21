@@ -58,3 +58,29 @@ export const printJobs = pgTable(
   },
   (t) => [index("print_jobs_queue_idx").on(t.restaurantId, t.status, t.createdAt)],
 );
+
+/**
+ * A Spotifood desktop app (Windows / macOS) linked to the restaurant. It keeps a copy of the menu
+ * and, when the internet drops, takes orders on the restaurant's network and prints them; the
+ * orders come back here once online. The token is shown once; only its hash is kept.
+ */
+export const offlineDevices = pgTable(
+  "offline_devices",
+  {
+    id: pk(),
+    restaurantId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    name: varchar({ length: 60 }).notNull(),
+    tokenHash: varchar({ length: 64 }).notNull(),
+    createdByUserId: uuid(),
+    lastSeenAt: tstz(),
+    lastSyncAt: tstz(),
+    /** Orders received from it, all time. */
+    syncedOrders: integer().notNull().default(0),
+    appVersion: varchar({ length: 24 }),
+    revokedAt: tstz(),
+    ...timestamps,
+  },
+  (t) => [index("offline_devices_restaurant_idx").on(t.restaurantId)],
+);

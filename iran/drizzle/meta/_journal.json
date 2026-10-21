@@ -162,6 +162,13 @@
       "when": 1792509531355,
       "tag": "0022_restaurant_cover",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792584214590,
+      "tag": "0023_offline_devices",
+      "breakpoints": true
     }
   ]
 }

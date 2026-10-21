@@ -767,7 +767,31 @@
     "printers": "Printers & kitchen flow",
     "printersHint": "Acceptance at the till, automatic kitchen, bar and till tickets.",
     "listing": "Restaurant guide listing",
-    "listingHint": "Your restaurant appears on spotifood.ir/restaurants with its menu and online booking."
+    "listingHint": "Your restaurant appears on spotifood.ir/restaurants with its menu and online booking.",
+    "desktopTitle": "Desktop app",
+    "desktopHint": "Spotifood for Windows and macOS: the whole site, plus order taking and printing even without internet.",
+    "desktop": {
+      "onlineTitle": "Like the site",
+      "onlineBody": "Online, the app shows Spotifood like the browser and prints kitchen and bar tickets.",
+      "offlineTitle": "Without internet",
+      "offlineBody": "The till PC takes over: orders at the till and on the waiters' phones (same Wi-Fi), tickets printed locally.",
+      "syncTitle": "Everything comes back",
+      "syncBody": "When the internet returns, orders and payments are sent up automatically, never twice.",
+      "windows": "Download for Windows",
+      "mac": "Download for macOS",
+      "soon": "Installers coming soon.",
+      "step1": "Install the app on the till PC (always on, on the restaurant's Wi-Fi).",
+      "step2": "Open it, sign in with a manager account, then \"Activate this PC\".",
+      "step3": "Network printers are picked up automatically; the print agent is no longer needed.",
+      "linked": "Linked PCs",
+      "none": "No PC linked yet.",
+      "connected": "Connected",
+      "seen": "Seen {when}",
+      "neverSeen": "Never connected",
+      "synced": "{n, plural, =0 {no offline order} one {# offline order synced} other {# offline orders synced}}",
+      "revoke": "Remove",
+      "revokeConfirm": "Remove \"{name}\"? This PC will no longer work for the restaurant."
+    }
   },
   "guest": {
     "table": "Table {label}",

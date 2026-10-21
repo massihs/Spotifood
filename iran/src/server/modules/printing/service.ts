@@ -21,6 +21,7 @@ import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { isUuid, randomToken } from "@/lib/ids";
 import { formatMoney } from "@/lib/money";
 import { renderTicket, ticketPng, toEscPos, type TicketBlock } from "./escpos";
+import { authenticateDevice } from "@/server/modules/offline/service";
 
 const MAX_ATTEMPTS = 5;
 /** Tickets not printed within this delay are dropped: a late kitchen ticket does more harm than good. */
@@ -239,10 +240,18 @@ export async function authenticateAgent(db: DbOrTx, token: string | null) {
     .select({ hash: restaurantSettings.printAgentTokenHash })
     .from(restaurantSettings)
     .where(eq(restaurantSettings.restaurantId, rid));
-  if (!s?.hash) return null;
   const a = Buffer.from(sha256(secret));
-  const b = Buffer.from(s.hash);
-  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  const b = Buffer.from(s?.hash ?? "");
+  if (!s?.hash || a.length !== b.length || !timingSafeEqual(a, b)) {
+    // The desktop app prints with its own device token.
+    const device = await authenticateDevice(db, token);
+    if (!device) return null;
+    await db
+      .update(restaurantSettings)
+      .set({ printAgentSeenAt: new Date() })
+      .where(eq(restaurantSettings.restaurantId, device.restaurantId));
+    return device.restaurantId;
+  }
   await db
     .update(restaurantSettings)
     .set({ printAgentSeenAt: new Date() })

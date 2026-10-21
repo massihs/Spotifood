@@ -333,7 +333,7 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
  * The table's open session, opened when the waiter or the till orders for a free table: the
  * table shows as occupied, and its bill gathers every round until it is closed.
  */
-async function seatTable(tx: DbOrTx, restaurantId: string, tableId: string) {
+export async function seatTable(tx: DbOrTx, restaurantId: string, tableId: string) {
   const current = async () =>
     (
       await tx

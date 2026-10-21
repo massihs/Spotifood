@@ -117,10 +117,17 @@ export const orders = pgTable(
     servedAt: tstz(),
     cancelledAt: tstz(),
     cancelReason: text(),
+    /** Taken on the desktop app while the internet was down: the device's id for it (sync key). */
+    offlineRef: uuid(),
+    /** Number printed on the offline tickets ("L-12"), kept to match paper and screen. */
+    offlineNumber: varchar({ length: 24 }),
     ...timestamps,
   },
   (t) => [
     uniqueIndex("orders_restaurant_number_uq").on(t.restaurantId, t.number),
+    uniqueIndex("orders_offline_ref_uq")
+      .on(t.restaurantId, t.offlineRef)
+      .where(sql`${t.offlineRef} is not null`),
     index("orders_restaurant_placed_idx").on(t.restaurantId, t.placedAt),
     index("orders_restaurant_status_idx").on(t.restaurantId, t.status),
     index("orders_session_idx").on(t.tableSessionId),

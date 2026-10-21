@@ -1,5 +1,7 @@
 "use server";
 
+import { revokeDevice } from "@/server/modules/offline/service";
+
 import { isBrandColor } from "@/lib/brand-colors";
 import { isMenuTheme, type MenuTheme } from "@/lib/menu-themes";
 import { isRestaurantKind, type RestaurantKind } from "@/lib/restaurant-kind";
@@ -267,6 +269,14 @@ export async function chooseCoverAction(restaurantId: string, imageId: string | 
     if (imageId) await chooseDishCover(db, ctx, imageId);
     else await resetCover(db, ctx);
     updateTag(DIRECTORY_TAG);
+    refresh();
+  });
+}
+
+export async function revokeDeviceAction(restaurantId: string, deviceId: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    await revokeDevice(db, ctx, deviceId);
     refresh();
   });
 }

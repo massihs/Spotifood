@@ -2,7 +2,7 @@ import { edition } from "@/config/edition";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
-import { Blocks, Building2, Clock, CreditCard, Percent, Printer, Scale, Store } from "lucide-react";
+import { Blocks, Building2, Clock, CreditCard, Laptop, Percent, Printer, Scale, Store } from "lucide-react";
 import type { ReactNode } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { requireRestaurant } from "@/server/auth/current";
@@ -23,6 +23,9 @@ import { ListingForm } from "./listing-form";
 import { getCoverChoices, getListing } from "@/server/modules/directory/service";
 import { CoverPicker } from "./cover-picker";
 import { PrintersPanel } from "./printers-panel";
+import { DesktopPanel } from "./desktop-panel";
+import { listDevices } from "@/server/modules/offline/service";
+import { desktopDownloads } from "@/lib/desktop";
 import { listPrinters } from "@/server/modules/printing/service";
 import { listStations } from "@/server/modules/kitchen/stations";
 import { env } from "@/server/env";
@@ -43,7 +46,7 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view, payment, printing, setup, listing, cover] = await Promise.all([
+  const [t, view, payment, printing, setup, listing, cover, devices] = await Promise.all([
     getTranslations("settings"),
     getRestaurantSettingsView(db, ctx),
     getPaymentSettingsView(db, ctx),
@@ -51,6 +54,7 @@ async function Settings({ params }: { params: Params }) {
     can(ctx, "orders.view") ? listStations(db, ctx) : { stations: [] },
     getListing(db, ctx),
     getCoverChoices(db, ctx),
+    listDevices(db, ctx),
   ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
@@ -69,7 +73,7 @@ async function Settings({ params }: { params: Params }) {
           {SECTIONS.map(({ key, icon }) => (
             <a
               key={key}
-              href={`#${key}`}
+              href={`#${key === "desktopTitle" ? "desktop" : key}`}
               className="flex shrink-0 items-center gap-2.5 rounded-full bg-surface px-4 py-2 text-sm font-bold whitespace-nowrap text-fg-muted shadow-[var(--shadow-soft)] hover:text-fg lg:rounded-2xl lg:bg-transparent lg:py-2.5 lg:shadow-none lg:hover:bg-surface [&_svg]:size-4 [&_svg]:shrink-0"
             >
               {icon}
@@ -164,6 +168,27 @@ async function Settings({ params }: { params: Params }) {
               />
             </div>
           </Card>
+          <Card id="desktop" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<Laptop />}>{t("desktopTitle")}</SectionTitle>}
+              description={t("desktopHint")}
+            />
+            <div className="p-5 sm:p-6">
+              <DesktopPanel
+                restaurantId={rid}
+                readOnly={readOnly}
+                downloads={desktopDownloads()}
+                devices={devices.map((d) => ({
+                  id: d.id,
+                  name: d.name,
+                  lastSeenAt: d.lastSeenAt?.toISOString() ?? null,
+                  lastSyncAt: d.lastSyncAt?.toISOString() ?? null,
+                  syncedOrders: d.syncedOrders,
+                  appVersion: d.appVersion,
+                }))}
+              />
+            </div>
+          </Card>
           <Card id="service" className="scroll-mt-24">
             <CardHeader
               title={<SectionTitle icon={<Clock />}>{t("service")}</SectionTitle>}
@@ -241,6 +266,7 @@ const SECTIONS = [
   { key: "listing", icon: <Store aria-hidden="true" /> },
   { key: "modules", icon: <Blocks aria-hidden="true" /> },
   { key: "printers", icon: <Printer aria-hidden="true" /> },
+  { key: "desktopTitle", icon: <Laptop aria-hidden="true" /> },
   { key: "service", icon: <Clock aria-hidden="true" /> },
   { key: "payments", icon: <CreditCard aria-hidden="true" /> },
   { key: "taxes", icon: <Percent aria-hidden="true" /> },
