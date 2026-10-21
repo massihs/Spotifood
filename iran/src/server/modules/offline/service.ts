@@ -35,6 +35,7 @@ import { applyOrderToStock } from "@/server/modules/inventory/service";
 import { linkOrderCustomer } from "@/server/modules/customers/service";
 import { emitPaymentUpdate, paymentConfig, settleAllocations } from "@/server/modules/payments/service";
 import { seatTable } from "@/server/modules/pos/service";
+import { stationsOf } from "@/server/modules/kitchen/stations";
 
 /** Snapshot format: the desktop app refuses a snapshot newer than it understands. */
 export const SNAPSHOT_VERSION = 1;
@@ -228,6 +229,11 @@ export async function getSnapshot(db: DbOrTx, auth: DeviceAuth) {
     paymentConfig(db, rid),
   ]);
   if (!r) throw notFound();
+  const productStations = await stationsOf(
+    db,
+    rid,
+    menu.map((p) => p.id),
+  );
   return {
     version: SNAPSHOT_VERSION,
     generatedAt: new Date().toISOString(),
@@ -235,6 +241,7 @@ export async function getSnapshot(db: DbOrTx, auth: DeviceAuth) {
     categories: cats,
     products: menu.map((p) => ({
       id: p.id,
+      stationId: productStations.get(p.id) ?? null,
       categoryId: p.categoryId,
       name: p.name,
       priceCents: p.priceCents,
@@ -476,6 +483,7 @@ async function importOne(
       })
       .returning();
 
+    const stations = await stationsOf(tx, rid, productIds);
     await tx.insert(orderItems).values(
       lines.map((l) => ({
         restaurantId: rid,
@@ -484,6 +492,7 @@ async function importOne(
         categoryId: l.categoryId && knownCategory.has(l.categoryId) ? l.categoryId : null,
         productName: l.name,
         categoryName: l.categoryName,
+        stationId: (l.productId && stations.get(l.productId)) ?? null,
         unitPriceCents: l.unitPriceCents,
         optionsTotalCents: l.optionsTotalCents,
         quantity: l.quantity,

@@ -228,3 +228,9 @@ test("virtual printers (OneNote, PDF, XPS) are never used for tickets", () => {
     assert.ok(isVirtualPrinter(n), n);
   for (const n of ["XP-80C", "EPSON TM-T20II Receipt", "POS-58"]) assert.ok(!isVirtualPrinter(n), n);
 });
+
+test("a dish sent elsewhere than its category prints at its own station", () => {
+  const kebab = { ...snapshot.products[0], stationId: "s-bar" };
+  const { line } = buildLine(kebab, "dine_in", ["v-lavash"], 1, "", snapshot.categories[0]);
+  assert.equal(line.stationId, "s-bar");
+});

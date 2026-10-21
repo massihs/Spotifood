@@ -84,6 +84,8 @@ export const products = pgTable(
       .notNull()
       .default(sql`ARRAY[]::text[]`),
     isAvailable: boolean().notNull().default(true),
+    /** Station preparing this dish when it differs from its category's (null = the category's). */
+    stationId: uuid(),
     isFeatured: boolean().notNull().default(false),
     isActive: boolean().notNull().default(true),
     sortOrder: integer().notNull().default(0),

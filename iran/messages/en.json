@@ -2559,5 +2559,29 @@
     "increase": "Increase",
     "viewTicket": "View order",
     "close": "Close"
+  },
+  "routing": {
+    "title": "Kitchen / bar routing",
+    "subtitle": "Choose where each category, and if needed each dish, is sent: its screen and its printer.",
+    "printers": "Printers",
+    "manageStations": "Manage stations",
+    "emptyTitle": "Dishes to the kitchen, drinks to the bar",
+    "emptyBody": "Create the Kitchen and Bar stations in one click: drinks go to the bar, everything else to the kitchen. You can fine-tune afterwards.",
+    "detectedDrinks": "Drinks found:",
+    "autoSetup": "Create Kitchen and Bar",
+    "autoSort": "Sort automatically",
+    "autoDone": "{bar, plural, =0 {No category} one {# category} other {# categories}} to the bar, {kitchen, plural, =0 {none} one {# category} other {# categories}} to the kitchen.",
+    "unassigned": "{n, plural, one {# category shows} other {# categories show}} on every screen: sort them so they reach the right station.",
+    "screen": "Station screen",
+    "noPrinter": "No printer: screen only",
+    "dishes": "{n, plural, =0 {no dish} one {# dish} other {# dishes}}",
+    "overrides": "{n} sent elsewhere",
+    "everyScreen": "Every screen",
+    "likeCategory": "Like the category ({station})",
+    "noDishes": "No dish in this category.",
+    "error": "The change was not saved.",
+    "kitchenName": "Kitchen",
+    "barName": "Bar",
+    "menuLink": "Kitchen / Bar"
   }
 }

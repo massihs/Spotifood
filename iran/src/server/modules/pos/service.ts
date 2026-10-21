@@ -25,6 +25,7 @@ import { normalizeIranMobile } from "@/lib/phone";
 import { forChannel, loadPricedProducts } from "@/server/modules/menu/public";
 import { computeTotals, priceLine, type PricedLine } from "@/server/modules/pricing";
 import { nextCounterValue } from "@/server/modules/restaurants/service";
+import { stationsOf } from "@/server/modules/kitchen/stations";
 import { applyOrderToStock } from "@/server/modules/inventory/service";
 import {
   chargeAccount,
@@ -220,6 +221,11 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       })
       .returning();
 
+    const stations = await stationsOf(
+      tx,
+      rid,
+      lines.map((l) => l.item.productId),
+    );
     await tx.insert(orderItems).values(
       lines.map(({ item, line, name, categoryId, categoryName }) => ({
         restaurantId: rid,
@@ -228,6 +234,7 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
         categoryId,
         productName: name,
         categoryName,
+        stationId: stations.get(item.productId) ?? null,
         unitPriceCents: line.unitPriceCents,
         optionsTotalCents: line.optionsTotalCents,
         quantity: line.quantity,

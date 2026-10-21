@@ -2567,5 +2567,29 @@
     "increase": "Augmenter",
     "viewTicket": "Voir la commande",
     "close": "Fermer"
+  },
+  "routing": {
+    "title": "Envoi cuisine / bar",
+    "subtitle": "Choisissez où part chaque catégorie, et au besoin chaque plat : son écran et son imprimante.",
+    "printers": "Imprimantes",
+    "manageStations": "Gérer les postes",
+    "emptyTitle": "Plats en cuisine, boissons au bar",
+    "emptyBody": "Créez les postes Cuisine et Bar en un clic : les boissons partent au bar, tout le reste en cuisine. Vous pourrez tout ajuster ensuite.",
+    "detectedDrinks": "Boissons repérées :",
+    "autoSetup": "Créer Cuisine et Bar",
+    "autoSort": "Ranger automatiquement",
+    "autoDone": "{bar, plural, =0 {Aucune catégorie} one {# catégorie} other {# catégories}} au bar, {kitchen, plural, =0 {aucune} one {# catégorie} other {# catégories}} en cuisine.",
+    "unassigned": "{n, plural, one {# catégorie s'affiche} other {# catégories s'affichent}} sur tous les écrans : rangez-les pour qu'elles partent au bon poste.",
+    "screen": "Écran du poste",
+    "noPrinter": "Pas d'imprimante : écran seulement",
+    "dishes": "{n, plural, =0 {aucun plat} one {# plat} other {# plats}}",
+    "overrides": "{n} envoyé(s) ailleurs",
+    "everyScreen": "Tous les écrans",
+    "likeCategory": "Comme la catégorie ({station})",
+    "noDishes": "Aucun plat dans cette catégorie.",
+    "error": "La modification n'a pas été enregistrée.",
+    "kitchenName": "Cuisine",
+    "barName": "Bar",
+    "menuLink": "Cuisine / Bar"
   }
 }

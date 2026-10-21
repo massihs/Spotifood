@@ -163,6 +163,8 @@ export const orderItems = pgTable(
     categoryId: uuid(),
     productName: varchar({ length: 120 }).notNull(),
     categoryName: varchar({ length: 80 }),
+    /** Station the line was sent to, fixed when ordered (dish's station, else its category's). */
+    stationId: uuid(),
     unitPriceCents: money().notNull(),
     optionsTotalCents: money().notNull().default(0),
     quantity: integer().notNull(),

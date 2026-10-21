@@ -58,15 +58,10 @@ export function KitchenBoard({
   const [managing, setManaging] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
 
-  const catStation = new Map(categories.map((c) => [c.id, c.stationId]));
   const columns = acceptAtTill ? COLUMNS.filter((c) => c !== "received") : COLUMNS;
   const visible = orders
     .filter((o) => !acceptAtTill || (o.status !== "received" && o.status !== "pending_payment"))
-    .map((o) =>
-      station === "all"
-        ? o
-        : { ...o, items: o.items.filter((i) => i.categoryId && catStation.get(i.categoryId) === station) },
-    )
+    .map((o) => (station === "all" ? o : { ...o, items: o.items.filter((i) => i.stationId === station) }))
     .filter((o) => o.items.length > 0);
 
   const ticketUrl = (orderId: string, auto = false) =>
@@ -162,11 +157,8 @@ export function KitchenBoard({
               <span className="text-xs tabular-nums opacity-70">
                 {s.id === "all"
                   ? orders.filter((o) => o.status !== "served").length
-                  : orders.filter(
-                      (o) =>
-                        o.status !== "served" &&
-                        o.items.some((i) => i.categoryId && catStation.get(i.categoryId) === s.id),
-                    ).length}
+                  : orders.filter((o) => o.status !== "served" && o.items.some((i) => i.stationId === s.id))
+                      .length}
               </span>
             </button>
           ))}

@@ -28,6 +28,7 @@ import { nextCounterValue } from "@/server/modules/restaurants/service";
 import { normalizeIranMobile } from "@/lib/phone";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { sms } from "@/server/infra/sms";
+import { stationsOf } from "@/server/modules/kitchen/stations";
 import { applyOrderToStock } from "@/server/modules/inventory/service";
 import {
   commitDiscounts,
@@ -171,6 +172,11 @@ export async function placeOrder(
       })
       .returning();
 
+    const stations = await stationsOf(
+      tx,
+      rid,
+      lines.map((l) => l.item.productId),
+    );
     await tx.insert(orderItems).values(
       lines.map(({ item, line, productName, categoryId, categoryName }) => ({
         restaurantId: rid,
@@ -179,6 +185,7 @@ export async function placeOrder(
         categoryId,
         productName,
         categoryName,
+        stationId: stations.get(item.productId) ?? null,
         unitPriceCents: line.unitPriceCents,
         optionsTotalCents: line.optionsTotalCents,
         quantity: line.quantity,

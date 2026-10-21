@@ -4,7 +4,6 @@ import { and, asc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
-  categories,
   kitchenStations,
   orderItems,
   orders,
@@ -52,9 +51,8 @@ export async function sendToKitchen(
   const stations = new Set(
     (
       await tx
-        .select({ stationId: categories.stationId })
+        .select({ stationId: orderItems.stationId })
         .from(orderItems)
-        .leftJoin(categories, eq(categories.id, orderItems.categoryId))
         .where(eq(orderItems.orderId, order.id))
     ).map((r) => r.stationId),
   );
@@ -361,12 +359,11 @@ export async function ticketBlocks(
       options: orderItems.options,
       note: orderItems.note,
       lineTotal: orderItems.lineTotalCents,
-      stationId: categories.stationId,
+      stationId: orderItems.stationId,
       stationName: kitchenStations.name,
     })
     .from(orderItems)
-    .leftJoin(categories, eq(categories.id, orderItems.categoryId))
-    .leftJoin(kitchenStations, eq(kitchenStations.id, categories.stationId))
+    .leftJoin(kitchenStations, eq(kitchenStations.id, orderItems.stationId))
     .where(eq(orderItems.orderId, o.id))
     .orderBy(asc(orderItems.createdAt));
   const station = job.kind === "station" && printer.stationId ? printer.stationId : null;

@@ -29,6 +29,8 @@ export type OrderCardData = {
   items: {
     id: string;
     categoryId?: string | null;
+    /** Station the line was sent to (fixed when ordered). */
+    stationId?: string | null;
     quantity: number;
     productName: string;
     options: { valueName: string }[];

@@ -25,7 +25,11 @@ async function Menu({ params, searchParams }: Pick<Props, "params" | "searchPara
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "menu.view");
   const sp = await searchParams;
-  const [t, categories] = await Promise.all([getTranslations("menu"), listCategories(db, ctx)]);
+  const [t, tRouting, categories] = await Promise.all([
+    getTranslations("menu"),
+    getTranslations("routing"),
+    listCategories(db, ctx),
+  ]);
   const wanted = typeof sp.category === "string" ? sp.category : undefined;
   const selected = categories.find((c) => c.id === wanted) ?? categories[0] ?? null;
   // Every dish: the board searches and filters the whole menu.
@@ -37,9 +41,20 @@ async function Menu({ params, searchParams }: Pick<Props, "params" | "searchPara
         title={t("title")}
         description={t("subtitle")}
         actions={
-          <Link href={`/dashboard/${ctx.restaurant.id}/menu/options`} className={buttonClasses("secondary")}>
-            {t("optionsLink")}
-          </Link>
+          <>
+            <Link
+              href={`/dashboard/${ctx.restaurant.id}/menu/stations`}
+              className={buttonClasses("secondary")}
+            >
+              {tRouting("menuLink")}
+            </Link>
+            <Link
+              href={`/dashboard/${ctx.restaurant.id}/menu/options`}
+              className={buttonClasses("secondary")}
+            >
+              {t("optionsLink")}
+            </Link>
+          </>
         }
       />
       <MenuBoard
