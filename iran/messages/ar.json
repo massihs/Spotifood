@@ -284,7 +284,27 @@
       "modules": "الوحدات"
     },
     "catalog": "القائمة والفريق",
-    "setupDone": "كل شيء جاهز! 🎉"
+    "setupDone": "كل شيء جاهز! 🎉",
+    "vsLastWeek": "مقارنة بـ{day} الماضي",
+    "averageTicket": "متوسط الفاتورة",
+    "ordersN": "{n, plural, one {طلب واحد} other {# طلبات}}",
+    "reservationsToday": "حجوزات اليوم",
+    "coversN": "{n, plural, one {شخص واحد} other {# أشخاص}}",
+    "liveOrders": "الطلبات الجارية",
+    "noLiveOrders": "لا توجد طلبات جارية.",
+    "seeAll": "عرض الكل",
+    "nextBookings": "الحجوزات القادمة",
+    "noBookingsToday": "لا حجوزات أخرى اليوم.",
+    "topProducts": "الأكثر مبيعًا · ٧ أيام",
+    "noSales": "لا مبيعات بعد هذا الأسبوع.",
+    "soldN": "{n} مُباع",
+    "partyN": "{n} أشخاص",
+    "alerts": {
+      "lowStock": "{n, plural, one {صنف واحد منخفض المخزون} other {# أصناف منخفضة المخزون}}",
+      "newOrders": "{n, plural, one {طلب واحد بانتظار القبول} other {# طلبات بانتظار القبول}}",
+      "pendingBookings": "{n, plural, one {حجز واحد بانتظار التأكيد} other {# حجوزات بانتظار التأكيد}}",
+      "unpaid": "{amount} للتحصيل"
+    }
   },
   "roles": {
     "owner": "المالك",
@@ -918,7 +938,8 @@
     "filters": "التصفية والعرض",
     "filtered": "التصفية:",
     "show": "عرض",
-    "priceUnit": "الأسعار بآلاف التومان"
+    "priceUnit": "الأسعار بآلاف التومان",
+    "couponHint": "هل لديك رمز؟"
   },
   "categoryTemplates": {
     "starters": "المقبلات",
@@ -1171,7 +1192,24 @@
       "ready": "جاهزة",
       "done": "منتهية"
     },
-    "new": "جديد"
+    "new": "جديد",
+    "kpi": {
+      "active": "الطلبات الجارية",
+      "ready": "جاهزة للتقديم",
+      "unpaid": "غير مدفوعة (جارية)",
+      "avgWait": "متوسط الانتظار"
+    },
+    "minutes": "{n} دقيقة",
+    "searchPlaceholder": "رقم الطلب أو الطاولة…",
+    "search": "بحث",
+    "channels": {
+      "all": "الكل",
+      "dine_in": "في المطعم",
+      "takeaway": "سفري",
+      "delivery": "توصيل"
+    },
+    "noMatch": "لا يوجد طلب مطابق",
+    "clear": "مسح"
   },
   "tableView": {
     "title": "طاولة {label}",
@@ -1244,7 +1282,9 @@
       "unpaid": "غير مدفوع"
     },
     "tillPrintOn": "طباعة تذكرة الصندوق تلقائياً: مفعّلة",
-    "tillPrintOff": "طباعة تذكرة الصندوق تلقائياً"
+    "tillPrintOff": "طباعة تذكرة الصندوق تلقائياً",
+    "darkMode": "الوضع الداكن",
+    "lightMode": "الوضع الفاتح"
   },
   "floor": {
     "title": "الصالة",
@@ -1731,7 +1771,9 @@
     "zone": "منطقة التوصيل",
     "deliveryNeedsPhone": "أدخل رقم العميل للتوصيل.",
     "deliveryFee": "رسوم التوصيل",
-    "accountInfo": "المستحق: {balance} · الرصيد المتاح: {available}"
+    "accountInfo": "المستحق: {balance} · الرصيد المتاح: {available}",
+    "densityPhotos": "مع الصور",
+    "densityCompact": "مضغوط"
   },
   "inventory": {
     "title": "المخزون",
@@ -2193,7 +2235,11 @@
       "queueLink": "قائمة الانتظار (QR عند الباب)",
       "linksHint": "يتلقى العميل رابط الحالة برسالة ويمكنه الإلغاء.",
       "copy": "نسخ"
-    }
+    },
+    "statPending": "بانتظار التأكيد",
+    "lunch": "الغداء",
+    "dinner": "العشاء",
+    "covers": "{count, plural, other {# شخص}}"
   },
   "booking": {
     "people": "الأشخاص",

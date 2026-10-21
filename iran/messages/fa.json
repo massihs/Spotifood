@@ -284,7 +284,27 @@
       "modules": "ماژول‌ها"
     },
     "catalog": "منو و تیم",
-    "setupDone": "همه چیز آماده است! 🎉"
+    "setupDone": "همه چیز آماده است! 🎉",
+    "vsLastWeek": "نسبت به {day} گذشته",
+    "averageTicket": "میانگین فاکتور",
+    "ordersN": "{n} سفارش",
+    "reservationsToday": "رزروهای امروز",
+    "coversN": "{n} نفر",
+    "liveOrders": "سفارش‌های در جریان",
+    "noLiveOrders": "سفارشی در جریان نیست.",
+    "seeAll": "مشاهده همه",
+    "nextBookings": "رزروهای بعدی",
+    "noBookingsToday": "رزرو دیگری برای امروز نیست.",
+    "topProducts": "پرفروش‌ها · ۷ روز",
+    "noSales": "هنوز فروشی در این هفته ثبت نشده.",
+    "soldN": "{n} فروش",
+    "partyN": "{n} نفر",
+    "alerts": {
+      "lowStock": "{n} کالا رو به اتمام",
+      "newOrders": "{n} سفارش در انتظار تأیید",
+      "pendingBookings": "{n} رزرو در انتظار تأیید",
+      "unpaid": "{amount} پرداخت‌نشده"
+    }
   },
   "roles": {
     "owner": "مالک",
@@ -918,7 +938,8 @@
     "filters": "فیلتر و نمایش",
     "filtered": "فیلتر:",
     "show": "نمایش",
-    "priceUnit": "قیمت به هزار تومان"
+    "priceUnit": "قیمت به هزار تومان",
+    "couponHint": "کد تخفیف دارید؟"
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",
@@ -1171,7 +1192,24 @@
       "ready": "آماده",
       "done": "تمام‌شده"
     },
-    "new": "جدید"
+    "new": "جدید",
+    "kpi": {
+      "active": "سفارش جاری",
+      "ready": "آماده تحویل",
+      "unpaid": "پرداخت‌نشده (جاری)",
+      "avgWait": "میانگین انتظار"
+    },
+    "minutes": "{n} دقیقه",
+    "searchPlaceholder": "شماره سفارش یا میز…",
+    "search": "جستجو",
+    "channels": {
+      "all": "همه",
+      "dine_in": "سر میز",
+      "takeaway": "بیرون‌بر",
+      "delivery": "ارسال"
+    },
+    "noMatch": "سفارشی با این جستجو پیدا نشد",
+    "clear": "پاک کردن"
   },
   "tableView": {
     "title": "میز {label}",
@@ -1244,7 +1282,9 @@
       "unpaid": "پرداخت نشده"
     },
     "tillPrintOn": "چاپ خودکار فیش صندوق: روشن",
-    "tillPrintOff": "چاپ خودکار فیش صندوق"
+    "tillPrintOff": "چاپ خودکار فیش صندوق",
+    "darkMode": "حالت تاریک",
+    "lightMode": "حالت روشن"
   },
   "floor": {
     "title": "سالن",
@@ -1731,7 +1771,9 @@
     "zone": "محدوده ارسال",
     "deliveryNeedsPhone": "برای ارسال، شماره مشتری را وارد کنید.",
     "deliveryFee": "هزینه ارسال",
-    "accountInfo": "بدهی: {balance}، اعتبار باقی‌مانده: {available}"
+    "accountInfo": "بدهی: {balance}، اعتبار باقی‌مانده: {available}",
+    "densityPhotos": "نمایش با عکس",
+    "densityCompact": "نمایش فشرده"
   },
   "inventory": {
     "title": "انبار",
@@ -2193,7 +2235,11 @@
       "queueLink": "صف انتظار (QR آن را دم در بگذارید)",
       "linksHint": "مشتری لینک وضعیت را با پیامک دریافت می‌کند و می‌تواند لغو کند.",
       "copy": "کپی"
-    }
+    },
+    "statPending": "در انتظار تأیید",
+    "lunch": "ناهار",
+    "dinner": "شام",
+    "covers": "{count, plural, other {# نفر}}"
   },
   "booking": {
     "people": "تعداد نفرات",

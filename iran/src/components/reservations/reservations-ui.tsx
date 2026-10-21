@@ -36,6 +36,15 @@ const STATUS_TONE: Record<string, string> = {
   cancelled: "bg-danger-soft text-danger",
   no_show: "bg-danger-soft text-danger",
 };
+const STATUS_STRIPE: Record<string, string> = {
+  pending: "border-s-warning",
+  confirmed: "border-s-tone-sky",
+  notified: "border-s-tone-fuchsia",
+  seated: "border-s-success",
+  completed: "border-s-border-strong",
+  cancelled: "border-s-danger",
+  no_show: "border-s-danger",
+};
 const NEXT: Record<string, string[]> = {
   pending: ["confirmed", "cancelled"],
   confirmed: ["seated", "no_show", "cancelled"],
@@ -77,75 +86,102 @@ export function BookingList({
         {t("noBookings")}
       </p>
     );
+  const hourOf = (iso: string) =>
+    Number(
+      new Intl.DateTimeFormat("en-US", { timeZone, hour: "2-digit", hourCycle: "h23" }).format(new Date(iso)),
+    );
+  // Two services: lunch until 17:00, dinner after.
+  const services = (["lunch", "dinner"] as const)
+    .map((k) => ({ k, list: rows.filter((r) => hourOf(r.startsAt) < 17 === (k === "lunch")) }))
+    .filter((g) => g.list.length);
   return (
-    <>
-      {error ? <p className="mb-2 text-sm text-danger">{error}</p> : null}
-      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
-        {rows.map((r) => (
-          <li
-            key={r.id}
-            className={cn(
-              "flex flex-wrap items-center gap-3 px-4 py-3",
-              ["cancelled", "no_show"].includes(r.status) && "opacity-55",
-            )}
-          >
-            <span className="w-16 shrink-0 text-center text-lg font-bold tabular-nums">
-              {time(r.startsAt)}
+    <div className="space-y-5">
+      {error ? <p className="text-sm text-danger">{error}</p> : null}
+      {services.map(({ k, list }) => (
+        <section key={k}>
+          <h3 className="mb-2 flex items-center gap-2 px-1 text-sm font-bold text-fg-muted">
+            {t(k)}
+            <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs tabular-nums">
+              {t("covers", {
+                count: list
+                  .filter((r) => !["cancelled", "no_show"].includes(r.status))
+                  .reduce((s, r) => s + r.partySize, 0),
+              })}
             </span>
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold">
-                {r.name}
-                <span className="ms-2 inline-flex items-center gap-1 text-sm font-normal text-fg-muted">
-                  <Users className="size-3.5" />
-                  {r.partySize}
-                </span>
-              </p>
-              <p className="flex flex-wrap gap-x-3 text-xs text-fg-muted">
-                <a href={`tel:${r.phone}`} dir="ltr" className="inline-flex items-center gap-1 tabular-nums">
-                  <Phone className="size-3" />
-                  {r.phone}
-                </a>
-                {r.tableLabel ? (
-                  <span>{t("tableN", { label: r.tableLabel })}</span>
-                ) : (
-                  <span>{t("noTable")}</span>
-                )}
-                <span>{t(`sources.${r.source}`)}</span>
-                {r.note ? <span className="text-fg">« {r.note} »</span> : null}
-              </p>
-            </div>
-            <div className="flex w-full items-center gap-1 ps-[4.75rem] sm:w-auto sm:ps-0">
-              <span
+          </h3>
+          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-soft)]">
+            {list.map((r) => (
+              <li
+                key={r.id}
                 className={cn(
-                  "me-auto rounded-full px-2.5 py-0.5 text-xs font-semibold sm:me-2",
-                  STATUS_TONE[r.status],
+                  "flex flex-wrap items-center gap-3 border-s-4 px-4 py-3",
+                  STATUS_STRIPE[r.status] ?? "border-s-transparent",
+                  ["cancelled", "no_show"].includes(r.status) && "opacity-55",
                 )}
               >
-                {t(`status.${r.status}`)}
-              </span>
-              {(NEXT[r.status] ?? []).map((to) => (
-                <button
-                  key={to}
-                  type="button"
-                  disabled={pending}
-                  onClick={() => run(() => setReservationStatusAction(rid, r.id, to))}
-                  className={cn(
-                    "h-8 rounded-full px-3 text-xs font-semibold",
-                    to === "seated" || to === "confirmed"
-                      ? "bg-accent text-accent-fg"
-                      : to === "completed"
-                        ? "bg-surface-2"
-                        : "text-danger ring-1 ring-danger/30",
-                  )}
-                >
-                  {t(`actions.${to}`)}
-                </button>
-              ))}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </>
+                <span className="w-16 shrink-0 text-center text-lg font-bold tabular-nums">
+                  {time(r.startsAt)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">
+                    {r.name}
+                    <span className="ms-2 inline-flex items-center gap-1 text-sm font-normal text-fg-muted">
+                      <Users className="size-3.5" />
+                      {r.partySize}
+                    </span>
+                  </p>
+                  <p className="flex flex-wrap gap-x-3 text-xs text-fg-muted">
+                    <a
+                      href={`tel:${r.phone}`}
+                      dir="ltr"
+                      className="inline-flex items-center gap-1 tabular-nums"
+                    >
+                      <Phone className="size-3" />
+                      {r.phone}
+                    </a>
+                    {r.tableLabel ? (
+                      <span>{t("tableN", { label: r.tableLabel })}</span>
+                    ) : (
+                      <span>{t("noTable")}</span>
+                    )}
+                    <span>{t(`sources.${r.source}`)}</span>
+                    {r.note ? <span className="text-fg">« {r.note} »</span> : null}
+                  </p>
+                </div>
+                <div className="flex w-full items-center gap-1 ps-[4.75rem] sm:w-auto sm:ps-0">
+                  <span
+                    className={cn(
+                      "me-auto rounded-full px-2.5 py-0.5 text-xs font-semibold sm:me-2",
+                      STATUS_TONE[r.status],
+                    )}
+                  >
+                    {t(`status.${r.status}`)}
+                  </span>
+                  {(NEXT[r.status] ?? []).map((to) => (
+                    <button
+                      key={to}
+                      type="button"
+                      disabled={pending}
+                      onClick={() => run(() => setReservationStatusAction(rid, r.id, to))}
+                      className={cn(
+                        "h-8 rounded-full px-3 text-xs font-semibold",
+                        to === "seated" || to === "confirmed"
+                          ? "bg-accent text-accent-fg"
+                          : to === "completed"
+                            ? "bg-surface-2"
+                            : "text-danger ring-1 ring-danger/30",
+                      )}
+                    >
+                      {t(`actions.${to}`)}
+                    </button>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
   );
 }
 

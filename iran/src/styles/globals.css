@@ -329,3 +329,29 @@ dialog[open]::backdrop {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Kitchen display: dark, high-contrast surfaces for a screen read from a distance. */
+.kds-dark {
+  --bg: oklch(0.15 0.015 270);
+  --surface: oklch(0.21 0.02 270);
+  --surface-2: oklch(0.25 0.022 270);
+  --surface-3: oklch(0.3 0.025 270);
+  --border: oklch(0.3 0.022 270);
+  --border-strong: oklch(0.38 0.025 270);
+  --fg: oklch(0.98 0.005 270);
+  --fg-muted: oklch(0.78 0.02 270);
+  --fg-subtle: oklch(0.62 0.02 270);
+  --ink: oklch(0.97 0.005 270);
+  --ink-fg: oklch(0.15 0.015 270);
+  --success: oklch(0.75 0.16 155);
+  --success-soft: oklch(0.29 0.06 155);
+  --warning-soft: oklch(0.32 0.06 75);
+  --danger: oklch(0.72 0.18 25);
+  --danger-soft: oklch(0.3 0.08 25);
+  --accent: oklch(max(var(--brand-l), 0.66) var(--brand-c) var(--brand-h));
+  --accent-text: oklch(0.8 var(--brand-c) var(--brand-h));
+  --accent-soft: oklch(0.3 calc(var(--brand-c) * 0.35) var(--brand-h));
+  --shadow-color: 0 0% 0%;
+  background: var(--bg);
+  color: var(--fg);
+}

@@ -52,7 +52,7 @@ export function ReadyWatcher() {
             await Notification.requestPermission().catch(() => undefined);
             setAsked((n) => n + 1);
           }}
-          className="mb-4 flex w-full items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 text-start text-sm font-semibold shadow-[var(--shadow-soft)]"
+          className="mb-4 flex w-full items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 text-start text-sm font-semibold shadow-[var(--shadow-soft)] lg:col-span-2"
         >
           <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
             <BellRing className="size-5" aria-hidden="true" />

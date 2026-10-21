@@ -6,6 +6,8 @@ import {
   ChefHat,
   CreditCard,
   ImageIcon,
+  LayoutGrid,
+  Rows3,
   Loader2,
   Minus,
   Percent,
@@ -23,7 +25,8 @@ import {
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { usePref, writePref } from "@/components/ui/use-pref";
 import { CategoryIcon } from "@/components/category-icon";
 import { useMoney } from "@/components/ui/use-money";
 import { cn } from "@/lib/cn";
@@ -106,6 +109,19 @@ export function PosTerminal({
   const [done, setDone] = useState<{ number: string; change: number | null } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const density = usePref("sf-pos-density", "photos") === "compact" ? "compact" : "photos";
+  const searchRef = useRef<HTMLInputElement>(null);
+  // "/" jumps to the search, like most tills and web apps.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (e.key !== "/" || /input|textarea|select/i.test(el.tagName)) return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const products = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -559,15 +575,43 @@ export function PosTerminal({
   return (
     <div className="grid min-h-0 gap-4 lg:h-[calc(100dvh-12rem)] lg:grid-cols-[minmax(0,1fr)_380px]">
       <section className="flex min-h-0 flex-col">
-        <label className="relative">
-          <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-fg-subtle" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("search")}
-            className="h-11 w-full rounded-xl border border-border bg-surface ps-9 pe-3"
-          />
-        </label>
+        <div className="flex gap-2">
+          <label className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-fg-subtle" />
+            <input
+              ref={searchRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("search")}
+              className="h-11 w-full rounded-xl border border-border bg-surface ps-9 pe-9"
+            />
+            <kbd className="pointer-events-none absolute end-3 top-1/2 hidden -translate-y-1/2 rounded border border-border px-1.5 text-[11px] text-fg-subtle lg:block">
+              /
+            </kbd>
+          </label>
+          <div className="flex shrink-0 rounded-xl border border-border bg-surface p-1" role="group">
+            {(["photos", "compact"] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => writePref("sf-pos-density", d)}
+                aria-pressed={density === d}
+                aria-label={t(d === "photos" ? "densityPhotos" : "densityCompact")}
+                title={t(d === "photos" ? "densityPhotos" : "densityCompact")}
+                className={cn(
+                  "grid size-9 place-items-center rounded-lg",
+                  density === d ? "bg-fg text-bg" : "text-fg-muted hover:text-fg",
+                )}
+              >
+                {d === "photos" ? (
+                  <LayoutGrid className="size-4" aria-hidden="true" />
+                ) : (
+                  <Rows3 className="size-4" aria-hidden="true" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="-mx-4 mt-3 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:px-0">
           <button
             type="button"
@@ -594,37 +638,70 @@ export function PosTerminal({
             </button>
           ))}
         </div>
-        <div className="mt-3 grid min-h-0 flex-1 auto-rows-max grid-cols-2 gap-3 overflow-y-auto pb-24 sm:grid-cols-3 lg:pb-2 xl:grid-cols-4">
-          {products.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => tap(p)}
-              disabled={!p.isAvailable}
-              className="group overflow-hidden rounded-2xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.97] disabled:opacity-45"
-            >
-              <span className="relative block aspect-[4/3] bg-surface-2">
-                {p.images[0] ? (
-                  <img src={p.images[0].sm} alt="" loading="lazy" className="size-full object-cover" />
-                ) : (
-                  <span className="grid size-full place-items-center text-fg-subtle">
-                    <ImageIcon className="size-6" />
+        <div
+          className={cn(
+            "mt-3 grid min-h-0 flex-1 auto-rows-max gap-3 overflow-y-auto pb-24 lg:pb-2",
+            density === "compact"
+              ? "grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+              : "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4",
+          )}
+        >
+          {products.map((p) => {
+            const inTicket = lines.filter((l) => l.product.id === p.id).reduce((s, l) => s + l.quantity, 0);
+            if (density === "compact")
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => tap(p)}
+                  disabled={!p.isAvailable}
+                  className={cn(
+                    "relative flex min-h-20 flex-col justify-between rounded-xl border bg-surface p-3 text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.97] disabled:opacity-45",
+                    inTicket ? "border-accent ring-2 ring-accent/20" : "border-border",
+                  )}
+                >
+                  <span className="line-clamp-2 text-sm leading-5 font-semibold">{p.name}</span>
+                  <span className="mt-1 text-sm font-bold text-accent-text tabular-nums">
+                    {money(forChannel(p, channel).priceCents)}
                   </span>
-                )}
-                {lines.some((l) => l.product.id === p.id) ? (
-                  <span className="absolute end-2 top-2 grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-accent-fg tabular-nums">
-                    {lines.filter((l) => l.product.id === p.id).reduce((s, l) => s + l.quantity, 0)}
-                  </span>
-                ) : null}
-              </span>
-              <span className="block p-2.5">
-                <span className="line-clamp-1 text-sm font-semibold">{p.name}</span>
-                <span className="mt-0.5 block text-sm font-bold text-accent-text tabular-nums">
-                  {money(forChannel(p, channel).priceCents)}
+                  {inTicket ? (
+                    <span className="absolute end-2 top-2 grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-accent-fg tabular-nums">
+                      {inTicket}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => tap(p)}
+                disabled={!p.isAvailable}
+                className="group overflow-hidden rounded-2xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.97] disabled:opacity-45"
+              >
+                <span className="relative block aspect-[4/3] bg-surface-2">
+                  {p.images[0] ? (
+                    <img src={p.images[0].sm} alt="" loading="lazy" className="size-full object-cover" />
+                  ) : (
+                    <span className="grid size-full place-items-center text-fg-subtle">
+                      <ImageIcon className="size-6" />
+                    </span>
+                  )}
+                  {lines.some((l) => l.product.id === p.id) ? (
+                    <span className="absolute end-2 top-2 grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-accent-fg tabular-nums">
+                      {lines.filter((l) => l.product.id === p.id).reduce((s, l) => s + l.quantity, 0)}
+                    </span>
+                  ) : null}
                 </span>
-              </span>
-            </button>
-          ))}
+                <span className="block p-2.5">
+                  <span className="line-clamp-1 text-sm font-semibold">{p.name}</span>
+                  <span className="mt-0.5 block text-sm font-bold text-accent-text tabular-nums">
+                    {money(forChannel(p, channel).priceCents)}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 

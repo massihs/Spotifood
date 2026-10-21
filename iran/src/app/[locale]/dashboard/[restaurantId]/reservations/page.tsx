@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarCheck, ChevronLeft, ChevronRight, Hourglass, Users, UserX } from "lucide-react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { LiveRefresh } from "@/components/realtime/live";
@@ -15,7 +15,7 @@ import { localDay } from "@/lib/period";
 import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { env } from "@/server/env";
-import { getReservationSettings, listDay } from "@/server/modules/reservations/service";
+import { getReservationSettings, listDay, weekCounts } from "@/server/modules/reservations/service";
 import { can } from "@/server/tenancy";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/reservations">;
@@ -42,12 +42,15 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
     : "bookings";
   const today = localDay(new Date(), tz);
   const day = typeof sp.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.day) ? sp.day : today;
-  const [t, format, locale, data, settings] = await Promise.all([
+  // The strip shows the selected day in a week, starting a little before it.
+  const stripStart = shift(day, -2);
+  const [t, format, locale, data, settings, week] = await Promise.all([
     getTranslations("reservations"),
     getFormatter(),
     getLocale(),
     listDay(db, ctx, tab === "queue" ? today : day),
     getReservationSettings(db, ctx),
+    weekCounts(db, ctx, stripStart),
   ]);
   const rid = ctx.restaurant.id;
   const base = `/dashboard/${rid}/reservations`;
@@ -93,48 +96,119 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
 
       {tab === "bookings" ? (
         <>
-          <div className="mb-4 flex flex-wrap items-center gap-2">
+          <div className="mb-4 flex items-center gap-2">
             <Link
-              href={`${base}?day=${shift(day, -1)}`}
-              className="grid size-10 place-items-center rounded-full ring-1 ring-border"
+              href={`${base}?day=${shift(day, -7)}`}
+              className="grid size-10 shrink-0 place-items-center rounded-full bg-surface ring-1 ring-border"
               aria-label={t("prevDay")}
             >
               <ChevronRight className="size-5 ltr:rotate-180" />
             </Link>
-            <p className="min-w-44 text-center font-semibold">
+            <ol className="flex min-w-0 flex-1 [scrollbar-width:none] gap-2 overflow-x-auto py-1">
+              {Array.from({ length: 7 }, (_, i) => shift(stripStart, i)).map((d) => {
+                const c = week.get(d);
+                const selected = d === day;
+                const date = new Date(`${d}T12:00:00Z`);
+                return (
+                  <li key={d} className="min-w-16 flex-1">
+                    <Link
+                      href={d === today ? base : `${base}?day=${d}`}
+                      aria-current={selected ? "date" : undefined}
+                      className={cn(
+                        "flex flex-col items-center gap-0.5 rounded-2xl px-2 py-2 transition-colors",
+                        selected
+                          ? "bg-fg text-bg shadow-[var(--shadow-float)]"
+                          : "bg-surface ring-1 ring-border hover:ring-border-strong",
+                      )}
+                    >
+                      <span className={cn("text-[11px]", selected ? "opacity-80" : "text-fg-muted")}>
+                        {d === today
+                          ? t("today")
+                          : format.dateTime(date, { weekday: "short", timeZone: "UTC" })}
+                      </span>
+                      <span className="text-lg leading-none font-black tabular-nums">
+                        {format.dateTime(date, { day: "numeric", timeZone: "UTC" })}
+                      </span>
+                      <span
+                        className={cn(
+                          "mt-0.5 rounded-full px-1.5 text-[10px] font-bold tabular-nums",
+                          c?.bookings
+                            ? selected
+                              ? "bg-bg/20"
+                              : "bg-accent-soft text-accent-text"
+                            : "opacity-40",
+                        )}
+                      >
+                        {c?.bookings ?? 0}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ol>
+            <Link
+              href={`${base}?day=${shift(day, 7)}`}
+              className="grid size-10 shrink-0 place-items-center rounded-full bg-surface ring-1 ring-border"
+              aria-label={t("nextDay")}
+            >
+              <ChevronLeft className="size-5 ltr:rotate-180" />
+            </Link>
+          </div>
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-lg font-bold">
               {format.dateTime(new Date(`${day}T12:00:00Z`), {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
                 timeZone: "UTC",
               })}
-            </p>
-            <Link
-              href={`${base}?day=${shift(day, 1)}`}
-              className="grid size-10 place-items-center rounded-full ring-1 ring-border"
-              aria-label={t("nextDay")}
-            >
-              <ChevronLeft className="size-5 ltr:rotate-180" />
-            </Link>
+            </h2>
             {day !== today ? (
-              <Link href={base} className="rounded-full px-3 py-1.5 text-sm ring-1 ring-border">
+              <Link href={base} className="text-sm font-semibold text-accent-text hover:underline">
                 {t("today")}
               </Link>
             ) : null}
-            <div className="ms-auto flex gap-2">
-              {[
-                [t("statBookings"), active.length],
-                [t("statCovers"), active.reduce((s, b) => s + b.partySize, 0)],
-                [t("statNoShow"), data.bookings.filter((b) => b.status === "no_show").length],
-              ].map(([k, v]) => (
-                <span
-                  key={String(k)}
-                  className="rounded-xl border border-border bg-surface px-3 py-1.5 text-sm"
-                >
-                  {k}: <b className="tabular-nums">{v}</b>
+          </div>
+          <div className="-mx-4 mb-5 flex [scrollbar-width:none] gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:px-0">
+            {[
+              {
+                k: "statBookings",
+                v: active.length,
+                icon: <CalendarCheck className="size-5" aria-hidden="true" />,
+                tone: "bg-accent-soft text-accent-text",
+              },
+              {
+                k: "statCovers",
+                v: active.reduce((s, b) => s + b.partySize, 0),
+                icon: <Users className="size-5" aria-hidden="true" />,
+                tone: "bg-info-soft text-info",
+              },
+              {
+                k: "statPending",
+                v: data.bookings.filter((b) => b.status === "pending").length,
+                icon: <Hourglass className="size-5" aria-hidden="true" />,
+                tone: "bg-warning-soft text-warning",
+              },
+              {
+                k: "statNoShow",
+                v: data.bookings.filter((b) => b.status === "no_show").length,
+                icon: <UserX className="size-5" aria-hidden="true" />,
+                tone: "bg-danger-soft text-danger",
+              },
+            ].map((x) => (
+              <div
+                key={x.k}
+                className="flex min-w-40 shrink-0 items-center gap-3 rounded-2xl bg-surface p-3.5 shadow-[var(--shadow-soft)] ring-1 ring-border sm:min-w-0"
+              >
+                <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl", x.tone)}>
+                  {x.icon}
                 </span>
-              ))}
-            </div>
+                <span>
+                  <span className="block text-xl leading-none font-black tabular-nums">{x.v}</span>
+                  <span className="mt-1 block text-xs text-fg-muted">{t(x.k)}</span>
+                </span>
+              </div>
+            ))}
           </div>
           <BookingList rid={rid} rows={rows(data.bookings)} timeZone={tz} locale={locale} />
         </>

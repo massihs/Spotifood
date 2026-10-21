@@ -87,11 +87,35 @@ export function OrderCard({
     const id = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(id);
   }, []);
-  // Waiting more than 10 minutes without being ready: shown in orange.
-  const late =
-    ["received", "accepted", "preparing", "pending_payment"].includes(o.status) &&
-    now - new Date(o.placedAt).getTime() > 10 * 60_000;
+  // Waiting time while the order is still in the works: green, then orange after 10 min, red after 20.
+  const active = ["received", "accepted", "preparing", "pending_payment"].includes(o.status);
+  const minutes = Math.max(0, Math.floor((now - new Date(o.placedAt).getTime()) / 60_000));
+  const urgency = !active ? null : minutes >= 20 ? "late" : minutes >= 10 ? "warn" : "ok";
   const paid = o.paymentStatus === "paid";
+  // The kitchen reads the card from a distance and does not care about money.
+  const kitchen = compact;
+  const timer =
+    urgency && minutes < 100 ? (
+      <span
+        className={cn(
+          "inline-flex items-center gap-1 rounded-full font-bold whitespace-nowrap tabular-nums",
+          kitchen ? "px-2.5 py-1 text-sm" : "px-2 py-0.5 text-xs",
+          urgency === "late"
+            ? "bg-danger text-white"
+            : urgency === "warn"
+              ? "bg-warning-soft text-warning"
+              : "bg-success-soft text-success",
+        )}
+      >
+        <Clock className={kitchen ? "size-4" : "size-3"} aria-hidden="true" />
+        {t("kitchen.waiting", { min: minutes })}
+      </span>
+    ) : (
+      <span className="flex items-center gap-1 text-xs whitespace-nowrap text-fg-subtle">
+        <Clock className="size-3" aria-hidden="true" />
+        <TimeAgo date={o.placedAt} timeZone={timeZone} />
+      </span>
+    );
 
   return (
     <Card
@@ -101,12 +125,26 @@ export function OrderCard({
         pending && "opacity-60",
       )}
     >
+      {urgency ? (
+        <span
+          aria-hidden="true"
+          className={cn(
+            "h-1 w-full",
+            urgency === "late" ? "bg-danger" : urgency === "warn" ? "bg-warning" : "bg-success",
+          )}
+        />
+      ) : null}
       <div className="flex items-start justify-between gap-3 p-4 pb-3">
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={cn(
-              "grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-accent-soft px-1 font-semibold text-accent-text tabular-nums",
-              (o.tableLabel?.length ?? 0) > 3 ? "text-[10px] leading-tight break-all" : "text-base",
+              "grid shrink-0 place-items-center overflow-hidden rounded-xl bg-accent-soft px-1 font-bold text-accent-text tabular-nums",
+              kitchen ? "size-14" : "size-12",
+              (o.tableLabel?.length ?? 0) > 3
+                ? "text-[10px] leading-tight break-all"
+                : kitchen
+                  ? "text-2xl"
+                  : "text-lg",
             )}
             aria-hidden="true"
           >
@@ -140,38 +178,48 @@ export function OrderCard({
               {t("orders.new")}
             </span>
           ) : null}
-          <span
-            className={cn(
-              "flex items-center gap-1 text-xs whitespace-nowrap",
-              late ? "font-semibold text-warning" : "text-fg-subtle",
-            )}
-          >
-            <Clock className="size-3" aria-hidden="true" />
-            <TimeAgo date={o.placedAt} timeZone={timeZone} />
-          </span>
+          {timer}
         </div>
       </div>
-      <ul className="mx-4 divide-y divide-border rounded-2xl bg-surface-2/70 text-sm">
+      <ul
+        className={cn(
+          "mx-4 divide-y divide-border rounded-2xl bg-surface-2/70",
+          kitchen ? "text-base" : "text-sm",
+        )}
+      >
         {o.items.map((i) => (
-          <li key={i.id} className="flex gap-3 px-3 py-2.5">
-            <span className="grid h-6 min-w-6 shrink-0 place-items-center rounded-lg bg-surface px-1 text-xs font-bold tabular-nums shadow-[var(--shadow-soft)]">
+          <li key={i.id} className={cn("flex gap-3 px-3", kitchen ? "py-3" : "py-2.5")}>
+            <span
+              className={cn(
+                "grid shrink-0 place-items-center rounded-lg bg-surface px-1 font-black tabular-nums shadow-[var(--shadow-soft)]",
+                kitchen ? "h-8 min-w-8 text-base" : "h-6 min-w-6 text-xs",
+                i.quantity > 1 && "bg-fg text-bg",
+              )}
+            >
               {i.quantity}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="font-semibold">{i.productName}</span>
+              <span className={kitchen ? "font-bold" : "font-semibold"}>{i.productName}</span>
               {i.options.length ? (
-                <span className="block text-xs text-fg-muted">
+                <span className={cn("block text-fg-muted", kitchen ? "text-sm" : "text-xs")}>
                   {i.options.map((x) => x.valueName).join(" · ")}
                 </span>
               ) : null}
               {i.note ? (
-                <span className="mt-0.5 block text-xs font-semibold text-accent-text">↳ {i.note}</span>
+                <span
+                  className={cn(
+                    "mt-1 block w-fit rounded-md bg-warning-soft px-1.5 font-bold text-warning",
+                    kitchen ? "text-sm" : "text-xs",
+                  )}
+                >
+                  ↳ {i.note}
+                </span>
               ) : null}
             </span>
           </li>
         ))}
       </ul>
-      {o.customerPhone ? (
+      {o.customerPhone && !kitchen ? (
         <a
           href={`tel:${o.customerPhone}`}
           dir="ltr"
@@ -191,18 +239,20 @@ export function OrderCard({
           </span>
         </p>
       ) : null}
-      <div className="mt-auto flex items-center justify-between gap-2 px-4 pt-3">
-        <p className="font-bold tabular-nums">{formatMoney(o.totalCents, o.currency, locale)}</p>
-        <span
-          className={cn(
-            "rounded-full px-2.5 py-0.5 text-xs font-bold",
-            paid ? "bg-success-soft text-success" : "bg-surface-2 text-fg-muted",
-          )}
-        >
-          {paid ? t("orders.paid") : t("orders.unpaid")}
-        </span>
-      </div>
-      <div className="flex gap-2 p-4 pt-3">
+      {!kitchen ? (
+        <div className="mt-auto flex items-center justify-between gap-2 px-4 pt-3">
+          <p className="font-bold tabular-nums">{formatMoney(o.totalCents, o.currency, locale)}</p>
+          <span
+            className={cn(
+              "rounded-full px-2.5 py-0.5 text-xs font-bold",
+              paid ? "bg-success-soft text-success" : "bg-surface-2 text-fg-muted",
+            )}
+          >
+            {paid ? t("orders.paid") : t("orders.unpaid")}
+          </span>
+        </div>
+      ) : null}
+      <div className={cn("flex gap-2 p-4 pt-3", kitchen && "mt-auto")}>
         {canCancel && o.status !== "served" && o.status !== "cancelled" ? (
           <Button
             variant="secondary"
@@ -222,7 +272,7 @@ export function OrderCard({
         ) : null}
         {canUpdate && next ? (
           <Button
-            size="md"
+            size={kitchen ? "lg" : "md"}
             variant={next === "ready" ? "accent" : "primary"}
             disabled={pending}
             className="flex-1"

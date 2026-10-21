@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Maximize2, Printer, Settings2 } from "lucide-react";
+import { Maximize2, Moon, Printer, Settings2, Sun } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -52,6 +52,9 @@ export function KitchenBoard({
   const stored = usePref(stationKey, defaultStation ?? "all");
   const station = stored === "all" || stations.some((s) => s.id === stored) ? stored : "all";
   const autoPrint = usePref(printKey, "off") === "on";
+  const darkKey = `sf-kitchen-dark-${restaurantId}`;
+  const dark = usePref(darkKey, "off") === "on";
+  const board = useRef<HTMLDivElement>(null);
   const [managing, setManaging] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
 
@@ -81,7 +84,13 @@ export function KitchenBoard({
     );
 
   return (
-    <div className="flex h-[calc(100dvh-8rem)] min-h-[32rem] flex-col">
+    <div
+      ref={board}
+      className={cn(
+        "flex h-[calc(100dvh-8rem)] min-h-[32rem] flex-col rounded-3xl transition-colors [&:fullscreen]:h-dvh [&:fullscreen]:rounded-none [&:fullscreen]:p-4",
+        dark && "kds-dark -mx-2 p-3 sm:-mx-4 sm:p-4",
+      )}
+    >
       <LiveRefresh types={["order.created", "order.accepted", "order.updated"]} />
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -108,8 +117,22 @@ export function KitchenBoard({
           <Button
             variant="secondary"
             size="sm"
+            aria-pressed={dark}
+            onClick={() => writePref(darkKey, dark ? "off" : "on")}
+            className={cn(dark && "ring-2 ring-accent")}
+          >
+            {dark ? (
+              <Sun className="size-4" aria-hidden="true" />
+            ) : (
+              <Moon className="size-4" aria-hidden="true" />
+            )}
+            {dark ? t("lightMode") : t("darkMode")}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             className="max-sm:hidden"
-            onClick={() => document.documentElement.requestFullscreen?.().catch(() => {})}
+            onClick={() => (board.current ?? document.documentElement).requestFullscreen?.().catch(() => {})}
           >
             <Maximize2 className="size-4" aria-hidden="true" />
             {t("fullscreen")}
@@ -156,7 +179,10 @@ export function KitchenBoard({
             <section
               key={col}
               aria-labelledby={`col-${col}`}
-              className="flex min-h-0 snap-start flex-col rounded-2xl bg-surface-2/70 p-2"
+              className={cn(
+                "flex min-h-0 snap-start flex-col rounded-2xl bg-surface-2/70 p-2",
+                col === "served" && "opacity-75",
+              )}
             >
               <h2
                 id={`col-${col}`}

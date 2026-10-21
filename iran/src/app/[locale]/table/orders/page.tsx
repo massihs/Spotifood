@@ -66,12 +66,12 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
             subtitle={`${guest.restaurant.name} · ${t("guest.tableBadge", { table: guest.table.label })}`}
             extra={<LiveIndicator className="rounded-full bg-surface-2 px-3 py-1.5" />}
           />
-          <main className="mx-auto max-w-2xl px-4 pt-4 pb-32">
+          <main className="mx-auto max-w-2xl px-4 pt-4 pb-32 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-x-6 lg:pt-6 lg:pb-12">
             {orders.length > 0 ? <ReadyWatcher /> : null}
             {sp.placed ? (
               <div
                 role="status"
-                className="animate-pop-in mb-4 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent-soft p-4"
+                className="animate-pop-in mb-4 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent-soft p-4 lg:col-span-2"
               >
                 <span className="grid size-12 shrink-0 place-items-center rounded-full bg-accent text-accent-fg">
                   <CircleCheck className="size-7" aria-hidden="true" />
@@ -84,7 +84,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
             ) : null}
 
             {orders.length === 0 ? (
-              <div className="py-16 text-center">
+              <div className="py-16 text-center lg:col-span-2">
                 <div className="mx-auto grid size-20 place-items-center rounded-full bg-surface-2">
                   <ReceiptText className="size-9 text-fg-muted" aria-hidden="true" />
                 </div>
@@ -243,8 +243,9 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
             )}
 
             {orders.length > 0 ? (
-              <>
-                <div className="mt-4 flex items-center justify-between rounded-2xl bg-surface-2 px-5 py-4">
+              // Desktop: the bill and payment stay in view beside the orders.
+              <aside className="lg:sticky lg:top-24 lg:col-start-2">
+                <div className="mt-4 flex items-center justify-between rounded-2xl bg-surface-2 px-5 py-4 lg:mt-0">
                   <span className="font-semibold">{t("guest.yourTotal")}</span>
                   <span className="text-lg font-semibold tabular-nums">{money(total)}</span>
                 </div>
@@ -253,19 +254,16 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                   currency={guest.restaurant.currency}
                   returned={returned?.status ?? null}
                 />
-              </>
-            ) : null}
-
-            {orders.length > 0 ? (
-              <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl border-t border-border bg-bg/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
-                <Link
-                  href="/table"
-                  className="flex h-14 items-center justify-center gap-2 rounded-full bg-surface-2 text-base font-bold active:bg-surface-3"
-                >
-                  <Plus className="size-5" strokeWidth={2.5} aria-hidden="true" />
-                  {t("guest.orderMore")}
-                </Link>
-              </div>
+                <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl border-t border-border bg-bg/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:static lg:mt-4 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+                  <Link
+                    href="/table"
+                    className="flex h-14 items-center justify-center gap-2 rounded-full bg-surface-2 text-base font-bold active:bg-surface-3 lg:border lg:border-border lg:bg-surface lg:hover:bg-surface-2"
+                  >
+                    <Plus className="size-5" strokeWidth={2.5} aria-hidden="true" />
+                    {t("guest.orderMore")}
+                  </Link>
+                </div>
+              </aside>
             ) : null}
           </main>
         </div>

@@ -284,7 +284,27 @@
     "last7": "Chiffre d'affaires, 7 derniers jours",
     "quick": "Accès rapide",
     "catalog": "Carte & équipe",
-    "setupDone": "Tout est prêt ! 🎉"
+    "setupDone": "Tout est prêt ! 🎉",
+    "vsLastWeek": "vs {day} dernier",
+    "averageTicket": "Ticket moyen",
+    "ordersN": "{n, plural, one {# commande} other {# commandes}}",
+    "reservationsToday": "Réservations du jour",
+    "coversN": "{n, plural, one {# couvert} other {# couverts}}",
+    "liveOrders": "Commandes en cours",
+    "noLiveOrders": "Aucune commande en cours.",
+    "seeAll": "Tout voir",
+    "nextBookings": "Prochaines réservations",
+    "noBookingsToday": "Plus de réservation aujourd'hui.",
+    "topProducts": "Meilleures ventes · 7 jours",
+    "noSales": "Pas encore de ventes cette semaine.",
+    "soldN": "{n} vendus",
+    "partyN": "{n} pers.",
+    "alerts": {
+      "lowStock": "{n, plural, one {# article en stock bas} other {# articles en stock bas}}",
+      "newOrders": "{n, plural, one {# commande à accepter} other {# commandes à accepter}}",
+      "pendingBookings": "{n, plural, one {# réservation à confirmer} other {# réservations à confirmer}}",
+      "unpaid": "{amount} à encaisser"
+    }
   },
   "roles": {
     "owner": "Propriétaire",
@@ -918,7 +938,8 @@
     "filters": "Filtrer et afficher",
     "filtered": "Filtre :",
     "show": "Afficher",
-    "priceUnit": "Prix en milliers de tomans"
+    "priceUnit": "Prix en milliers de tomans",
+    "couponHint": "Vous avez un code ?"
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -1171,7 +1192,24 @@
       "ready": "Prêtes",
       "done": "Terminées"
     },
-    "new": "Nouveau"
+    "new": "Nouveau",
+    "kpi": {
+      "active": "Commandes en cours",
+      "ready": "Prêtes à servir",
+      "unpaid": "Non payées (en cours)",
+      "avgWait": "Attente moyenne"
+    },
+    "minutes": "{n} min",
+    "searchPlaceholder": "N° de commande ou de table…",
+    "search": "Rechercher",
+    "channels": {
+      "all": "Toutes",
+      "dine_in": "Sur place",
+      "takeaway": "À emporter",
+      "delivery": "Livraison"
+    },
+    "noMatch": "Aucune commande ne correspond",
+    "clear": "Effacer"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1244,7 +1282,9 @@
       "unpaid": "Non payé"
     },
     "tillPrintOn": "Impression auto du ticket caisse : activée",
-    "tillPrintOff": "Impression auto du ticket caisse"
+    "tillPrintOff": "Impression auto du ticket caisse",
+    "darkMode": "Mode sombre",
+    "lightMode": "Mode clair"
   },
   "floor": {
     "title": "Salle",
@@ -1739,7 +1779,9 @@
     "zone": "Zone de livraison",
     "deliveryNeedsPhone": "Saisissez le téléphone du client pour une livraison.",
     "deliveryFee": "Frais de livraison",
-    "accountInfo": "Dû : {balance} · crédit restant : {available}"
+    "accountInfo": "Dû : {balance} · crédit restant : {available}",
+    "densityPhotos": "Avec photos",
+    "densityCompact": "Compact"
   },
   "inventory": {
     "title": "Stocks",
@@ -2201,7 +2243,11 @@
       "queueLink": "File d’attente (QR à l’entrée)",
       "linksHint": "Le client reçoit un lien de suivi par SMS et peut annuler.",
       "copy": "Copier"
-    }
+    },
+    "statPending": "À confirmer",
+    "lunch": "Déjeuner",
+    "dinner": "Dîner",
+    "covers": "{count, plural, one {# couvert} other {# couverts}}"
   },
   "booking": {
     "people": "Couverts",

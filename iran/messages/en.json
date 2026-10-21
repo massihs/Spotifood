@@ -284,7 +284,27 @@
       "modules": "Modules"
     },
     "catalog": "Menu & team",
-    "setupDone": "You are all set! 🎉"
+    "setupDone": "You are all set! 🎉",
+    "vsLastWeek": "vs last {day}",
+    "averageTicket": "Average ticket",
+    "ordersN": "{n, plural, one {# order} other {# orders}}",
+    "reservationsToday": "Today's bookings",
+    "coversN": "{n, plural, one {# cover} other {# covers}}",
+    "liveOrders": "Orders in progress",
+    "noLiveOrders": "No order in progress.",
+    "seeAll": "See all",
+    "nextBookings": "Next bookings",
+    "noBookingsToday": "No more bookings today.",
+    "topProducts": "Best sellers · 7 days",
+    "noSales": "No sales yet this week.",
+    "soldN": "{n} sold",
+    "partyN": "{n} ppl",
+    "alerts": {
+      "lowStock": "{n, plural, one {# item low on stock} other {# items low on stock}}",
+      "newOrders": "{n, plural, one {# order to accept} other {# orders to accept}}",
+      "pendingBookings": "{n, plural, one {# booking to confirm} other {# bookings to confirm}}",
+      "unpaid": "{amount} to collect"
+    }
   },
   "roles": {
     "owner": "Owner",
@@ -918,7 +938,8 @@
     "filters": "Filter & view",
     "filtered": "Filter:",
     "show": "Show",
-    "priceUnit": "Prices in thousand tomans"
+    "priceUnit": "Prices in thousand tomans",
+    "couponHint": "Got a code?"
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -1171,7 +1192,24 @@
       "ready": "Ready",
       "done": "Done"
     },
-    "new": "New"
+    "new": "New",
+    "kpi": {
+      "active": "Active orders",
+      "ready": "Ready to serve",
+      "unpaid": "Unpaid (active)",
+      "avgWait": "Average wait"
+    },
+    "minutes": "{n} min",
+    "searchPlaceholder": "Order or table number…",
+    "search": "Search",
+    "channels": {
+      "all": "All",
+      "dine_in": "Dine in",
+      "takeaway": "Takeaway",
+      "delivery": "Delivery"
+    },
+    "noMatch": "No order matches this search",
+    "clear": "Clear"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1244,7 +1282,9 @@
       "unpaid": "Not paid"
     },
     "tillPrintOn": "Till ticket auto-print: on",
-    "tillPrintOff": "Auto-print till ticket"
+    "tillPrintOff": "Auto-print till ticket",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode"
   },
   "floor": {
     "title": "Floor",
@@ -1731,7 +1771,9 @@
     "zone": "Delivery zone",
     "deliveryNeedsPhone": "Enter the customer phone for a delivery.",
     "deliveryFee": "Delivery fee",
-    "accountInfo": "Owed: {balance} · credit left: {available}"
+    "accountInfo": "Owed: {balance} · credit left: {available}",
+    "densityPhotos": "With photos",
+    "densityCompact": "Compact"
   },
   "inventory": {
     "title": "Stock",
@@ -2193,7 +2235,11 @@
       "queueLink": "Waitlist (print its QR at the door)",
       "linksHint": "Guests get a status link by SMS and can cancel.",
       "copy": "Copy"
-    }
+    },
+    "statPending": "To confirm",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "covers": "{count, plural, one {# guest} other {# guests}}"
   },
   "booking": {
     "people": "Guests",

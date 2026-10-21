@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, isNull, lt, ne, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNull, lt, ne, notInArray, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
@@ -394,6 +394,34 @@ export async function listDay(db: Database, ctx: RestaurantContext, day: string)
     bookings: list.filter((r) => r.kind === "booking"),
     queue: list.filter((r) => r.kind === "queue"),
   };
+}
+
+/** Bookings and covers per day over a week, for the date strip (cancelled and no-shows left out). */
+export async function weekCounts(db: Database, ctx: RestaurantContext, firstDay: string, days = 7) {
+  assertCan(ctx, "orders.view");
+  const tz = ctx.restaurant.timezone;
+  const from = dayStart(firstDay, tz);
+  const to = new Date(from.getTime() + days * 24 * 3600_000 + 3 * 3600_000);
+  const local = sql<string>`to_char(${reservations.startsAt} at time zone ${tz}, 'YYYY-MM-DD')`;
+  const rows = await db
+    .select({
+      day: local,
+      bookings: sql<number>`count(*)::int`,
+      covers: sql<number>`coalesce(sum(${reservations.partySize}), 0)::int`,
+    })
+    .from(reservations)
+    .where(
+      and(
+        eq(reservations.restaurantId, ctx.restaurant.id),
+        eq(reservations.kind, "booking"),
+        gte(reservations.startsAt, from),
+        lt(reservations.startsAt, to),
+        notInArray(reservations.status, ["cancelled", "no_show"]),
+      ),
+    )
+    // By position: the time zone is a bound parameter, so the select and group expressions differ in text.
+    .groupBy(sql`1`);
+  return new Map(rows.map((r) => [r.day, { bookings: r.bookings, covers: r.covers }]));
 }
 
 const TRANSITIONS: Record<string, string[]> = {
