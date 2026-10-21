@@ -150,6 +150,7 @@ async function ProductEditor({ params, searchParams }: Pick<Props, "params" | "s
           allergens={ALLERGENS}
           suggestedTags={SUGGESTED_TAGS}
           currency={ctx.restaurant.currency}
+          photo={product?.images[0]?.urls.sm ?? null}
         />
       </div>
     </>

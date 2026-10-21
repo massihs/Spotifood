@@ -451,7 +451,8 @@
     "slot_unavailable": "Ce créneau n’est plus disponible.",
     "party_too_large": "Pour les grands groupes, appelez-nous.",
     "invalid_station": "Le poste choisi n'est pas valide.",
-    "invalid_position": "Position invalide : saisissez la latitude et la longitude."
+    "invalid_position": "Position invalide : saisissez la latitude et la longitude.",
+    "invalid_percent": "Pourcentage invalide."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1011,6 +1012,46 @@
         "drinks": "Boissons",
         "other": "Autres"
       }
+    },
+    "stats": {
+      "all": "Tous les plats",
+      "soldOut": "Épuisés",
+      "hidden": "Masqués",
+      "noPhoto": "Sans photo",
+      "featured": "Vedettes"
+    },
+    "search": "Rechercher un plat dans toutes les catégories…",
+    "viewList": "Vue liste",
+    "viewGrid": "Vue cartes",
+    "results": "{count, plural, =0 {Aucun résultat} one {# plat} other {# plats}}",
+    "noResults": "Aucun plat ne correspond à ces filtres",
+    "clearFilters": "Effacer les filtres",
+    "markSoldOut": "Marquer épuisé",
+    "markAvailable": "Marquer disponible",
+    "show": "Afficher au menu",
+    "hide": "Masquer du menu",
+    "feature": "Mettre en vedette",
+    "unfeature": "Retirer des vedettes",
+    "editPrice": "Modifier le prix",
+    "priceSaved": "Prix enregistré.",
+    "edit": "Modifier",
+    "reorderHint": "Videz la recherche et les filtres pour réordonner.",
+    "inCategory": "dans {name}",
+    "bulk": {
+      "button": "Modifier les prix",
+      "title": "Modifier les prix en masse",
+      "scope": "Portée",
+      "scopeCategory": "Seulement « {name} »",
+      "scopeAll": "Tout le menu",
+      "percent": "Variation (%)",
+      "percentHint": "ex. 15 pour +15 %, ou -10 pour −10 %.",
+      "round": "Arrondir les nouveaux prix",
+      "roundNone": "Sans arrondi",
+      "roundTo": "Au {amount} le plus proche",
+      "preview": "Aperçu",
+      "more": "et {count} autres plats",
+      "apply": "Appliquer à {count} plats",
+      "done": "{count, plural, =0 {Aucun prix modifié} one {# prix mis à jour} other {# prix mis à jour}}."
     }
   },
   "product": {
@@ -1061,7 +1102,9 @@
     "deleteConfirm": "Supprimer « {name} » du menu ? L'historique des commandes est conservé.",
     "takeawayPrice": "Prix à emporter",
     "deliveryPrice": "Prix livraison",
-    "channelPriceHint": "Vide = prix du menu"
+    "channelPriceHint": "Vide = prix du menu",
+    "preview": "Aperçu client",
+    "previewHint": "Tel qu'il apparaît sur le menu QR."
   },
   "options": {
     "title": "Options & suppléments",

@@ -1,3 +1,4 @@
+import { SlidersHorizontal } from "lucide-react";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -46,8 +47,16 @@ async function Options({ params }: { params: Params }) {
       </div>
       {groups.length === 0 ? (
         <Card className="px-6 py-14 text-center">
-          <h2 className="text-lg font-semibold">{t("empty")}</h2>
+          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-accent-soft text-accent-text">
+            <SlidersHorizontal className="size-7" aria-hidden="true" />
+          </span>
+          <h2 className="mt-4 text-lg font-semibold">{t("empty")}</h2>
           <p className="mx-auto mt-1 max-w-md text-fg-muted">{t("emptyBody")}</p>
+          {manage ? (
+            <div className="mt-6 flex justify-center">
+              <NewGroupDialog restaurantId={ctx.restaurant.id} currency={ctx.restaurant.currency} />
+            </div>
+          ) : null}
         </Card>
       ) : (
         <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

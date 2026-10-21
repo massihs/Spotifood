@@ -28,7 +28,8 @@ async function Menu({ params, searchParams }: Pick<Props, "params" | "searchPara
   const [t, categories] = await Promise.all([getTranslations("menu"), listCategories(db, ctx)]);
   const wanted = typeof sp.category === "string" ? sp.category : undefined;
   const selected = categories.find((c) => c.id === wanted) ?? categories[0] ?? null;
-  const products = selected ? await listProducts(db, ctx, selected.id) : [];
+  // Every dish: the board searches and filters the whole menu.
+  const products = await listProducts(db, ctx);
 
   return (
     <>
@@ -48,6 +49,7 @@ async function Menu({ params, searchParams }: Pick<Props, "params" | "searchPara
         products={products}
         currency={ctx.restaurant.currency}
         canManage={can(ctx, "menu.manage")}
+        canFlag={can(ctx, "menu.manage") || can(ctx, "orders.update_status")}
         templates={[...DEFAULT_CATEGORY_TEMPLATES]}
       />
     </>

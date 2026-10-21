@@ -451,7 +451,8 @@
     "slot_unavailable": "هذا الوقت لم يعد متاحاً.",
     "party_too_large": "للمجموعات الكبيرة اتصل بنا.",
     "invalid_station": "المحطة المختارة غير صالحة.",
-    "invalid_position": "موقع غير صالح: أدخل خط العرض وخط الطول معًا."
+    "invalid_position": "موقع غير صالح: أدخل خط العرض وخط الطول معًا.",
+    "invalid_percent": "نسبة غير صالحة."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -1011,6 +1012,46 @@
         "drinks": "المشروبات",
         "other": "أخرى"
       }
+    },
+    "stats": {
+      "all": "كل الأطباق",
+      "soldOut": "نفدت",
+      "hidden": "مخفية",
+      "noPhoto": "بدون صورة",
+      "featured": "مميزة"
+    },
+    "search": "ابحث عن طبق في كل الفئات…",
+    "viewList": "عرض القائمة",
+    "viewGrid": "عرض البطاقات",
+    "results": "{count, plural, =0 {لا نتائج} other {# طبق}}",
+    "noResults": "لا يوجد طبق يطابق هذه الفلاتر",
+    "clearFilters": "مسح الفلاتر",
+    "markSoldOut": "وضع علامة «نفد»",
+    "markAvailable": "وضع علامة «متوفر»",
+    "show": "إظهار في القائمة",
+    "hide": "إخفاء من القائمة",
+    "feature": "جعله مميزًا",
+    "unfeature": "إزالة من المميزة",
+    "editPrice": "تعديل السعر",
+    "priceSaved": "تم حفظ السعر.",
+    "edit": "تعديل",
+    "reorderHint": "امسح البحث والفلاتر لإعادة الترتيب.",
+    "inCategory": "في {name}",
+    "bulk": {
+      "button": "تغيير الأسعار",
+      "title": "تغيير الأسعار دفعة واحدة",
+      "scope": "النطاق",
+      "scopeCategory": "فقط «{name}»",
+      "scopeAll": "القائمة كاملة",
+      "percent": "نسبة التغيير (%)",
+      "percentHint": "مثلاً 15 لزيادة 15٪، أو -10 لتخفيض 10٪.",
+      "round": "تقريب الأسعار الجديدة",
+      "roundNone": "بدون تقريب",
+      "roundTo": "إلى أقرب {amount}",
+      "preview": "معاينة",
+      "more": "و{count} أطباق أخرى",
+      "apply": "تطبيق على {count} طبق",
+      "done": "{count, plural, =0 {لم يتغير أي سعر} other {تم تحديث # سعر}}."
     }
   },
   "product": {
@@ -1061,7 +1102,9 @@
     "deleteConfirm": "إزالة «{name}» من القائمة؟ يُحتفظ بسجل الطلبات.",
     "takeawayPrice": "سعر السفري",
     "deliveryPrice": "سعر التوصيل",
-    "channelPriceHint": "فارغ = سعر القائمة"
+    "channelPriceHint": "فارغ = سعر القائمة",
+    "preview": "معاينة للزبون",
+    "previewHint": "كما يظهر في قائمة QR."
   },
   "options": {
     "title": "الخيارات والإضافات",

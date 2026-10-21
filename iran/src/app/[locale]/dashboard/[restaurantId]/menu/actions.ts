@@ -8,7 +8,7 @@ import { actionContext, runAction } from "@/server/actions";
 import { AppError } from "@/server/errors";
 import { MAX_UPLOAD_BYTES } from "@/server/infra/images";
 import { enforceRateLimit } from "@/server/infra/rate-limit";
-import { parseMoneyInput } from "@/lib/money";
+import { displayFactor, parseMoneyInput } from "@/lib/money";
 import type { RestaurantContext } from "@/server/tenancy";
 import { menuTag } from "@/server/modules/menu/cache";
 import {
@@ -22,7 +22,9 @@ import {
   createProduct,
   deleteProduct,
   reorderProducts,
+  adjustPrices,
   setProductFlags,
+  setProductPrice,
   updateProduct,
 } from "@/server/modules/menu/products";
 import { addProductImage, deleteProductImage, setPrimaryImage } from "@/server/modules/menu/images";
@@ -181,7 +183,7 @@ export async function deleteProductAction(restaurantId: string, productId: strin
 export async function setProductFlagAction(
   restaurantId: string,
   productId: string,
-  flag: "isAvailable" | "isActive",
+  flag: "isAvailable" | "isActive" | "isFeatured",
   value: boolean,
 ) {
   return runAction(async () => {
@@ -281,5 +283,35 @@ export async function deleteOptionGroupAction(restaurantId: string, groupId: str
     const ctx = await actionContext(restaurantId, "menu.manage");
     await deleteOptionGroup(db, ctx, groupId);
     menuChanged(ctx);
+  });
+}
+
+export async function setProductPriceAction(restaurantId: string, productId: string, input: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "menu.manage");
+    const cents = parseMoneyInput(input, ctx.restaurant.currency);
+    if (cents === null) throw new AppError("VALIDATION", "invalid_price", { field: "price" });
+    const p = await setProductPrice(db, ctx, productId, cents);
+    menuChanged(ctx);
+    return { priceCents: p.priceCents };
+  });
+}
+
+/** `roundTo` comes in the display unit (tomans for IRR). */
+export async function adjustPricesAction(
+  restaurantId: string,
+  categoryId: string | null,
+  percent: number,
+  roundTo: number,
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "menu.manage");
+    const res = await adjustPrices(db, ctx, {
+      categoryId,
+      percent,
+      roundTo: Math.round(roundTo * displayFactor(ctx.restaurant.currency)),
+    });
+    menuChanged(ctx);
+    return res;
   });
 }

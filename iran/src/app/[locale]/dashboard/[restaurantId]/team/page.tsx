@@ -10,6 +10,9 @@ import { listMembers } from "@/server/modules/members/service";
 import { AddMemberDialog, EditMemberDialog } from "./member-forms";
 import { JobPicker } from "./job-picker";
 import { JobGuide } from "./job-guide";
+import { cn } from "@/lib/cn";
+import { isJob } from "@/lib/jobs";
+import { JOB_TONES } from "./job-meta";
 import { listStations } from "@/server/modules/kitchen/stations";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/team">["params"];
@@ -44,7 +47,12 @@ async function Team({ params }: { params: Params }) {
           <AddMemberDialog restaurantId={ctx.restaurant.id} roles={[...roles]} stations={stationList} />
         }
       />
-      <JobGuide />
+      <JobGuide
+        counts={members.reduce<Record<string, number>>((acc, m) => {
+          if (m.job) acc[m.job] = (acc[m.job] ?? 0) + 1;
+          return acc;
+        }, {})}
+      />
       <Card className="overflow-x-auto">
         {/* Phones: each member is a card (the table rows turn into small grids). */}
         <table className="w-full text-sm max-sm:block">
@@ -70,10 +78,31 @@ async function Team({ params }: { params: Params }) {
                   className="max-sm:grid max-sm:grid-cols-[1fr_auto] max-sm:items-center max-sm:gap-x-3 max-sm:gap-y-2 max-sm:p-4 max-sm:[&>td]:p-0"
                 >
                   <td className="px-5 py-3 max-sm:col-span-2">
-                    <p className="font-medium">
-                      {m.fullName} {isSelf ? <span className="text-fg-subtle">({t("team.you")})</span> : null}
-                    </p>
-                    <p className="text-xs text-fg-subtle">{m.email}</p>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={cn(
+                          "grid size-10 shrink-0 place-items-center rounded-full text-sm font-bold",
+                          m.role === "owner"
+                            ? "bg-accent text-accent-fg"
+                            : isJob(m.job)
+                              ? JOB_TONES[m.job]
+                              : "bg-surface-2 text-fg-muted",
+                          m.status !== "active" && "opacity-50",
+                        )}
+                        aria-hidden="true"
+                      >
+                        {initials(m.fullName)}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">
+                          {m.fullName}{" "}
+                          {isSelf ? <span className="text-fg-subtle">({t("team.you")})</span> : null}
+                        </p>
+                        <p className="truncate text-xs text-fg-subtle" dir="ltr">
+                          {m.email}
+                        </p>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-5 py-3 max-sm:col-span-2">
                     {editable ? (
@@ -128,4 +157,13 @@ async function Team({ params }: { params: Params }) {
       </Card>
     </>
   );
+}
+
+/** Two initials for the avatar ("نگار کریمی" → "نک"). */
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return (parts.length > 1 ? [parts[0], parts[parts.length - 1]] : parts)
+    .map((p) => [...p][0] ?? "")
+    .join("")
+    .toUpperCase();
 }

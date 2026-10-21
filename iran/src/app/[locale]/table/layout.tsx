@@ -18,7 +18,7 @@ export const viewport: Viewport = {
 
 export default function GuestLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto min-h-dvh max-w-2xl bg-bg">
+    <div className="min-h-dvh bg-bg">
       <Suspense fallback={<GuestSkeleton />}>{children}</Suspense>
     </div>
   );

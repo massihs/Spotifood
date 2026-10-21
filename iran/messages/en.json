@@ -451,7 +451,8 @@
     "slot_unavailable": "This time is no longer available; pick another.",
     "party_too_large": "For larger groups, please call us.",
     "invalid_station": "The selected station is not valid.",
-    "invalid_position": "Invalid position: enter both latitude and longitude."
+    "invalid_position": "Invalid position: enter both latitude and longitude.",
+    "invalid_percent": "Invalid percentage."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1011,6 +1012,46 @@
         "drinks": "Drinks",
         "other": "Other"
       }
+    },
+    "stats": {
+      "all": "All dishes",
+      "soldOut": "Sold out",
+      "hidden": "Hidden",
+      "noPhoto": "No photo",
+      "featured": "Featured"
+    },
+    "search": "Search dishes in every category…",
+    "viewList": "List view",
+    "viewGrid": "Card view",
+    "results": "{count, plural, =0 {No results} one {# dish} other {# dishes}}",
+    "noResults": "No dish matches these filters",
+    "clearFilters": "Clear filters",
+    "markSoldOut": "Mark sold out",
+    "markAvailable": "Mark available",
+    "show": "Show on the menu",
+    "hide": "Hide from the menu",
+    "feature": "Feature",
+    "unfeature": "Remove from featured",
+    "editPrice": "Edit price",
+    "priceSaved": "Price saved.",
+    "edit": "Edit",
+    "reorderHint": "Clear search and filters to reorder.",
+    "inCategory": "in {name}",
+    "bulk": {
+      "button": "Change prices",
+      "title": "Change prices in bulk",
+      "scope": "Scope",
+      "scopeCategory": "Only “{name}”",
+      "scopeAll": "Whole menu",
+      "percent": "Change (%)",
+      "percentHint": "e.g. 15 for +15 %, or -10 for −10 %.",
+      "round": "Round the new prices",
+      "roundNone": "No rounding",
+      "roundTo": "To the nearest {amount}",
+      "preview": "Preview",
+      "more": "and {count} more dishes",
+      "apply": "Apply to {count} dishes",
+      "done": "{count, plural, =0 {No price changed} one {# price updated} other {# prices updated}}."
     }
   },
   "product": {
@@ -1061,7 +1102,9 @@
     "deleteConfirm": "Remove “{name}” from the menu? Order history is kept.",
     "takeawayPrice": "Takeaway price",
     "deliveryPrice": "Delivery price",
-    "channelPriceHint": "Empty = menu price"
+    "channelPriceHint": "Empty = menu price",
+    "preview": "Guest preview",
+    "previewHint": "As it appears on the QR menu."
   },
   "options": {
     "title": "Options & extras",

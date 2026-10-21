@@ -257,7 +257,7 @@ export function MenuApp({
         )}
         aria-hidden={!compact}
       >
-        <div className="mx-auto flex h-12 max-w-3xl items-center gap-3 px-4 pt-[env(safe-area-inset-top)]">
+        <div className="mx-auto flex h-12 max-w-3xl items-center gap-3 px-4 pt-[env(safe-area-inset-top)] lg:max-w-6xl">
           <p className="min-w-0 flex-1 truncate font-menu-display text-[17px] font-semibold">
             {restaurantName}
           </p>
@@ -266,7 +266,7 @@ export function MenuApp({
           </span>
         </div>
       </div>
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-3xl lg:max-w-6xl">
         <div
           className={cn(
             "sticky z-20 mt-2 bg-bg/95 pt-2 backdrop-blur-xl transition-[top] duration-200",
@@ -470,7 +470,7 @@ export function MenuApp({
                   <p className="mt-1.5 px-4 text-sm leading-6 text-fg-muted atelier:px-5">{c.description}</p>
                 ) : null}
                 {view === "grid" ? (
-                  <ul className="mt-3 grid grid-cols-2 gap-3 px-4 sm:grid-cols-3 atelier:gap-x-4 atelier:gap-y-6 atelier:px-5">
+                  <ul className="mt-3 grid grid-cols-2 gap-3 px-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 atelier:gap-x-4 atelier:gap-y-6 atelier:px-5">
                     {c.items.map((p, pi) => (
                       <li key={p.id}>
                         <GridCard p={p} eager={ci === 0 && pi < 4} {...card} />
@@ -478,7 +478,7 @@ export function MenuApp({
                     ))}
                   </ul>
                 ) : (
-                  <ul className="mt-3 grid gap-3 px-4 sm:grid-cols-2 atelier:mt-1 atelier:gap-0 atelier:px-5 atelier:sm:gap-x-8 nuit:gap-1">
+                  <ul className="mt-3 grid gap-3 px-4 sm:grid-cols-2 lg:grid-cols-3 atelier:mt-1 atelier:gap-0 atelier:px-5 atelier:sm:gap-x-8 nuit:gap-1">
                     {c.items.map((p, pi) => (
                       <li key={p.id}>
                         <ListCard p={p} eager={ci === 0 && pi < 4} {...card} />

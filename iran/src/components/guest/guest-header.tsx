@@ -82,7 +82,7 @@ export async function GuestHeader({
 
   if (theme === "atelier")
     return (
-      <header className="mx-auto max-w-3xl px-5 pt-[max(0.75rem,env(safe-area-inset-top))]">
+      <header className="mx-auto max-w-3xl px-5 pt-[max(0.75rem,env(safe-area-inset-top))] lg:max-w-6xl">
         <div className="flex items-center justify-between gap-2">
           <WaiterCall />
           {actions}
@@ -115,10 +115,10 @@ export async function GuestHeader({
             aria-hidden="true"
             className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-[var(--bg)]"
           />
-          <div className="relative mx-auto max-w-3xl px-4 pt-[max(0.75rem,env(safe-area-inset-top))]">
+          <div className="relative mx-auto max-w-3xl px-4 pt-[max(0.75rem,env(safe-area-inset-top))] lg:max-w-6xl">
             {actions}
           </div>
-          <div className="absolute inset-x-0 bottom-0 mx-auto flex max-w-3xl items-end gap-3 px-4 pb-3">
+          <div className="absolute inset-x-0 bottom-0 mx-auto flex max-w-3xl items-end gap-3 px-4 pb-3 lg:max-w-6xl">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-3">
                 {logoTile("size-11 rounded-xl")}
@@ -151,11 +151,11 @@ export async function GuestHeader({
           aria-hidden="true"
           className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/5 to-black/35"
         />
-        <div className="relative mx-auto max-w-3xl px-4 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <div className="relative mx-auto max-w-3xl px-4 pt-[max(0.75rem,env(safe-area-inset-top))] lg:max-w-6xl">
           {actions}
         </div>
       </div>
-      <div className="relative mx-auto -mt-10 max-w-3xl px-4">
+      <div className="relative mx-auto -mt-10 max-w-3xl px-4 lg:max-w-6xl">
         <div className="flex items-center gap-3 rounded-3xl border border-border bg-surface p-3 shadow-[var(--shadow-float)]">
           {logoTile("size-14 rounded-2xl ring-1 ring-border")}
           <div className="min-w-0 flex-1">

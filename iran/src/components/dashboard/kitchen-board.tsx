@@ -2,9 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { Maximize2, Printer, Settings2 } from "lucide-react";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { usePref, writePref } from "@/components/ui/use-pref";
 import { LiveIndicator, LiveRefresh, useLiveEvent } from "@/components/realtime/live";
 import { StationManager, STATION_TONE, type StationView } from "@/components/kitchen/stations";
 import { OrderCard, type OrderCardData } from "./order-card";
@@ -20,38 +21,6 @@ const DOT: Record<(typeof COLUMNS)[number], string> = {
 };
 
 /** Per-device preferences: which station this screen shows, and whether it auto-prints tickets. */
-const PREF_EVENT = "sf-kitchen-pref";
-function readPref(key: string, fallback: string) {
-  try {
-    return localStorage.getItem(key) ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-function writePref(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    /* ignore */
-  }
-  window.dispatchEvent(new Event(PREF_EVENT));
-}
-function subscribe(cb: () => void) {
-  window.addEventListener(PREF_EVENT, cb);
-  window.addEventListener("storage", cb);
-  return () => {
-    window.removeEventListener(PREF_EVENT, cb);
-    window.removeEventListener("storage", cb);
-  };
-}
-function usePref(key: string, fallback: string) {
-  return useSyncExternalStore(
-    subscribe,
-    () => readPref(key, fallback),
-    () => fallback,
-  );
-}
-
 export function KitchenBoard({
   restaurantId,
   orders,

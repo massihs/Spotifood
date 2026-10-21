@@ -17,7 +17,9 @@ import {
   useActionForm,
   useFieldError,
 } from "@/components/ui/form";
-import { centsToInput, formatMoney, unitLabel } from "@/lib/money";
+import { centsToInput, formatMoney, parseMoneyInput } from "@/lib/money";
+import { MoneyField } from "@/components/ui/money-field";
+import { ImageIcon, Star } from "lucide-react";
 import { cn } from "@/lib/cn";
 import {
   createProductAction,
@@ -64,7 +66,10 @@ export function ProductForm({
   allergens,
   suggestedTags,
   currency,
+  photo,
 }: {
+  /** First photo of the dish, for the guest preview. */
+  photo?: string | null;
   restaurantId: string;
   values: ProductValues;
   categories: Option[];
@@ -85,9 +90,44 @@ export function ProductForm({
   const err = useFieldError(form.state);
   const customTags = values.tags.filter((tag) => !suggestedTags.includes(tag));
   const money = (c: number) => formatMoney(c, currency, locale);
+  const [preview, setPreview] = useState<Preview>(() => ({
+    name: values.name,
+    description: values.description ?? "",
+    priceCents: values.priceCents,
+    compareAtCents: values.compareAtPriceCents,
+    isAvailable: values.isAvailable,
+    isFeatured: values.isFeatured,
+    isActive: values.isActive,
+    tags: values.tags.filter((tag) => suggestedTags.includes(tag)),
+  }));
+  // The preview follows what is typed, field by field (inputs bubble up to the form).
+  const readForm = (formEl: HTMLFormElement) => {
+    const fd = new FormData(formEl);
+    setPreview({
+      name: String(fd.get("name") ?? ""),
+      description: String(fd.get("description") ?? ""),
+      priceCents: parseMoneyInput(String(fd.get("price") ?? ""), currency),
+      compareAtCents: parseMoneyInput(String(fd.get("compareAt") ?? ""), currency),
+      isAvailable: fd.get("isAvailable") === "on",
+      isFeatured: fd.get("isFeatured") === "on",
+      isActive: fd.get("isActive") === "on",
+      tags: fd.getAll("tags").map(String),
+    });
+  };
+  const save = (
+    <>
+      <FormFeedback state={form.state} success={t("common.saved")} />
+      <SubmitButton className="w-full">{editing ? t("common.save") : t("product.create")}</SubmitButton>
+    </>
+  );
 
   return (
-    <ActionForm form={form} className="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <ActionForm
+      form={form}
+      onInput={(e) => readForm(e.currentTarget)}
+      onChange={(e) => readForm(e.currentTarget)}
+      className="grid gap-6 pb-24 xl:grid-cols-[1fr_340px] xl:pb-0"
+    >
       <div className="space-y-6">
         <Card>
           <CardHeader title={t("product.general")} />
@@ -125,36 +165,35 @@ export function ProductForm({
         <Card>
           <CardHeader title={t("product.pricing")} />
           <div className="grid gap-4 p-5 sm:grid-cols-3">
-            <Field
-              label={`${t("product.price")} (${unitLabel(currency, locale)})`}
+            <MoneyField
+              label={t("product.price")}
               name="price"
+              currency={currency}
               required
-              inputMode="decimal"
-              placeholder="0,00"
               defaultValue={centsToInput(values.priceCents, locale, currency)}
               hint={t("product.priceHint")}
               error={err("price") ?? err("priceCents")}
             />
-            <Field
+            <MoneyField
               label={t("product.compareAt")}
               name="compareAt"
-              inputMode="decimal"
+              currency={currency}
               defaultValue={centsToInput(values.compareAtPriceCents, locale, currency)}
               hint={t("product.compareAtHint")}
               error={err("compareAt") ?? err("compareAtPriceCents")}
             />
-            <Field
+            <MoneyField
               label={t("product.takeawayPrice")}
               name="takeawayPrice"
-              inputMode="decimal"
+              currency={currency}
               defaultValue={centsToInput(values.takeawayPriceCents, locale, currency)}
               hint={t("product.channelPriceHint")}
               error={err("takeawayPrice") ?? err("takeawayPriceCents")}
             />
-            <Field
+            <MoneyField
               label={t("product.deliveryPrice")}
               name="deliveryPrice"
-              inputMode="decimal"
+              currency={currency}
               defaultValue={centsToInput(values.deliveryPriceCents, locale, currency)}
               hint={t("product.channelPriceHint")}
               error={err("deliveryPrice") ?? err("deliveryPriceCents")}
@@ -266,7 +305,14 @@ export function ProductForm({
         </Card>
       </div>
 
-      <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
+      <div className="space-y-6 xl:sticky xl:top-20 xl:self-start">
+        <Card className="max-xl:hidden">
+          <CardHeader title={t("product.preview")} description={t("product.previewHint")} />
+          <div className="space-y-4 p-4">
+            <GuestPreview preview={preview} photo={photo} money={money} t={t} />
+            <div className="space-y-3">{save}</div>
+          </div>
+        </Card>
         <Card>
           <CardHeader title={t("product.visibility")} />
           <div className="space-y-4 p-5">
@@ -319,12 +365,88 @@ export function ProductForm({
             />
           </div>
         </Card>
-        <div className="space-y-3 rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
-          <FormFeedback state={form.state} success={t("common.saved")} />
-          <SubmitButton className="w-full">{editing ? t("common.save") : t("product.create")}</SubmitButton>
-        </div>
+      </div>
+      {/* Phones and tablets: the save button stays at hand at the bottom of the screen. */}
+      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 space-y-2 border-t border-border bg-surface/95 p-3 backdrop-blur lg:start-[272px] lg:bottom-0 xl:hidden">
+        {save}
       </div>
     </ActionForm>
+  );
+}
+
+type Preview = {
+  name: string;
+  description: string;
+  priceCents: number | null;
+  compareAtCents: number | null;
+  isAvailable: boolean;
+  isFeatured: boolean;
+  isActive: boolean;
+  tags: string[];
+};
+
+/** The dish as a guest sees it in the menu list, updated while typing. */
+function GuestPreview({
+  preview: p,
+  photo,
+  money,
+  t,
+}: {
+  preview: Preview;
+  photo?: string | null;
+  money: (c: number) => string;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  return (
+    <div className={cn("rounded-2xl bg-bg p-3 ring-1 ring-border", !p.isActive && "opacity-50")}>
+      <div className="flex gap-3">
+        <div className="min-w-0 flex-1">
+          {p.isFeatured ? (
+            <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-accent-fg">
+              <Star className="size-3 fill-current" aria-hidden="true" />
+              {t("menu.featured")}
+            </span>
+          ) : null}
+          <p className="leading-6 font-bold">{p.name || "—"}</p>
+          {p.description ? (
+            <p className="mt-0.5 line-clamp-2 text-xs leading-5 text-fg-muted">{p.description}</p>
+          ) : null}
+          {p.tags.length ? (
+            <p className="mt-1 flex flex-wrap gap-1">
+              {p.tags.slice(0, 3).map((tag) => (
+                <span key={tag} className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px]">
+                  {t(`tags.${tag}`)}
+                </span>
+              ))}
+            </p>
+          ) : null}
+          <p className="mt-2 flex items-baseline gap-2 text-sm tabular-nums">
+            {p.isAvailable ? (
+              <>
+                <b>{p.priceCents != null ? money(p.priceCents) : "—"}</b>
+                {p.compareAtCents ? (
+                  <span className="text-xs text-fg-subtle line-through">{money(p.compareAtCents)}</span>
+                ) : null}
+              </>
+            ) : (
+              <span className="font-bold text-warning">{t("menu.soldOut")}</span>
+            )}
+          </p>
+        </div>
+        <span
+          className={cn(
+            "grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl bg-surface-2 text-fg-subtle",
+            !p.isAvailable && "grayscale",
+          )}
+        >
+          {photo ? (
+            <img src={photo} alt="" className="size-full object-cover" />
+          ) : (
+            <ImageIcon className="size-6" aria-hidden="true" />
+          )}
+        </span>
+      </div>
+    </div>
   );
 }
 

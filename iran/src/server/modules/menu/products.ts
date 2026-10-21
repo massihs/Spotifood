@@ -1,4 +1,7 @@
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { z } from "zod";
+import { MAX_AMOUNT_CENTS } from "@/lib/money";
+import { adjustedPrice } from "@/lib/price-adjust";
 import type { Database, DbOrTx } from "@/server/db/client";
 import { productOptionGroups, products, taxRates } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
@@ -184,11 +187,11 @@ export async function setProductFlags(
   db: Database,
   ctx: RestaurantContext,
   id: string,
-  flags: { isAvailable?: boolean; isActive?: boolean },
+  flags: { isAvailable?: boolean; isActive?: boolean; isFeatured?: boolean },
 ) {
   // Hiding a dish is menu management; marking it sold out is also a service action
   // (floor staff can flag "épuisé" during the rush).
-  if (flags.isActive !== undefined) assertCan(ctx, "menu.manage");
+  if (flags.isActive !== undefined || flags.isFeatured !== undefined) assertCan(ctx, "menu.manage");
   if (flags.isAvailable !== undefined && !ctx.permissions.has("menu.manage"))
     assertCan(ctx, "orders.update_status");
   return db.transaction(async (tx) => {
@@ -241,5 +244,77 @@ export async function reorderProducts(
       ids,
     );
     await applyOrder(tx, "products", ids);
+  });
+}
+
+/** Quick price change from the menu list (the full form stays the place for everything else). */
+export async function setProductPrice(db: Database, ctx: RestaurantContext, id: string, priceCents: number) {
+  assertCan(ctx, "menu.manage");
+  if (!Number.isInteger(priceCents) || priceCents < 0 || priceCents > MAX_AMOUNT_CENTS)
+    throw new AppError("VALIDATION", "invalid_price", { field: "price" });
+  return db.transaction(async (tx) => {
+    const before = await loadProduct(tx, ctx, id);
+    const [p] = await tx.update(products).set({ priceCents }).where(eq(products.id, id)).returning();
+    await recordAudit(tx, {
+      action: "product.price_updated",
+      actorUserId: ctx.user.id,
+      restaurantId: ctx.restaurant.id,
+      entityType: "product",
+      entityId: id,
+      metadata: { from: before.priceCents, to: priceCents },
+    });
+    return p!;
+  });
+}
+
+export const priceAdjustSchema = z.object({
+  categoryId: z.uuid().nullable(),
+  /** −50 % … +200 %: an Iranian menu is repriced often, rarely more than doubled at once. */
+  percent: z
+    .number()
+    .min(-50)
+    .max(200)
+    .refine((v) => v !== 0, "invalid_percent"),
+  /** Round the new prices to this many minor units (0 = exact). */
+  roundTo: z.number().int().min(0).max(100_000_000),
+});
+
+/** Raises or lowers every price of a category (or the whole menu) by a percentage, in one go. */
+export async function adjustPrices(
+  db: Database,
+  ctx: RestaurantContext,
+  raw: z.input<typeof priceAdjustSchema>,
+) {
+  assertCan(ctx, "menu.manage");
+  const input = priceAdjustSchema.parse(raw);
+  return db.transaction(async (tx) => {
+    const rows = await tx
+      .select({ id: products.id, priceCents: products.priceCents, compareAt: products.compareAtPriceCents })
+      .from(products)
+      .where(
+        and(
+          live(ctx.restaurant.id),
+          input.categoryId ? eq(products.categoryId, input.categoryId) : undefined,
+        ),
+      );
+    let changed = 0;
+    for (const r of rows) {
+      if (r.priceCents === 0) continue;
+      const next = adjustedPrice(r.priceCents, input.percent, input.roundTo);
+      const compareAt = r.compareAt ? adjustedPrice(r.compareAt, input.percent, input.roundTo) : null;
+      if (next === r.priceCents && compareAt === r.compareAt) continue;
+      await tx
+        .update(products)
+        .set({ priceCents: next, compareAtPriceCents: compareAt })
+        .where(eq(products.id, r.id));
+      changed++;
+    }
+    await recordAudit(tx, {
+      action: "product.prices_adjusted",
+      actorUserId: ctx.user.id,
+      restaurantId: ctx.restaurant.id,
+      metadata: { ...input, changed },
+    });
+    return { changed };
   });
 }
