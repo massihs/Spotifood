@@ -1,6 +1,8 @@
 /** Wording of the desktop app's own screens (the website keeps its own translations). */
 const STRINGS = {
   fa: {
+    noRealPrinter: "چاپگر واقعی روی این کامپیوتر پیدا نشد؛ چاپگر فیش را نصب کنید.",
+    virtualPrinter: "مجازی، برای فیش نه",
     pairTitle: "اتصال به صندوق",
     pairBody: "کد ۶ رقمی نمایش داده‌شده روی کامپیوتر صندوق را وارد کنید.",
     pairGo: "اتصال",
@@ -107,6 +109,8 @@ const STRINGS = {
     version: "نسخه {v}",
   },
   fr: {
+    noRealPrinter: "Aucune vraie imprimante sur ce PC : installez d'abord l'imprimante tickets.",
+    virtualPrinter: "virtuelle, pas pour les tickets",
     pairTitle: "Connexion à la caisse",
     pairBody: "Saisissez le code à 6 chiffres affiché sur le PC caisse.",
     pairGo: "Connecter",
@@ -213,6 +217,8 @@ const STRINGS = {
     version: "Version {v}",
   },
   en: {
+    noRealPrinter: "No real printer on this PC: install the receipt printer first.",
+    virtualPrinter: "virtual, not for tickets",
     pairTitle: "Connect to the till",
     pairBody: "Enter the 6-digit code shown on the till PC.",
     pairGo: "Connect",

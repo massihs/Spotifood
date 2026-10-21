@@ -55,7 +55,10 @@ function renderPrinters() {
       ${
         p.system !== undefined
           ? `<label>${t("systemPrinter")}<select class="field" data-k="system">${systemList
-              .map((x) => `<option value="${esc(x.name)}" ${x.name === p.system ? "selected" : ""}>${esc(x.displayName)}</option>`)
+              .map(
+                (x) =>
+                  `<option value="${esc(x.name)}" ${x.name === p.system ? "selected" : ""} ${x.virtual ? "disabled" : ""}>${esc(x.displayName)}${x.virtual ? ` (${t("virtualPrinter")})` : ""}</option>`,
+              )
               .join("")}</select></label>`
           : `<label>IP<input class="field" dir="ltr" data-k="host" value="${esc(p.host)}" placeholder="192.168.1.50"></label>
              <label>Port<input class="field" dir="ltr" data-k="port" value="${esc(p.port ?? 9100)}"></label>`
@@ -108,7 +111,10 @@ $("printers").addEventListener("click", async (e) => {
   }
 });
 $("addSystem").onclick = () => {
-  printers.push({ system: systemList.find((x) => x.isDefault)?.name ?? systemList[0]?.name ?? "", paperMm: 80, target: "cashier", copies: 1 });
+  // A real printer by default: Windows often defaults to OneNote or "Print to PDF".
+  const real = systemList.filter((x) => !x.virtual);
+  printers.push({ system: real.find((x) => x.isDefault)?.name ?? real[0]?.name ?? "", paperMm: 80, target: "cashier", copies: 1 });
+  if (!real.length) $("printerMsg").textContent = t("noRealPrinter");
   printers.at(-1).name = printers.at(-1).system;
   renderPrinters();
 };

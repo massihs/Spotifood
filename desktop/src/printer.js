@@ -2,7 +2,7 @@ import { BrowserWindow } from "electron";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { toEscPos, toMono } from "./escpos.js";
+import { isVirtualPrinter, toEscPos, toMono } from "./escpos.js";
 import { sendToPrinter } from "./sync.js";
 import { ticketHtml } from "./tickets.js";
 
@@ -81,6 +81,8 @@ export async function deliver(printer, ticket, { rtl = true } = {}) {
   // printers then happens in parallel (an unplugged printer must not hold up the others).
   const job = queue.then(async () => {
     if (printer.system) {
+      // Sending a ticket to OneNote or "Print to PDF" pops a window on every order.
+      if (isVirtualPrinter(printer.system)) throw new Error("virtual_printer");
       const win = view();
       await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(ticketHtml(ticket, widthFor(printer.paperMm), rtl, fonts()))}`);
       await new Promise((resolve, reject) =>
@@ -102,5 +104,10 @@ export async function deliver(printer, ticket, { rtl = true } = {}) {
 /** Printers installed on this PC (USB thermal printers usually show up here). */
 export async function systemPrinters(webContents) {
   const list = await webContents.getPrintersAsync();
-  return list.map((p) => ({ name: p.name, displayName: p.displayName || p.name, isDefault: !!p.isDefault }));
+  return list.map((p) => ({
+    name: p.name,
+    displayName: p.displayName || p.name,
+    isDefault: !!p.isDefault,
+    virtual: isVirtualPrinter(p.name) || isVirtualPrinter(p.displayName),
+  }));
 }

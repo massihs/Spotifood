@@ -14,6 +14,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHub, HUB_PORT, lanAddresses } from "./hub.js";
+import { isVirtualPrinter } from "./escpos.js";
 import { deliver, systemPrinters } from "./printer.js";
 import { createStore } from "./store.js";
 import { createSync } from "./sync.js";
@@ -30,6 +31,9 @@ if (!app.requestSingleInstanceLock()) app.quit();
 
 const store = createStore(path.join(app.getPath("userData"), "data"));
 let config = { serverUrl: DEFAULT_SERVER, localPrinters: [], ...store.read("config", {}) };
+// Older versions could pick OneNote / "Print to PDF" as the ticket printer: drop them.
+config.localPrinters = (config.localPrinters ?? []).filter((p) => !isVirtualPrinter(p.system));
+store.write("config", config);
 const saveConfig = (patch) => {
   config = { ...config, ...patch };
   store.write("config", config);

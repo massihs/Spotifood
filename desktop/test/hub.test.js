@@ -6,7 +6,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { createHub } from "../src/hub.js";
 import { createStore } from "../src/store.js";
-import { toEscPos, toMono } from "../src/escpos.js";
+import { isVirtualPrinter, toEscPos, toMono } from "../src/escpos.js";
 import { ticketHtml, ticketsFor, labelsFor } from "../src/tickets.js";
 import { buildLine, parseMoney, totalsOf } from "../offline/model.js";
 
@@ -221,4 +221,10 @@ test("screens load their scripts from files (the pages' CSP blocks inline script
       );
       assert.equal(inline.length, 0, `${dir}/${f} has an inline script`);
     }
+});
+
+test("virtual printers (OneNote, PDF, XPS) are never used for tickets", () => {
+  for (const n of ["OneNote (Desktop)", "Send To OneNote 2016", "Microsoft Print to PDF", "Microsoft XPS Document Writer", "Fax"])
+    assert.ok(isVirtualPrinter(n), n);
+  for (const n of ["XP-80C", "EPSON TM-T20II Receipt", "POS-58"]) assert.ok(!isVirtualPrinter(n), n);
 });

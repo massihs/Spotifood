@@ -44,3 +44,7 @@ export function toEscPos(mono, copies = 1) {
   }
   return Buffer.concat(parts);
 }
+
+/** Windows / macOS "printers" that only save a file (OneNote, PDF, XPS, fax): never for tickets. */
+export const isVirtualPrinter = (name) =>
+  /onenote|pdf|xps|fax|document writer|send to/i.test(String(name ?? ""));
