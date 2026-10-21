@@ -96,7 +96,14 @@ function showLocal(screen = "") {
   void content.webContents.loadURL(localUrl(screen));
   pushState();
 }
+/** First run: straight to the website's sign-in page (the address is rarely changed). */
 function showSetup() {
+  mode = "setup";
+  void content.webContents.loadURL(`${config.serverUrl.replace(/\/+$/, "")}/login`);
+  pushState();
+}
+/** The website could not be reached: offer to check its address. */
+function showServerSetup() {
   mode = "setup";
   void content.webContents.loadURL(`http://127.0.0.1:${hubPort}/_app/index.html`);
   pushState();
@@ -195,6 +202,7 @@ function createWindow() {
   wc.on("did-navigate-in-page", (_e, url) => onNavigate(url));
   wc.on("did-fail-load", (_e, code, _desc, url, isMain) => {
     // The website did not answer: go on with the local screens.
+    if (isMain && mode === "setup" && code !== -3 && url.startsWith(config.serverUrl)) return showServerSetup();
     if (isMain && mode === "site" && code !== -3 && url.startsWith(config.serverUrl)) {
       hub.setStatus({ online: false });
       showLocal();
@@ -267,7 +275,7 @@ ipcMain.handle("action", async (e, name, arg) => {
       return state();
     }
     case "login":
-      mode = "site";
+      mode = "setup";
       void content.webContents.loadURL(`${config.serverUrl.replace(/\/+$/, "")}/login`);
       return pushState();
     case "setDeviceName":

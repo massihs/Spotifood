@@ -16,6 +16,8 @@ try {
 for (const [id, key] of Object.entries({
   title: "settings",
   back: "back",
+  serverTitle: "server",
+  serverSave: "save",
   pcTitle: "pcName",
   pcSave: "save",
   phonesTitle: "phonesTitle",
@@ -117,6 +119,17 @@ $("addNetwork").onclick = () => {
 $("savePrinters").onclick = async () => {
   await api.action("setLocalPrinters", printers);
   $("printerMsg").textContent = "✓";
+};
+$("server").value = s.serverUrl;
+// The address is tied to the restaurant the PC is linked to: change it only before linking.
+$("server").disabled = $("serverSave").disabled = s.linked;
+$("serverSave").onclick = async () => {
+  try {
+    await api.action("setServer", $("server").value);
+    await api.action("site");
+  } catch {
+    $("serverErr").textContent = "https://…";
+  }
 };
 $("pcSave").onclick = () => api.action("setDeviceName", $("pcName").value);
 $("newCode").onclick = () => api.action("newCode");
