@@ -1,4 +1,4 @@
-import { Store } from "lucide-react";
+import { CircleUser, Store } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { buttonClasses } from "@/components/ui/button";
@@ -47,6 +47,14 @@ export async function SiteHeader({ home = false, active }: { home?: boolean; act
             <span className="max-[420px]:sr-only">{t("nav.restaurants")}</span>
           </Link>
           <LanguageSwitcher className="hidden sm:inline-flex" />
+          <Link
+            href="/account"
+            aria-label={t("nav.account")}
+            className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-fg-muted ring-1 ring-border hover:text-fg"
+          >
+            <CircleUser className="size-4" aria-hidden="true" />
+            <span className="hidden lg:inline">{t("nav.account")}</span>
+          </Link>
           <Link
             href="/login"
             className="hidden h-9 items-center rounded-full px-4 text-sm font-medium text-fg-muted hover:text-fg sm:inline-flex"

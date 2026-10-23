@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import type { Nutrition } from "@/lib/nutrition";
 import {
   boolean,
   check,
@@ -117,6 +118,8 @@ export const orders = pgTable(
     servedAt: tstz(),
     cancelledAt: tstz(),
     cancelReason: text(),
+    /** The diner's Spotifood account, when they were signed in or gave their verified mobile. */
+    dinerId: uuid(),
     /** Taken on the desktop app while the internet was down: the device's id for it (sync key). */
     offlineRef: uuid(),
     /** Number printed on the offline tickets ("L-12"), kept to match paper and screen. */
@@ -125,6 +128,7 @@ export const orders = pgTable(
   },
   (t) => [
     uniqueIndex("orders_restaurant_number_uq").on(t.restaurantId, t.number),
+    index("orders_diner_placed_idx").on(t.dinerId, t.placedAt),
     uniqueIndex("orders_offline_ref_uq")
       .on(t.restaurantId, t.offlineRef)
       .where(sql`${t.offlineRef} is not null`),
@@ -163,6 +167,8 @@ export const orderItems = pgTable(
     categoryId: uuid(),
     productName: varchar({ length: 120 }).notNull(),
     categoryName: varchar({ length: 80 }),
+    /** Nutrition of one portion as served, fixed when ordered (the diner's history keeps it). */
+    nutrition: jsonb().$type<Nutrition>(),
     /** Station the line was sent to, fixed when ordered (dish's station, else its category's). */
     stationId: uuid(),
     unitPriceCents: money().notNull(),

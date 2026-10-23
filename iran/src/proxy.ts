@@ -1,7 +1,12 @@
 import createIntlMiddleware from "next-intl/middleware";
 import type { NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
-import { SESSION_COOKIE, sessionCookieOptions } from "@/server/auth/cookies";
+import {
+  DINER_COOKIE,
+  dinerCookieOptions,
+  SESSION_COOKIE,
+  sessionCookieOptions,
+} from "@/server/auth/cookies";
 
 const intl = createIntlMiddleware(routing);
 
@@ -13,6 +18,8 @@ export default function proxy(request: NextRequest) {
   const response = intl(request);
   const session = request.cookies.get(SESSION_COOKIE)?.value;
   if (session) response.cookies.set(SESSION_COOKIE, session, sessionCookieOptions);
+  const diner = request.cookies.get(DINER_COOKIE)?.value;
+  if (diner) response.cookies.set(DINER_COOKIE, diner, dinerCookieOptions);
   return response;
 }
 

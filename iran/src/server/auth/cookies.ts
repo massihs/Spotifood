@@ -9,3 +9,7 @@ export const sessionCookieOptions = {
   path: "/",
   maxAge: SESSION_COOKIE_MAX_AGE,
 };
+
+/** Diner (customer) account: separate from staff sessions. */
+export const DINER_COOKIE = process.env.NODE_ENV === "production" ? "__Host-sf_diner" : "sf_diner";
+export const dinerCookieOptions = { ...sessionCookieOptions, maxAge: 90 * 24 * 60 * 60 };

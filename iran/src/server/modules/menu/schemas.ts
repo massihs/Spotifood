@@ -1,3 +1,4 @@
+import { tidy } from "@/lib/nutrition";
 import { isCategoryIcon } from "@/lib/category-icons";
 import { MAX_AMOUNT_CENTS } from "@/lib/money";
 import { z } from "zod";
@@ -44,6 +45,7 @@ const text = (max: number) =>
 
 const cents = z.number().int().min(0).max(MAX_AMOUNT_CENTS);
 const optionalInt = (max: number) => z.number().int().min(0).max(max).nullable().optional();
+const grams = z.number().min(0).max(5000).optional();
 
 export const categorySchema = z.object({
   name: z.string().trim().min(1).max(80),
@@ -76,6 +78,19 @@ export const productSchema = z
     allergens: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length).default([]),
     caloriesKcal: optionalInt(10_000),
     weightGrams: optionalInt(100_000),
+    /** Per portion; kcal is taken from caloriesKcal. */
+    nutrition: z
+      .object({
+        proteinG: grams,
+        carbsG: grams,
+        sugarG: grams,
+        fatG: grams,
+        fiberG: grams,
+        saltG: grams,
+      })
+      .nullable()
+      .optional(),
+    nutritionSource: z.enum(["manual", "estimated"]).nullable().optional(),
     tags: z
       .array(
         z
@@ -94,6 +109,12 @@ export const productSchema = z
   .refine((p) => p.compareAtPriceCents == null || p.compareAtPriceCents > p.priceCents, {
     message: "compare_at_not_higher",
     path: ["compareAtPriceCents"],
+  })
+  .transform((p) => {
+    if (p.nutrition === undefined) return p;
+    const n = tidy({ ...p.nutrition, kcal: p.caloriesKcal ?? undefined });
+    const nutrition = Object.keys(n).length ? n : null;
+    return { ...p, nutrition, nutritionSource: nutrition ? (p.nutritionSource ?? "manual") : null };
   });
 export type ProductInput = z.input<typeof productSchema>;
 

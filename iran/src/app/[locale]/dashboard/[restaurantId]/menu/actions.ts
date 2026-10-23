@@ -30,11 +30,17 @@ import {
 import { addProductImage, deleteProductImage, setPrimaryImage } from "@/server/modules/menu/images";
 import { createOptionGroup, deleteOptionGroup, updateOptionGroup } from "@/server/modules/menu/options";
 import type { Allergen } from "@/server/modules/menu/schemas";
+import { asciiDigits } from "@/lib/phone";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "");
 const optInt = (fd: FormData, k: string) => {
   const v = str(fd, k).trim();
   return v === "" ? null : Number.isInteger(Number(v)) ? Number(v) : NaN;
+};
+/** Decimal number (Persian digits and "," accepted); empty → undefined. */
+const optNum = (fd: FormData, k: string) => {
+  const v = asciiDigits(str(fd, k).trim()).replace(/[٫,]/, ".");
+  return v === "" ? undefined : Number(v);
 };
 /** Prices are typed in the display unit (tomans for IRR) and stored in minor units. */
 const money = (fd: FormData, k: string, required: boolean, currency: string) => {
@@ -137,6 +143,16 @@ function productFields(fd: FormData, currency: string) {
     allergens: fd.getAll("allergens").map(String) as Allergen[],
     caloriesKcal: optInt(fd, "caloriesKcal"),
     weightGrams: optInt(fd, "weightGrams"),
+    nutrition: {
+      proteinG: optNum(fd, "proteinG"),
+      carbsG: optNum(fd, "carbsG"),
+      sugarG: optNum(fd, "sugarG"),
+      fatG: optNum(fd, "fatG"),
+      fiberG: optNum(fd, "fiberG"),
+      saltG: optNum(fd, "saltG"),
+    },
+    nutritionSource:
+      str(fd, "nutritionSource") === "estimated" ? ("estimated" as const) : ("manual" as const),
     tags: [...new Set([...fd.getAll("tags").map(String), ...customTags])],
     isActive: fd.get("isActive") === "on",
     isAvailable: fd.get("isAvailable") === "on",

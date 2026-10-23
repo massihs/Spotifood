@@ -1,9 +1,11 @@
 import { sql } from "drizzle-orm";
+import type { Nutrition } from "@/lib/nutrition";
 import {
   boolean,
   check,
   index,
   integer,
+  jsonb,
   pgTable,
   primaryKey,
   text,
@@ -78,6 +80,10 @@ export const products = pgTable(
       .notNull()
       .default(sql`ARRAY[]::text[]`),
     caloriesKcal: integer(),
+    /** Nutrition of one portion (kcal mirrors caloriesKcal). */
+    nutrition: jsonb().$type<Nutrition>(),
+    /** "manual" (entered) or "estimated" (from the ingredients, to be checked). */
+    nutritionSource: varchar({ length: 12 }),
     weightGrams: integer(),
     tags: text()
       .array()

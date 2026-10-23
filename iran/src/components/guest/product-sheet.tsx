@@ -185,6 +185,20 @@ export function ProductSheet({
               </div>
             ) : null}
 
+            {p.nutrition &&
+            (p.nutrition.proteinG != null || p.nutrition.carbsG != null || p.nutrition.fatG != null) ? (
+              <dl className="mt-3 grid grid-cols-4 gap-1.5 text-center">
+                {(["proteinG", "carbsG", "fatG", "fiberG"] as const).map((k) =>
+                  p.nutrition?.[k] != null ? (
+                    <div key={k} className="rounded-xl bg-surface-2 px-1 py-2">
+                      <dt className="text-[11px] text-fg-muted">{t(`nutrition.short.${k}`)}</dt>
+                      <dd className="text-sm font-bold">{t("nutrition.grams", { n: p.nutrition[k] })}</dd>
+                    </div>
+                  ) : null,
+                )}
+              </dl>
+            ) : null}
+
             {p.ingredients || p.allergens.length ? (
               <div className="mt-4 space-y-2 rounded-2xl bg-surface-2 p-4 text-sm">
                 {p.ingredients ? (

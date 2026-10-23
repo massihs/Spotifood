@@ -48,6 +48,10 @@ export const RATE_LIMITS = {
   paymentRequest: { limit: 3, windowMs: 5 * 60_000 },
   /** Public booking / queue forms (each sends an SMS). */
   booking: { limit: 6, windowMs: 10 * 60_000 },
+  /** Diner sign-in codes by SMS: per number, and per address. */
+  dinerCode: { limit: 3, windowMs: 10 * 60_000 },
+  dinerCodeIp: { limit: 10, windowMs: 60 * 60_000 },
+  dinerVerify: { limit: 10, windowMs: 15 * 60_000 },
 } as const;
 
 export async function enforceRateLimit(

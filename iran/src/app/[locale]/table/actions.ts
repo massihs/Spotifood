@@ -6,6 +6,7 @@ import { findUsableCoupon } from "@/server/modules/customers/service";
 import { validation } from "@/server/errors";
 import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
+import { getCurrentDiner } from "@/server/auth/diner";
 import { runAction } from "@/server/actions";
 import { enforceRateLimit } from "@/server/infra/rate-limit";
 import { requireGuest } from "@/server/modules/guest/current";
@@ -88,7 +89,8 @@ export async function renameAction(_prev: unknown, fd: FormData) {
 export async function placeOrderAction(note: string, phone = "", couponCode = "") {
   return runAction(async () => {
     const g = await guest();
-    const order = await placeOrder(db, g, { note, phone, couponCode });
+    const diner = await getCurrentDiner();
+    const order = await placeOrder(db, g, { note, phone, couponCode }, { dinerId: diner?.id });
     return { number: order.number };
   });
 }

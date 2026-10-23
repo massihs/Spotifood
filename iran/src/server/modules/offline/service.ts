@@ -36,6 +36,8 @@ import { linkOrderCustomer } from "@/server/modules/customers/service";
 import { emitPaymentUpdate, paymentConfig, settleAllocations } from "@/server/modules/payments/service";
 import { seatTable } from "@/server/modules/pos/service";
 import { stationsOf } from "@/server/modules/kitchen/stations";
+import { nutritionOf } from "@/server/modules/nutrition/service";
+import { dinerForOrder } from "@/server/modules/diners/service";
 
 /** Snapshot format: the desktop app refuses a snapshot newer than it understands. */
 export const SNAPSHOT_VERSION = 1;
@@ -468,6 +470,7 @@ async function importOne(
         pricesIncludeTax,
         note: input.note || null,
         customerPhone: normalizeIranMobile(input.customerPhone) ?? null,
+        dinerId: await dinerForOrder(tx, { phone: input.customerPhone }),
         createdByUserId: actor,
         placedAt: at,
         acceptedAt: at,
@@ -484,6 +487,7 @@ async function importOne(
       .returning();
 
     const stations = await stationsOf(tx, rid, productIds);
+    const nutrition = await nutritionOf(tx, rid, productIds);
     await tx.insert(orderItems).values(
       lines.map((l) => ({
         restaurantId: rid,
@@ -493,6 +497,7 @@ async function importOne(
         productName: l.name,
         categoryName: l.categoryName,
         stationId: (l.productId && stations.get(l.productId)) ?? null,
+        nutrition: (l.productId ? nutrition.get(l.productId) : null) ?? null,
         unitPriceCents: l.unitPriceCents,
         optionsTotalCents: l.optionsTotalCents,
         quantity: l.quantity,

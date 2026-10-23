@@ -176,6 +176,13 @@
       "when": 1792619335216,
       "tag": "0024_item_stations",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792746397294,
+      "tag": "0025_diners_nutrition",
+      "breakpoints": true
     }
   ]
 }

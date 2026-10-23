@@ -29,6 +29,8 @@ import { normalizeIranMobile } from "@/lib/phone";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { sms } from "@/server/infra/sms";
 import { stationsOf } from "@/server/modules/kitchen/stations";
+import { nutritionOf } from "@/server/modules/nutrition/service";
+import { dinerForOrder } from "@/server/modules/diners/service";
 import { applyOrderToStock } from "@/server/modules/inventory/service";
 import {
   commitDiscounts,
@@ -73,6 +75,7 @@ export async function placeOrder(
   db: Database,
   guest: GuestContext,
   raw: z.input<typeof placeOrderSchema> = {},
+  opts: { dinerId?: string | null } = {},
 ) {
   const parsed = placeOrderSchema.safeParse(raw);
   if (!parsed.success) throw new AppError("VALIDATION", "invalid_phone", { field: "phone" });
@@ -169,10 +172,16 @@ export async function placeOrder(
         pricesIncludeTax,
         note: input.note ?? null,
         customerPhone: input.phone ?? null,
+        dinerId: await dinerForOrder(tx, { dinerId: opts.dinerId, phone: input.phone }),
       })
       .returning();
 
     const stations = await stationsOf(
+      tx,
+      rid,
+      lines.map((l) => l.item.productId),
+    );
+    const nutrition = await nutritionOf(
       tx,
       rid,
       lines.map((l) => l.item.productId),
@@ -186,6 +195,7 @@ export async function placeOrder(
         productName,
         categoryName,
         stationId: stations.get(item.productId) ?? null,
+        nutrition: nutrition.get(item.productId) ?? null,
         unitPriceCents: line.unitPriceCents,
         optionsTotalCents: line.optionsTotalCents,
         quantity: line.quantity,

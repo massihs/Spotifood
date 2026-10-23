@@ -1,3 +1,4 @@
+import type { Nutrition } from "@/lib/nutrition";
 import { resolveCategoryIcon } from "@/lib/category-icons";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import type { DbOrTx } from "@/server/db/client";
@@ -25,6 +26,8 @@ export type PublicProduct = PricedProduct & {
   ingredients: string | null;
   caloriesKcal: number | null;
   weightGrams: number | null;
+  /** Protein, carbs… of one portion (kcal is caloriesKcal). */
+  nutrition: Nutrition | null;
   categoryId: string;
   categoryName: string;
   images: { sm: string; md: string; lg: string; placeholder: string | null }[];
@@ -195,6 +198,7 @@ export async function loadPricedProducts(
     ingredients: p.ingredients,
     caloriesKcal: p.caloriesKcal,
     weightGrams: p.weightGrams,
+    nutrition: p.nutrition,
     taxRateBps: rateBps ?? defaultRate[0]?.rateBps ?? 0,
     images: imgs
       .filter((i) => i.productId === p.id)

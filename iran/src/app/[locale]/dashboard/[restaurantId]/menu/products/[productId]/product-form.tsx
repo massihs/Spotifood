@@ -21,6 +21,8 @@ import { centsToInput, formatMoney, parseMoneyInput } from "@/lib/money";
 import { MoneyField } from "@/components/ui/money-field";
 import { ImageIcon, Star } from "lucide-react";
 import { cn } from "@/lib/cn";
+import type { Nutrition } from "@/lib/nutrition";
+import { NutritionFields } from "./nutrition-fields";
 import {
   createProductAction,
   deleteProductAction,
@@ -43,6 +45,8 @@ export type ProductValues = {
   allergens: string[];
   caloriesKcal: number | null;
   weightGrams: number | null;
+  nutrition: Nutrition | null;
+  nutritionSource: string | null;
   tags: string[];
   isActive: boolean;
   isAvailable: boolean;
@@ -238,26 +242,14 @@ export function ProductForm({
                 ))}
               </div>
             </fieldset>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field
-                label={t("product.calories")}
-                name="caloriesKcal"
-                type="number"
-                min={0}
-                inputMode="numeric"
-                defaultValue={values.caloriesKcal ?? ""}
-                error={err("caloriesKcal")}
-              />
-              <Field
-                label={t("product.weight")}
-                name="weightGrams"
-                type="number"
-                min={0}
-                inputMode="numeric"
-                defaultValue={values.weightGrams ?? ""}
-                error={err("weightGrams")}
-              />
-            </div>
+            <NutritionFields
+              values={values}
+              errors={{
+                caloriesKcal: err("caloriesKcal"),
+                weightGrams: err("weightGrams"),
+                nutrition: err("nutrition"),
+              }}
+            />
           </div>
         </Card>
 

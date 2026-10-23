@@ -5,6 +5,7 @@ import {
   ConciergeBell,
   Plus,
   ReceiptText,
+  Salad,
   Smartphone,
   Utensils,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { db } from "@/server/db/client";
+import { getCurrentDiner } from "@/server/auth/diner";
 import { getGuest } from "@/server/modules/guest/current";
 import { listGuestOrders } from "@/server/modules/orders/service";
 import { getGuestPaymentState, getGuestPaymentStatus } from "@/server/modules/payments/service";
@@ -52,6 +54,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
     getGuestPaymentState(db, guest),
     getLocale(),
   ]);
+  const diner = await getCurrentDiner();
   const returned = typeof sp.payment === "string" ? await getGuestPaymentStatus(db, guest, sp.payment) : null;
   const money = (c: number) => formatMoney(c, guest.restaurant.currency, locale);
   const total = orders.filter((o) => o.status !== "cancelled").reduce((s, o) => s + o.totalCents, 0);
@@ -254,6 +257,22 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                   currency={guest.restaurant.currency}
                   returned={returned?.status ?? null}
                 />
+                <Link
+                  href="/account"
+                  className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 hover:bg-surface-2"
+                >
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                    <Salad className="size-5" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold">
+                      {diner ? t("account.trackedTitle") : t("account.trackTitle")}
+                    </span>
+                    <span className="block text-xs text-fg-muted">
+                      {diner ? t("account.trackedBody") : t("account.trackBody")}
+                    </span>
+                  </span>
+                </Link>
                 <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl border-t border-border bg-bg/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:static lg:mt-4 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
                   <Link
                     href="/table"
