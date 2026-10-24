@@ -14,6 +14,7 @@ import {
   deleteDiner,
   loginWithEmail,
   requestPhoneCode,
+  setCalorieTracking,
   signupWithEmail,
   updateDinerProfile,
   validateDinerSession,
@@ -163,5 +164,39 @@ describe("diner accounts and nutrition journal", () => {
     await requestPhoneCode(db, mine);
     const withPhone = await verifyPhoneCode(db, { phone: mine, code: sms.code(), attachTo: d.id });
     expect(withPhone).toMatchObject({ id: d.id, phone: mine });
+  });
+
+  it("asks whether to count calories and turns the body profile into daily goals", async () => {
+    const d = await signupWithEmail(db, { email: uniqueEmail("cal"), password: TEST_PASSWORD });
+    expect(d.trackCalories).toBeNull();
+    await expect(
+      setCalorieTracking(db, d.id, {
+        track: true,
+        body: { sex: "female", age: 8, weightKg: 60, heightCm: 165 },
+      }),
+    ).rejects.toThrow();
+    const needs = await setCalorieTracking(db, d.id, {
+      track: true,
+      body: { sex: "female", age: 30, weightKg: 60, heightCm: 165, activity: "light", goal: "maintain" },
+    });
+    const [row] = await db.select().from(diners).where(eq(diners.id, d.id));
+    expect(row).toMatchObject({ trackCalories: true, sex: "female", weightKg: 60, heightCm: 165 });
+    expect(row!.goals).toEqual(needs!.goals);
+    expect(row!.goals!.kcal).toBe(1820);
+
+    // Goals typed by the diner win over a new calculation; emptying them goes back to it.
+    await updateDinerProfile(db, d.id, { goals: { kcal: 1600 } });
+    await setCalorieTracking(db, d.id, {
+      track: true,
+      body: { sex: "female", age: 30, weightKg: 70, heightCm: 165 },
+    });
+    expect((await db.select().from(diners).where(eq(diners.id, d.id)))[0]!.goals).toEqual({ kcal: 1600 });
+    await updateDinerProfile(db, d.id, { goals: {} });
+    const [back] = await db.select().from(diners).where(eq(diners.id, d.id));
+    expect(back!.goalsManual).toBe(false);
+    expect(back!.goals!.kcal).toBeGreaterThan(1820);
+
+    await setCalorieTracking(db, d.id, { track: false });
+    expect((await db.select().from(diners).where(eq(diners.id, d.id)))[0]!.trackCalories).toBe(false);
   });
 });

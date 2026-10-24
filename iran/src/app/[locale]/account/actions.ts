@@ -15,6 +15,7 @@ import {
   deleteDiner,
   loginWithEmail,
   requestPhoneCode,
+  setCalorieTracking,
   signupWithEmail,
   updateDinerProfile,
   verifyPhoneCode,
@@ -104,6 +105,21 @@ export async function deleteAccountAction(confirm: string) {
     if (confirm !== "DELETE") throw new AppError("VALIDATION", "confirm_required");
     await deleteDiner(db, d.id);
     await endDinerSession();
+    refresh();
+  });
+}
+
+/** Sign-up question: count calories (with the body profile) or not. */
+export async function saveCalorieTrackingAction(input: {
+  track: boolean;
+  body?: { sex: string; age: number; weightKg: number; heightCm: number; activity: string; goal: string };
+}) {
+  return runAction(async () => {
+    const d = await requireDiner();
+    await setCalorieTracking(db, d.id, {
+      track: input.track,
+      body: input.body as Parameters<typeof setCalorieTracking>[2]["body"],
+    });
     refresh();
   });
 }

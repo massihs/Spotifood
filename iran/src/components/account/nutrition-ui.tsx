@@ -156,17 +156,18 @@ export function MacroTile({
   name: string;
   ratio: number;
   value: string;
-  goal: string;
+  goal: string | null;
 }) {
   return (
     <div className="flex flex-col items-center gap-2 rounded-2xl bg-surface p-3 text-center shadow-[var(--shadow-soft)] sm:p-4">
-      <Ring ratio={ratio} size={64} stroke={7} className={MACRO[nutrient].stroke}>
-        <span className="text-sm font-bold tabular-nums">{Math.round(ratio * 100)}%</span>
+      <Ring ratio={goal ? ratio : 1} size={64} stroke={7} className={MACRO[nutrient].stroke}>
+        <span className="text-sm font-bold tabular-nums">{goal ? `${Math.round(ratio * 100)}%` : value}</span>
       </Ring>
       <div>
         <p className="text-sm font-semibold">{name}</p>
         <p className="text-xs text-fg-muted tabular-nums">
-          <span className="font-semibold text-fg">{value}</span> / {goal}
+          <span className="font-semibold text-fg">{value}</span>
+          {goal ? ` / ${goal}` : ""}
         </p>
       </div>
     </div>
@@ -187,7 +188,7 @@ export function LimitTile({
   name: string;
   ratio: number;
   value: string;
-  goal: string;
+  goal: string | null;
   status: Status;
   statusLabel: string;
 }) {
@@ -212,9 +213,13 @@ export function LimitTile({
         ) : null}
       </div>
       <p className="mt-1 text-xs text-fg-muted tabular-nums">
-        <span className="text-base font-bold text-fg">{value}</span> / {goal}
+        <span className="text-base font-bold text-fg">{value}</span>
+        {goal ? ` / ${goal}` : ""}
       </p>
-      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2" aria-hidden="true">
+      <div
+        className={cn("mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2", !goal && "hidden")}
+        aria-hidden="true"
+      >
         <div
           className={cn(
             "h-full rounded-full",

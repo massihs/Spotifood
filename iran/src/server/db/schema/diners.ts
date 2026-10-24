@@ -1,5 +1,16 @@
 import { sql } from "drizzle-orm";
-import { index, integer, jsonb, pgTable, text, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  real,
+  text,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import type { Nutrition } from "@/lib/nutrition";
 import { pk, softDelete, timestamps, tstz } from "./_helpers";
 
@@ -21,6 +32,17 @@ export const diners = pgTable(
     timezone: varchar({ length: 64 }).notNull().default("Asia/Tehran"),
     /** Daily goals (null = the reference intakes). */
     goals: jsonb().$type<Nutrition>(),
+    /** Asked when the account is created: null = not answered yet. */
+    trackCalories: boolean(),
+    /** Body profile for the daily needs (all optional). Age is kept as a birth year. */
+    sex: varchar({ length: 8 }),
+    birthYear: integer(),
+    weightKg: real(),
+    heightCm: real(),
+    activity: varchar({ length: 16 }),
+    weightGoal: varchar({ length: 12 }),
+    /** Goals typed by the diner instead of the calculated ones. */
+    goalsManual: boolean().notNull().default(false),
     /** "Clear my history": orders before this are no longer shown nor claimed again. */
     historySince: tstz(),
     lastLoginAt: tstz(),

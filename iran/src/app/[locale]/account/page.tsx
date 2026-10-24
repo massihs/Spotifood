@@ -13,6 +13,7 @@ import {
   WeekStrip,
   type Status,
 } from "@/components/account/nutrition-ui";
+import { CalorieSetup } from "@/components/account/calorie-setup";
 import { DinerLogin } from "@/components/account/diner-login";
 import { Card } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -28,6 +29,7 @@ import {
 } from "@/lib/nutrition";
 import { dayInsights, energySplit, streak } from "@/lib/nutrition-insights";
 import { getCurrentDiner } from "@/server/auth/diner";
+import { bodyProfileOf } from "@/server/modules/diners/service";
 import { db } from "@/server/db/client";
 import {
   dayJournal,
@@ -94,6 +96,28 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
       </div>
     );
 
+  // First visit: ask whether to count calories (and the body profile for the daily needs).
+  if (diner.trackCalories == null) {
+    const body = bodyProfileOf(diner);
+    return (
+      <div className="mx-auto max-w-xl">
+        <Card className="p-6 sm:p-8">
+          <CalorieSetup
+            initial={{
+              sex: body?.sex ?? null,
+              age: body?.age ?? null,
+              weightKg: body?.weightKg ?? null,
+              heightCm: body?.heightCm ?? null,
+              activity: body?.activity ?? null,
+              goal: body?.goal ?? null,
+            }}
+          />
+        </Card>
+      </div>
+    );
+  }
+  const goalsOn = diner.trackCalories;
+
   const sp = await searchParams;
   const tz = diner.timezone;
   const today = localDate(new Date(), tz);
@@ -113,7 +137,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
 
   const goals: Required<Nutrition> = { ...REFERENCE_INTAKE, ...(diner.goals ?? {}) };
   const total = day.total;
-  const ratio = (k: Nutrient, v = total[k]) => (goals[k] > 0 ? v / goals[k] : 0);
+  const ratio = (k: Nutrient, v = total[k]) => (goalsOn && goals[k] > 0 ? v / goals[k] : 0);
   const asDate = (d: string) => new Date(`${d}T12:00:00Z`);
   type DateOpts = {
     weekday?: "long" | "short" | "narrow";
@@ -139,7 +163,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
       date: d,
       weekday: fmt(d, { weekday: "narrow" }),
       day: fmt(d, { day: "numeric" }),
-      ratio: r ? ratio("kcal", r.kcal) : 0,
+      ratio: r ? (goalsOn ? ratio("kcal", r.kcal) : r.meals > 0 ? 1 : 0) : 0,
       meals: r?.meals ?? 0,
       selected: d === date,
       today: d === today,
@@ -165,17 +189,19 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
   const known = new Set(
     day.meals.flatMap((m) => m.items.flatMap((i) => Object.keys(i.nutrition ?? {}))) as Nutrient[],
   );
-  const gk = (k: Nutrient, v: number) => (known.has(k) ? g(v) : "—");
+  const gk = (k: Nutrient, v: number) => (known.has(k) || !day.meals.length ? g(v) : "—");
   const dishes = day.meals.reduce((s, m) => s + m.items.reduce((a, i) => a + i.quantity, 0), 0);
   const split = energySplit(total);
   const insights = dayInsights(total, goals, {
     meals: day.meals.length,
     unknownPortions: day.unknownPortions,
     isToday: date === today,
-  }).map((i) => ({ tone: i.tone, text: t(`insight.${i.code}`, i.values) }));
+  })
+    .filter((i) => goalsOn || i.code === "unknown_dishes")
+    .map((i) => ({ tone: i.tone, text: t(`insight.${i.code}`, i.values) }));
 
   const limitStatus = (k: "fiberG" | "sugarG" | "saltG"): Status => {
-    if (!day.meals.length || !known.has(k)) return "ok";
+    if (!goalsOn || !day.meals.length || !known.has(k)) return "ok";
     const r = ratio(k);
     if (MORE_IS_BETTER[k]) return r >= 1 ? "good" : date < today && r < 0.5 ? "low" : "ok";
     return r > 1 ? "high" : "good";
@@ -209,6 +235,19 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
 
       <WeekStrip days={week} />
 
+      {!goalsOn ? (
+        <Link
+          href="/account/settings#calories"
+          className="flex items-center gap-3 rounded-2xl bg-accent-soft px-4 py-3 text-sm hover:opacity-90"
+        >
+          <Flame className="size-5 shrink-0 text-accent-text" aria-hidden="true" />
+          <span className="flex-1">
+            <span className="block font-semibold">{t("enableTitle")}</span>
+            <span className="block text-fg-muted">{t("enableBody")}</span>
+          </span>
+        </Link>
+      ) : null}
+
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
         <div className="space-y-5">
           {/* Hero: calories of the day */}
@@ -219,7 +258,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
             />
             <div className="relative flex flex-col items-center gap-6 sm:flex-row">
               <Ring
-                ratio={ratio("kcal")}
+                ratio={goalsOn ? ratio("kcal") : total.kcal > 0 ? 1 : 0}
                 size={168}
                 stroke={6}
                 className={ratio("kcal") > 1.1 ? "stroke-warning" : "stroke-accent"}
@@ -228,16 +267,25 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                 <span className="block text-4xl font-extrabold tracking-tight tabular-nums">
                   {n(total.kcal)}
                 </span>
-                <span className="block text-xs text-fg-muted">{t("ofKcal", { goal: n(goals.kcal) })}</span>
+                <span className="block text-xs text-fg-muted">
+                  {goalsOn ? t("ofKcal", { goal: n(goals.kcal) }) : tn("short.kcal")}
+                </span>
               </Ring>
               <div className="w-full flex-1 space-y-5">
-                <dl className="grid grid-cols-3 gap-2 text-center sm:text-start">
-                  <div className="rounded-2xl bg-surface p-3 ring-1 ring-border/60">
-                    <dt className="text-xs text-fg-muted">{left >= 0 ? t("remaining") : t("over")}</dt>
-                    <dd className={cn("text-xl font-bold tabular-nums", left < 0 && "text-warning")}>
-                      {n(Math.abs(left))}
-                    </dd>
-                  </div>
+                <dl
+                  className={cn(
+                    "grid gap-2 text-center sm:text-start",
+                    goalsOn ? "grid-cols-3" : "grid-cols-2",
+                  )}
+                >
+                  {goalsOn ? (
+                    <div className="rounded-2xl bg-surface p-3 ring-1 ring-border/60">
+                      <dt className="text-xs text-fg-muted">{left >= 0 ? t("remaining") : t("over")}</dt>
+                      <dd className={cn("text-xl font-bold tabular-nums", left < 0 && "text-warning")}>
+                        {n(Math.abs(left))}
+                      </dd>
+                    </div>
+                  ) : null}
                   <div className="rounded-2xl bg-surface p-3 ring-1 ring-border/60">
                     <dt className="text-xs text-fg-muted">{t("mealsLabel")}</dt>
                     <dd className="text-xl font-bold tabular-nums">{n(day.meals.length)}</dd>
@@ -275,7 +323,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                 name={tn(`short.${k}`)}
                 ratio={ratio(k)}
                 value={gk(k, total[k])}
-                goal={g(goals[k])}
+                goal={goalsOn ? g(goals[k]) : null}
               />
             ))}
           </div>
@@ -288,7 +336,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                   name={tn(`short.${k}`)}
                   ratio={ratio(k)}
                   value={gk(k, total[k])}
-                  goal={g(goals[k])}
+                  goal={goalsOn ? g(goals[k]) : null}
                   status={s}
                   statusLabel={s === "ok" ? "" : t(`status.${s}`)}
                 />
@@ -481,7 +529,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
             </div>
             <div className="mt-5">
               <TrendChart
-                goal={goals[metric]}
+                goal={goalsOn ? goals[metric] : null}
                 average={avg(metric)}
                 goalLabel={t("goal", { n: metric === "kcal" ? n(goals.kcal) : g(goals[metric]) })}
                 averageLabel={t("avgShort", { n: metric === "kcal" ? n(avg(metric)) : g(avg(metric)) })}

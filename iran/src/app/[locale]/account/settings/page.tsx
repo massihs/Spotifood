@@ -3,7 +3,13 @@ import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { DinerLogin } from "@/components/account/diner-login";
-import { LogoutButton, PrivacyActions, ProfileForm } from "@/components/account/settings-forms";
+import {
+  CaloriesPanel,
+  LogoutButton,
+  PrivacyActions,
+  ProfileForm,
+} from "@/components/account/settings-forms";
+import { bodyProfileOf } from "@/server/modules/diners/service";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { edition } from "@/config/edition";
@@ -26,6 +32,8 @@ async function Settings({ locale }: { locale: string }) {
   if (!diner) redirect({ href: "/account", locale });
   const d = diner!;
   const t = await getTranslations("account");
+  const tc = await getTranslations("calories");
+  const body = bodyProfileOf(d);
   const sms = edition.edition === "iran" || edition.defaultLocale === "fa";
   return (
     <div className="space-y-5">
@@ -43,10 +51,31 @@ async function Settings({ locale }: { locale: string }) {
         </div>
       </div>
 
+      <Card id="calories" className="scroll-mt-6">
+        <CardHeader title={tc("panelTitle")} description={d.trackCalories ? tc("panelOn") : tc("panelOff")} />
+        <div className="p-5">
+          <CaloriesPanel
+            tracking={Boolean(d.trackCalories)}
+            initial={{
+              sex: body?.sex ?? null,
+              age: body?.age ?? null,
+              weightKg: body?.weightKg ?? null,
+              heightCm: body?.heightCm ?? null,
+              activity: body?.activity ?? null,
+              goal: body?.goal ?? null,
+            }}
+          />
+        </div>
+      </Card>
+
       <Card>
         <CardHeader title={t("profile")} />
         <div className="p-5">
-          <ProfileForm name={d.name} goals={d.goals} />
+          <ProfileForm
+            name={d.name}
+            goals={d.goalsManual ? d.goals : null}
+            placeholders={d.goals ?? undefined}
+          />
         </div>
       </Card>
 

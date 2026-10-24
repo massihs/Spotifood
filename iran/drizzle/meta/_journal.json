@@ -190,6 +190,13 @@
       "when": 1792846183184,
       "tag": "0026_foods",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792847163291,
+      "tag": "0027_diner_profile",
+      "breakpoints": true
     }
   ]
 }

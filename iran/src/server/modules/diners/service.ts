@@ -3,6 +3,17 @@ import { and, desc, eq, gt, gte, isNull, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 import { edition } from "@/config/edition";
 import { tidy, type Nutrition } from "@/lib/nutrition";
+import {
+  ACTIVITY,
+  dailyNeeds,
+  GOALS,
+  LIMITS,
+  SEXES,
+  type Activity,
+  type BodyProfile,
+  type Sex,
+  type WeightGoal,
+} from "@/lib/nutrition-goals";
 import { normalizeIranMobile } from "@/lib/phone";
 import { burnPasswordCheck, hashPassword, PASSWORD_MIN_LENGTH, verifyPassword } from "@/server/auth/password";
 import { newSessionToken, sha256 } from "@/server/auth/tokens";
@@ -270,9 +281,76 @@ export async function updateDinerProfile(
   if (input.name !== undefined) patch.name = input.name?.trim().slice(0, 80) || null;
   if (input.goals !== undefined) {
     const g = input.goals ? tidy(goalsSchema.parse(input.goals)) : null;
-    patch.goals = g && Object.keys(g).length ? g : null;
+    if (g && Object.keys(g).length) {
+      patch.goals = g;
+      patch.goalsManual = true;
+    } else {
+      // Emptied: back to the goals calculated from the body profile (or the reference intakes).
+      const [d] = await db.select().from(diners).where(eq(diners.id, dinerId));
+      const body = d ? bodyProfileOf(d) : null;
+      patch.goals = body ? dailyNeeds(body).goals : null;
+      patch.goalsManual = false;
+    }
   }
   await db.update(diners).set(patch).where(eq(diners.id, dinerId));
+}
+
+export const bodySchema = z.object({
+  sex: z.enum(SEXES),
+  age: z.coerce.number().int().min(LIMITS.age[0]).max(LIMITS.age[1]),
+  weightKg: z.coerce.number().min(LIMITS.weightKg[0]).max(LIMITS.weightKg[1]),
+  heightCm: z.coerce.number().min(LIMITS.heightCm[0]).max(LIMITS.heightCm[1]),
+  activity: z.enum(Object.keys(ACTIVITY) as [Activity, ...Activity[]]).default("light"),
+  goal: z.enum(Object.keys(GOALS) as [WeightGoal, ...WeightGoal[]]).default("maintain"),
+});
+
+/** The diner's body profile, when complete (age from the birth year). */
+export function bodyProfileOf(d: Diner): BodyProfile | null {
+  if (!d.sex || !d.birthYear || !d.weightKg || !d.heightCm) return null;
+  return {
+    sex: d.sex as Sex,
+    age: new Date().getFullYear() - d.birthYear,
+    weightKg: d.weightKg,
+    heightCm: d.heightCm,
+    activity: (d.activity as Activity) ?? "light",
+    goal: (d.weightGoal as WeightGoal) ?? "maintain",
+  };
+}
+
+/**
+ * The question asked at sign-up: count calories or not, and if so the body profile that gives
+ * the daily needs. The calculated goals replace the previous ones unless the diner typed theirs.
+ */
+export async function setCalorieTracking(
+  db: DbOrTx,
+  dinerId: string,
+  input: { track: boolean; body?: z.input<typeof bodySchema> },
+) {
+  if (!input.track) {
+    await db
+      .update(diners)
+      .set({ trackCalories: false, updatedAt: new Date() })
+      .where(eq(diners.id, dinerId));
+    return null;
+  }
+  const b = bodySchema.parse(input.body ?? {});
+  const [d] = await db.select({ goalsManual: diners.goalsManual }).from(diners).where(eq(diners.id, dinerId));
+  const needs = dailyNeeds(b);
+  await db
+    .update(diners)
+    .set({
+      trackCalories: true,
+      sex: b.sex,
+      birthYear: new Date().getFullYear() - b.age,
+      weightKg: b.weightKg,
+      heightCm: b.heightCm,
+      activity: b.activity,
+      weightGoal: b.goal,
+      ...(d?.goalsManual ? {} : { goals: needs.goals }),
+      updatedAt: new Date(),
+    })
+    .where(eq(diners.id, dinerId));
+  return needs;
 }
 
 /** Detaches every order from the account; they are not attached again by the phone number. */

@@ -6,8 +6,10 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 import { NUTRIENTS, REFERENCE_INTAKE, type Nutrition } from "@/lib/nutrition";
+import { CalorieSetup } from "@/components/account/calorie-setup";
 import {
   clearHistoryAction,
+  saveCalorieTrackingAction,
   deleteAccountAction,
   logoutDinerAction,
   saveProfileAction,
@@ -30,7 +32,16 @@ export function LogoutButton() {
 }
 
 /** Name and daily goals (empty = the reference intake). */
-export function ProfileForm({ name, goals }: { name: string | null; goals: Nutrition | null }) {
+export function ProfileForm({
+  name,
+  goals,
+  placeholders = REFERENCE_INTAKE,
+}: {
+  name: string | null;
+  /** Goals typed by the diner (null = calculated / reference: shown as placeholders). */
+  goals: Nutrition | null;
+  placeholders?: Nutrition;
+}) {
   const t = useTranslations("account");
   const tn = useTranslations("nutrition");
   const [pending, start] = useTransition();
@@ -73,7 +84,7 @@ export function ProfileForm({ name, goals }: { name: string | null; goals: Nutri
               min={0}
               step={k === "kcal" ? 50 : 0.1}
               inputMode="decimal"
-              placeholder={String(REFERENCE_INTAKE[k])}
+              placeholder={String(placeholders[k] ?? REFERENCE_INTAKE[k])}
               defaultValue={goals?.[k] ?? ""}
             />
           ))}
@@ -137,6 +148,36 @@ export function PrivacyActions() {
           </Button>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Body profile and daily needs, or turn calorie counting off. */
+export function CaloriesPanel({
+  tracking,
+  initial,
+}: {
+  tracking: boolean;
+  initial: Parameters<typeof CalorieSetup>[0]["initial"];
+}) {
+  const t = useTranslations("calories");
+  const [pending, start] = useTransition();
+  return (
+    <div className="space-y-5">
+      <CalorieSetup initial={initial} ask={false} />
+      {tracking ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+          <p className="min-w-0 flex-1 text-sm text-fg-muted">{t("offHint")}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pending}
+            onClick={() => start(async () => void (await saveCalorieTrackingAction({ track: false })))}
+          >
+            {t("turnOff")}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
