@@ -243,6 +243,7 @@ export function ProductForm({
               </div>
             </fieldset>
             <NutritionFields
+              restaurantId={restaurantId}
               values={values}
               errors={{
                 caloriesKcal: err("caloriesKcal"),

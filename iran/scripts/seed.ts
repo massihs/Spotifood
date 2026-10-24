@@ -41,6 +41,7 @@ import type { OrderStatus } from "@/server/modules/orders/status";
 import { uploadLogo } from "@/server/modules/restaurants/settings";
 import { storage } from "@/server/infra/storage";
 import { readFile } from "node:fs/promises";
+import { backfillNutrition, syncFoods } from "@/server/modules/nutrition/foods";
 import { BRIELLE_MENU } from "./brielle";
 import { assignBrielleJobs, listBrielle, seedBrielleHistory } from "./brielle-history";
 
@@ -840,6 +841,12 @@ async function seedBrielleMedia(restaurantId: string, owner: typeof users.$infer
 
 async function main() {
   await seedPlatform();
+  // Food database + nutrition of every dish (and of past order lines that lack it).
+  const foodsSync = await syncFoods(db);
+  const filled = await backfillNutrition(db);
+  console.log(
+    `✓ foods: ${foodsSync.usdaAdded} USDA added, ${foodsSync.catalogue} catalogue entries; nutrition: ${filled.dishes} dishes, ${filled.lines} order lines completed`,
+  );
   // The showcase restaurant: on by default, SEED_BRIELLE=false to skip.
   if (process.env.SEED_BRIELLE !== "false") await seedBrielle();
   // Production containers run this on every start with SEED_DEMO unset: platform data only.

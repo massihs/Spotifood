@@ -1102,7 +1102,8 @@
       "more": "and {count} more dishes",
       "apply": "Apply to {count} dishes",
       "done": "{count, plural, =0 {No price changed} one {# price updated} other {# prices updated}}."
-    }
+    },
+    "nutritionLink": "Nutrition database"
   },
   "product": {
     "new": "New product",
@@ -1156,11 +1157,14 @@
     "preview": "Guest preview",
     "previewHint": "As it appears on the QR menu.",
     "nutritionTitle": "Nutrition facts (1 portion)",
-    "nutritionHint": "Fill them in, or let Spotifood estimate them from the ingredients and the weight.",
-    "estimate": "Estimate",
+    "nutritionHint": "Calculated automatically from our database (USDA + typical recipes) from the name, ingredients and weight. Type a value to fix it.",
+    "estimate": "Calculate now",
     "estimatedNotice": "Estimated from the ingredients: check and correct them before saving.",
     "estimateUnknown": "Not recognised (not counted): {list}",
-    "estimateNothing": "No ingredient recognised: add the ingredient list (e.g. “rice 200 g, chicken, tomato”)."
+    "estimateNothing": "No ingredient recognised: add the ingredient list (e.g. “rice 200 g, chicken, tomato”).",
+    "autoNotice": "Calculated automatically on save: the dish is recognised by its name or ingredients. A value typed by hand is kept.",
+    "autoPlaceholder": "auto",
+    "estimatedRecipe": "Typical recipe recognised from the dish name: check and correct it if yours differs."
   },
   "options": {
     "title": "Options & extras",
@@ -2730,5 +2734,29 @@
       "fat_high": "Fat above goal: {n, number} g of {goal, number} g.",
       "unknown_dishes": "{n, plural, one {# dish has} other {# dishes have}} no values: the summary is partial."
     }
+  },
+  "foodDb": {
+    "title": "Nutrition database",
+    "subtitle": "Your dishes' values are calculated from this database: 7,793 USDA foods, our ingredients in Persian / French / English and typical recipes.",
+    "recalculate": "Recalculate my dishes",
+    "recalculated": "{n, plural, =0 {Already up to date} one {# dish updated} other {# dishes updated}}",
+    "count": {
+      "auto": "dishes calculated automatically",
+      "manual": "dishes entered by hand",
+      "missing": "dishes without data"
+    },
+    "missingTitle": "Dishes without data",
+    "missingHint": "Add ingredients (e.g. “rice 200 g, chicken, tomato”) or a weight: they are calculated on save.",
+    "allCovered": "All your dishes have nutrition values.",
+    "searchTitle": "Search a food",
+    "searchPlaceholder": "E.g. chicken, برنج, caesar salad, riz…",
+    "search": "Search",
+    "source": "Source: USDA FoodData Central (SR Legacy, public domain) and Spotifood recipes.",
+    "food": "Food",
+    "ingredient": "Ingredient",
+    "recipe": "Typical recipe",
+    "per100": "per 100 g",
+    "perPortion": "per portion ({g} g)",
+    "noResult": "No food found."
   }
 }

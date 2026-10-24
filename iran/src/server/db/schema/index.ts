@@ -15,3 +15,4 @@ export * from "./reservations";
 export * from "./printing";
 export * from "./relations";
 export * from "./diners";
+export * from "./foods";

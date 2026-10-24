@@ -161,6 +161,11 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
         : d[metric] <= goals[metric],
   ).length;
 
+  // A nutrient no dish of the day gives is unknown ("—"), not zero.
+  const known = new Set(
+    day.meals.flatMap((m) => m.items.flatMap((i) => Object.keys(i.nutrition ?? {}))) as Nutrient[],
+  );
+  const gk = (k: Nutrient, v: number) => (known.has(k) ? g(v) : "—");
   const dishes = day.meals.reduce((s, m) => s + m.items.reduce((a, i) => a + i.quantity, 0), 0);
   const split = energySplit(total);
   const insights = dayInsights(total, goals, {
@@ -170,7 +175,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
   }).map((i) => ({ tone: i.tone, text: t(`insight.${i.code}`, i.values) }));
 
   const limitStatus = (k: "fiberG" | "sugarG" | "saltG"): Status => {
-    if (!day.meals.length) return "ok";
+    if (!day.meals.length || !known.has(k)) return "ok";
     const r = ratio(k);
     if (MORE_IS_BETTER[k]) return r >= 1 ? "good" : date < today && r < 0.5 ? "low" : "ok";
     return r > 1 ? "high" : "good";
@@ -269,7 +274,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                 nutrient={k}
                 name={tn(`short.${k}`)}
                 ratio={ratio(k)}
-                value={g(total[k])}
+                value={gk(k, total[k])}
                 goal={g(goals[k])}
               />
             ))}
@@ -282,7 +287,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                   key={k}
                   name={tn(`short.${k}`)}
                   ratio={ratio(k)}
-                  value={g(total[k])}
+                  value={gk(k, total[k])}
                   goal={g(goals[k])}
                   status={s}
                   statusLabel={s === "ok" ? "" : t(`status.${s}`)}

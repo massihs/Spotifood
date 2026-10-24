@@ -12,6 +12,7 @@ import { applyOrder, assertSameSet, loadCategory } from "./categories";
 import { listProductImages, productImageUrls } from "./images";
 import { assertOwnedGroups } from "./options";
 import { productSchema, reorderSchema, type ProductInput } from "./schemas";
+import { completeNutrition } from "@/server/modules/nutrition/foods";
 
 const live = (rid: string) => and(eq(products.restaurantId, rid), isNull(products.deletedAt));
 
@@ -114,9 +115,25 @@ async function setProductGroups(tx: DbOrTx, ctx: RestaurantContext, productId: s
   }
 }
 
+/** Missing nutrients are calculated from the ingredients / recipe (entered values stay). */
+function withNutrition<T extends Omit<z.output<typeof productSchema>, "optionGroupIds">>(p: T): T {
+  if (p.nutrition === undefined) return p;
+  const done = completeNutrition({
+    name: p.name,
+    ingredients: p.ingredients ?? null,
+    description: p.description ?? null,
+    weightGrams: p.weightGrams ?? null,
+    caloriesKcal: p.caloriesKcal ?? null,
+    nutrition: p.nutrition,
+    nutritionSource: p.nutritionSource ?? null,
+  });
+  return { ...p, ...done };
+}
+
 export async function createProduct(db: Database, ctx: RestaurantContext, raw: ProductInput) {
   assertCan(ctx, "menu.manage");
-  const { optionGroupIds, ...input } = productSchema.parse(raw);
+  const { optionGroupIds, ...parsed } = productSchema.parse(raw);
+  const input = withNutrition(parsed);
   return db.transaction(async (tx) => {
     await loadCategory(tx, ctx, input.categoryId).catch(() => {
       throw new AppError("VALIDATION", "invalid_category", { field: "categoryId" });
@@ -145,7 +162,8 @@ export async function createProduct(db: Database, ctx: RestaurantContext, raw: P
 
 export async function updateProduct(db: Database, ctx: RestaurantContext, id: string, raw: ProductInput) {
   assertCan(ctx, "menu.manage");
-  const { optionGroupIds, ...input } = productSchema.parse(raw);
+  const { optionGroupIds, ...parsed } = productSchema.parse(raw);
+  const input = withNutrition(parsed);
   return db.transaction(async (tx) => {
     const before = await loadProduct(tx, ctx, id);
     await loadCategory(tx, ctx, input.categoryId).catch(() => {

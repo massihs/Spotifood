@@ -90,7 +90,7 @@ export const productSchema = z
       })
       .nullable()
       .optional(),
-    nutritionSource: z.enum(["manual", "estimated"]).nullable().optional(),
+    nutritionSource: z.enum(["manual", "estimated", "auto"]).nullable().optional(),
     tags: z
       .array(
         z
@@ -114,7 +114,7 @@ export const productSchema = z
     if (p.nutrition === undefined) return p;
     const n = tidy({ ...p.nutrition, kcal: p.caloriesKcal ?? undefined });
     const nutrition = Object.keys(n).length ? n : null;
-    return { ...p, nutrition, nutritionSource: nutrition ? (p.nutritionSource ?? "manual") : null };
+    return { ...p, nutrition, nutritionSource: p.nutritionSource ?? "manual" };
   });
 export type ProductInput = z.input<typeof productSchema>;
 

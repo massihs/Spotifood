@@ -49,6 +49,12 @@ async function Menu({ params, searchParams }: Pick<Props, "params" | "searchPara
               {tRouting("menuLink")}
             </Link>
             <Link
+              href={`/dashboard/${ctx.restaurant.id}/menu/nutrition`}
+              className={buttonClasses("secondary")}
+            >
+              {t("nutritionLink")}
+            </Link>
+            <Link
               href={`/dashboard/${ctx.restaurant.id}/menu/options`}
               className={buttonClasses("secondary")}
             >

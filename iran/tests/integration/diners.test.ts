@@ -51,7 +51,7 @@ async function menu() {
     caloriesKcal: 850,
     nutrition: { proteinG: 45, carbsG: 90, fatG: 30, fiberG: 3, saltG: 2.4 },
   });
-  const tea = await createProduct(db, ctx, { categoryId: cat.id, name: "چای", priceCents: 100 });
+  const tea = await createProduct(db, ctx, { categoryId: cat.id, name: "ویژه سرآشپز", priceCents: 100 });
   return { ctx, kebab, tea };
 }
 
@@ -74,7 +74,7 @@ describe("diner accounts and nutrition journal", () => {
       kcal: 850,
       proteinG: 45,
     });
-    expect(lines.find((l) => l.productName === "چای")?.nutrition).toBeNull();
+    expect(lines.find((l) => l.productName === "ویژه سرآشپز")?.nutrition).toBeNull();
 
     await requestPhoneCode(db, mobile.replace(/^0/, "+98"));
     expect(sms.sent.at(-1)?.to).toBe(mobile);

@@ -4,3 +4,4 @@ drizzle/meta
 package-lock.json
 .storage
 coverage
+src/server/modules/nutrition/data

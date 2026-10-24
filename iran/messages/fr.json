@@ -1102,7 +1102,8 @@
       "more": "et {count} autres plats",
       "apply": "Appliquer à {count} plats",
       "done": "{count, plural, =0 {Aucun prix modifié} one {# prix mis à jour} other {# prix mis à jour}}."
-    }
+    },
+    "nutritionLink": "Base nutritionnelle"
   },
   "product": {
     "new": "Nouveau produit",
@@ -1156,11 +1157,14 @@
     "preview": "Aperçu client",
     "previewHint": "Tel qu'il apparaît sur le menu QR.",
     "nutritionTitle": "Valeurs nutritionnelles (1 portion)",
-    "nutritionHint": "Remplissez à la main, ou laissez Spotifood estimer à partir des ingrédients et du poids.",
-    "estimate": "Estimer",
+    "nutritionHint": "Calculées automatiquement depuis notre base (USDA + recettes types) à partir du nom, des ingrédients et du poids. Tapez une valeur pour la fixer.",
+    "estimate": "Calculer maintenant",
     "estimatedNotice": "Valeurs estimées à partir des ingrédients : vérifiez-les et corrigez si besoin avant d'enregistrer.",
     "estimateUnknown": "Non reconnus (non comptés) : {list}",
-    "estimateNothing": "Aucun ingrédient reconnu : ajoutez la liste des ingrédients (ex. « riz 200 g, poulet, tomate »)."
+    "estimateNothing": "Aucun ingrédient reconnu : ajoutez la liste des ingrédients (ex. « riz 200 g, poulet, tomate »).",
+    "autoNotice": "Calcul automatique à l'enregistrement : le plat est reconnu par son nom ou ses ingrédients. Une valeur tapée à la main est conservée.",
+    "autoPlaceholder": "auto",
+    "estimatedRecipe": "Recette type reconnue d'après le nom du plat : vérifiez et corrigez si votre recette diffère."
   },
   "options": {
     "title": "Options & suppléments",
@@ -2738,5 +2742,29 @@
       "fat_high": "Lipides au-dessus de l'objectif : {n, number} g sur {goal, number} g.",
       "unknown_dishes": "{n, plural, one {# plat n'a} other {# plats n'ont}} pas de valeurs : le bilan est partiel."
     }
+  },
+  "foodDb": {
+    "title": "Base nutritionnelle",
+    "subtitle": "Les valeurs de vos plats sont calculées depuis cette base : 7 793 aliments USDA, nos ingrédients en persan / français / anglais et des recettes types.",
+    "recalculate": "Recalculer mes plats",
+    "recalculated": "{n, plural, =0 {Déjà à jour} one {# plat mis à jour} other {# plats mis à jour}}",
+    "count": {
+      "auto": "plats calculés automatiquement",
+      "manual": "plats saisis à la main",
+      "missing": "plats sans données"
+    },
+    "missingTitle": "Plats sans données",
+    "missingHint": "Ajoutez des ingrédients (ex. « riz 200 g, poulet, tomate ») ou un poids : le calcul se fera à l'enregistrement.",
+    "allCovered": "Tous vos plats ont des valeurs nutritionnelles.",
+    "searchTitle": "Chercher un aliment",
+    "searchPlaceholder": "Ex. poulet, برنج, salade césar, rice…",
+    "search": "Chercher",
+    "source": "Source : USDA FoodData Central (SR Legacy, domaine public) et recettes Spotifood.",
+    "food": "Aliment",
+    "ingredient": "Ingrédient",
+    "recipe": "Recette type",
+    "per100": "pour 100 g",
+    "perPortion": "par portion ({g} g)",
+    "noResult": "Aucun aliment trouvé."
   }
 }

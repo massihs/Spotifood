@@ -1,5 +1,6 @@
 "use server";
 
+import { estimateDish } from "@/server/modules/nutrition/estimate";
 import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -151,8 +152,9 @@ function productFields(fd: FormData, currency: string) {
       fiberG: optNum(fd, "fiberG"),
       saltG: optNum(fd, "saltG"),
     },
-    nutritionSource:
-      str(fd, "nutritionSource") === "estimated" ? ("estimated" as const) : ("manual" as const),
+    nutritionSource: (["estimated", "auto"].includes(str(fd, "nutritionSource"))
+      ? str(fd, "nutritionSource")
+      : "manual") as "manual" | "estimated" | "auto",
     tags: [...new Set([...fd.getAll("tags").map(String), ...customTags])],
     isActive: fd.get("isActive") === "on",
     isAvailable: fd.get("isAvailable") === "on",
@@ -329,5 +331,23 @@ export async function adjustPricesAction(
     });
     menuChanged(ctx);
     return res;
+  });
+}
+
+/** Nutrition estimate of a dish being edited (food database: USDA + recipes). */
+export async function estimateDishAction(
+  restaurantId: string,
+  input: { name: string; ingredients: string; description?: string; weightGrams: number | null },
+) {
+  return runAction(async () => {
+    await actionContext(restaurantId, "menu.manage");
+    return estimateDish({
+      name: String(input.name ?? "").slice(0, 200),
+      ingredients: String(input.ingredients?.trim() ? input.ingredients : (input.description ?? "")).slice(
+        0,
+        2000,
+      ),
+      weightGrams: Number(input.weightGrams) > 0 ? Number(input.weightGrams) : null,
+    });
   });
 }
