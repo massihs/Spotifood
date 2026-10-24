@@ -36,17 +36,19 @@ export function GuestTopBar({
   title,
   subtitle,
   extra,
+  backHref = "/table",
 }: {
   title: string;
   subtitle?: React.ReactNode;
   extra?: React.ReactNode;
+  backHref?: string;
 }) {
   const t = useTranslations("guest");
   return (
     <div className="sticky top-0 z-20 border-b border-border bg-bg/95 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 backdrop-blur-md supports-[backdrop-filter]:bg-bg/85">
       <div className="mx-auto flex max-w-2xl items-center gap-3 lg:max-w-6xl">
         <Link
-          href="/table"
+          href={backHref}
           className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-2 active:bg-surface-3"
           aria-label={t("backToMenu")}
         >

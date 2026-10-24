@@ -52,6 +52,8 @@ export const RATE_LIMITS = {
   dinerCode: { limit: 3, windowMs: 10 * 60_000 },
   dinerCodeIp: { limit: 10, windowMs: 60 * 60_000 },
   dinerVerify: { limit: 10, windowMs: 15 * 60_000 },
+  /** Games: the board pings every few seconds, plus the moves. */
+  game: { limit: 150, windowMs: 60_000 },
 } as const;
 
 export async function enforceRateLimit(

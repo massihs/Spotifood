@@ -18,7 +18,8 @@ export type RealtimeEvent = {
     | "notification.created"
     | "menu.updated"
     | "payment.updated"
-    | "waiter.called";
+    | "waiter.called"
+    | "game.updated";
   data?: Record<string, string | number | boolean | null>;
 };
 
@@ -42,6 +43,8 @@ export const topics = {
   restaurant: (id: string) => `restaurant:${id}`,
   participant: (id: string) => `participant:${id}`,
   session: (id: string) => `session:${id}`,
+  /** Games between the guests of a restaurant (lobby + boards). */
+  games: (restaurantId: string) => `games:${restaurantId}`,
 };
 
 /**

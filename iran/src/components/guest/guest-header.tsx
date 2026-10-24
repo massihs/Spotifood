@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { OpenState } from "@/lib/opening";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { GamesButton } from "./games-button";
 import { WaiterCall } from "./waiter-call";
 import { Link } from "@/i18n/navigation";
 import { isLocale, type AppLocale } from "@/i18n/config";
@@ -84,7 +85,10 @@ export async function GuestHeader({
     return (
       <header className="mx-auto max-w-3xl px-5 pt-[max(0.75rem,env(safe-area-inset-top))] lg:max-w-6xl">
         <div className="flex items-center justify-between gap-2">
-          <WaiterCall />
+          <div className="flex items-center gap-2">
+            <WaiterCall />
+            <GamesButton />
+          </div>
           {actions}
         </div>
         <div className="mt-1 flex flex-col items-center text-center">
@@ -128,7 +132,10 @@ export async function GuestHeader({
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">{guestLine}</div>
             </div>
-            <WaiterCall />
+            <div className="flex items-center gap-2">
+              <GamesButton />
+              <WaiterCall />
+            </div>
           </div>
         </div>
       </header>
@@ -162,7 +169,10 @@ export async function GuestHeader({
             <h1 className="truncate text-lg leading-tight font-bold tracking-tight">{name}</h1>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px]">{guestLine}</p>
           </div>
-          <WaiterCall />
+          <div className="flex shrink-0 items-center gap-2">
+            <GamesButton />
+            <WaiterCall />
+          </div>
         </div>
       </div>
     </header>
