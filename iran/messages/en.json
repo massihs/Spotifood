@@ -2692,6 +2692,43 @@
       "invalid_credentials": "Wrong e-mail or password.",
       "signed_out": "You were signed out.",
       "internal": "Something went wrong. Please try again."
+    },
+    "helloAnon": "Hello 👋",
+    "remaining": "Left (kcal)",
+    "over": "Over (kcal)",
+    "mealsLabel": "Meals",
+    "dishesLabel": "Dishes",
+    "energySplit": "Energy split",
+    "splitEmpty": "Macros will show up with your first meal that has nutrition facts.",
+    "insightsTitle": "Today's highlights",
+    "findRestaurant": "Find a restaurant",
+    "average": "Average",
+    "onTarget": "On target",
+    "streak": "Streak",
+    "daysShort": "{n, plural, one {# day} other {# days}}",
+    "avgShort": "Avg {n}",
+    "period": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "snack": "Snack",
+      "dinner": "Dinner"
+    },
+    "status": {
+      "good": "OK",
+      "high": "High",
+      "low": "Low"
+    },
+    "insight": {
+      "kcal_on_target": "Calories on target: nicely balanced.",
+      "kcal_over": "{n, number} kcal over your goal today.",
+      "protein_reached": "Protein goal reached ({n, number} g).",
+      "protein_low": "Low on protein: {n, number} g of {goal, number} g.",
+      "fiber_low": "Low on fibre ({n, number} g of {goal, number} g): think vegetables, pulses, wholegrain bread.",
+      "fiber_reached": "Fibre goal reached ({n, number} g) 👏",
+      "sugar_high": "High in sugars: {n, number} g for {goal, number} g advised.",
+      "salt_high": "High in salt: {n, number} g for {goal, number} g advised. Drink water.",
+      "fat_high": "Fat above goal: {n, number} g of {goal, number} g.",
+      "unknown_dishes": "{n, plural, one {# dish has} other {# dishes have}} no values: the summary is partial."
     }
   }
 }

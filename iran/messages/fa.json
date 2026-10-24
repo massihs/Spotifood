@@ -2692,6 +2692,43 @@
       "invalid_credentials": "ایمیل یا رمز عبور اشتباه است.",
       "signed_out": "از حساب خارج شدید.",
       "internal": "خطایی رخ داد. دوباره امتحان کنید."
+    },
+    "helloAnon": "سلام 👋",
+    "remaining": "باقی‌مانده (کالری)",
+    "over": "بیش از هدف (کالری)",
+    "mealsLabel": "وعده",
+    "dishesLabel": "غذا",
+    "energySplit": "سهم انرژی",
+    "splitEmpty": "با اولین وعده‌ای که ارزش غذایی دارد، درشت‌مغذی‌ها نمایش داده می‌شوند.",
+    "insightsTitle": "نکته‌های امروز",
+    "findRestaurant": "پیدا کردن رستوران",
+    "average": "میانگین",
+    "onTarget": "در محدوده هدف",
+    "streak": "روزهای پیاپی",
+    "daysShort": "{n} روز",
+    "avgShort": "میانگین {n}",
+    "period": {
+      "breakfast": "صبحانه",
+      "lunch": "ناهار",
+      "snack": "میان‌وعده",
+      "dinner": "شام"
+    },
+    "status": {
+      "good": "خوب",
+      "high": "زیاد",
+      "low": "کم"
+    },
+    "insight": {
+      "kcal_on_target": "کالری در محدوده هدف است: تعادل خوبی دارید.",
+      "kcal_over": "امروز {n, number} کالری بیش از هدف.",
+      "protein_reached": "به هدف پروتئین رسیدید ({n, number} گرم).",
+      "protein_low": "پروتئین کم است: {n, number} از {goal, number} گرم.",
+      "fiber_low": "فیبر کم است ({n, number} از {goal, number} گرم): سبزیجات، حبوبات و نان سبوس‌دار بخورید.",
+      "fiber_reached": "به هدف فیبر رسیدید ({n, number} گرم) 👏",
+      "sugar_high": "قند زیاد است: {n, number} گرم در برابر {goal, number} گرم توصیه‌شده.",
+      "salt_high": "نمک زیاد است: {n, number} گرم در برابر {goal, number} گرم توصیه‌شده. آب بنوشید.",
+      "fat_high": "چربی بیش از هدف: {n, number} از {goal, number} گرم.",
+      "unknown_dishes": "{n, number} غذا ارزش غذایی ندارد: گزارش ناقص است."
     }
   }
 }

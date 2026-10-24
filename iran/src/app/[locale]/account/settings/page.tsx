@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { DinerLogin } from "@/components/account/diner-login";
-import { PrivacyActions, ProfileForm } from "@/components/account/settings-forms";
+import { LogoutButton, PrivacyActions, ProfileForm } from "@/components/account/settings-forms";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { edition } from "@/config/edition";
@@ -37,7 +37,10 @@ async function Settings({ locale }: { locale: string }) {
           <ArrowRight className="size-4 ltr:rotate-180" aria-hidden="true" />
           {t("back")}
         </Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight">{t("settings")}</h1>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold tracking-tight">{t("settings")}</h1>
+          <LogoutButton />
+        </div>
       </div>
 
       <Card>

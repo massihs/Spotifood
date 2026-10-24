@@ -2692,6 +2692,43 @@
       "invalid_credentials": "بريد أو كلمة مرور غير صحيحة.",
       "signed_out": "تم تسجيل خروجك.",
       "internal": "حدث خطأ. أعد المحاولة."
+    },
+    "helloAnon": "مرحبًا 👋",
+    "remaining": "المتبقي (سعرة)",
+    "over": "فوق الهدف (سعرة)",
+    "mealsLabel": "وجبات",
+    "dishesLabel": "أطباق",
+    "energySplit": "توزيع الطاقة",
+    "splitEmpty": "ستظهر العناصر الكبرى مع أول وجبة لها قيم غذائية.",
+    "insightsTitle": "أبرز ملاحظات اليوم",
+    "findRestaurant": "ابحث عن مطعم",
+    "average": "المتوسط",
+    "onTarget": "ضمن الهدف",
+    "streak": "أيام متتالية",
+    "daysShort": "{n} يوم",
+    "avgShort": "متوسط {n}",
+    "period": {
+      "breakfast": "الفطور",
+      "lunch": "الغداء",
+      "snack": "وجبة خفيفة",
+      "dinner": "العشاء"
+    },
+    "status": {
+      "good": "جيد",
+      "high": "مرتفع",
+      "low": "منخفض"
+    },
+    "insight": {
+      "kcal_on_target": "السعرات ضمن الهدف: توازن جيد.",
+      "kcal_over": "{n, number} سعرة فوق هدفك اليوم.",
+      "protein_reached": "بلغت هدف البروتين ({n, number} غ).",
+      "protein_low": "بروتين قليل: {n, number} من {goal, number} غ.",
+      "fiber_low": "ألياف قليلة ({n, number} من {goal, number} غ): فكّر في الخضار والبقول والخبز الكامل.",
+      "fiber_reached": "بلغت هدف الألياف ({n, number} غ) 👏",
+      "sugar_high": "سكريات مرتفعة: {n, number} غ مقابل {goal, number} غ موصى بها.",
+      "salt_high": "ملح مرتفع: {n, number} غ مقابل {goal, number} غ موصى بها. اشرب الماء.",
+      "fat_high": "دهون فوق الهدف: {n, number} من {goal, number} غ.",
+      "unknown_dishes": "{n, number} طبق بلا قيم: الملخص جزئي."
     }
   }
 }

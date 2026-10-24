@@ -1,7 +1,8 @@
 import { and, asc, eq, inArray, ne, sql } from "drizzle-orm";
 import { NUTRIENTS, sumNutrition, type Nutrient, type Nutrition } from "@/lib/nutrition";
 import type { DbOrTx } from "@/server/db/client";
-import { orderItems, orders, restaurants } from "@/server/db/schema";
+import { orderItems, orders, productImages, restaurants } from "@/server/db/schema";
+import { productImageUrls } from "@/server/modules/menu/images";
 import type { Diner } from "./service";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -22,6 +23,26 @@ export function shiftDate(date: string, days: number) {
   return d.toISOString().slice(0, 10);
 }
 
+export type MealPeriod = "breakfast" | "lunch" | "snack" | "dinner";
+
+/** Breakfast before 11:00, lunch until 16:00, snack until 18:30, then dinner (diner's time). */
+export function mealPeriod(at: Date, timeZone: string): MealPeriod {
+  const [h, m] = new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  })
+    .format(at)
+    .split(":")
+    .map(Number);
+  const t = h! * 60 + m!;
+  if (t >= 4 * 60 && t < 11 * 60) return "breakfast";
+  if (t >= 11 * 60 && t < 16 * 60) return "lunch";
+  if (t >= 16 * 60 && t < 18 * 60 + 30) return "snack";
+  return "dinner";
+}
+
 export const isDate = (v: unknown): v is string => typeof v === "string" && DATE_RE.test(v);
 
 /** Every meal of one day (diner's time zone): what was ordered, where, and its nutrition. */
@@ -38,6 +59,13 @@ export async function dayJournal(db: DbOrTx, diner: Pick<Diner, "id" | "timezone
       name: orderItems.productName,
       quantity: orderItems.quantity,
       nutrition: orderItems.nutrition,
+      category: orderItems.categoryName,
+      imageKey: sql<
+        string | null
+      >`(select ${productImages.storageKey} from ${productImages} where ${productImages.productId} = ${orderItems.productId} order by ${productImages.sortOrder} limit 1)`,
+      placeholder: sql<
+        string | null
+      >`(select ${productImages.placeholder} from ${productImages} where ${productImages.productId} = ${orderItems.productId} order by ${productImages.sortOrder} limit 1)`,
     })
     .from(orders)
     .innerJoin(orderItems, eq(orderItems.orderId, orders.id))
@@ -56,7 +84,16 @@ export async function dayJournal(db: DbOrTx, diner: Pick<Diner, "id" | "timezone
     number: string;
     at: Date;
     restaurant: string;
-    items: { id: string; name: string; quantity: number; nutrition: Nutrition | null }[];
+    period: MealPeriod;
+    items: {
+      id: string;
+      name: string;
+      category: string | null;
+      quantity: number;
+      nutrition: Nutrition | null;
+      image: string | null;
+      placeholder: string | null;
+    }[];
     total: Required<Nutrition>;
     unknownPortions: number;
   }[] = [];
@@ -68,13 +105,22 @@ export async function dayJournal(db: DbOrTx, diner: Pick<Diner, "id" | "timezone
         number: r.number,
         at: r.placedAt,
         restaurant: r.restaurant,
+        period: mealPeriod(r.placedAt, tz),
         items: [],
         total: { kcal: 0, proteinG: 0, carbsG: 0, sugarG: 0, fatG: 0, fiberG: 0, saltG: 0 },
         unknownPortions: 0,
       };
       meals.push(meal);
     }
-    meal.items.push({ id: r.itemId, name: r.name, quantity: r.quantity, nutrition: r.nutrition });
+    meal.items.push({
+      id: r.itemId,
+      name: r.name,
+      category: r.category,
+      quantity: r.quantity,
+      nutrition: r.nutrition,
+      image: r.imageKey ? productImageUrls(r.imageKey).sm : null,
+      placeholder: r.placeholder,
+    });
   }
   for (const m of meals) {
     const s = sumNutrition(m.items);
@@ -138,23 +184,38 @@ export async function rangeTotals(
   return out;
 }
 
-/** Most ordered dishes over a period (for "your favourites"). */
-export async function topDishes(db: DbOrTx, dinerId: string, limit = 5) {
+/** Most ordered dishes (for "your favourites"), with a photo when the dish has one. */
+export async function topDishes(db: DbOrTx, dinerId: string, limit = 6) {
   const orderIds = db
     .select({ id: orders.id })
     .from(orders)
     .where(and(eq(orders.dinerId, dinerId), ne(orders.status, "cancelled")));
-  return db
+  const rows = await db
     .select({
       name: orderItems.productName,
       count: sql<number>`sum(${orderItems.quantity})`.mapWith(Number),
       kcal: sql<number | null>`max((${orderItems.nutrition}->>'kcal')::numeric)`.mapWith((v) =>
         v == null ? null : Number(v),
       ),
+      productId: sql<string | null>`max(${orderItems.productId}::text)`,
     })
     .from(orderItems)
     .where(inArray(orderItems.orderId, orderIds))
     .groupBy(orderItems.productName)
     .orderBy(sql`sum(${orderItems.quantity}) desc`)
     .limit(limit);
+  const ids = rows.map((r) => r.productId).filter((v): v is string => Boolean(v));
+  const imgs = ids.length
+    ? await db
+        .select({ productId: productImages.productId, key: productImages.storageKey })
+        .from(productImages)
+        .where(inArray(productImages.productId, ids))
+        .orderBy(asc(productImages.sortOrder))
+    : [];
+  const first = new Map<string, string>();
+  for (const i of imgs) if (!first.has(i.productId)) first.set(i.productId, i.key);
+  return rows.map(({ productId, ...r }) => {
+    const key = productId ? first.get(productId) : undefined;
+    return { ...r, image: key ? productImageUrls(key).sm : null };
+  });
 }

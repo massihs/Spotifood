@@ -2700,6 +2700,43 @@
       "invalid_credentials": "E-mail ou mot de passe incorrect.",
       "signed_out": "Vous avez été déconnecté.",
       "internal": "Une erreur est survenue. Réessayez."
+    },
+    "helloAnon": "Bonjour 👋",
+    "remaining": "Restant (kcal)",
+    "over": "Au-dessus (kcal)",
+    "mealsLabel": "Repas",
+    "dishesLabel": "Plats",
+    "energySplit": "Répartition de l'énergie",
+    "splitEmpty": "Les macros s'afficheront dès votre premier repas renseigné.",
+    "insightsTitle": "À retenir aujourd'hui",
+    "findRestaurant": "Trouver un restaurant",
+    "average": "Moyenne",
+    "onTarget": "Dans l'objectif",
+    "streak": "Série",
+    "daysShort": "{n, plural, one {# jour} other {# jours}}",
+    "avgShort": "Moy. {n}",
+    "period": {
+      "breakfast": "Petit-déjeuner",
+      "lunch": "Déjeuner",
+      "snack": "Collation",
+      "dinner": "Dîner"
+    },
+    "status": {
+      "good": "OK",
+      "high": "Élevé",
+      "low": "Bas"
+    },
+    "insight": {
+      "kcal_on_target": "Calories dans l'objectif : bel équilibre.",
+      "kcal_over": "{n, number} kcal au-dessus de l'objectif aujourd'hui.",
+      "protein_reached": "Objectif protéines atteint ({n, number} g).",
+      "protein_low": "Peu de protéines : {n, number} g sur {goal, number} g.",
+      "fiber_low": "Peu de fibres ({n, number} g sur {goal, number} g) : pensez légumes, légumineuses, pain complet.",
+      "fiber_reached": "Objectif fibres atteint ({n, number} g) 👏",
+      "sugar_high": "Sucres élevés : {n, number} g pour {goal, number} g conseillés.",
+      "salt_high": "Sel élevé : {n, number} g pour {goal, number} g conseillés. Buvez de l'eau.",
+      "fat_high": "Lipides au-dessus de l'objectif : {n, number} g sur {goal, number} g.",
+      "unknown_dishes": "{n, plural, one {# plat n'a} other {# plats n'ont}} pas de valeurs : le bilan est partiel."
     }
   }
 }
