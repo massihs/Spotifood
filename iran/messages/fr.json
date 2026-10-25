@@ -2897,6 +2897,9 @@
     "swapDice": "Inverser les dés",
     "dice": "Dés",
     "cannotMove": "Ce pion ne peut pas bouger.",
-    "menu": "Menu"
+    "menu": "Menu",
+    "soundOn": "Son activé",
+    "soundOff": "Son coupé",
+    "doubleHint": "Double {n} : jouez {n} quatre fois."
   }
 }

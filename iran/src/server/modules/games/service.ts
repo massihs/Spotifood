@@ -426,6 +426,8 @@ async function view(db: DbOrTx, g: Row, guest: GuestContext) {
           lastGame: s.lastGame,
           turnNo: s.turnNo,
           awaitConfirm: Boolean(s.awaitConfirm),
+          /** Lets the board replay the turn's moves locally (instant taps, undo). */
+          turnBoard: s.turnBoard ?? null,
         }
       : null,
     legal:

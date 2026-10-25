@@ -2889,6 +2889,9 @@
     "swapDice": "Swap the dice",
     "dice": "Dice",
     "cannotMove": "This checker cannot move.",
-    "menu": "Menu"
+    "menu": "Menu",
+    "soundOn": "Sound on",
+    "soundOff": "Sound off",
+    "doubleHint": "Double {n}: play {n} four times."
   }
 }

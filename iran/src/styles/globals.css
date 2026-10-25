@@ -459,3 +459,21 @@ dialog[open]::backdrop {
     transform: scaleX(0);
   }
 }
+
+/* Backgammon dice landing on a new roll (components/guest/games/board.tsx) */
+@keyframes dice-roll {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) rotate(-220deg) scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(3px) rotate(12deg) scale(1.06);
+  }
+  100% {
+    transform: none;
+  }
+}
+.animate-dice-roll {
+  animation: dice-roll 0.45s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
