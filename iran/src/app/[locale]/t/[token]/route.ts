@@ -56,7 +56,10 @@ export async function GET(req: NextRequest, { params }: RouteContext<"/[locale]/
     : DEFAULT_LOCALE;
   const target: AppLocale = allowed.includes(requested) ? requested : fallback;
 
-  const res = NextResponse.redirect(to("/table", target), 303);
+  // `welcome`: the menu opens behind the restaurant's animated logo (components/guest/welcome-splash).
+  const dest = to("/table", target);
+  dest.searchParams.set("welcome", "1");
+  const res = NextResponse.redirect(dest, 303);
   res.cookies.set(GUEST_COOKIE, signValue(guestId), guestCookieOptions);
   res.cookies.set(SEAT_COOKIE, signValue(entry.participant.id), seatCookieOptions);
   res.headers.set("Referrer-Policy", "no-referrer");

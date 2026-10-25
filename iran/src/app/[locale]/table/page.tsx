@@ -9,16 +9,41 @@ import { listGuestOrders } from "@/server/modules/orders/service";
 import { getPopularProductIds, getPublicMenu } from "@/server/modules/menu/public-cache";
 import { getStorefront } from "@/server/modules/guest/storefront";
 import { MenuApp } from "@/components/guest/menu-app";
+import { WelcomeSplash } from "@/components/guest/welcome-splash";
+import { logoUrl } from "@/server/modules/restaurants/settings";
+import { getTranslations } from "next-intl/server";
 import { GuestHeader } from "@/components/guest/guest-header";
 import { SessionExpired, GuestSkeleton } from "@/components/guest/states";
 import { LiveProvider, LiveRefresh } from "@/components/realtime/live";
 
 /** The guest cookie is per request: the page streams behind its own boundary (instant navigations). */
-export default function GuestMenuPage() {
+export default function GuestMenuPage({ searchParams }: PageProps<"/[locale]/table">) {
   return (
-    <Suspense fallback={<GuestSkeleton />}>
-      <GuestMenu />
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <Welcome searchParams={searchParams} />
+      </Suspense>
+      <Suspense fallback={<GuestSkeleton />}>
+        <GuestMenu />
+      </Suspense>
+    </>
+  );
+}
+
+/** Right after a QR scan (`?welcome=1`): the restaurant's logo for 3 s over the loading menu. */
+async function Welcome({ searchParams }: Pick<PageProps<"/[locale]/table">, "searchParams">) {
+  if ((await searchParams).welcome !== "1") return null;
+  const guest = await getGuest();
+  if (!guest) return null;
+  const t = await getTranslations("guest");
+  return (
+    <WelcomeSplash
+      name={guest.restaurant.name}
+      logo={logoUrl(guest.restaurant.logoKey, "512")}
+      brand={guest.restaurant.brandColor}
+      table={t("tableBadge", { table: guest.table.label })}
+      welcome={t("welcome")}
+    />
   );
 }
 
