@@ -84,10 +84,17 @@ Les établissements de type **فودکورت / food court** envoient un SMS au c
 
 Variables Liara à ajouter :
 
-| Variable            | Valeur                                                       |
-| ------------------- | ------------------------------------------------------------ |
-| `SMS_PROVIDER`      | `kavenegar` (`console` = journal uniquement)                 |
-| `KAVENEGAR_API_KEY` | clé API du panneau Kavenegar (Compte → Paramètres → API Key) |
-| `KAVENEGAR_SENDER`  | facultatif : numéro de ligne d'envoi                         |
+| Variable                 | Valeur                                                            |
+| ------------------------ | ----------------------------------------------------------------- |
+| `SMS_PROVIDER`           | `kavenegar` (`console` = journal uniquement)                      |
+| `KAVENEGAR_API_KEY`      | clé API du panneau Kavenegar (Compte → Paramètres → API Key)      |
+| `KAVENEGAR_SENDER`       | facultatif : numéro de ligne d'envoi                              |
+| `KAVENEGAR_OTP_TEMPLATE` | facultatif : nom du modèle « Verify » pour les codes de connexion |
+
+**Codes de connexion (comptes clients).** Avec `KAVENEGAR_OTP_TEMPLATE`, le code est envoyé par le
+service Verify de Kavenegar (ligne rapide, texte du modèle) au lieu d'un SMS simple. Dans le panneau
+Kavenegar : Verify (اعتبارسنجی) → ajouter un modèle, par exemple nommé `spotifood-login`, avec le
+texte `کد ورود اسپاتیفود: %token%` puis attendre sa validation. Ce modèle est propre à Spotifood :
+celui de Padel Time reste distinct même avec le même compte et la même clé API.
 
 Sans clé, rien n'est envoyé : le message apparaît seulement dans les journaux (`[sms:console]`).

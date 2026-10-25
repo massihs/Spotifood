@@ -21,7 +21,7 @@ import type { DbOrTx } from "@/server/db/client";
 import { dinerOtps, diners, dinerSessions, orders } from "@/server/db/schema";
 import { AppError } from "@/server/errors";
 import { enforceRateLimit } from "@/server/infra/rate-limit";
-import { sms } from "@/server/infra/sms";
+import { sendCode } from "@/server/infra/sms";
 
 export const DINER_SESSION_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 const RENEW_THRESHOLD_MS = 45 * 24 * 60 * 60 * 1000;
@@ -72,7 +72,7 @@ export async function requestPhoneCode(db: DbOrTx, rawPhone: string, meta: { ip?
     edition.defaultLocale === "fa"
       ? `کد ورود اسپاتیفود: ${code}\nاین کد را به کسی ندهید.`
       : `Spotifood code: ${code}`;
-  await sms().send(phone, text);
+  await sendCode(phone, code, text);
   return { phone };
 }
 
