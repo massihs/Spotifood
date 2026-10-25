@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { BellRing, ReceiptText, Search, Timer, Wallet } from "lucide-react";
 import { formatMoney, normalizeDigits } from "@/lib/money";
 import { PageHeader } from "@/components/dashboard/app-shell";
+import { AcceptAllButton } from "@/components/dashboard/accept-all-button";
 import { OrderCard } from "@/components/dashboard/order-card";
 import { LiveRefresh } from "@/components/realtime/live";
 import { TillAutoPrint } from "@/components/kitchen/till-auto-print";
@@ -188,6 +189,21 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
           );
         })}
       </nav>
+      {can(ctx, "orders.update_status") && (view === "active" || view === "new")
+        ? (() => {
+            const fresh = shown.filter((o) => o.status === "received");
+            return fresh.length > 1 ? (
+              <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-accent/30 bg-accent-soft px-4 py-3">
+                <p className="min-w-0 flex-1 text-sm font-semibold">{t("newWaiting", { n: fresh.length })}</p>
+                <AcceptAllButton
+                  restaurantId={ctx.restaurant.id}
+                  orderIds={fresh.map((o) => o.id)}
+                  size="md"
+                />
+              </div>
+            ) : null;
+          })()
+        : null}
       {shown.length === 0 ? (
         <Card className="px-6 py-14 text-center">
           <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-surface-2 text-fg-subtle">

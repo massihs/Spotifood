@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { ArrowRight, Clock, MessageSquareText, Phone, X } from "lucide-react";
+import { ArrowRight, Clock, MessageSquareText, Phone, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
@@ -22,6 +22,9 @@ export type OrderCardData = {
   currency: string;
   note: string | null;
   placedAt: Date;
+  /** When it was ready / served: the kitchen time is frozen at that moment. */
+  readyAt?: Date | null;
+  servedAt?: Date | null;
   customerPhone?: string | null;
   participantSeq: number | null;
   participantName: string | null;
@@ -85,39 +88,80 @@ export function OrderCard({
   const tone = TONE[o.status];
   const isNew = o.status === "received" || o.status === "pending_payment";
   const [now, setNow] = useState(() => Date.now());
+  // The kitchen screen shows a running stopwatch (every second); other screens update each 30 s.
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 30_000);
+    const id = setInterval(() => setNow(Date.now()), compact ? 1000 : 30_000);
     return () => clearInterval(id);
-  }, []);
+  }, [compact]);
   // Waiting time while the order is still in the works: green, then orange after 10 min, red after 20.
   const active = ["received", "accepted", "preparing", "pending_payment"].includes(o.status);
-  const minutes = Math.max(0, Math.floor((now - new Date(o.placedAt).getTime()) / 60_000));
+  const finishedAt = o.readyAt ?? o.servedAt;
+  const end = active || !finishedAt ? now : new Date(finishedAt).getTime();
+  const elapsed = Math.max(0, end - new Date(o.placedAt).getTime());
+  const minutes = Math.floor(elapsed / 60_000);
   const urgency = !active ? null : minutes >= 20 ? "late" : minutes >= 10 ? "warn" : "ok";
   const paid = o.paymentStatus === "paid";
   // The kitchen reads the card from a distance and does not care about money.
   const kitchen = compact;
-  const timer =
-    urgency && minutes < 100 ? (
+  const clock = (() => {
+    const total = Math.floor(elapsed / 1000);
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const sec = total % 60;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    if (h >= 10) return `${h}h`;
+    return h ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+  })();
+  const timer = kitchen ? (
+    active ? (
       <span
         className={cn(
-          "inline-flex items-center gap-1 rounded-full font-bold whitespace-nowrap tabular-nums",
-          kitchen ? "px-2.5 py-1 text-sm" : "px-2 py-0.5 text-xs",
+          "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-base font-black whitespace-nowrap tabular-nums",
           urgency === "late"
-            ? "bg-danger text-white"
+            ? "animate-pulse bg-danger text-white"
             : urgency === "warn"
-              ? "bg-warning-soft text-warning"
-              : "bg-success-soft text-success",
+              ? "bg-warning text-white"
+              : "bg-success text-white",
         )}
+        title={t("kitchen.sincePlaced")}
       >
-        <Clock className={kitchen ? "size-4" : "size-3"} aria-hidden="true" />
-        {t("kitchen.waiting", { min: minutes })}
+        <Timer className="size-4" aria-hidden="true" />
+        <bdi dir="ltr" suppressHydrationWarning>
+          {clock}
+        </bdi>
       </span>
-    ) : (
-      <span className="flex items-center gap-1 text-xs whitespace-nowrap text-fg-subtle">
-        <Clock className="size-3" aria-hidden="true" />
-        <TimeAgo date={o.placedAt} timeZone={timeZone} />
+    ) : finishedAt && (o.status === "ready" || o.status === "served") ? (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-bold whitespace-nowrap text-fg-muted tabular-nums"
+        title={t("kitchen.totalTime")}
+      >
+        <Timer className="size-3.5" aria-hidden="true" />
+        {t("kitchen.readyIn")}{" "}
+        <bdi dir="ltr" suppressHydrationWarning>
+          {clock}
+        </bdi>
       </span>
-    );
+    ) : null
+  ) : urgency && minutes < 100 ? (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold whitespace-nowrap tabular-nums",
+        urgency === "late"
+          ? "bg-danger text-white"
+          : urgency === "warn"
+            ? "bg-warning-soft text-warning"
+            : "bg-success-soft text-success",
+      )}
+    >
+      <Clock className="size-3" aria-hidden="true" />
+      {t("kitchen.waiting", { min: minutes })}
+    </span>
+  ) : (
+    <span className="flex items-center gap-1 text-xs whitespace-nowrap text-fg-subtle">
+      <Clock className="size-3" aria-hidden="true" />
+      <TimeAgo date={o.placedAt} timeZone={timeZone} />
+    </span>
+  );
 
   return (
     <Card
@@ -180,9 +224,10 @@ export function OrderCard({
               {t("orders.new")}
             </span>
           ) : null}
-          {timer}
+          {kitchen ? null : timer}
         </div>
       </div>
+      {kitchen && timer ? <div className="flex items-center gap-2 px-4 pb-3">{timer}</div> : null}
       <ul
         className={cn(
           "mx-4 divide-y divide-border rounded-2xl bg-surface-2/70",

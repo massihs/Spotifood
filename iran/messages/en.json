@@ -1248,7 +1248,8 @@
       "delivery": "Delivery"
     },
     "noMatch": "No order matches this search",
-    "clear": "Clear"
+    "clear": "Clear",
+    "newWaiting": "{n} new orders waiting"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1323,7 +1324,16 @@
     "tillPrintOn": "Till ticket auto-print: on",
     "tillPrintOff": "Auto-print till ticket",
     "darkMode": "Dark mode",
-    "lightMode": "Light mode"
+    "lightMode": "Light mode",
+    "sincePlaced": "Time since the order was placed",
+    "totalTime": "Total time, from order to ready",
+    "readyIn": "Ready in",
+    "bulk": {
+      "acceptAll": "Accept all ({n})",
+      "startAll": "Start all ({n})",
+      "confirm": "Confirm ({n})?",
+      "done": "{n, plural, one {# order} other {# orders}} done"
+    }
   },
   "floor": {
     "title": "Floor",

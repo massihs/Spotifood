@@ -17,7 +17,7 @@ import {
 import { recordAudit } from "@/server/audit";
 import { emit, topics } from "@/server/infra/realtime";
 import { sendToKitchen } from "@/server/modules/printing/service";
-import { AppError, conflict, notFound } from "@/server/errors";
+import { AppError, isAppError, conflict, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { isUuid } from "@/lib/ids";
 import { taxFromGross, taxFromNet } from "@/lib/money";
@@ -312,6 +312,8 @@ export async function listActiveOrders(
       note: orders.note,
       placedAt: orders.placedAt,
       acceptedAt: orders.acceptedAt,
+      readyAt: orders.readyAt,
+      servedAt: orders.servedAt,
       channel: orders.channel,
       customerPhone: orders.customerPhone,
       participantSeq: participantLabel,
@@ -327,6 +329,43 @@ export async function listActiveOrders(
     )
     .orderBy(asc(orders.placedAt));
   return attachItems(db, list);
+}
+
+/**
+ * "Accept all": every new order (status `received`, or only `orderIds` among them) goes to the
+ * kitchen, one by one through the same transition as a single accept (tickets, guest updates).
+ * Orders someone else moved meanwhile are skipped.
+ */
+export async function acceptAllOrders(
+  db: Database,
+  ctx: RestaurantContext,
+  opts: { orderIds?: string[]; from?: "received" | "accepted"; to?: "accepted" | "preparing" } = {},
+) {
+  assertCan(ctx, "orders.update_status");
+  const from = opts.from ?? "received";
+  const to = opts.to ?? (from === "received" ? "accepted" : "preparing");
+  const ids = opts.orderIds?.filter(isUuid);
+  const list = await db
+    .select({ id: orders.id })
+    .from(orders)
+    .where(
+      and(
+        eq(orders.restaurantId, ctx.restaurant.id),
+        eq(orders.status, from),
+        ids ? inArray(orders.id, ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]) : undefined,
+      ),
+    )
+    .orderBy(asc(orders.placedAt));
+  let done = 0;
+  for (const o of list) {
+    try {
+      await updateOrderStatus(db, ctx, o.id, to);
+      done++;
+    } catch (e) {
+      if (!(isAppError(e) && e.code === "CONFLICT")) throw e;
+    }
+  }
+  return { done, skipped: list.length - done };
 }
 
 /**

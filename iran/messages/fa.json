@@ -1248,7 +1248,8 @@
       "delivery": "ارسال"
     },
     "noMatch": "سفارشی با این جستجو پیدا نشد",
-    "clear": "پاک کردن"
+    "clear": "پاک کردن",
+    "newWaiting": "{n} سفارش جدید منتظر است"
   },
   "tableView": {
     "title": "میز {label}",
@@ -1323,7 +1324,16 @@
     "tillPrintOn": "چاپ خودکار فیش صندوق: روشن",
     "tillPrintOff": "چاپ خودکار فیش صندوق",
     "darkMode": "حالت تاریک",
-    "lightMode": "حالت روشن"
+    "lightMode": "حالت روشن",
+    "sincePlaced": "زمان سپری‌شده از ثبت سفارش",
+    "totalTime": "زمان کل، از ثبت تا آماده شدن",
+    "readyIn": "آماده در",
+    "bulk": {
+      "acceptAll": "پذیرش همه ({n})",
+      "startAll": "شروع همه ({n})",
+      "confirm": "تأیید ({n})؟",
+      "done": "{n} سفارش انجام شد"
+    }
   },
   "floor": {
     "title": "سالن",

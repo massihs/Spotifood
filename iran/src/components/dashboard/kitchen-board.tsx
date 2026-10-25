@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { usePref, writePref } from "@/components/ui/use-pref";
 import { LiveIndicator, LiveRefresh, useLiveEvent } from "@/components/realtime/live";
 import { StationManager, STATION_TONE, type StationView } from "@/components/kitchen/stations";
+import { AcceptAllButton } from "./accept-all-button";
 import { OrderCard, type OrderCardData } from "./order-card";
 
 const COLUMNS = ["received", "accepted", "preparing", "ready", "served"] as const;
@@ -184,13 +185,22 @@ export function KitchenBoard({
                   <span className={cn("size-2 rounded-full", DOT[col])} aria-hidden="true" />
                   {t(`columns.${col}`)}
                 </span>
-                <span
-                  className={cn(
-                    "grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-bold tabular-nums",
-                    list.length ? "bg-accent text-accent-fg" : "bg-surface text-fg-subtle",
-                  )}
-                >
-                  {list.length}
+                <span className="flex items-center gap-2">
+                  {canUpdate && (col === "received" || col === "accepted") && list.length > 1 ? (
+                    <AcceptAllButton
+                      restaurantId={restaurantId}
+                      from={col}
+                      orderIds={list.filter((o) => o.status === col).map((o) => o.id)}
+                    />
+                  ) : null}
+                  <span
+                    className={cn(
+                      "grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-bold tabular-nums",
+                      list.length ? "bg-accent text-accent-fg" : "bg-surface text-fg-subtle",
+                    )}
+                  >
+                    {list.length}
+                  </span>
                 </span>
               </h2>
               <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto p-0.5">

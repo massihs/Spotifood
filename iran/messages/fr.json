@@ -1248,7 +1248,8 @@
       "delivery": "Livraison"
     },
     "noMatch": "Aucune commande ne correspond",
-    "clear": "Effacer"
+    "clear": "Effacer",
+    "newWaiting": "{n} nouvelles commandes attendent"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1323,7 +1324,16 @@
     "tillPrintOn": "Impression auto du ticket caisse : activée",
     "tillPrintOff": "Impression auto du ticket caisse",
     "darkMode": "Mode sombre",
-    "lightMode": "Mode clair"
+    "lightMode": "Mode clair",
+    "sincePlaced": "Temps écoulé depuis la prise de commande",
+    "totalTime": "Temps total, de la commande au plat prêt",
+    "readyIn": "Prête en",
+    "bulk": {
+      "acceptAll": "Tout accepter ({n})",
+      "startAll": "Tout lancer ({n})",
+      "confirm": "Confirmer ({n}) ?",
+      "done": "{n, plural, one {# commande} other {# commandes}} OK"
+    }
   },
   "floor": {
     "title": "Salle",
