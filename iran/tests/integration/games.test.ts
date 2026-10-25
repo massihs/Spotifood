@@ -12,8 +12,10 @@ import {
   gamesBadge,
   gamesLobby,
   joinGame,
+  confirmTurn,
   playMove,
   resignGame,
+  undoMove,
   tickAt,
   TURN_MS,
 } from "@/server/modules/games/service";
@@ -60,13 +62,26 @@ describe("backgammon between guests", () => {
     await expect(playMove(db, mover, g.id, { from: 2, die: 6 })).rejects.toMatchObject({
       message: "illegal_move",
     });
-    let state = mv;
-    while (state.state!.turn === turn && state.legal.length) {
+    // Undo: back to the position before the move, same dice left.
+    const first = mv.legal[0]!;
+    const one = await playMove(db, mover, g.id, { from: first.from, die: first.die });
+    expect(one.canUndo).toBe(true);
+    const back = await undoMove(db, mover, g.id);
+    expect(back.state!.board).toEqual(mv.state!.board);
+    expect(back.state!.remaining.sort()).toEqual(mv.state!.remaining.sort());
+    await expect(undoMove(db, mover, g.id)).rejects.toMatchObject({ message: "nothing_to_undo" });
+
+    let state = back;
+    while (state.legal.length) {
       const m = state.legal[0]!;
       state = await playMove(db, mover, g.id, { from: m.from, die: m.die });
     }
-    expect(state.state!.turn).not.toBe(turn);
-    expect(state.state!.last?.color).toBe(turn);
+    // All dice played: the turn waits for "Done" (or an undo).
+    expect(state.state!.awaitConfirm).toBe(true);
+    expect(state.state!.turn).toBe(turn);
+    const done = await confirmTurn(db, mover, g.id);
+    expect(done.state!.turn).not.toBe(turn);
+    expect(done.state!.last?.color).toBe(turn);
   });
 
   it("15 s of inactivity plays the turn; the third time the opponent wins; wins are counted", async () => {

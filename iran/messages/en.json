@@ -2871,6 +2871,14 @@
       "game_over": "The game is over.",
       "move": "Move not possible, try again.",
       "generic": "Something went wrong."
-    }
+    },
+    "tapHint": "Tap a checker: it moves by the left die. Tap the dice to swap them.",
+    "confirmHint": "Turn played: confirm, or undo a move.",
+    "undo": "Undo last move",
+    "done": "Done",
+    "swapDice": "Swap the dice",
+    "dice": "Dice",
+    "cannotMove": "This checker cannot move.",
+    "menu": "Menu"
   }
 }

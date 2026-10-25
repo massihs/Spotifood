@@ -2879,6 +2879,14 @@
       "game_over": "La partie est terminée.",
       "move": "Coup impossible, réessayez.",
       "generic": "Une erreur est survenue."
-    }
+    },
+    "tapHint": "Touchez un pion : il avance du dé de gauche. Touchez les dés pour les inverser.",
+    "confirmHint": "Tour joué : validez, ou annulez un coup.",
+    "undo": "Annuler le dernier coup",
+    "done": "Valider",
+    "swapDice": "Inverser les dés",
+    "dice": "Dés",
+    "cannotMove": "Ce pion ne peut pas bouger.",
+    "menu": "Menu"
   }
 }

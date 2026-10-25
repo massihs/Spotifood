@@ -24,6 +24,8 @@ import type { GuestContext } from "@/server/modules/guest/sessions";
 export const TURN_MS = 15_000;
 /** Turns played automatically before the player loses by forfeit. */
 export const MAX_STRIKES = 3;
+/** After the last die is played, the turn is confirmed by itself after this (time to undo). */
+export const CONFIRM_MS = 5_000;
 /** A player is "at the board" when their screen pinged within this delay. */
 const PRESENT_MS = 12_000;
 /** An open game nobody joined disappears after this. */
@@ -46,6 +48,10 @@ export type GameState = {
   strikes: Record<Color, number>;
   lastGame: { winner: Color; points: number } | null;
   turnNo: number;
+  /** The board when the turn started (to undo moves). */
+  turnBoard?: Board;
+  /** All dice played: the player confirms (or undoes) before the turn passes. */
+  awaitConfirm?: boolean;
 };
 
 type Row = typeof games.$inferSelect;
@@ -58,6 +64,7 @@ function rollFor(s: GameState, color: Color, dice: [number, number] = roll()) {
   s.remaining = diceToPlay(dice);
   s.moves = [];
   s.turnNo++;
+  s.awaitConfirm = false;
   // No legal move: the turn passes (at most a few times in a row).
   for (let i = 0; i < 6 && !legalMoves(s.board, s.turn, s.remaining).length; i++) {
     s.last = { color: s.turn, dice: s.dice, moves: [], pass: true };
@@ -66,6 +73,7 @@ function rollFor(s: GameState, color: Color, dice: [number, number] = roll()) {
     s.remaining = diceToPlay(s.dice as [number, number]);
     s.turnNo++;
   }
+  s.turnBoard = structuredClone(s.board);
 }
 
 /** A new game of the match: opening roll, the higher die starts and plays both dice. */
@@ -98,6 +106,7 @@ export function freshState(): GameState {
 /** Ends the current turn: a won game scores, a won match ends, otherwise the opponent rolls. */
 function endTurn(s: GameState, target: number, auto = false): Color | null {
   const c = s.turn;
+  s.awaitConfirm = false;
   s.last = { color: c, dice: s.dice, moves: s.moves, ...(auto ? { auto } : {}) };
   if (s.board.off[c] === CHECKERS) {
     const points = gamePoints(s.board, c);
@@ -128,6 +137,12 @@ function tick(g: Row, now: Date): Partial<Row> | null {
   const deadline = g.turnDeadline;
   if (!deadline) return { turnDeadline: new Date(now.getTime() + TURN_MS) };
   if (now < deadline) return null;
+  if (s.awaitConfirm) {
+    // Everything was played and not undone: the turn passes (no penalty).
+    const winner = endTurn(s, g.targetPoints);
+    if (winner) return finish(s, guestOf(g, winner), "points");
+    return { state: s as unknown as Row["state"], turnDeadline: new Date(now.getTime() + TURN_MS) };
+  }
   if (!present) return { turnDeadline: new Date(now.getTime() + TURN_MS) }; // paused
   const mover = s.turn;
   const play = autoPlay(s.board, mover, s.remaining);
@@ -410,9 +425,14 @@ async function view(db: DbOrTx, g: Row, guest: GuestContext) {
           gameNo: s.gameNo,
           lastGame: s.lastGame,
           turnNo: s.turnNo,
+          awaitConfirm: Boolean(s.awaitConfirm),
         }
       : null,
-    legal: s && g.status === "playing" && me === s.turn ? legalMoves(s.board, s.turn, s.remaining) : [],
+    legal:
+      s && g.status === "playing" && me === s.turn && !s.awaitConfirm
+        ? legalMoves(s.board, s.turn, s.remaining)
+        : [],
+    canUndo: Boolean(s && g.status === "playing" && me === s.turn && s.moves.length && s.turnBoard),
     deadline: g.turnDeadline?.getTime() ?? null,
     serverNow: now,
     winner: (g.status === "finished"
@@ -422,6 +442,7 @@ async function view(db: DbOrTx, g: Row, guest: GuestContext) {
       : null) as Color | null,
     finishReason: g.finishReason as "points" | "forfeit" | "resign" | null,
     maxStrikes: MAX_STRIKES,
+    confirmSeconds: CONFIRM_MS / 1000,
     turnSeconds: TURN_MS / 1000,
   };
 }
@@ -486,16 +507,74 @@ export async function playMove(
     s.moves.push(r.move);
     s.remaining.splice(s.remaining.indexOf(input.die), 1);
     const now = new Date();
-    let patch: Partial<Row> = {
-      state: s as unknown as Row["state"],
-      [me === "w" ? "whiteSeenAt" : "blackSeenAt"]: now,
-    };
-    if (!s.remaining.length || !legalMoves(s.board, me, s.remaining).length) {
+    const done = !s.remaining.length || !legalMoves(s.board, me, s.remaining).length;
+    let patch: Partial<Row>;
+    if (done && s.board.off[me] === CHECKERS) {
+      // The last checker is off: the game is won at once.
       const winner = endTurn(s, g.targetPoints);
       patch = winner
-        ? { ...patch, ...finish(s, guestOf(g, winner), "points") }
-        : { ...patch, state: s as unknown as Row["state"], turnDeadline: new Date(now.getTime() + TURN_MS) };
+        ? finish(s, guestOf(g, winner), "points")
+        : { state: s as unknown as Row["state"], turnDeadline: new Date(now.getTime() + TURN_MS) };
+    } else {
+      // All dice played: a few seconds to undo or confirm.
+      s.awaitConfirm = done;
+      patch = {
+        state: s as unknown as Row["state"],
+        [me === "w" ? "whiteSeenAt" : "blackSeenAt"]: now,
+        turnDeadline: new Date(now.getTime() + (done ? CONFIRM_MS : TURN_MS)),
+      };
     }
+    return view(tx, await save(tx, g, patch), guest);
+  });
+}
+
+/** Takes back the last move of the turn (until the turn is confirmed). */
+export async function undoMove(db: Database, guest: GuestContext, id: string) {
+  return db.transaction(async (tx) => {
+    const g = await lockGame(tx, guest, id);
+    const me = colorOf(g, guest.guestId);
+    const s = g.state as unknown as GameState;
+    if (g.status !== "playing" || !me || s.turn !== me || !s.moves.length || !s.turnBoard)
+      throw new AppError("CONFLICT", "nothing_to_undo");
+    const keep = s.moves.slice(0, -1);
+    let board = structuredClone(s.turnBoard);
+    const remaining = diceToPlay(s.dice as [number, number]);
+    for (const m of keep) {
+      const r = tryMove(board, me, m.from, m.die);
+      if (!r) throw new AppError("INTERNAL", "undo_failed");
+      board = r.board;
+      remaining.splice(remaining.indexOf(m.die), 1);
+    }
+    s.board = board;
+    s.moves = keep;
+    s.remaining = remaining;
+    s.awaitConfirm = false;
+    const now = new Date();
+    return view(
+      tx,
+      await save(tx, g, {
+        state: s as unknown as Row["state"],
+        [me === "w" ? "whiteSeenAt" : "blackSeenAt"]: now,
+        turnDeadline: new Date(now.getTime() + TURN_MS),
+      }),
+      guest,
+    );
+  });
+}
+
+/** "Done": the played turn passes to the opponent. */
+export async function confirmTurn(db: Database, guest: GuestContext, id: string) {
+  return db.transaction(async (tx) => {
+    const g = await lockGame(tx, guest, id);
+    const me = colorOf(g, guest.guestId);
+    const s = g.state as unknown as GameState;
+    if (g.status !== "playing" || !me || s.turn !== me || !s.awaitConfirm)
+      throw new AppError("CONFLICT", "not_allowed");
+    const winner = endTurn(s, g.targetPoints);
+    const now = new Date();
+    const patch: Partial<Row> = winner
+      ? finish(s, guestOf(g, winner), "points")
+      : { state: s as unknown as Row["state"], turnDeadline: new Date(now.getTime() + TURN_MS) };
     return view(tx, await save(tx, g, patch), guest);
   });
 }

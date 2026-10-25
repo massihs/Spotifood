@@ -5,12 +5,14 @@ import { db } from "@/server/db/client";
 import { enforceRateLimit } from "@/server/infra/rate-limit";
 import {
   cancelGame,
+  confirmTurn,
   createGame,
   gameHeartbeat,
   gamesBadge,
   joinGame,
   playMove,
   resignGame,
+  undoMove,
 } from "@/server/modules/games/service";
 import { getGuest, requireGuest } from "@/server/modules/guest/current";
 
@@ -60,4 +62,12 @@ export async function moveAction(id: string, from: number | "bar", die: number, 
 
 export async function resignAction(id: string) {
   return runAction(async () => resignGame(db, await player(), id));
+}
+
+export async function undoAction(id: string) {
+  return runAction(async () => undoMove(db, await player(), id));
+}
+
+export async function confirmAction(id: string) {
+  return runAction(async () => confirmTurn(db, await player(), id));
 }
