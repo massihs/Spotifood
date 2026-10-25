@@ -127,15 +127,62 @@ export function legalSequences(b: Board, c: Color, dice: number[]): { moves: Mov
   return best;
 }
 
-/** The single moves that can be played now (first steps of a complete legal play). */
-export function legalMoves(b: Board, c: Color, remaining: number[]): Move[] {
-  const seqs = legalSequences(b, c, remaining);
-  const out = new Map<string, Move>();
-  for (const s of seqs) {
-    const m = s.moves[0];
-    if (m) out.set(`${m.from}>${m.to}>${m.die}`, m);
+/** Pieces that can move now: the bar first, else every point with a checker of `c`. */
+function sources(b: Board, c: Color): From[] {
+  if (b.bar[c]) return ["bar"];
+  const out: From[] = [];
+  for (let i = 0; i < 24; i++) if (own(b.points[i]!, c)) out.push(i);
+  return out;
+}
+
+/** How many of `dice` can still be played from this position (memoised by position). */
+function maxPlayable(b: Board, c: Color, dice: number[], memo: Map<string, number>): number {
+  if (!dice.length) return 0;
+  const key = `${boardKey(b)}:${[...dice].sort().join("")}`;
+  const known = memo.get(key);
+  if (known != null) return known;
+  let best = 0;
+  for (const die of new Set(dice)) {
+    const rest = [...dice];
+    rest.splice(rest.indexOf(die), 1);
+    for (const from of sources(b, c)) {
+      const r = tryMove(b, c, from, die);
+      if (!r) continue;
+      best = Math.max(best, 1 + maxPlayable(r.board, c, rest, memo));
+      if (best === dice.length) break;
+    }
+    if (best === dice.length) break;
   }
-  return [...out.values()];
+  memo.set(key, best);
+  return best;
+}
+
+/**
+ * The single moves that can be played now: every move that starts a play using as many dice
+ * as possible (and, when only one of two different dice can be played, the higher one).
+ * Each candidate is checked on its own, so a move is never hidden because another order of
+ * the same moves reaches the same position (that hid the front checker on doubles).
+ */
+export function legalMoves(b: Board, c: Color, remaining: number[]): Move[] {
+  const memo = new Map<string, number>();
+  const max = maxPlayable(b, c, remaining, memo);
+  if (!max) return [];
+  const out = new Map<string, Move>();
+  for (const die of new Set(remaining)) {
+    const rest = [...remaining];
+    rest.splice(rest.indexOf(die), 1);
+    for (const from of sources(b, c)) {
+      const r = tryMove(b, c, from, die);
+      if (!r || 1 + maxPlayable(r.board, c, rest, memo) !== max) continue;
+      out.set(`${r.move.from}>${r.move.to}>${die}`, r.move);
+    }
+  }
+  let moves = [...out.values()];
+  if (max === 1 && remaining.length === 2 && remaining[0] !== remaining[1]) {
+    const high = Math.max(...remaining);
+    if (moves.some((m) => m.die === high)) moves = moves.filter((m) => m.die === high);
+  }
+  return moves;
 }
 
 /** Dice to play: doubles are played four times. */
