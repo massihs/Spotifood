@@ -31,13 +31,16 @@ function CollectForm({
   restaurantId,
   tableSessionId,
   participantId,
+  orderId,
   amountCents,
   currency,
   methods,
 }: {
   restaurantId: string;
-  tableSessionId: string;
+  tableSessionId: string | null;
   participantId: string | null;
+  /** One order paid on its own (no table needed). */
+  orderId?: string;
   amountCents: number;
   currency: string;
   methods: string[];
@@ -56,7 +59,8 @@ function CollectForm({
   return (
     <ActionForm form={form} className="space-y-4">
       <FormFeedback state={form.state} />
-      <input type="hidden" name="tableSessionId" value={tableSessionId} />
+      {tableSessionId ? <input type="hidden" name="tableSessionId" value={tableSessionId} /> : null}
+      {orderId ? <input type="hidden" name="orderId" value={orderId} /> : null}
       {participantId ? <input type="hidden" name="participantId" value={participantId} /> : null}
       <input type="hidden" name="idempotencyKey" value={key} />
       <p className="text-center text-3xl font-semibold tabular-nums">{money(amountCents)}</p>
@@ -115,8 +119,9 @@ function CollectForm({
 
 export function CollectPaymentDialog(props: {
   restaurantId: string;
-  tableSessionId: string;
+  tableSessionId: string | null;
   participantId: string | null;
+  orderId?: string;
   amountCents: number;
   currency: string;
   methods: string[];

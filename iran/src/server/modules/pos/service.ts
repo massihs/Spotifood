@@ -16,6 +16,7 @@ import {
   tableSessions,
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
+import { issueInvoiceInTx } from "@/server/modules/invoices/service";
 import { emit, topics } from "@/server/infra/realtime";
 import { sendToKitchen } from "@/server/modules/printing/service";
 import { AppError, conflict, forbidden, notFound } from "@/server/errors";
@@ -307,6 +308,8 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       });
       await settleAllocations(tx, payment!, ctx.user.id);
       await emitPaymentUpdate(tx, payment!);
+      // Every sale at the till has its invoice (Invoices page), nameable later.
+      await issueInvoiceInTx(tx, rid, payment!.id, ctx.user.id);
     }
 
     await tx.insert(notifications).values({

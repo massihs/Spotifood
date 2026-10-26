@@ -14,6 +14,7 @@ import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { can } from "@/server/tenancy";
 import { listActiveOrders } from "@/server/modules/orders/service";
+import { getPaymentMethods } from "@/server/modules/payments/service";
 import { ACTIVE_STATUSES } from "@/server/modules/orders/status";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/orders">;
@@ -33,7 +34,11 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
   const VIEWS = ["active", "new", "progress", "ready", "done"] as const;
   type View = (typeof VIEWS)[number];
   const view: View = (VIEWS as readonly string[]).includes(String(sp.view)) ? (sp.view as View) : "active";
-  const [t, all] = await Promise.all([getTranslations("orders"), listActiveOrders(db, ctx)]);
+  const [t, all, methods] = await Promise.all([
+    getTranslations("orders"),
+    listActiveOrders(db, ctx),
+    can(ctx, "payments.record") ? getPaymentMethods(db, ctx.restaurant.id) : null,
+  ]);
   const groups: Record<View, typeof all> = {
     active: all.filter((o) => ACTIVE_STATUSES.includes(o.status)),
     new: all.filter((o) => o.status === "received" || o.status === "pending_payment"),
@@ -222,6 +227,7 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
                 canUpdate={can(ctx, "orders.update_status")}
                 canCancel={can(ctx, "orders.cancel")}
                 timeZone={ctx.restaurant.timezone}
+                collectMethods={methods?.offline}
               />
             </li>
           ))}

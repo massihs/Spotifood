@@ -8,6 +8,7 @@ import { useEffect, useState, useTransition } from "react";
 import { ArrowRight, Clock, MessageSquareText, Phone, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CollectPaymentDialog } from "@/components/dashboard/payment-dialogs";
 import { cn } from "@/lib/cn";
 import { nextStatus, type OrderStatus } from "@/server/modules/orders/status";
 import { updateOrderStatusAction } from "@/app/[locale]/dashboard/[restaurantId]/orders/actions";
@@ -59,12 +60,15 @@ export function OrderCard({
   canCancel,
   timeZone,
   compact = false,
+  collectMethods,
 }: {
   restaurantId: string;
   order: OrderCardData;
   canUpdate: boolean;
   canCancel: boolean;
   timeZone: string;
+  /** Payment methods the staff can collect with (orders page): unpaid orders get a "Collect" button. */
+  collectMethods?: string[];
   /** Kitchen columns: the column already names the status, so drop the chip. */
   compact?: boolean;
 }) {
@@ -154,7 +158,8 @@ export function OrderCard({
       )}
     >
       <Clock className="size-3" aria-hidden="true" />
-      {t("kitchen.waiting", { min: minutes })}
+      {/* Minutes since the order: the server's and the browser's clocks may differ by one. */}
+      <span suppressHydrationWarning>{t("kitchen.waiting", { min: minutes })}</span>
     </span>
   ) : (
     <span className="flex items-center gap-1 text-xs whitespace-nowrap text-fg-subtle">
@@ -297,6 +302,22 @@ export function OrderCard({
           >
             {paid ? t("orders.paid") : t("orders.unpaid")}
           </span>
+        </div>
+      ) : null}
+      {!kitchen && !paid && o.status !== "cancelled" && collectMethods?.length && o.totalCents > 0 ? (
+        <div className="px-4 pt-3">
+          <CollectPaymentDialog
+            restaurantId={restaurantId}
+            tableSessionId={null}
+            participantId={null}
+            orderId={o.id}
+            amountCents={o.totalCents}
+            currency={o.currency}
+            methods={collectMethods}
+            title={t("payments.collectOrder", { number: o.number })}
+            variant="secondary"
+            size="md"
+          />
         </div>
       ) : null}
       <div className={cn("flex gap-2 p-4 pt-3", kitchen && "mt-auto")}>

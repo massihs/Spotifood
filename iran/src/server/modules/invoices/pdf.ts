@@ -282,6 +282,7 @@ export async function renderInvoicePdf(input: {
     y += 18;
   };
   const baseTotal = s.taxes.reduce((sum, t) => sum + t.baseCents, 0) || s.subtotalCents;
+  if (s.discountCents > 0) totalRow("تخفیف (ریال)", rial(s.discountCents));
   totalRow("جمع مبلغ قبل از مالیات (ریال)", rial(baseTotal));
   for (const t of s.taxes.filter((t) => t.rateBps > 0)) {
     totalRow(`مالیات بر ارزش افزوده ${pct(t.rateBps)} (ریال)`, rial(t.taxCents));

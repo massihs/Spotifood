@@ -12,6 +12,7 @@ import {
   payments,
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
+import { issueInvoiceInTx } from "@/server/modules/invoices/service";
 import { emit, topics } from "@/server/infra/realtime";
 import { conflict, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
@@ -423,6 +424,7 @@ export async function settleCourier(db: Database, ctx: RestaurantContext, courie
         })),
       );
       await settleAllocations(tx, p!, ctx.user.id);
+      await issueInvoiceInTx(tx, rid, p!.id, ctx.user.id);
       await emitPaymentUpdate(tx, p!);
     }
     await tx

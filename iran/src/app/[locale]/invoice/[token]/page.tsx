@@ -149,6 +149,12 @@ async function Invoice({ params }: PageProps<"/[locale]/invoice/[token]">) {
         </div>
 
         <dl className="ms-auto mt-6 max-w-sm space-y-1 text-sm">
+          {s.discountCents > 0 ? (
+            <div className="flex justify-between gap-4 text-fg-muted">
+              <dt>{t("discount")}</dt>
+              <dd className="tabular-nums">−{money(s.discountCents)}</dd>
+            </div>
+          ) : null}
           <div className="flex justify-between gap-4">
             <dt>{t("beforeTax")}</dt>
             <dd className="tabular-nums">

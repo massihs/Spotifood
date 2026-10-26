@@ -16,6 +16,7 @@ import {
   tableSessions,
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
+import { issueInvoiceInTx } from "@/server/modules/invoices/service";
 import { getEntitlements, hasFeature } from "@/server/entitlements";
 import { AppError, conflict, forbidden, notFound, validation } from "@/server/errors";
 import { emit, topics } from "@/server/infra/realtime";
@@ -687,7 +688,10 @@ export async function handleWebhook(db: Database, providerCode: string, rawBody:
 // ─── Staff side ──────────────────────────────────────────────────────────────
 
 export const recordPaymentSchema = z.object({
-  tableSessionId: z.uuid(),
+  /** A table's bill (with `participantId`, one guest's share)… */
+  tableSessionId: z.uuid().nullable().optional(),
+  /** …or one order rung up without a table (takeaway, delivery, counter), paid later. */
+  orderId: z.uuid().nullable().optional(),
   /** Omitted → the whole table pays (every participant's unpaid orders). */
   participantId: z.uuid().nullable().optional(),
   provider: z.enum(OFFLINE_CODES),
@@ -696,7 +700,10 @@ export const recordPaymentSchema = z.object({
   idempotencyKey: z.string().regex(/^[A-Za-z0-9_-]{16,64}$/),
 });
 
-/** A waiter collected cash / a terminal payment for a guest (or the whole table). */
+/**
+ * A waiter collected cash / a terminal payment for a guest, the whole table, or one order. The
+ * sale gets its invoice at once (staff sales are always in the invoice list).
+ */
 export async function recordStaffPayment(
   db: Database,
   ctx: RestaurantContext,
@@ -715,6 +722,8 @@ export async function recordStaffPayment(
   if (existing) return existing;
 
   return db.transaction(async (tx) => {
+    if (input.orderId) return collectOrder(tx, ctx, input.orderId, input);
+    if (!input.tableSessionId) throw notFound();
     const [session] = await tx
       .select({ id: tableSessions.id, restaurantId: tableSessions.restaurantId })
       .from(tableSessions)
@@ -778,8 +787,80 @@ export async function recordStaffPayment(
         orders: due.map((o) => o.number),
       },
     });
+    await issueInvoiceInTx(tx, rid, created!.id, ctx.user.id);
     return created!;
   });
+}
+
+/** One unpaid order paid at the counter (it may have no table). */
+async function collectOrder(
+  tx: Tx,
+  ctx: RestaurantContext,
+  orderId: string,
+  input: z.output<typeof recordPaymentSchema>,
+) {
+  const rid = ctx.restaurant.id;
+  const [order] = await tx
+    .select({
+      id: orders.id,
+      number: orders.number,
+      totalCents: orders.totalCents,
+      tableSessionId: orders.tableSessionId,
+    })
+    .from(orders)
+    .where(and(eq(orders.id, orderId), eq(orders.restaurantId, rid), PAYABLE))
+    .for("update");
+  if (!order) throw conflict("nothing_to_pay");
+  if (order.totalCents <= 0) throw conflict("nothing_to_pay");
+  // An online checkout left open for this order would cover it twice.
+  const [busy] = await tx
+    .select({ id: payments.id })
+    .from(paymentAllocations)
+    .innerJoin(payments, eq(payments.id, paymentAllocations.paymentId))
+    .where(
+      and(eq(paymentAllocations.orderId, order.id), inArray(payments.status, ["pending", "requires_action"])),
+    );
+  if (busy) throw conflict("payment_in_progress");
+  if (input.provider === "cash" && input.tenderedCents != null && input.tenderedCents < order.totalCents)
+    throw validation("tendered_too_low", { amountCents: order.totalCents });
+  const [created] = await tx
+    .insert(payments)
+    .values({
+      restaurantId: rid,
+      tableSessionId: order.tableSessionId,
+      provider: input.provider,
+      status: "succeeded",
+      succeededAt: new Date(),
+      amountCents: order.totalCents,
+      currency: ctx.restaurant.currency,
+      idempotencyKey: input.idempotencyKey,
+      recordedByUserId: ctx.user.id,
+      metadata: input.tenderedCents != null ? { tenderedCents: input.tenderedCents } : {},
+    })
+    .returning();
+  await tx.insert(paymentAllocations).values({
+    restaurantId: rid,
+    paymentId: created!.id,
+    orderId: order.id,
+    amountCents: order.totalCents,
+  });
+  await settleAllocations(tx, created!, ctx.user.id);
+  await emitPaymentUpdate(tx, created!);
+  await recordAudit(tx, {
+    action: "payment.recorded",
+    actorUserId: ctx.user.id,
+    restaurantId: rid,
+    entityType: "payment",
+    entityId: created!.id,
+    metadata: {
+      provider: input.provider,
+      amountCents: order.totalCents,
+      scope: "order",
+      orders: [order.number],
+    },
+  });
+  await issueInvoiceInTx(tx, rid, created!.id, ctx.user.id);
+  return created!;
 }
 
 /** Staff can abort an online checkout that is stuck (guest left), releasing the orders. */

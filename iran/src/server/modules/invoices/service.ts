@@ -48,7 +48,7 @@ export function invoiceNumber(year: number, seq: number) {
   return `${year}-${String(seq).padStart(6, "0")}`;
 }
 
-type Issuer = { kind: "staff"; userId: string } | { kind: "guest" };
+type Issuer = { kind: "staff"; userId: string } | { kind: "guest" } | { kind: "system" };
 
 /**
  * Issues the invoice of a payment. Idempotent: the payment row is locked and an existing invoice
@@ -62,7 +62,36 @@ async function issueForPayment(
   issuer: Issuer,
   buyer: InvoiceParty | null,
 ) {
-  return db.transaction(async (tx) => {
+  return db.transaction((tx) => issueInTx(tx, restaurantId, paymentId, issuer, buyer));
+}
+
+/**
+ * Same as above inside an open transaction: a sale recorded by the staff (till, table, order)
+ * gets its invoice in the same transaction, so every manual sale is in the invoice list.
+ */
+export async function issueInvoiceInTx(
+  tx: DbOrTx,
+  restaurantId: string,
+  paymentId: string,
+  userId: string | null,
+) {
+  return issueInTx(
+    tx,
+    restaurantId,
+    paymentId,
+    userId ? { kind: "staff", userId } : { kind: "system" },
+    null,
+  );
+}
+
+async function issueInTx(
+  tx: DbOrTx,
+  restaurantId: string,
+  paymentId: string,
+  issuer: Issuer,
+  buyer: InvoiceParty | null,
+) {
+  {
     const [payment] = await tx
       .select()
       .from(payments)
@@ -70,7 +99,18 @@ async function issueForPayment(
       .for("update");
     if (!payment) throw notFound();
     const [existing] = await tx.select().from(invoices).where(eq(invoices.paymentId, paymentId));
-    if (existing) return existing;
+    if (existing) {
+      // Issued at the till without a buyer: naming it later keeps the same number.
+      if (buyer && !existing.snapshot.buyer) {
+        const [named] = await tx
+          .update(invoices)
+          .set({ snapshot: { ...existing.snapshot, buyer } })
+          .where(eq(invoices.id, existing.id))
+          .returning();
+        return named!;
+      }
+      return existing;
+    }
     if (payment.status === "refunded") throw conflict("payment_refunded");
     if (payment.status !== "succeeded" && payment.status !== "partially_refunded")
       throw conflict("payment_not_settled");
@@ -108,7 +148,7 @@ async function issueForPayment(
     }
     await recordAudit(tx, {
       action: "invoice.issued",
-      actorType: issuer.kind === "staff" ? "user" : "guest",
+      actorType: issuer.kind === "staff" ? "user" : issuer.kind,
       actorUserId: issuer.kind === "staff" ? issuer.userId : null,
       restaurantId,
       entityType: "invoice",
@@ -116,7 +156,7 @@ async function issueForPayment(
       metadata: { number: created!.number, totalCents: created!.totalCents, buyer: Boolean(buyer) },
     });
     return created!;
-  });
+  }
 }
 
 async function nextInvoiceSeq(tx: DbOrTx, restaurantId: string, year: number) {
@@ -182,7 +222,11 @@ async function buildSnapshot(
     const lines = items.filter((i) => i.orderId === o.id);
     const gross = new Map<number, number>();
     for (const l of lines) gross.set(l.taxRateBps, (gross.get(l.taxRateBps) ?? 0) + l.lineTotalCents);
-    for (const [rate, amount] of gross) {
+    // A discount (till, coupon, points) lowers every rate's base in proportion.
+    const linesTotal = lines.reduce((sum, l) => sum + l.lineTotalCents, 0);
+    const factor = o.discountCents > 0 && linesTotal > 0 ? (linesTotal - o.discountCents) / linesTotal : 1;
+    for (const [rate, full] of gross) {
+      const amount = Math.round(full * factor);
       const tax = o.pricesIncludeTax ? taxFromGross(amount, rate) : taxFromNet(amount, rate);
       const base = o.pricesIncludeTax ? amount - tax : amount;
       const acc = byRate.get(rate) ?? { base: 0, tax: 0 };
@@ -223,7 +267,7 @@ async function buildSnapshot(
     pricesIncludeTax: orderRows.every((o) => o.pricesIncludeTax),
     taxes,
     subtotalCents: items.reduce((s, i) => s + i.lineTotalCents, 0),
-    discountCents: 0,
+    discountCents: orderRows.reduce((sum, o) => sum + o.discountCents, 0),
     taxCents,
     totalCents,
     currency: payment.currency,

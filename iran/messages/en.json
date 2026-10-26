@@ -477,7 +477,8 @@
     "duplicate_booking": "This guest already has a booking at that time.",
     "table_taken": "This table is already booked for that time.",
     "table_too_small": "This table is too small for the party.",
-    "slot_full": "This slot is full."
+    "slot_full": "This slot is full.",
+    "payment_in_progress": "An online payment is in progress for this order."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1485,7 +1486,8 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded",
       "partially_refunded": "Partially refunded"
-    }
+    },
+    "collectOrder": "Collect order {number}"
   },
   "invoice": {
     "title": "Sales invoice",
@@ -1531,7 +1533,8 @@
       "mock_online": "Online (test)",
       "stripe": "Stripe",
       "pay_later": "Pay at the table"
-    }
+    },
+    "discount": "Discount"
   },
   "kinds": {
     "label": "Type of venue",

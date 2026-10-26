@@ -477,7 +477,8 @@
     "duplicate_booking": "لدى هذا العميل حجز في الوقت نفسه.",
     "table_taken": "هذه الطاولة محجوزة في هذا الموعد.",
     "table_too_small": "هذه الطاولة صغيرة جدًا لهذا العدد.",
-    "slot_full": "هذا الموعد ممتلئ."
+    "slot_full": "هذا الموعد ممتلئ.",
+    "payment_in_progress": "يوجد دفع إلكتروني قيد التنفيذ لهذا الطلب."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -1485,7 +1486,8 @@
       "cancelled": "ملغى",
       "refunded": "مسترد",
       "partially_refunded": "مسترد جزئيًا"
-    }
+    },
+    "collectOrder": "تحصيل الطلب {number}"
   },
   "invoice": {
     "title": "فاتورة مبيعات",
@@ -1531,7 +1533,8 @@
       "mock_online": "إلكتروني (تجريبي)",
       "stripe": "Stripe",
       "pay_later": "الدفع على الطاولة"
-    }
+    },
+    "discount": "خصم"
   },
   "kinds": {
     "label": "نوع النشاط",

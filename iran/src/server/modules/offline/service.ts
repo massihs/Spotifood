@@ -38,6 +38,7 @@ import { seatTable } from "@/server/modules/pos/service";
 import { stationsOf } from "@/server/modules/kitchen/stations";
 import { nutritionOf } from "@/server/modules/nutrition/service";
 import { dinerForOrder } from "@/server/modules/diners/service";
+import { issueInvoiceInTx } from "@/server/modules/invoices/service";
 
 /** Snapshot format: the desktop app refuses a snapshot newer than it understands. */
 export const SNAPSHOT_VERSION = 1;
@@ -549,6 +550,7 @@ async function importOne(
       });
       await settleAllocations(tx, payment!, actor);
       await emitPaymentUpdate(tx, payment!);
+      await issueInvoiceInTx(tx, rid, payment!.id, actor);
     }
 
     await emit(tx, {

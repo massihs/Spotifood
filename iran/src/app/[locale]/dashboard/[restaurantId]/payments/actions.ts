@@ -8,7 +8,7 @@ import { parseMoneyInput } from "@/lib/money";
 import { issueInvoiceAsStaff } from "@/server/modules/invoices/service";
 import { cancelPendingPayment, recordStaffPayment, refundPayment } from "@/server/modules/payments/service";
 
-/** Cash / terminal collected at the table. The amount is computed server-side from unpaid orders. */
+/** Cash / terminal collected for a table, a guest or one order. The amount is computed server-side. */
 export async function recordPaymentAction(restaurantId: string, _prev: unknown, fd: FormData) {
   return runAction(async () => {
     const ctx = await actionContext(restaurantId);
@@ -17,7 +17,8 @@ export async function recordPaymentAction(restaurantId: string, _prev: unknown, 
     if (tenderedRaw && tendered === null)
       throw new AppError("VALIDATION", "invalid_price", { field: "tendered" });
     const payment = await recordStaffPayment(db, ctx, {
-      tableSessionId: String(fd.get("tableSessionId") ?? ""),
+      tableSessionId: fd.get("tableSessionId") ? String(fd.get("tableSessionId")) : null,
+      orderId: fd.get("orderId") ? String(fd.get("orderId")) : null,
       participantId: fd.get("participantId") ? String(fd.get("participantId")) : null,
       provider: String(fd.get("provider") ?? "") as "cash",
       tenderedCents: tendered,

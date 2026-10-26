@@ -168,7 +168,7 @@ describe("Iranian invoices", () => {
     expect(await db.select().from(invoices).where(eq(invoices.paymentId, p.id))).toHaveLength(1);
   });
 
-  it("guests only get their own invoices; tenants are isolated; refunded payments are refused", async () => {
+  it("guests only get their own invoices; tenants are isolated; staff cash sales are invoiced at once", async () => {
     const { owner, table, doogh } = await setup();
     const a = await seat(table.qrToken);
     const b = await seat(table.qrToken);
@@ -181,10 +181,11 @@ describe("Iranian invoices", () => {
     await expect(issueInvoiceAsStaff(db, intruder.ctx, pa.id)).rejects.toMatchObject({ code: "NOT_FOUND" });
     expect(await listInvoices(db, intruder.ctx)).toEqual([]);
 
+    // Cash collected by the staff: invoiced at once; a later refund keeps that invoice.
+    const issued = (await listInvoices(db, owner.ctx)).find((i) => i.paymentId === pa.id);
+    expect(issued).toBeDefined();
     await refundPayment(db, owner.ctx, pa.id, { amountCents: pa.amountCents });
-    await expect(issueInvoiceAsStaff(db, owner.ctx, pa.id)).rejects.toMatchObject({
-      message: "payment_refunded",
-    });
+    expect((await issueInvoiceAsStaff(db, owner.ctx, pa.id)).number).toBe(issued!.number);
   });
 
   it("staff can issue invoices; buyer details are validated", async () => {

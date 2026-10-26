@@ -477,7 +477,8 @@
     "duplicate_booking": "Ce client a déjà une réservation à ce moment-là.",
     "table_taken": "Cette table est déjà réservée sur ce créneau.",
     "table_too_small": "Cette table est trop petite pour ce groupe.",
-    "slot_full": "Ce créneau est complet."
+    "slot_full": "Ce créneau est complet.",
+    "payment_in_progress": "Un paiement en ligne est en cours pour cette commande."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1485,7 +1486,8 @@
       "cancelled": "Annulé",
       "refunded": "Remboursé",
       "partially_refunded": "Remboursé en partie"
-    }
+    },
+    "collectOrder": "Encaisser la commande {number}"
   },
   "invoice": {
     "title": "Facture de vente",
@@ -1531,7 +1533,8 @@
       "mock_online": "En ligne (test)",
       "stripe": "Stripe",
       "pay_later": "Payer à table"
-    }
+    },
+    "discount": "Remise"
   },
   "kinds": {
     "label": "Type d'établissement",
