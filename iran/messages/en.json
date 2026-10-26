@@ -2547,7 +2547,9 @@
       "auto": "Automatic: featured dish",
       "upload": "Your photo",
       "dish": "Menu photo"
-    }
+    },
+    "showPrices": "Show prices on the public page",
+    "showPricesHint": "Off: the guide page shows the dishes without prices. The QR menu at the table always shows prices."
   },
   "waiter": {
     "title": "Take orders",

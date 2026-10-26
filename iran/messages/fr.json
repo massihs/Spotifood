@@ -2555,7 +2555,9 @@
       "auto": "Automatique : plat vedette",
       "upload": "Votre image",
       "dish": "Photo du menu"
-    }
+    },
+    "showPrices": "Afficher les prix sur la page publique",
+    "showPricesHint": "Désactivé : la page du guide montre les plats sans prix. Le menu du QR code à table affiche toujours les prix."
   },
   "waiter": {
     "title": "Prise de commande",

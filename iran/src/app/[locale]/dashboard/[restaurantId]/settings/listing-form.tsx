@@ -23,6 +23,7 @@ export type ListingValues = {
   listed: boolean;
   cuisines: string[];
   priceLevel: number | null;
+  showPublicPrices: boolean;
   tagline: string | null;
   city: string | null;
   cityKey: string | null;
@@ -116,6 +117,15 @@ export function ListingForm({
               </option>
             ))}
           </SelectField>
+        </div>
+
+        <div className="rounded-2xl bg-surface-2 p-4">
+          <Checkbox
+            name="showPublicPrices"
+            defaultChecked={values.showPublicPrices}
+            label={t("listing.showPrices")}
+            description={t("listing.showPricesHint")}
+          />
         </div>
 
         <Field

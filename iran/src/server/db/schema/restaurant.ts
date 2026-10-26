@@ -57,6 +57,8 @@ export const restaurants = pgTable(
       .notNull()
       .default(sql`ARRAY[]::text[]`),
     priceLevel: smallint(),
+    /** Prices on the public page (/r/slug); the QR menu at the table always shows them. */
+    showPublicPrices: boolean().notNull().default(true),
     tagline: varchar({ length: 200 }),
     /** Guide photo chosen by the owner: an uploaded cover or one of the dish photos (null = automatic). */
     coverKey: text(),

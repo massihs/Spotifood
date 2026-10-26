@@ -273,11 +273,14 @@ async function Place({ params }: Pick<Props, "params">) {
                                   {p.description}
                                 </p>
                               ) : null}
-                              <p className="mt-1.5 text-sm font-bold text-accent-text tabular-nums">
-                                {p.isAvailable
-                                  ? formatMoney(p.priceCents, place.currency, locale)
-                                  : t("profile.soldOut")}
-                              </p>
+                              {/* The owner may keep prices for the QR menu only. */}
+                              {!p.isAvailable || place.showPrices ? (
+                                <p className="mt-1.5 text-sm font-bold text-accent-text tabular-nums">
+                                  {p.isAvailable
+                                    ? formatMoney(p.priceCents, place.currency, locale)
+                                    : t("profile.soldOut")}
+                                </p>
+                              ) : null}
                             </div>
                             {p.images[0] ? (
                               <img

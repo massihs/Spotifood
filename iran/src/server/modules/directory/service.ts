@@ -27,6 +27,8 @@ export type DirectoryEntry = {
   tagline: string | null;
   cuisines: Cuisine[];
   priceLevel: number | null;
+  /** Dish prices shown on the public page. */
+  showPrices: boolean;
   city: City | null;
   cityText: string | null;
   address: string | null;
@@ -55,6 +57,7 @@ export async function loadDirectory(db: DbOrTx): Promise<DirectoryEntry[]> {
       coverKey: restaurants.coverKey,
       cuisines: restaurants.cuisines,
       priceLevel: restaurants.priceLevel,
+      showPrices: restaurants.showPublicPrices,
       city: restaurants.city,
       line1: restaurants.addressLine1,
       phone: restaurants.phone,
@@ -132,6 +135,7 @@ export async function loadDirectory(db: DbOrTx): Promise<DirectoryEntry[]> {
       tagline: r.tagline,
       cuisines: r.cuisines.filter(isCuisine),
       priceLevel: r.priceLevel,
+      showPrices: r.showPrices,
       city,
       cityText: r.city,
       address: [r.line1, r.city].filter(Boolean).join("، ") || null,
@@ -213,6 +217,7 @@ export const listingSchema = z
     listed: z.boolean(),
     cuisines: z.array(z.enum(CUISINES)).max(5),
     priceLevel: z.number().int().min(1).max(4).nullable(),
+    showPublicPrices: z.boolean().default(true),
     tagline: z
       .string()
       .trim()
@@ -241,6 +246,7 @@ export async function getListing(db: DbOrTx, ctx: RestaurantContext) {
       listed: restaurants.listed,
       cuisines: restaurants.cuisines,
       priceLevel: restaurants.priceLevel,
+      showPublicPrices: restaurants.showPublicPrices,
       tagline: restaurants.tagline,
       city: restaurants.city,
       latitude: restaurants.latitude,

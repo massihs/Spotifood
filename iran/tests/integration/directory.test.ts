@@ -38,6 +38,7 @@ describe("public restaurant guide", () => {
       listed: true,
       cuisines: ["cafe"],
       priceLevel: null,
+      showPublicPrices: false,
       tagline: "",
       city: "Shiraz",
       latitude: "",
@@ -60,6 +61,10 @@ describe("public restaurant guide", () => {
     const cafe = all.find((e) => e.name === "Guide Café")!;
     expect(cafe.position).toMatchObject({ approximate: true });
     expect(cafe.city?.key).toBe("shiraz");
+    // Prices: shown by default, hidden on the public page when the owner says so.
+    expect(cafe.showPrices).toBe(false);
+    expect(all.find((e) => e.name === "Guide Kebab")!.showPrices).toBe(true);
+    expect((await getListing(db, b.ctx)).showPublicPrices).toBe(false);
 
     expect(searchDirectory(all, { city: "tehran" }).map((e) => e.name)).toEqual(["Guide Kebab"]);
     expect(searchDirectory(all, { cuisine: "cafe" }).map((e) => e.name)).toEqual(["Guide Café"]);
