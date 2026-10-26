@@ -126,7 +126,12 @@ describe("music", () => {
       .map((x) => x.id);
     expect(foreign).toBe(other.theme.id);
     await expect(
-      reportPlayback(db, owner.ctx, { trackId: first!.id.replace(/.$/, "0"), positionSec: 0, playing: true }),
+      reportPlayback(db, owner.ctx, {
+        // Another id for sure (the last hex digit changed, whatever it was).
+        trackId: first!.id.replace(/.$/, (c) => (c === "0" ? "1" : "0")),
+        positionSec: 0,
+        playing: true,
+      }),
     ).rejects.toThrow();
   });
 });
