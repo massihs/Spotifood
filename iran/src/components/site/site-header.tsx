@@ -14,7 +14,7 @@ export async function SiteHeader({ home = false, active }: { home?: boolean; act
     <header className="sticky top-0 z-40 border-b border-border/70 bg-bg/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-3 sm:px-6">
         <Logo />
-        <nav className="ms-6 hidden items-center gap-6 text-sm font-medium text-fg-muted md:flex">
+        <nav className="ms-6 hidden items-center gap-5 text-sm font-medium whitespace-nowrap text-fg-muted lg:flex">
           <Link
             href="/restaurants"
             className={cn("hover:text-fg", active === "restaurants" && "font-semibold text-fg")}
@@ -42,7 +42,7 @@ export async function SiteHeader({ home = false, active }: { home?: boolean; act
             href="/restaurants"
             aria-label={t("nav.restaurants")}
             className={cn(
-              "inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-fg-muted ring-1 ring-border hover:text-fg md:hidden",
+              "inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium whitespace-nowrap text-fg-muted ring-1 ring-border hover:text-fg lg:hidden",
               active === "restaurants" && "bg-accent-soft text-accent-text ring-0",
             )}
           >
@@ -53,19 +53,21 @@ export async function SiteHeader({ home = false, active }: { home?: boolean; act
           <Link
             href="/account"
             aria-label={t("nav.account")}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-fg-muted ring-1 ring-border hover:text-fg"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium whitespace-nowrap text-fg-muted ring-1 ring-border hover:text-fg"
           >
             <CircleUser className="size-4" aria-hidden="true" />
-            <span className="hidden lg:inline">{t("nav.account")}</span>
+            <span className="hidden xl:inline">{t("nav.account")}</span>
           </Link>
           <Link
             href="/login"
-            className="hidden h-9 items-center rounded-full px-4 text-sm font-medium text-fg-muted hover:text-fg sm:inline-flex"
+            className="hidden h-9 items-center rounded-full px-4 text-sm font-medium whitespace-nowrap text-fg-muted hover:text-fg sm:inline-flex"
           >
             {t("ctaSecondary")}
           </Link>
           <Link href="/signup" className={buttonClasses("accent", "sm", "h-9 px-4")}>
-            {t("ctaPrimary")}
+            {/* Phones: the short label, so the bar never overflows in English or French. */}
+            <span className="sm:hidden">{t("footer.signup")}</span>
+            <span className="hidden sm:inline">{t("ctaPrimary")}</span>
           </Link>
         </div>
       </div>

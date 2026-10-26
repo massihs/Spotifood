@@ -1,30 +1,44 @@
 import {
+  ArrowLeft,
   BarChart3,
+  Bike,
+  Boxes,
+  Building2,
+  CalendarCheck,
+  Calculator,
   Check,
   ChefHat,
   ChevronDown,
+  Clock,
+  Compass,
+  CreditCard,
+  Dices,
+  Gift,
   Languages,
   Mail,
   MapPin,
+  MessageSquareText,
+  Music,
+  NotebookPen,
   Phone,
   QrCode,
   ReceiptText,
+  Salad,
   ShoppingBag,
-  Store,
   Smartphone,
   SquareMenu,
-  Users,
-  UsersRound,
-  Wallet,
-  Zap,
+  Store,
+  WifiOff,
 } from "lucide-react";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonClasses } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
+import { getDirectory } from "@/server/modules/directory/cache";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -38,19 +52,33 @@ const STEPS = [
   { key: "serve", Icon: ChefHat },
 ] as const;
 
-const FEATURES = [
-  { key: "qr", Icon: QrCode },
-  { key: "split", Icon: UsersRound },
-  { key: "live", Icon: Zap },
-  { key: "pay", Icon: Wallet },
-  { key: "invoice", Icon: ReceiptText },
-  { key: "langs", Icon: Languages },
-  { key: "team", Icon: Users },
-  { key: "insights", Icon: BarChart3 },
+/** Every module of the platform (the big three have their own cards above). */
+const MODULES = [
+  { key: "pos", Icon: Calculator },
+  { key: "waiter", Icon: NotebookPen },
+  { key: "delivery", Icon: Bike },
+  { key: "reservations", Icon: CalendarCheck },
+  { key: "club", Icon: Gift },
+  { key: "inventory", Icon: Boxes },
+  { key: "branches", Icon: Building2 },
+  { key: "offline", Icon: WifiOff },
+  { key: "music", Icon: Music },
+  { key: "games", Icon: Dices },
+  { key: "nutrition", Icon: Salad },
+  { key: "guide", Icon: Compass },
 ] as const;
 
-const STATS = ["setup", "app", "langs", "live"] as const;
-const FAQ = ["app", "pay", "cash", "hardware", "menu"] as const;
+const MADE_FOR_IRAN = [
+  { key: "zarinpal", Icon: CreditCard },
+  { key: "invoice", Icon: ReceiptText },
+  { key: "toman", Icon: Calculator },
+  { key: "rtl", Icon: Languages },
+  { key: "offline", Icon: WifiOff },
+  { key: "sms", Icon: MessageSquareText },
+] as const;
+
+const STATS = ["setup", "app", "langs", "modules"] as const;
+const FAQ = ["app", "pay", "cash", "hardware", "offline", "branches", "menu"] as const;
 
 /** Mock dishes shown in the phone preview (Brielle's real photos). */
 const MOCK = [
@@ -65,6 +93,8 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
   const t = await getTranslations("landing");
   const guestPoints = t.raw("split.guest") as string[];
   const ownerPoints = t.raw("split.owner") as string[];
+  // Real restaurants of the public guide (none yet: the strip is left out).
+  const places = (await getDirectory().catch(() => [])).slice(0, 14);
 
   return (
     <div className="min-h-dvh bg-bg">
@@ -72,92 +102,233 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 
       <main>
         {/* ── Hero ────────────────────────────────────────── */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-accent-soft/70 to-bg">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -end-40 -top-40 size-[34rem] rounded-full bg-accent/15 blur-3xl"
-          />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:pt-20 lg:pb-28">
+        <section className="landing-hero relative isolate overflow-hidden text-white">
+          <div aria-hidden="true" className="landing-grid pointer-events-none absolute inset-0 -z-10" />
+          <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24 lg:pb-28">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg-muted ring-1 ring-border">
-                <span className="size-1.5 rounded-full bg-accent" />
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/85 ring-1 ring-white/15 backdrop-blur">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60" />
+                  <span className="relative inline-flex size-2 rounded-full bg-accent" />
+                </span>
                 {t("badge")}
               </span>
-              <h1 className="mt-6 text-4xl leading-[1.2] font-bold tracking-tight text-balance sm:text-[3.4rem]">
-                {t("title")}
+              <h1 className="mt-6 text-[2.5rem] leading-[1.15] font-black tracking-tight text-balance sm:text-6xl">
+                {t.rich("titleRich", {
+                  hl: (chunks: ReactNode) => <span className="landing-highlight">{chunks}</span>,
+                })}
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-pretty text-fg-muted">{t("subtitle")}</p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/signup" className={buttonClasses("primary", "lg", "px-7")}>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-pretty text-white/70">{t("subtitle")}</p>
+              <div className="mt-9 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/signup"
+                  className={buttonClasses("accent", "lg", "px-7 shadow-[0_10px_30px_-8px_var(--accent)]")}
+                >
                   {t("ctaPrimary")}
+                  <ArrowLeft className="size-4 ltr:rotate-180" aria-hidden="true" />
                 </Link>
-                <Link href="/login" className={buttonClasses("secondary", "lg", "px-7")}>
+                <Link
+                  href="/login"
+                  className="inline-flex h-12 items-center rounded-full bg-white/10 px-7 font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15"
+                >
                   {t("ctaSecondary")}
                 </Link>
               </div>
-              <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-fg-muted">
+              <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/65">
                 {(["noApp", "zarinpal", "invoice"] as const).map((k) => (
                   <li key={k} className="flex items-center gap-1.5">
-                    <Check className="size-4 text-accent" strokeWidth={3} aria-hidden="true" />
+                    <span className="grid size-5 place-items-center rounded-full bg-accent/25">
+                      <Check className="size-3 text-white" strokeWidth={3} aria-hidden="true" />
+                    </span>
                     {t(`trust.${k}`)}
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/restaurants"
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm font-semibold ring-1 ring-border hover:ring-border-strong"
-              >
-                <Store className="size-4 text-accent-text" aria-hidden="true" />
-                {t("findRestaurant")}
-              </Link>
             </div>
-            <PhoneMock table={t("mock.table")} featured={t("mock.featured")} cart={t("mock.cart")} />
+            <HeroVisual t={t} />
           </div>
         </section>
 
+        {/* ── Real restaurants on Spotifood ───────────────── */}
+        {places.length >= 2 ? (
+          <section className="border-b border-border bg-surface py-8">
+            <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6">
+              <p className="text-sm font-semibold text-fg-muted">{t("onSpotifood.title")}</p>
+              <Link href="/restaurants" className="text-sm font-semibold text-accent-text hover:underline">
+                {t("onSpotifood.all")}
+              </Link>
+            </div>
+            <div className="landing-marquee-mask mt-5 overflow-hidden" dir="ltr">
+              <ul className="landing-marquee flex w-max gap-3">
+                {[...places, ...places].map((r, i) => (
+                  <li
+                    key={`${r.id}-${i}`}
+                    aria-hidden={i >= places.length ? true : undefined}
+                    className={i >= places.length ? "landing-dup" : undefined}
+                  >
+                    <Link
+                      href={`/r/${r.slug}`}
+                      tabIndex={i >= places.length ? -1 : undefined}
+                      className="flex items-center gap-3 rounded-2xl bg-bg py-2 ps-2 pe-4 ring-1 ring-border transition hover:ring-border-strong"
+                    >
+                      <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-black/5">
+                        {r.logo ? (
+                          <img
+                            src={r.logo}
+                            alt=""
+                            loading="lazy"
+                            className="size-full object-contain p-0.5"
+                          />
+                        ) : (
+                          <span className="font-bold text-neutral-800">{[...r.name][0]}</span>
+                        )}
+                      </span>
+                      <span dir="auto" className="text-sm font-semibold whitespace-nowrap">
+                        {r.name}
+                        {r.city ? (
+                          <span className="block text-xs font-normal text-fg-muted">
+                            {locale === "fa" || locale === "ar" ? r.city.fa : r.city.en}
+                          </span>
+                        ) : null}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        ) : null}
+
         {/* ── Stats strip ─────────────────────────────────── */}
         <section className="border-b border-border">
-          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-border sm:grid-cols-4">
-            {STATS.map((k) => (
-              <div key={k} className="bg-bg px-4 py-7 text-center sm:px-6">
-                <p className="text-2xl font-semibold tracking-tight">{t(`stats.${k}.value`)}</p>
-                <p className="mt-1 text-sm text-fg-muted">{t(`stats.${k}.label`)}</p>
+          <div className="mx-auto grid max-w-6xl grid-cols-2 sm:grid-cols-4">
+            {STATS.map((k, i) => (
+              <div
+                key={k}
+                className={cn(
+                  "px-4 py-8 text-center sm:px-6",
+                  i % 2 === 1 && "border-s border-border",
+                  i >= 2 && "border-t border-border sm:border-t-0",
+                  i === 2 && "sm:border-s",
+                )}
+              >
+                <p className="text-3xl font-black tracking-tight text-accent-text">{t(`stats.${k}.value`)}</p>
+                <p className="mt-1.5 text-sm text-fg-muted">{t(`stats.${k}.label`)}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ── How it works ────────────────────────────────── */}
-        <section id="how" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
-          <SectionTitle title={t("howTitle")} subtitle={t("howSubtitle")} />
-          <ol className="mt-12 grid gap-4 md:grid-cols-3">
-            {STEPS.map(({ key, Icon }, i) => (
-              <li key={key} className="relative rounded-2xl border border-border bg-surface p-6">
-                <div className="flex items-center justify-between">
-                  <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent-text">
-                    <Icon className="size-5" aria-hidden="true" />
+        {/* ── Platform (bento) ────────────────────────────── */}
+        <section id="features" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6">
+          <SectionTitle
+            eyebrow={t("platform.eyebrow")}
+            title={t("platform.title")}
+            subtitle={t("platform.subtitle")}
+          />
+          <div className="mt-14 grid gap-4 lg:grid-cols-3">
+            <BentoCard
+              className="lg:col-span-2 lg:row-span-2"
+              Icon={QrCode}
+              title={t("platform.qr.title")}
+              body={t("platform.qr.body")}
+            >
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:min-h-72 lg:flex-1 lg:grid-cols-2 lg:grid-rows-2">
+                {["salmon", "pepperoni", "baconavocado", "rockshrimp"].map((n, i) => (
+                  <div key={n} className="relative overflow-hidden rounded-2xl lg:min-h-0">
+                    <img
+                      src={`/landing/${n}.jpg`}
+                      alt=""
+                      loading="lazy"
+                      className="aspect-square w-full object-cover transition duration-500 hover:scale-105 lg:aspect-auto lg:h-full"
+                    />
+                    {i === 0 ? (
+                      <span className="absolute start-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
+                        {t("mock.featured")}
+                      </span>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {(["noApp", "zarinpal", "invoice"] as const).map((k) => (
+                  <span
+                    key={k}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent-text"
+                  >
+                    <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+                    {t(`trust.${k}`)}
                   </span>
-                  <span className="text-sm font-semibold text-fg-subtle tabular-nums">0{i + 1}</span>
-                </div>
-                <h3 className="mt-5 text-lg font-semibold">{t(`steps.${key}.title`)}</h3>
-                <p className="mt-2 leading-7 text-fg-muted">{t(`steps.${key}.body`)}</p>
+                ))}
+              </div>
+            </BentoCard>
+            <BentoCard Icon={ChefHat} title={t("platform.kds.title")} body={t("platform.kds.body")}>
+              <KitchenTicket t={t} className="mt-5" />
+            </BentoCard>
+            <BentoCard Icon={BarChart3} title={t("platform.reports.title")} body={t("platform.reports.body")}>
+              <MiniChart label={t("platform.mockRevenue")} />
+            </BentoCard>
+          </div>
+          <ul className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {MODULES.map(({ key, Icon }) => (
+              <li
+                key={key}
+                className="group rounded-3xl bg-surface p-4 ring-1 ring-border transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-float)] sm:p-5"
+              >
+                <span className="grid size-11 place-items-center rounded-2xl bg-accent-soft text-accent-text transition group-hover:bg-accent group-hover:text-accent-fg">
+                  <Icon className="size-5" aria-hidden="true" />
+                </span>
+                <h3 className="mt-4 font-bold">{t(`platform.modules.${key}.title`)}</h3>
+                <p className="mt-1.5 text-xs leading-5 text-fg-muted sm:text-sm sm:leading-6">
+                  {t(`platform.modules.${key}.body`)}
+                </p>
               </li>
             ))}
-          </ol>
+          </ul>
         </section>
 
-        {/* ── Features ────────────────────────────────────── */}
-        <section id="features" className="scroll-mt-20 border-y border-border bg-surface">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-            <SectionTitle title={t("featuresTitle")} subtitle={t("featuresSubtitle")} />
-            <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {FEATURES.map(({ key, Icon }) => (
-                <li key={key} className="rounded-2xl border border-border bg-bg p-6">
-                  <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent-text">
+        {/* ── How it works ────────────────────────────────── */}
+        <section id="how" className="scroll-mt-20 border-y border-border bg-surface">
+          <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
+            <SectionTitle eyebrow={t("howEyebrow")} title={t("howTitle")} subtitle={t("howSubtitle")} />
+            <ol className="relative mt-14 grid gap-6 md:grid-cols-3">
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-[16%] top-7 hidden border-t-2 border-dashed border-border-strong md:block"
+              />
+              {STEPS.map(({ key, Icon }, i) => (
+                <li key={key} className="relative text-center">
+                  <span className="relative mx-auto grid size-14 place-items-center rounded-2xl bg-accent text-accent-fg shadow-[0_10px_24px_-10px_var(--accent)]">
+                    <Icon className="size-6" aria-hidden="true" />
+                    <span className="absolute -end-2 -top-2 grid size-6 place-items-center rounded-full bg-ink text-xs font-bold text-ink-fg tabular-nums">
+                      {i + 1}
+                    </span>
+                  </span>
+                  <h3 className="mt-5 text-lg font-bold">{t(`steps.${key}.title`)}</h3>
+                  <p className="mx-auto mt-2 max-w-xs leading-7 text-fg-muted">{t(`steps.${key}.body`)}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ── Made for Iran ───────────────────────────────── */}
+        <section className="px-4 py-24 sm:px-6">
+          <div className="landing-hero relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] px-6 py-14 text-white sm:px-12">
+            <div aria-hidden="true" className="landing-grid pointer-events-none absolute inset-0 -z-10" />
+            <SectionTitle eyebrow={t("iran.eyebrow")} title={t("iran.title")} dark />
+            <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {MADE_FOR_IRAN.map(({ key, Icon }) => (
+                <li key={key} className="flex gap-4 rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/10">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent text-accent-fg">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
-                  <h3 className="mt-4 font-semibold">{t(`features.${key}.title`)}</h3>
-                  <p className="mt-1.5 text-sm leading-6 text-fg-muted">{t(`features.${key}.body`)}</p>
+                  <span>
+                    <span className="block font-bold">{t(`iran.items.${key}.title`)}</span>
+                    <span className="mt-1 block text-sm leading-6 text-white/65">
+                      {t(`iran.items.${key}.body`)}
+                    </span>
+                  </span>
                 </li>
               ))}
             </ul>
@@ -165,51 +336,35 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* ── Guests vs restaurants ───────────────────────── */}
-        <section className="mx-auto grid max-w-6xl gap-4 px-4 py-20 sm:px-6 md:grid-cols-2">
+        <section className="mx-auto grid max-w-6xl gap-4 px-4 pb-24 sm:px-6 md:grid-cols-2">
           <BenefitCard
             title={t("split.guestTitle")}
             points={guestPoints}
             Icon={Smartphone}
-            className="border border-border bg-surface"
+            className="bg-surface ring-1 ring-border"
           />
           <BenefitCard
             title={t("split.ownerTitle")}
             points={ownerPoints}
-            Icon={ChefHat}
-            className="border border-accent/20 bg-accent-soft"
+            Icon={Store}
+            className="bg-accent-soft ring-1 ring-accent/20"
           />
         </section>
 
-        {/* ── Showcase ────────────────────────────────────── */}
-        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface">
-            <div className="grid grid-cols-2 sm:grid-cols-4">
-              {["salmon", "pepperoni", "baconavocado", "rockshrimp"].map((n) => (
-                <img
-                  key={n}
-                  src={`/landing/${n}.jpg`}
-                  alt=""
-                  loading="lazy"
-                  className="aspect-[4/3] w-full object-cover"
-                />
-              ))}
-            </div>
-            <p className="px-6 py-5 text-center font-medium text-fg-muted">{t("showcase")}</p>
-          </div>
-        </section>
-
         {/* ── FAQ ─────────────────────────────────────────── */}
-        <section id="faq" className="mx-auto max-w-3xl scroll-mt-20 px-4 pb-20 sm:px-6">
+        <section id="faq" className="mx-auto max-w-3xl scroll-mt-20 px-4 pb-24 sm:px-6">
           <SectionTitle title={t("faqTitle")} />
-          <div className="mt-10 divide-y divide-border rounded-2xl border border-border bg-surface">
+          <div className="mt-10 space-y-3">
             {FAQ.map((k) => (
-              <details key={k} className="group px-6 py-5 [&_summary::-webkit-details-marker]:hidden">
+              <details
+                key={k}
+                className="group rounded-2xl bg-surface px-6 py-5 ring-1 ring-border open:ring-accent/40 [&_summary::-webkit-details-marker]:hidden"
+              >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
                   {t(`faq.${k}.q`)}
-                  <ChevronDown
-                    className="size-5 shrink-0 text-fg-muted transition-transform group-open:rotate-180"
-                    aria-hidden="true"
-                  />
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 transition group-open:rotate-180 group-open:bg-accent group-open:text-accent-fg">
+                    <ChevronDown className="size-4" aria-hidden="true" />
+                  </span>
                 </summary>
                 <p className="mt-3 leading-7 text-fg-muted">{t(`faq.${k}.a`)}</p>
               </details>
@@ -259,22 +414,25 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* ── Final CTA ───────────────────────────────────── */}
-        <section className="px-4 pb-20 sm:px-6">
-          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl bg-accent px-6 py-16 text-center text-accent-fg sm:px-12">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -top-24 left-1/2 size-96 -translate-x-1/2 rounded-full bg-white/20 blur-3xl"
-            />
-            <h2 className="relative text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+        <section className="px-4 pb-24 sm:px-6">
+          <div className="landing-hero relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] px-6 py-16 text-center text-white sm:px-12">
+            <div aria-hidden="true" className="landing-grid pointer-events-none absolute inset-0 -z-10" />
+            <h2 className="mx-auto max-w-2xl text-3xl font-black tracking-tight text-balance sm:text-4xl">
               {t("finalTitle")}
             </h2>
-            <p className="relative mx-auto mt-4 max-w-xl leading-8 opacity-85">{t("finalBody")}</p>
-            <Link
-              href="/signup"
-              className="relative mt-8 inline-flex h-12 items-center rounded-full bg-white px-8 font-semibold text-accent-text shadow-[var(--shadow-soft)] hover:bg-white/90"
-            >
-              {t("ctaPrimary")}
-            </Link>
+            <p className="mx-auto mt-4 max-w-xl leading-8 text-white/70">{t("finalBody")}</p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link href="/signup" className={buttonClasses("accent", "lg", "px-8")}>
+                {t("ctaPrimary")}
+              </Link>
+              <Link
+                href="/restaurants"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-white/10 px-7 font-semibold text-white ring-1 ring-white/20 hover:bg-white/15"
+              >
+                <MapPin className="size-4" aria-hidden="true" />
+                {t("ctaGuide")}
+              </Link>
+            </div>
           </div>
         </section>
       </main>
@@ -287,11 +445,58 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 /** Spotifood's own contact details (the "Contact us" section and the footer). */
 const CONTACT = { phone: "021 2212 5555", phoneE164: "+982122125555", email: "contact@spotifood.ir" };
 
-function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
+function SectionTitle({
+  eyebrow,
+  title,
+  subtitle,
+  dark = false,
+}: {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  dark?: boolean;
+}) {
   return (
-    <div className="text-center">
-      <h2 className="text-2xl font-bold tracking-tight text-balance sm:text-3xl">{title}</h2>
-      {subtitle ? <p className="mt-3 text-lg text-fg-muted">{subtitle}</p> : null}
+    <div className="mx-auto max-w-2xl text-center">
+      {eyebrow ? (
+        <p
+          className={cn(
+            "text-sm font-bold tracking-wide",
+            dark ? "text-[color:var(--landing-glow-text)]" : "text-accent-text",
+          )}
+        >
+          {eyebrow}
+        </p>
+      ) : null}
+      <h2 className="mt-2 text-3xl font-black tracking-tight text-balance sm:text-4xl">{title}</h2>
+      {subtitle ? (
+        <p className={cn("mt-4 text-lg leading-8", dark ? "text-white/70" : "text-fg-muted")}>{subtitle}</p>
+      ) : null}
+    </div>
+  );
+}
+
+function BentoCard({
+  Icon,
+  title,
+  body,
+  className,
+  children,
+}: {
+  Icon: typeof Smartphone;
+  title: string;
+  body: string;
+  className?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div className={cn("flex flex-col rounded-3xl bg-surface p-6 ring-1 ring-border sm:p-7", className)}>
+      <span className="grid size-12 place-items-center rounded-2xl bg-accent text-accent-fg">
+        <Icon className="size-6" aria-hidden="true" />
+      </span>
+      <h3 className="mt-5 text-xl font-bold">{title}</h3>
+      <p className="mt-2 leading-7 text-fg-muted">{body}</p>
+      <div className="flex flex-1 flex-col justify-end">{children}</div>
     </div>
   );
 }
@@ -308,19 +513,97 @@ function BenefitCard({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-2xl p-8", className)}>
-      <span className="grid size-11 place-items-center rounded-xl bg-accent text-accent-fg">
-        <Icon className="size-5" aria-hidden="true" />
+    <div className={cn("rounded-3xl p-8", className)}>
+      <span className="grid size-12 place-items-center rounded-2xl bg-accent text-accent-fg">
+        <Icon className="size-6" aria-hidden="true" />
       </span>
-      <h3 className="mt-5 text-xl font-semibold">{title}</h3>
+      <h3 className="mt-5 text-2xl font-bold">{title}</h3>
       <ul className="mt-5 space-y-3">
         {points.map((p) => (
           <li key={p} className="flex items-start gap-3">
-            <Check className="mt-1 size-4 shrink-0 text-accent" strokeWidth={3} aria-hidden="true" />
+            <Check className="mt-1 size-4 shrink-0 text-accent-text" strokeWidth={3} aria-hidden="true" />
             <p className="leading-7 text-fg-muted">{p}</p>
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+type T = Awaited<ReturnType<typeof getTranslations<"landing">>>;
+
+/** Hero illustration: the guest menu on a phone, with the kitchen ticket and live toasts around it. */
+function HeroVisual({ t }: { t: T }) {
+  return (
+    <div aria-hidden="true" className="relative mx-auto w-full max-w-md lg:me-0">
+      <div className="landing-orb absolute inset-x-6 top-10 bottom-0 -z-10 rounded-full" />
+      <PhoneMock table={t("mock.table")} featured={t("mock.featured")} cart={t("mock.cart")} />
+      <div className="landing-float absolute -start-2 top-24 hidden w-48 sm:block lg:-start-14">
+        <KitchenTicket t={t} />
+      </div>
+      <div className="landing-float-slow absolute -end-1 top-6 flex items-center gap-2.5 rounded-2xl bg-white/95 px-3.5 py-2.5 text-[#141414] shadow-xl ring-1 ring-black/5 lg:-end-8">
+        <span className="grid size-8 place-items-center rounded-full bg-emerald-500 text-white">
+          <Check className="size-4" strokeWidth={3} />
+        </span>
+        <span className="text-sm leading-tight font-bold">
+          {t("float.paid")}
+          <span className="block text-xs font-medium text-neutral-500">۳٬۶۰۰٬۰۰۰ تومان</span>
+        </span>
+      </div>
+      <div className="landing-float absolute -end-2 bottom-24 flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-fg shadow-xl lg:-end-10">
+        <ChefHat className="size-4" />
+        {t("float.ready")} · {t("float.table")}
+      </div>
+    </div>
+  );
+}
+
+/** A kitchen display ticket with its running timer (decorative). */
+function KitchenTicket({ t, className }: { t: T; className?: string }) {
+  return (
+    <div className={cn("rounded-2xl bg-white p-3.5 text-[#141414] shadow-xl ring-1 ring-black/5", className)}>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[13px] font-black whitespace-nowrap">
+          #A-1042 <span className="font-semibold text-neutral-500">· {t("float.table")}</span>
+        </span>
+        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white tabular-nums">
+          <Clock className="size-3" />
+          {t("float.minutes")}
+        </span>
+      </div>
+      <ul className="mt-2.5 space-y-1.5 text-[13px]">
+        {(["mockDish1", "mockDish2", "mockDish3"] as const).map((k, i) => (
+          <li key={k} className="flex items-center gap-2">
+            <span className="grid size-5 place-items-center rounded-md bg-neutral-100 text-[11px] font-bold">
+              {i === 0 ? 2 : 1}
+            </span>
+            <span className="font-semibold">{t(`platform.${k}`)}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-3 h-8 rounded-xl bg-[#141414] text-center text-xs leading-8 font-bold text-white">
+        {t("float.kitchen")} ✓
+      </div>
+    </div>
+  );
+}
+
+/** A small weekly sales chart (decorative). */
+function MiniChart({ label }: { label: string }) {
+  const bars = [42, 58, 50, 71, 64, 88, 96];
+  return (
+    <div aria-hidden="true" className="mt-5 rounded-2xl bg-bg p-4 ring-1 ring-border">
+      <p className="text-xs font-semibold text-fg-muted">{label}</p>
+      <p className="mt-1 text-lg font-black tabular-nums">+۲۴٪</p>
+      <div className="mt-3 flex h-20 items-end gap-1.5" dir="ltr">
+        {bars.map((h, i) => (
+          <span
+            key={i}
+            className={cn("flex-1 rounded-t-md", i === bars.length - 1 ? "bg-accent" : "bg-accent-soft-2")}
+            style={{ height: `${h}%` }}
+          />
+        ))}
+      </div>
     </div>
   );
 }

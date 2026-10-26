@@ -31,45 +31,10 @@
   "landing": {
     "metaTitle": "Spotifood — Commande à table par QR code pour restaurants",
     "metaDescription": "Digitalisez votre menu et vos commandes : vos clients scannent, commandent et paient depuis leur table. Cuisine en temps réel, paiement séparé, factures, avis.",
-    "badge": "Plateforme restaurant",
-    "title": "Vos clients scannent. Commandent. Paient.",
-    "subtitle": "Spotifood transforme chaque table en point de commande. Menu en ligne, commandes en temps réel en cuisine, paiement individuel et factures — sans application à installer.",
+    "badge": "La plateforme complète des restaurants et cafés d'Iran",
+    "subtitle": "Spotifood réunit le menu QR à table, la caisse, la cuisine, la livraison, les réservations, le club clients et les stocks sur une seule plateforme — sans appli à installer pour vos clients.",
     "ctaPrimary": "Créer mon restaurant",
     "ctaSecondary": "Se connecter",
-    "features": {
-      "qr": {
-        "title": "Un QR par table",
-        "body": "Générez et imprimez les QR codes de toutes vos tables en un clic."
-      },
-      "split": {
-        "title": "Chacun paie sa part",
-        "body": "Plusieurs clients à la même table, chacun avec son panier et son addition."
-      },
-      "live": {
-        "title": "Cuisine en direct",
-        "body": "Les commandes arrivent instantanément en cuisine et en salle."
-      },
-      "insights": {
-        "title": "Ventes & avis",
-        "body": "Chiffre d'affaires, produits phares, avis et plaintes au même endroit."
-      },
-      "pay": {
-        "title": "Paiement en ligne Zarinpal",
-        "body": "Paiement depuis la table via la passerelle Zarinpal du restaurant, ou en espèces et par carte."
-      },
-      "invoice": {
-        "title": "Factures officielles",
-        "body": "Factures en persan numérotées par année solaire, avec TVA et PDF imprimable."
-      },
-      "langs": {
-        "title": "Carte multilingue",
-        "body": "Carte en persan, anglais et arabe pour les habitués et les visiteurs."
-      },
-      "team": {
-        "title": "Équipe & rôles",
-        "body": "Gérant, caissier, serveur : chacun ne voit que ce dont il a besoin."
-      }
-    },
     "nav": {
       "radio": "Radio",
       "features": "Fonctionnalités",
@@ -89,7 +54,6 @@
       "cart": "Voir le panier",
       "featured": "À la une"
     },
-    "showcase": "La vraie carte de Brielle, Téhéran, sur Spotifood",
     "stats": {
       "setup": {
         "value": "10 min",
@@ -97,15 +61,15 @@
       },
       "app": {
         "value": "0",
-        "label": "appli à installer"
+        "label": "appli à installer pour le client"
       },
       "langs": {
         "value": "3 langues",
         "label": "persan, anglais, arabe"
       },
-      "live": {
-        "value": "En direct",
-        "label": "commandes en cuisine"
+      "modules": {
+        "value": "15+",
+        "label": "modules sur une plateforme"
       }
     },
     "howTitle": "Trois étapes. C'est tout.",
@@ -124,8 +88,6 @@
         "body": "Les clients scannent et commandent ; la cuisine le voit aussitôt."
       }
     },
-    "featuresTitle": "Tout ce qu'un restaurant moderne attend",
-    "featuresSubtitle": "De la carte à la facture, sur une seule plateforme.",
     "split": {
       "guestTitle": "Pour les clients",
       "guest": [
@@ -163,6 +125,14 @@
       "menu": {
         "q": "Les modifications de carte sont-elles rapides ?",
         "a": "Instantanées. Changez un prix, une photo ou marquez un plat épuisé : les clients le voient aussitôt."
+      },
+      "offline": {
+        "q": "Et si Internet est coupé ?",
+        "a": "Le logiciel Spotifood pour ordinateur fonctionne sur le réseau local du restaurant : commandes, cuisine et impression continuent, et tout se synchronise au retour d'Internet."
+      },
+      "branches": {
+        "q": "J'ai plusieurs établissements : puis-je tout voir au même endroit ?",
+        "a": "Oui. La vue groupe montre les ventes de toutes les succursales, et vous pouvez copier un menu d'un établissement à l'autre."
       }
     },
     "finalTitle": "Passez votre restaurant au numérique dès aujourd'hui",
@@ -180,7 +150,124 @@
       "email": "E-mail",
       "address": "Adresse",
       "addressValue": "Téhéran, 1er district, Tour Park Center"
-    }
+    },
+    "titleRich": "Vos clients scannent, commandent, <hl>paient.</hl>",
+    "ctaGuide": "Guide des restaurants",
+    "float": {
+      "newOrder": "Nouvelle commande",
+      "table": "Table 4",
+      "paid": "Paiement réussi",
+      "ready": "Prête à servir",
+      "kitchen": "Cuisine",
+      "minutes": "04:12"
+    },
+    "onSpotifood": {
+      "title": "Ils travaillent avec Spotifood",
+      "all": "Tout voir"
+    },
+    "platform": {
+      "eyebrow": "Une plateforme, tout le restaurant",
+      "title": "Tout ce dont la salle, la cuisine et la gestion ont besoin",
+      "subtitle": "Activez les modules dont vous avez besoin ; les autres restent masqués.",
+      "qr": {
+        "title": "Menu QR et commande à table",
+        "body": "Le client scanne avec son appareil photo, voit la carte en photos, commande et paie sa part en ligne ou en espèces."
+      },
+      "kds": {
+        "title": "Cuisine et bar en temps réel",
+        "body": "Chaque commande part au bon poste, avec un chronomètre depuis la prise de commande et l'impression automatique des tickets."
+      },
+      "reports": {
+        "title": "Rapports, comptabilité et factures",
+        "body": "Ventes du jour, meilleures ventes, marge, TVA et factures officielles au calendrier persan."
+      },
+      "mockOrders": "Commandes du jour",
+      "mockRevenue": "Ventes de la semaine",
+      "mockDish1": "Kebab koobideh",
+      "mockDish2": "Doogh",
+      "mockDish3": "Salade shirazi",
+      "modules": {
+        "pos": {
+          "title": "Caisse",
+          "body": "Sur place, à emporter, par téléphone, crédit client et clôture de caisse."
+        },
+        "waiter": {
+          "title": "Prise de commande serveur",
+          "body": "Le serveur commande depuis son téléphone et envoie en cuisine."
+        },
+        "delivery": {
+          "title": "Livraison et coursiers",
+          "body": "Zones et frais, attribution des coursiers et règlement."
+        },
+        "reservations": {
+          "title": "Réservations et file d'attente",
+          "body": "Plan de salle, SMS de confirmation et de rappel, liste d'attente."
+        },
+        "club": {
+          "title": "Club clients",
+          "body": "Points de fidélité, codes promo et campagnes SMS."
+        },
+        "inventory": {
+          "title": "Stocks et recettes",
+          "body": "Déduction automatique des ingrédients, achats et alertes."
+        },
+        "branches": {
+          "title": "Multi-établissements",
+          "body": "Vue d'ensemble de toutes les succursales et copie de menu."
+        },
+        "offline": {
+          "title": "Logiciel hors ligne",
+          "body": "Internet coupé ? Caisse et cuisine continuent sur le réseau local."
+        },
+        "music": {
+          "title": "Musique et radio",
+          "body": "Des playlists pour l'ambiance du restaurant."
+        },
+        "games": {
+          "title": "Backgammon",
+          "body": "Les clients jouent entre eux en attendant leur plat."
+        },
+        "nutrition": {
+          "title": "Calories et nutrition",
+          "body": "Le client suit les calories de ce qu'il a mangé."
+        },
+        "guide": {
+          "title": "Guide des restaurants",
+          "body": "Page publique, carte et réservation en ligne sur spotifood.ir."
+        }
+      }
+    },
+    "iran": {
+      "eyebrow": "Conçu pour l'Iran",
+      "title": "Pensé dès le premier jour pour les restaurants iraniens",
+      "items": {
+        "zarinpal": {
+          "title": "Votre propre passerelle Zarinpal",
+          "body": "L'argent arrive directement sur votre compte."
+        },
+        "invoice": {
+          "title": "Factures officielles persanes",
+          "body": "Numérotation par année solaire, TVA et PDF."
+        },
+        "toman": {
+          "title": "Prix en tomans",
+          "body": "Saisie et affichage en tomans, en chiffres persans."
+        },
+        "rtl": {
+          "title": "Persan, anglais et arabe",
+          "body": "Carte et panneau entièrement de droite à gauche, et pour les visiteurs étrangers."
+        },
+        "offline": {
+          "title": "Fonctionne sans Internet",
+          "body": "Logiciel Windows et Mac, imprimantes thermiques sur le réseau local."
+        },
+        "sms": {
+          "title": "SMS",
+          "body": "Code de connexion, commande prête, réservations et campagnes."
+        }
+      }
+    },
+    "howEyebrow": "Démarrage simple"
   },
   "auth": {
     "loginTitle": "Bon retour",

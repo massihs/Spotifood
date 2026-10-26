@@ -40,9 +40,8 @@
       "account": "My account",
       "contact": "Contact us"
     },
-    "badge": "Built for restaurants and cafés in Iran",
-    "title": "Guests scan. Order. Pay.",
-    "subtitle": "Spotifood turns every table into an ordering point: a beautiful photo menu, orders straight to the kitchen, split payments with Zarinpal and official invoices — no app to install.",
+    "badge": "The complete platform for restaurants and cafés in Iran",
+    "subtitle": "Spotifood brings the QR menu at the table, the till, the kitchen, delivery, reservations, the customer club and stock together in one platform — with no app for your guests to install.",
     "ctaPrimary": "Create my restaurant",
     "ctaSecondary": "Log in",
     "trust": {
@@ -55,23 +54,22 @@
       "cart": "View cart",
       "featured": "Featured"
     },
-    "showcase": "The real menu of Brielle, Tehran, on Spotifood",
     "stats": {
       "setup": {
         "value": "10 min",
-        "label": "to your first order"
+        "label": "to the first order"
       },
       "app": {
         "value": "0",
-        "label": "apps to install"
+        "label": "apps for guests to install"
       },
       "langs": {
         "value": "3 languages",
         "label": "Persian, English, Arabic"
       },
-      "live": {
-        "value": "Live",
-        "label": "orders in the kitchen"
+      "modules": {
+        "value": "15+",
+        "label": "modules in one platform"
       }
     },
     "howTitle": "Three steps. That's it.",
@@ -88,42 +86,6 @@
       "serve": {
         "title": "Take orders",
         "body": "Guests scan and order; the kitchen sees it instantly."
-      }
-    },
-    "featuresTitle": "Everything a modern restaurant needs",
-    "featuresSubtitle": "From menu to invoice, in one platform.",
-    "features": {
-      "qr": {
-        "title": "One QR per table",
-        "body": "Generate and print every table's QR code in one click."
-      },
-      "split": {
-        "title": "Everyone pays their share",
-        "body": "Several guests at one table, each with their own cart and bill."
-      },
-      "live": {
-        "title": "Live kitchen",
-        "body": "Orders appear instantly on the kitchen and floor screens."
-      },
-      "pay": {
-        "title": "Zarinpal online payment",
-        "body": "Pay from the table through the restaurant's own Zarinpal gateway, or cash and card."
-      },
-      "invoice": {
-        "title": "Official invoices",
-        "body": "Persian invoices numbered by Jalali year, with VAT and a printable PDF."
-      },
-      "langs": {
-        "title": "Multilingual menu",
-        "body": "Menu in Persian, English and Arabic for locals and visitors."
-      },
-      "team": {
-        "title": "Team & roles",
-        "body": "Manager, cashier, waiter: everyone sees only what they need."
-      },
-      "insights": {
-        "title": "Sales & reports",
-        "body": "Today's revenue, best sellers and payments at a glance."
       }
     },
     "split": {
@@ -163,6 +125,14 @@
       "menu": {
         "q": "How fast are menu changes?",
         "a": "Instant. Change a price, a photo or mark a dish sold out; guests see it right away."
+      },
+      "offline": {
+        "q": "What if the Internet goes down?",
+        "a": "The Spotifood desktop app runs on the restaurant's local network: orders, kitchen and printing carry on, and everything syncs when the Internet is back."
+      },
+      "branches": {
+        "q": "I have several branches: can I see them all in one place?",
+        "a": "Yes. The group view shows sales for every branch, and you can copy a menu from one branch to another."
       }
     },
     "finalTitle": "Take your restaurant digital today",
@@ -180,7 +150,124 @@
       "email": "Email",
       "address": "Address",
       "addressValue": "Tehran, District 1, Park Center Tower"
-    }
+    },
+    "titleRich": "Guests scan, order and <hl>pay.</hl>",
+    "ctaGuide": "Restaurant guide",
+    "float": {
+      "newOrder": "New order",
+      "table": "Table 4",
+      "paid": "Payment received",
+      "ready": "Ready to serve",
+      "kitchen": "Kitchen",
+      "minutes": "04:12"
+    },
+    "onSpotifood": {
+      "title": "Already working with Spotifood",
+      "all": "See all"
+    },
+    "platform": {
+      "eyebrow": "One platform, the whole restaurant",
+      "title": "Everything the floor, the kitchen and the office need",
+      "subtitle": "Turn on the modules you need; the rest stay out of the way.",
+      "qr": {
+        "title": "QR menu and table ordering",
+        "body": "Guests scan with their camera, browse a photo menu, order and pay their own share online or in cash."
+      },
+      "kds": {
+        "title": "Kitchen and bar in real time",
+        "body": "Each order goes to the right station, with a timer from the moment it was placed and automatic ticket printing."
+      },
+      "reports": {
+        "title": "Reports, accounting and invoices",
+        "body": "Daily sales, best sellers, margins, VAT and official Persian-calendar invoices."
+      },
+      "mockOrders": "Today's orders",
+      "mockRevenue": "Sales this week",
+      "mockDish1": "Koobideh kebab",
+      "mockDish2": "Doogh",
+      "mockDish3": "Shirazi salad",
+      "modules": {
+        "pos": {
+          "title": "Point of sale",
+          "body": "Dine-in, takeaway and phone orders, house accounts and shift closing."
+        },
+        "waiter": {
+          "title": "Waiter ordering",
+          "body": "Waiters take orders on their phone and send them to the kitchen."
+        },
+        "delivery": {
+          "title": "Delivery and couriers",
+          "body": "Zones and fees, courier dispatch and settlement."
+        },
+        "reservations": {
+          "title": "Reservations and waitlist",
+          "body": "Floor plan, SMS confirmations and reminders, queue."
+        },
+        "club": {
+          "title": "Customer club",
+          "body": "Loyalty points, coupons and SMS campaigns."
+        },
+        "inventory": {
+          "title": "Stock and recipes",
+          "body": "Automatic ingredient deduction, purchases and low-stock alerts."
+        },
+        "branches": {
+          "title": "Multiple branches",
+          "body": "A group view of every branch and menu copying."
+        },
+        "offline": {
+          "title": "Offline desktop app",
+          "body": "Internet down? The till and kitchen keep running on the local network."
+        },
+        "music": {
+          "title": "Music and radio",
+          "body": "Playlists for the restaurant's atmosphere."
+        },
+        "games": {
+          "title": "Backgammon",
+          "body": "Guests play each other while they wait for their food."
+        },
+        "nutrition": {
+          "title": "Calories and nutrition",
+          "body": "Guests track the calories of what they ate."
+        },
+        "guide": {
+          "title": "Restaurant guide",
+          "body": "Public page, map and online booking on spotifood.ir."
+        }
+      }
+    },
+    "iran": {
+      "eyebrow": "Made for Iran",
+      "title": "Designed from day one for Iranian restaurants",
+      "items": {
+        "zarinpal": {
+          "title": "Your own Zarinpal gateway",
+          "body": "Money goes straight to your account."
+        },
+        "invoice": {
+          "title": "Official Persian invoices",
+          "body": "Numbered by solar year, with VAT and PDF."
+        },
+        "toman": {
+          "title": "Prices in tomans",
+          "body": "Enter and display prices in tomans, with Persian digits."
+        },
+        "rtl": {
+          "title": "Persian, English and Arabic",
+          "body": "Fully right-to-left menu and dashboard, and for foreign visitors too."
+        },
+        "offline": {
+          "title": "Works without Internet",
+          "body": "Windows and Mac app with thermal printers on the local network."
+        },
+        "sms": {
+          "title": "SMS",
+          "body": "Login codes, order ready, reservations and campaigns."
+        }
+      }
+    },
+    "howEyebrow": "Simple start"
   },
   "auth": {
     "loginTitle": "Welcome back",
