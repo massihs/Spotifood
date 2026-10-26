@@ -14,6 +14,9 @@ export async function SiteFooter() {
           <Link href="/restaurants" className="hover:text-fg">
             {t("nav.restaurants")}
           </Link>
+          <Link href="/#contact" className="hover:text-fg">
+            {t("nav.contact")}
+          </Link>
           <Link href="/login" className="hover:text-fg">
             {t("footer.login")}
           </Link>

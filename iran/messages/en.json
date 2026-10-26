@@ -37,7 +37,8 @@
       "faq": "FAQ",
       "radio": "Radio",
       "restaurants": "Restaurants",
-      "account": "My account"
+      "account": "My account",
+      "contact": "Contact us"
     },
     "badge": "Built for restaurants and cafés in Iran",
     "title": "Guests scan. Order. Pay.",
@@ -171,7 +172,15 @@
       "login": "Log in",
       "signup": "Sign up"
     },
-    "findRestaurant": "Looking for a restaurant or café? Browse the guide"
+    "findRestaurant": "Looking for a restaurant or café? Browse the guide",
+    "contact": {
+      "title": "Contact us",
+      "subtitle": "A question or a demo? The Spotifood team is here to help.",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "addressValue": "Tehran, District 1, Park Center Tower"
+    }
   },
   "auth": {
     "loginTitle": "Welcome back",

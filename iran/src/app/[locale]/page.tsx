@@ -4,6 +4,9 @@ import {
   ChefHat,
   ChevronDown,
   Languages,
+  Mail,
+  MapPin,
+  Phone,
   QrCode,
   ReceiptText,
   ShoppingBag,
@@ -214,6 +217,47 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
+        {/* ── Contact ─────────────────────────────────────── */}
+        <section id="contact" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-20 sm:px-6">
+          <SectionTitle title={t("contact.title")} subtitle={t("contact.subtitle")} />
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                key: "phone",
+                Icon: Phone,
+                value: CONTACT.phone,
+                href: `tel:${CONTACT.phoneE164}`,
+                ltr: true,
+              },
+              { key: "email", Icon: Mail, value: CONTACT.email, href: `mailto:${CONTACT.email}`, ltr: true },
+              { key: "address", Icon: MapPin, value: t("contact.addressValue"), href: null, ltr: false },
+            ].map(({ key, Icon, value, href, ltr }) => (
+              <div
+                key={key}
+                className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-5 shadow-[var(--shadow-soft)]"
+              >
+                <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                  <Icon className="size-5" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm text-fg-muted">{t(`contact.${key}`)}</span>
+                  {href ? (
+                    <a
+                      href={href}
+                      dir={ltr ? "ltr" : undefined}
+                      className="mt-1 block font-semibold break-words text-fg hover:text-accent-text"
+                    >
+                      {value}
+                    </a>
+                  ) : (
+                    <span className="mt-1 block leading-7 font-semibold">{value}</span>
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* ── Final CTA ───────────────────────────────────── */}
         <section className="px-4 pb-20 sm:px-6">
           <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl bg-accent px-6 py-16 text-center text-accent-fg sm:px-12">
@@ -239,6 +283,9 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
     </div>
   );
 }
+
+/** Spotifood's own contact details (the "Contact us" section and the footer). */
+const CONTACT = { phone: "021 2212 5555", phoneE164: "+982122125555", email: "contact@spotifood.ir" };
 
 function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (

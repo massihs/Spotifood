@@ -33,6 +33,9 @@ export async function SiteHeader({ home = false, active }: { home?: boolean; act
           <Link href="/radio" className="hover:text-fg">
             {t("nav.radio")}
           </Link>
+          <a href={anchor("contact")} className="hover:text-fg">
+            {t("nav.contact")}
+          </a>
         </nav>
         <div className="ms-auto flex items-center gap-2">
           <Link

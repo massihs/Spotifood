@@ -76,7 +76,8 @@
       "how": "Comment ça marche",
       "faq": "FAQ",
       "restaurants": "Restaurants",
-      "account": "Mon compte"
+      "account": "Mon compte",
+      "contact": "Nous contacter"
     },
     "trust": {
       "noApp": "Aucune appli à installer",
@@ -171,7 +172,15 @@
       "login": "Connexion",
       "signup": "Inscription"
     },
-    "findRestaurant": "Vous cherchez un restaurant ou un café ? Voir le guide"
+    "findRestaurant": "Vous cherchez un restaurant ou un café ? Voir le guide",
+    "contact": {
+      "title": "Nous contacter",
+      "subtitle": "Une question, une démo ? L'équipe Spotifood vous répond.",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "address": "Adresse",
+      "addressValue": "Téhéran, 1er district, Tour Park Center"
+    }
   },
   "auth": {
     "loginTitle": "Bon retour",
