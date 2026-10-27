@@ -52,7 +52,8 @@
     "mock": {
       "table": "Table 4",
       "cart": "Voir le panier",
-      "featured": "À la une"
+      "featured": "À la une",
+      "menu": "Notre menu"
     },
     "stats": {
       "setup": {

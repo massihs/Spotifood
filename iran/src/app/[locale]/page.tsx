@@ -28,6 +28,7 @@ import {
   Smartphone,
   SquareMenu,
   Store,
+  UtensilsCrossed,
   WifiOff,
 } from "lucide-react";
 import type { Metadata } from "next";
@@ -81,11 +82,12 @@ const MADE_FOR_IRAN = [
 const STATS = ["setup", "app", "langs", "modules"] as const;
 const FAQ = ["app", "pay", "cash", "hardware", "offline", "branches", "menu"] as const;
 
-/** Mock dishes shown in the phone preview (Brielle's real photos). */
+/** Mock dishes shown in the phone preview (no restaurant named). */
 const MOCK = [
   { img: "/landing/salmon.jpg", name: "بشقاب سالمون", price: "۲٬۴۰۰٬۰۰۰" },
   { img: "/landing/rockshrimp.jpg", name: "راک شریمپ", price: "۱٬۳۱۹٬۰۰۰" },
   { img: "/landing/baconavocado.jpg", name: "سالاد بیکن و آووکادو", price: "۱٬۲۰۰٬۰۰۰" },
+  { img: "/landing/pepperoni.jpg", name: "پیتزا پپرونی", price: "۹۸۰٬۰۰۰" },
 ];
 
 export default async function LandingPage({ params }: PageProps<"/[locale]">) {
@@ -542,11 +544,16 @@ function HeroVisual({ t }: { t: T }) {
   return (
     <div aria-hidden="true" className="relative mx-auto w-full max-w-md lg:me-0">
       <div className="landing-orb absolute inset-x-6 top-10 bottom-0 -z-10 rounded-full" />
-      <PhoneMock table={t("mock.table")} featured={t("mock.featured")} cart={t("mock.cart")} />
+      <PhoneMock
+        table={t("mock.table")}
+        featured={t("mock.featured")}
+        cart={t("mock.cart")}
+        menu={t("mock.menu")}
+      />
       <div className="landing-float absolute -start-2 top-24 hidden w-48 sm:block lg:-start-14">
         <KitchenTicket t={t} />
       </div>
-      <div className="landing-float-slow absolute -end-1 top-6 flex items-center gap-2.5 rounded-2xl bg-white/95 px-3.5 py-2.5 text-[#141414] shadow-xl ring-1 ring-black/5 lg:-end-8">
+      <div className="landing-float-slow absolute -end-1 top-24 flex items-center gap-2.5 rounded-2xl bg-white/95 px-3.5 py-2.5 text-[#141414] shadow-xl ring-1 ring-black/5 lg:-end-8">
         <span className="grid size-8 place-items-center rounded-full bg-emerald-500 text-white">
           <Check className="size-4" strokeWidth={3} />
         </span>
@@ -614,49 +621,87 @@ function MiniChart({ label }: { label: string }) {
 }
 
 /** Static phone preview of the guest menu (decorative). */
-function PhoneMock({ table, featured, cart }: { table: string; featured: string; cart: string }) {
+function PhoneMock({
+  table,
+  featured,
+  cart,
+  menu,
+}: {
+  table: string;
+  featured: string;
+  cart: string;
+  menu: string;
+}) {
   return (
-    <div aria-hidden="true" className="mx-auto w-full max-w-[19rem] lg:me-0">
-      <div className="rounded-[2.75rem] bg-[#1c1c1e] p-2 shadow-[0_30px_80px_-20px_hsl(265_30%_20%/0.35)]">
-        <div className="overflow-hidden rounded-[2.25rem] bg-white text-[#141414]" dir="rtl">
-          <div className="bg-gradient-to-b from-[#e9f8ee] to-white px-4 pt-5 pb-8">
-            <div className="flex items-center gap-3">
-              <div className="grid size-11 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-black/5">
-                <img src="/landing/logo-brielle.png" alt="" className="size-full object-contain p-0.5" />
-              </div>
-              <div>
-                <p className="text-lg font-bold">Brielle</p>
-                <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold ring-1 ring-black/5">
-                  {table}
+    <div aria-hidden="true" className="relative mx-auto w-[16.5rem] sm:w-[17.5rem] lg:me-6">
+      {/* iPhone: titanium frame, side buttons, Dynamic Island, status bar, home indicator. */}
+      <span className="absolute -start-[3px] top-24 h-7 w-[3px] rounded-s bg-[#3a3a3c]" />
+      <span className="absolute -start-[3px] top-36 h-12 w-[3px] rounded-s bg-[#3a3a3c]" />
+      <span className="absolute -start-[3px] top-[13.5rem] h-12 w-[3px] rounded-s bg-[#3a3a3c]" />
+      <span className="absolute -end-[3px] top-40 h-16 w-[3px] rounded-e bg-[#3a3a3c]" />
+      <div className="aspect-[9/19.5] rounded-[3rem] bg-gradient-to-b from-[#4a4a4f] via-[#2c2c2e] to-[#4a4a4f] p-[3px] shadow-[0_40px_90px_-25px_rgba(0,0,0,0.8)]">
+        <div className="h-full rounded-[2.85rem] bg-black p-[7px]">
+          <div
+            className="relative flex h-full flex-col overflow-hidden rounded-[2.4rem] bg-white text-[#141414]"
+            dir="rtl"
+          >
+            <div className="absolute top-2.5 left-1/2 z-10 h-[26px] w-[88px] -translate-x-1/2 rounded-full bg-black" />
+            <div
+              className="flex items-center justify-between px-6 pt-3.5 text-[12px] font-semibold"
+              dir="ltr"
+            >
+              <span>9:41</span>
+              <span className="flex items-center gap-1">
+                <span className="flex items-end gap-[2px]">
+                  {[4, 6, 8, 10].map((h) => (
+                    <span key={h} className="w-[3px] rounded-sm bg-[#141414]" style={{ height: h }} />
+                  ))}
                 </span>
+                <span className="relative ms-1 h-[11px] w-[22px] rounded-[3px] border border-[#141414]/40 p-[1px]">
+                  <span className="block h-full w-4/5 rounded-[1px] bg-[#141414]" />
+                </span>
+              </span>
+            </div>
+            <div className="bg-gradient-to-b from-accent-soft to-white px-4 pt-5 pb-7">
+              <div className="flex items-center gap-3">
+                <div className="grid size-11 place-items-center rounded-xl bg-accent text-accent-fg">
+                  <UtensilsCrossed className="size-5" />
+                </div>
+                <div>
+                  <p className="text-base font-bold">{menu}</p>
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold ring-1 ring-black/5">
+                    {table}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="-mt-4 rounded-t-3xl bg-white px-4 pt-4 pb-3">
-            <div className="h-9 rounded-full bg-[#f3f3f3]" />
-            <p className="mt-4 text-sm font-bold">{featured}</p>
-            <div className="mt-2 space-y-3">
-              {MOCK.map((d) => (
-                <div key={d.name} className="flex items-center gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-bold">{d.name}</p>
-                    <p className="text-[12px] font-semibold text-[#555]">{d.price} تومان</p>
+            <div className="-mt-4 flex flex-1 flex-col rounded-t-3xl bg-white px-4 pt-4 pb-3">
+              <div className="h-9 rounded-full bg-[#f3f3f3]" />
+              <p className="mt-4 text-sm font-bold">{featured}</p>
+              <div className="mt-2 space-y-3">
+                {MOCK.map((d) => (
+                  <div key={d.name} className="flex items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13px] font-bold">{d.name}</p>
+                      <p className="text-[12px] font-semibold text-[#555]">{d.price} تومان</p>
+                    </div>
+                    <div className="relative">
+                      <img src={d.img} alt="" className="size-16 rounded-xl bg-[#f3f3f3] object-cover" />
+                      <span className="absolute -end-1 -bottom-1 grid size-6 place-items-center rounded-full bg-white text-sm font-bold shadow">
+                        +
+                      </span>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <img src={d.img} alt="" className="size-16 rounded-xl bg-[#f3f3f3] object-cover" />
-                    <span className="absolute -end-1 -bottom-1 grid size-6 place-items-center rounded-full bg-white text-sm font-bold shadow">
-                      +
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 flex h-11 items-center gap-2 rounded-full bg-accent ps-1.5 pe-4 text-[13px] font-bold text-white">
-              <span className="grid size-8 place-items-center rounded-full bg-white/20">
-                <ShoppingBag className="size-4" />
-              </span>
-              <span className="flex-1">{cart}</span>
-              <span>۳٬۶۰۰٬۰۰۰</span>
+                ))}
+              </div>
+              <div className="mt-auto flex h-11 items-center gap-2 rounded-full bg-accent ps-1.5 pe-4 text-[13px] font-bold text-white">
+                <span className="grid size-8 place-items-center rounded-full bg-white/20">
+                  <ShoppingBag className="size-4" />
+                </span>
+                <span className="flex-1">{cart}</span>
+                <span>۳٬۶۰۰٬۰۰۰</span>
+              </div>
+              <div className="mx-auto mt-3 h-[5px] w-28 rounded-full bg-[#141414]" />
             </div>
           </div>
         </div>

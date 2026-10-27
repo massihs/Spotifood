@@ -52,7 +52,8 @@
     "mock": {
       "table": "طاولة ٤",
       "cart": "عرض السلة",
-      "featured": "مقترحات"
+      "featured": "مقترحات",
+      "menu": "قائمة الطعام"
     },
     "stats": {
       "setup": {
