@@ -31,7 +31,8 @@ import {
   WifiOff,
 } from "lucide-react";
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
+import { connection } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -93,8 +94,6 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
   const t = await getTranslations("landing");
   const guestPoints = t.raw("split.guest") as string[];
   const ownerPoints = t.raw("split.owner") as string[];
-  // Real restaurants of the public guide (none yet: the strip is left out).
-  const places = (await getDirectory().catch(() => [])).slice(0, 14);
 
   return (
     <div className="min-h-dvh bg-bg">
@@ -149,55 +148,10 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
           </div>
         </section>
 
-        {/* ── Real restaurants on Spotifood ───────────────── */}
-        {places.length >= 2 ? (
-          <section className="border-b border-border bg-surface py-8">
-            <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6">
-              <p className="text-sm font-semibold text-fg-muted">{t("onSpotifood.title")}</p>
-              <Link href="/restaurants" className="text-sm font-semibold text-accent-text hover:underline">
-                {t("onSpotifood.all")}
-              </Link>
-            </div>
-            <div className="landing-marquee-mask mt-5 overflow-hidden" dir="ltr">
-              <ul className="landing-marquee flex w-max gap-3">
-                {[...places, ...places].map((r, i) => (
-                  <li
-                    key={`${r.id}-${i}`}
-                    aria-hidden={i >= places.length ? true : undefined}
-                    className={i >= places.length ? "landing-dup" : undefined}
-                  >
-                    <Link
-                      href={`/r/${r.slug}`}
-                      tabIndex={i >= places.length ? -1 : undefined}
-                      className="flex items-center gap-3 rounded-2xl bg-bg py-2 ps-2 pe-4 ring-1 ring-border transition hover:ring-border-strong"
-                    >
-                      <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-black/5">
-                        {r.logo ? (
-                          <img
-                            src={r.logo}
-                            alt=""
-                            loading="lazy"
-                            className="size-full object-contain p-0.5"
-                          />
-                        ) : (
-                          <span className="font-bold text-neutral-800">{[...r.name][0]}</span>
-                        )}
-                      </span>
-                      <span dir="auto" className="text-sm font-semibold whitespace-nowrap">
-                        {r.name}
-                        {r.city ? (
-                          <span className="block text-xs font-normal text-fg-muted">
-                            {locale === "fa" || locale === "ar" ? r.city.fa : r.city.en}
-                          </span>
-                        ) : null}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        ) : null}
+        {/* ── Real restaurants on Spotifood (read at request time: no database at build) ── */}
+        <Suspense fallback={null}>
+          <RestaurantsStrip locale={locale} />
+        </Suspense>
 
         {/* ── Stats strip ─────────────────────────────────── */}
         <section className="border-b border-border">
@@ -444,6 +398,57 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 
 /** Spotifood's own contact details (the "Contact us" section and the footer). */
 const CONTACT = { phone: "021 2212 5555", phoneE164: "+982122125555", email: "contact@spotifood.ir" };
+
+/** The real restaurants of the public guide (left out while there are fewer than two). */
+async function RestaurantsStrip({ locale }: { locale: string }) {
+  await connection();
+  const [t, all] = await Promise.all([getTranslations("landing"), getDirectory().catch(() => [])]);
+  const places = all.slice(0, 14);
+  if (places.length < 2) return null;
+  return (
+    <section className="border-b border-border bg-surface py-8">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6">
+        <p className="text-sm font-semibold text-fg-muted">{t("onSpotifood.title")}</p>
+        <Link href="/restaurants" className="text-sm font-semibold text-accent-text hover:underline">
+          {t("onSpotifood.all")}
+        </Link>
+      </div>
+      <div className="landing-marquee-mask mt-5 overflow-hidden" dir="ltr">
+        <ul className="landing-marquee flex w-max gap-3">
+          {[...places, ...places].map((r, i) => (
+            <li
+              key={`${r.id}-${i}`}
+              aria-hidden={i >= places.length ? true : undefined}
+              className={i >= places.length ? "landing-dup" : undefined}
+            >
+              <Link
+                href={`/r/${r.slug}`}
+                tabIndex={i >= places.length ? -1 : undefined}
+                className="flex items-center gap-3 rounded-2xl bg-bg py-2 ps-2 pe-4 ring-1 ring-border transition hover:ring-border-strong"
+              >
+                <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-black/5">
+                  {r.logo ? (
+                    <img src={r.logo} alt="" loading="lazy" className="size-full object-contain p-0.5" />
+                  ) : (
+                    <span className="font-bold text-neutral-800">{[...r.name][0]}</span>
+                  )}
+                </span>
+                <span dir="auto" className="text-sm font-semibold whitespace-nowrap">
+                  {r.name}
+                  {r.city ? (
+                    <span className="block text-xs font-normal text-fg-muted">
+                      {locale === "fa" || locale === "ar" ? r.city.fa : r.city.en}
+                    </span>
+                  ) : null}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
 
 function SectionTitle({
   eyebrow,
