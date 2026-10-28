@@ -7,7 +7,13 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 
 /** The public site's top bar (landing, restaurant guide). `home`: anchors scroll in place. */
-export async function SiteHeader({ home = false, active }: { home?: boolean; active?: "restaurants" }) {
+export async function SiteHeader({
+  home = false,
+  active,
+}: {
+  home?: boolean;
+  active?: "restaurants" | "pricing";
+}) {
   const t = await getTranslations("landing");
   const anchor = (id: string) => (home ? `#${id}` : `/#${id}`);
   return (
@@ -20,6 +26,12 @@ export async function SiteHeader({ home = false, active }: { home?: boolean; act
             className={cn("hover:text-fg", active === "restaurants" && "font-semibold text-fg")}
           >
             {t("nav.restaurants")}
+          </Link>
+          <Link
+            href="/pricing"
+            className={cn("hover:text-fg", active === "pricing" && "font-semibold text-fg")}
+          >
+            {t("nav.pricing")}
           </Link>
           <a href={anchor("how")} className="hover:text-fg">
             {t("nav.how")}

@@ -18,3 +18,4 @@ export * from "./diners";
 export * from "./foods";
 export * from "./games";
 export * from "./ops";
+export * from "./billing";

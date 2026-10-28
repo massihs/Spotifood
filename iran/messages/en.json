@@ -38,7 +38,8 @@
       "radio": "Radio",
       "restaurants": "Restaurants",
       "account": "My account",
-      "contact": "Contact us"
+      "contact": "Contact us",
+      "pricing": "Pricing"
     },
     "badge": "The complete platform for restaurants and cafés in Iran",
     "subtitle": "Spotifood brings the QR menu at the table, the till, the kitchen, delivery, reservations, the customer club and stock together in one platform — with no app for your guests to install.",
@@ -339,7 +340,9 @@
     "searchMove": "move",
     "searchOpen": "open",
     "waiter": "Take orders",
-    "adminErrors": "Errors"
+    "adminErrors": "Errors",
+    "billing": "Subscription",
+    "adminPlans": "Plans"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -457,6 +460,31 @@
       "resolved": "Resolved",
       "resolve": "Mark resolved",
       "stack": "Technical details"
+    },
+    "plans": {
+      "title": "Plans",
+      "billingOn": "Subscription payment on (Spotifood Zarinpal merchant set).",
+      "billingOff": "Subscription payment off: set BILLING_ZARINPAL_MERCHANT_ID to open it (14-day trial for new restaurants).",
+      "public": "Shown on /pricing",
+      "name": "Name",
+      "price": "Monthly price ({currency, select, IRR {tomans} other {{currency}}})",
+      "maxTables": "Max tables",
+      "maxStaff": "Max staff",
+      "maxRestaurants": "Max venues",
+      "maxOrdersPerMonth": "Max orders / month",
+      "unlimited": "Unlimited",
+      "save": "Save",
+      "stateFree": "Free",
+      "stateTrial": "{plan} trial until {date}",
+      "stateExpired": "{plan} expired on {date}",
+      "statePaid": "{plan} until {date}",
+      "current": "Plan:",
+      "grant": "Grant a plan",
+      "months": "Duration",
+      "noEnd": "No end",
+      "monthsN": "{count} months",
+      "amount": "Amount received (optional)",
+      "apply": "Apply"
     }
   },
   "errors": {
@@ -588,7 +616,10 @@
     "payment_in_progress": "An online payment is in progress for this order.",
     "table_not_confirmed": "A waiter must approve your table first. They’re on their way!",
     "too_many_pending": "You already have orders waiting. Please wait until they are accepted.",
-    "not_a_guest_order": "This order was entered by the staff: there is no device to block."
+    "not_a_guest_order": "This order was entered by the staff: there is no device to block.",
+    "billing_disabled": "Subscription payment is not open yet.",
+    "billing_provider_error": "Zarinpal is not responding. Please try again shortly.",
+    "plan_not_payable": "This plan cannot be paid online."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -3029,5 +3060,82 @@
     "blockedEmpty": "No blocked device. Block one from an order or a table.",
     "blockedTable": "Table {label}",
     "blockedDevice": "Device"
+  },
+  "billing": {
+    "title": "Subscription",
+    "subtitle": "Your Spotifood plan, its end date and your invoices.",
+    "paidOk": "Payment received, thank you! Your plan is extended.",
+    "paidFailed": "The payment did not go through. Nothing was charged; you can try again.",
+    "current": "Current plan",
+    "freePlan": "Free",
+    "trialBadge": "Trial",
+    "expiredBadge": "Expired",
+    "activeBadge": "Active",
+    "trialUntil": "Free trial until {date} ({days, plural, one {# day left} other {# days left}}).",
+    "paidUntil": "Paid until {date} ({days, plural, one {# day left} other {# days left}}).",
+    "noEnd": "No end date.",
+    "expiredSince": "Ended on {date}: your restaurant runs with the Free plan’s limits.",
+    "freeBody": "Free plan: 5 tables, 2 staff members.",
+    "choose": "Choose or extend a plan",
+    "chooseHint": "Secure payment by Zarinpal. The duration is added to the current period.",
+    "disabledHint": "Online subscription payment opens very soon.",
+    "disabledBody": "To change plan right now, contact us.",
+    "seePricing": "See pricing",
+    "history": "Invoices",
+    "historyEmpty": "No payment yet.",
+    "months": "{count, plural, one {# month} other {# months}}",
+    "failed": "Failed",
+    "perMonth": "/ month",
+    "duration": "Duration",
+    "twoFree": "2 months free",
+    "total": "Total",
+    "redirecting": "Redirecting…",
+    "pay": "Pay with Zarinpal",
+    "ownerOnly": "Only the owner or a manager can pay.",
+    "print": "Print",
+    "invoiceTitle": "Invoice",
+    "billedTo": "Billed to",
+    "line": "Description",
+    "amount": "Amount",
+    "lineLabel": "{plan} plan — {months, plural, one {# month} other {# months}}",
+    "paidWith": "Paid with Zarinpal · reference {ref} · card {card}",
+    "paidManual": "Settled with Spotifood.",
+    "limits": {
+      "tables": "{count, plural, one {# table} other {Up to # tables}}",
+      "tablesUnlimited": "Unlimited tables",
+      "staff": "{count, plural, one {# staff member} other {# staff members}}",
+      "staffUnlimited": "Unlimited staff",
+      "restaurants": "{count, plural, one {# venue} other {# venues}}",
+      "restaurantsUnlimited": "Unlimited venues",
+      "orders": "{count} orders / month",
+      "ordersUnlimited": "Unlimited orders"
+    },
+    "features": {
+      "online_payments": "Online payment at the table",
+      "invoices_email": "Invoices by email",
+      "analytics_advanced": "Advanced reports",
+      "custom_branding": "Custom colours and logo",
+      "priority_support": "Priority support"
+    },
+    "banner": {
+      "trial": "{plan} trial: {days, plural, one {# day left} other {# days left}}.",
+      "ending": "Your {plan} plan ends in {days, plural, one {# day} other {# days}}.",
+      "trialOver": "Your {plan} trial is over: back to the Free plan’s limits.",
+      "expired": "Your {plan} plan has expired: back to the Free plan’s limits.",
+      "renew": "Renew",
+      "choose": "Choose a plan"
+    }
+  },
+  "pricing": {
+    "metaTitle": "Pricing — Spotifood",
+    "title": "Simple pricing",
+    "subtitle": "QR menu, orders, till and kitchen: start free, move up as you grow.",
+    "yearly": "Pay 12 months, get 2 free. No commitment.",
+    "trial": "{days}-day free trial, no card",
+    "popular": "Most chosen",
+    "onQuote": "On quote",
+    "free": "Free",
+    "contact": "Contact us",
+    "start": "Get started"
   }
 }

@@ -38,7 +38,8 @@
       "radio": "راديو",
       "restaurants": "المطاعم",
       "account": "حسابي",
-      "contact": "اتصل بنا"
+      "contact": "اتصل بنا",
+      "pricing": "الأسعار"
     },
     "badge": "المنصة الكاملة للمطاعم والمقاهي في إيران",
     "subtitle": "تجمع سبوتيفود قائمة QR على الطاولة والكاشير والمطبخ والتوصيل والحجوزات ونادي الزبائن والمخزون في منصة واحدة — دون أي تطبيق يثبّته الزبون.",
@@ -339,7 +340,9 @@
     "searchMove": "تنقّل",
     "searchOpen": "فتح",
     "waiter": "أخذ الطلبات",
-    "adminErrors": "الأخطاء"
+    "adminErrors": "الأخطاء",
+    "billing": "الاشتراك",
+    "adminPlans": "الباقات"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -457,6 +460,31 @@
       "resolved": "تمت المعالجة",
       "resolve": "تعليم كمعالج",
       "stack": "تفاصيل تقنية"
+    },
+    "plans": {
+      "title": "الباقات",
+      "billingOn": "دفع الاشتراكات مفعّل (تم ضبط تاجر زرين بال لسبوتيفود).",
+      "billingOff": "دفع الاشتراكات معطّل: اضبط BILLING_ZARINPAL_MERCHANT_ID لتفعيله (تجربة 14 يومًا للمطاعم الجديدة).",
+      "public": "ظاهرة في /pricing",
+      "name": "الاسم",
+      "price": "السعر الشهري ({currency, select, IRR {تومان} other {{currency}}})",
+      "maxTables": "أقصى عدد طاولات",
+      "maxStaff": "أقصى عدد للفريق",
+      "maxRestaurants": "أقصى عدد فروع",
+      "maxOrdersPerMonth": "أقصى طلبات / شهر",
+      "unlimited": "غير محدود",
+      "save": "حفظ",
+      "stateFree": "مجانية",
+      "stateTrial": "تجربة {plan} حتى {date}",
+      "stateExpired": "{plan} انتهت في {date}",
+      "statePaid": "{plan} حتى {date}",
+      "current": "الباقة:",
+      "grant": "منح باقة",
+      "months": "المدة",
+      "noEnd": "بلا نهاية",
+      "monthsN": "{count} شهر",
+      "amount": "المبلغ المستلم (اختياري)",
+      "apply": "تطبيق"
     }
   },
   "errors": {
@@ -588,7 +616,10 @@
     "payment_in_progress": "يوجد دفع إلكتروني قيد التنفيذ لهذا الطلب.",
     "table_not_confirmed": "يجب أن يوافق النادل على طاولتك أولًا. إنه قادم!",
     "too_many_pending": "لديك طلبات منتظرة. يرجى الانتظار حتى تُقبل.",
-    "not_a_guest_order": "أدخل الفريق هذا الطلب: لا يوجد جهاز لحظره."
+    "not_a_guest_order": "أدخل الفريق هذا الطلب: لا يوجد جهاز لحظره.",
+    "billing_disabled": "دفع الاشتراك غير متاح بعد.",
+    "billing_provider_error": "زرين بال لا يستجيب. حاول بعد قليل.",
+    "plan_not_payable": "لا يمكن دفع هذه الباقة عبر الإنترنت."
   },
   "tables": {
     "title": "الطاولات ورموز QR",
@@ -3029,5 +3060,82 @@
     "blockedEmpty": "لا يوجد جهاز محظور. احظر جهازًا من طلب أو طاولة.",
     "blockedTable": "الطاولة {label}",
     "blockedDevice": "جهاز"
+  },
+  "billing": {
+    "title": "الاشتراك",
+    "subtitle": "باقة سبوتيفود الخاصة بك وتاريخ انتهائها وفواتيرك.",
+    "paidOk": "تم استلام الدفع، شكرًا! تم تمديد باقتك.",
+    "paidFailed": "لم يتم الدفع. لم يُخصم أي مبلغ؛ يمكنك المحاولة مجددًا.",
+    "current": "الباقة الحالية",
+    "freePlan": "مجانية",
+    "trialBadge": "تجربة",
+    "expiredBadge": "منتهية",
+    "activeBadge": "فعّالة",
+    "trialUntil": "تجربة مجانية حتى {date} (متبقٍ {days} يوم).",
+    "paidUntil": "مدفوعة حتى {date} (متبقٍ {days} يوم).",
+    "noEnd": "بلا تاريخ انتهاء.",
+    "expiredSince": "انتهت في {date}: يعمل مطعمك بحدود الباقة المجانية.",
+    "freeBody": "الباقة المجانية: 5 طاولات، عضوان في الفريق.",
+    "choose": "اختيار باقة أو تمديدها",
+    "chooseHint": "دفع آمن عبر زرين بال. تُضاف المدة إلى الفترة الحالية.",
+    "disabledHint": "سيُفتح الدفع الإلكتروني للاشتراك قريبًا جدًا.",
+    "disabledBody": "لتغيير الباقة الآن، تواصل معنا.",
+    "seePricing": "عرض الأسعار",
+    "history": "الفواتير",
+    "historyEmpty": "لا توجد مدفوعات بعد.",
+    "months": "{count} شهر",
+    "failed": "فشل",
+    "perMonth": "/ شهر",
+    "duration": "المدة",
+    "twoFree": "شهران مجانًا",
+    "total": "المجموع",
+    "redirecting": "جارٍ التحويل…",
+    "pay": "الدفع عبر زرين بال",
+    "ownerOnly": "يمكن للمالك أو المدير فقط الدفع.",
+    "print": "طباعة",
+    "invoiceTitle": "فاتورة",
+    "billedTo": "صادرة إلى",
+    "line": "البيان",
+    "amount": "المبلغ",
+    "lineLabel": "باقة {plan} — {months} شهر",
+    "paidWith": "مدفوع عبر زرين بال · المرجع {ref} · البطاقة {card}",
+    "paidManual": "تمت التسوية لدى سبوتيفود.",
+    "limits": {
+      "tables": "حتى {count} طاولة",
+      "tablesUnlimited": "طاولات غير محدودة",
+      "staff": "{count} عضو في الفريق",
+      "staffUnlimited": "فريق غير محدود",
+      "restaurants": "{count} فرع",
+      "restaurantsUnlimited": "فروع غير محدودة",
+      "orders": "{count} طلب / شهر",
+      "ordersUnlimited": "طلبات غير محدودة"
+    },
+    "features": {
+      "online_payments": "الدفع الإلكتروني على الطاولة",
+      "invoices_email": "الفواتير بالبريد",
+      "analytics_advanced": "تقارير متقدمة",
+      "custom_branding": "ألوان وشعار مخصصان",
+      "priority_support": "دعم ذو أولوية"
+    },
+    "banner": {
+      "trial": "تجربة {plan}: متبقٍ {days} يوم.",
+      "ending": "تنتهي باقة {plan} بعد {days} يوم.",
+      "trialOver": "انتهت تجربة {plan}: العودة إلى حدود الباقة المجانية.",
+      "expired": "انتهت باقة {plan}: العودة إلى حدود الباقة المجانية.",
+      "renew": "تجديد",
+      "choose": "اختيار باقة"
+    }
+  },
+  "pricing": {
+    "metaTitle": "الأسعار — سبوتيفود",
+    "title": "أسعار بسيطة",
+    "subtitle": "قائمة QR والطلبات والصندوق والمطبخ: ابدأ مجانًا وانتقل للأعلى كلما كبرت.",
+    "yearly": "ادفع 12 شهرًا واحصل على شهرين مجانًا. بلا التزام.",
+    "trial": "تجربة مجانية لمدة {days} يومًا، بلا بطاقة",
+    "popular": "الأكثر اختيارًا",
+    "onQuote": "حسب الطلب",
+    "free": "مجانية",
+    "contact": "تواصل معنا",
+    "start": "ابدأ الآن"
   }
 }

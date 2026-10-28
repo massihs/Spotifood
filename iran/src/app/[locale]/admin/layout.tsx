@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import { IconChart, IconStore, IconUsers } from "@/components/ui/icons";
 import { requireSuperAdmin } from "@/server/auth/current";
-import { Bug, Music } from "lucide-react";
+import { Bug, CreditCard, Music } from "lucide-react";
 
 export default function AdminLayout({ children }: LayoutProps<"/[locale]/admin">) {
   return (
@@ -27,6 +27,7 @@ async function AdminShell({ children }: { children: React.ReactNode }) {
         { href: "/admin/restaurants", label: t("adminRestaurants"), icon: <IconStore />, primary: true },
         { href: "/admin/users", label: t("adminUsers"), icon: <IconUsers />, primary: true },
         { href: "/admin/music", label: t("adminMusic"), icon: <Music />, primary: true },
+        { href: "/admin/plans", label: t("adminPlans"), icon: <CreditCard />, primary: true },
         { href: "/admin/errors", label: t("adminErrors"), icon: <Bug />, primary: true },
       ]}
     >

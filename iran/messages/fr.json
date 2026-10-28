@@ -42,7 +42,8 @@
       "faq": "FAQ",
       "restaurants": "Restaurants",
       "account": "Mon compte",
-      "contact": "Nous contacter"
+      "contact": "Nous contacter",
+      "pricing": "Tarifs"
     },
     "trust": {
       "noApp": "Aucune appli à installer",
@@ -339,7 +340,9 @@
     "close": "Fermer",
     "mainNav": "Navigation principale",
     "waiter": "Prise de commande",
-    "adminErrors": "Erreurs"
+    "adminErrors": "Erreurs",
+    "billing": "Abonnement",
+    "adminPlans": "Forfaits"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -457,6 +460,31 @@
       "resolved": "Traitée",
       "resolve": "Marquer traitée",
       "stack": "Détails techniques"
+    },
+    "plans": {
+      "title": "Forfaits",
+      "billingOn": "Paiement des abonnements actif (merchant Zarinpal Spotifood configuré).",
+      "billingOff": "Paiement des abonnements inactif : définissez BILLING_ZARINPAL_MERCHANT_ID pour l’ouvrir (essai de 14 jours pour les nouveaux restaurants).",
+      "public": "Visible sur /pricing",
+      "name": "Nom",
+      "price": "Prix mensuel ({currency, select, IRR {tomans} other {{currency}}})",
+      "maxTables": "Tables max.",
+      "maxStaff": "Équipe max.",
+      "maxRestaurants": "Établissements max.",
+      "maxOrdersPerMonth": "Commandes / mois max.",
+      "unlimited": "Illimité",
+      "save": "Enregistrer",
+      "stateFree": "Gratuit",
+      "stateTrial": "Essai {plan} jusqu’au {date}",
+      "stateExpired": "{plan} expiré le {date}",
+      "statePaid": "{plan} jusqu’au {date}",
+      "current": "Forfait :",
+      "grant": "Attribuer un forfait",
+      "months": "Durée",
+      "noEnd": "Sans fin",
+      "monthsN": "{count} mois",
+      "amount": "Montant reçu (facultatif)",
+      "apply": "Appliquer"
     }
   },
   "errors": {
@@ -588,7 +616,10 @@
     "payment_in_progress": "Un paiement en ligne est en cours pour cette commande.",
     "table_not_confirmed": "Un serveur doit d’abord valider votre table. Il arrive !",
     "too_many_pending": "Vous avez déjà des commandes en attente. Patientez qu’elles soient acceptées.",
-    "not_a_guest_order": "Cette commande a été saisie par l’équipe : aucun appareil à bloquer."
+    "not_a_guest_order": "Cette commande a été saisie par l’équipe : aucun appareil à bloquer.",
+    "billing_disabled": "Le paiement de l’abonnement n’est pas encore ouvert.",
+    "billing_provider_error": "Zarinpal ne répond pas. Réessayez dans un instant.",
+    "plan_not_payable": "Ce forfait ne se paie pas en ligne."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -3037,5 +3068,82 @@
     "blockedEmpty": "Aucun appareil bloqué. Bloquez-en un depuis une commande ou une table.",
     "blockedTable": "Table {label}",
     "blockedDevice": "Appareil"
+  },
+  "billing": {
+    "title": "Abonnement",
+    "subtitle": "Votre forfait Spotifood, sa date de fin et vos factures.",
+    "paidOk": "Paiement reçu, merci ! Votre forfait est prolongé.",
+    "paidFailed": "Le paiement n’a pas abouti. Aucun montant n’a été prélevé ; vous pouvez réessayer.",
+    "current": "Forfait actuel",
+    "freePlan": "Gratuit",
+    "trialBadge": "Essai",
+    "expiredBadge": "Expiré",
+    "activeBadge": "Actif",
+    "trialUntil": "Essai gratuit jusqu’au {date} ({days, plural, one {# jour restant} other {# jours restants}}).",
+    "paidUntil": "Payé jusqu’au {date} ({days, plural, one {# jour restant} other {# jours restants}}).",
+    "noEnd": "Sans date de fin.",
+    "expiredSince": "Terminé le {date} : votre restaurant fonctionne avec les limites du forfait Gratuit.",
+    "freeBody": "Forfait Gratuit : 5 tables, 2 membres d’équipe.",
+    "choose": "Choisir ou prolonger un forfait",
+    "chooseHint": "Paiement sécurisé par Zarinpal. La durée s’ajoute à la période en cours.",
+    "disabledHint": "Le paiement en ligne de l’abonnement ouvre très bientôt.",
+    "disabledBody": "Pour changer de forfait dès maintenant, contactez-nous.",
+    "seePricing": "Voir les tarifs",
+    "history": "Factures",
+    "historyEmpty": "Aucun paiement pour l’instant.",
+    "months": "{count, plural, one {# mois} other {# mois}}",
+    "failed": "Échoué",
+    "perMonth": "/ mois",
+    "duration": "Durée",
+    "twoFree": "2 mois offerts",
+    "total": "Total",
+    "redirecting": "Redirection…",
+    "pay": "Payer avec Zarinpal",
+    "ownerOnly": "Seul le propriétaire ou un gérant peut payer.",
+    "print": "Imprimer",
+    "invoiceTitle": "Facture",
+    "billedTo": "Facturé à",
+    "line": "Désignation",
+    "amount": "Montant",
+    "lineLabel": "Forfait {plan} — {months, plural, one {# mois} other {# mois}}",
+    "paidWith": "Payé par Zarinpal · référence {ref} · carte {card}",
+    "paidManual": "Réglé auprès de Spotifood.",
+    "limits": {
+      "tables": "{count, plural, one {# table} other {Jusqu’à # tables}}",
+      "tablesUnlimited": "Tables illimitées",
+      "staff": "{count, plural, one {# membre d’équipe} other {# membres d’équipe}}",
+      "staffUnlimited": "Équipe illimitée",
+      "restaurants": "{count, plural, one {# établissement} other {# établissements}}",
+      "restaurantsUnlimited": "Établissements illimités",
+      "orders": "{count} commandes / mois",
+      "ordersUnlimited": "Commandes illimitées"
+    },
+    "features": {
+      "online_payments": "Paiement en ligne à table",
+      "invoices_email": "Factures par e-mail",
+      "analytics_advanced": "Rapports avancés",
+      "custom_branding": "Couleurs et logo personnalisés",
+      "priority_support": "Support prioritaire"
+    },
+    "banner": {
+      "trial": "Essai {plan} : {days, plural, one {# jour restant} other {# jours restants}}.",
+      "ending": "Votre forfait {plan} se termine dans {days, plural, one {# jour} other {# jours}}.",
+      "trialOver": "Votre essai {plan} est terminé : retour aux limites du forfait Gratuit.",
+      "expired": "Votre forfait {plan} a expiré : retour aux limites du forfait Gratuit.",
+      "renew": "Renouveler",
+      "choose": "Choisir un forfait"
+    }
+  },
+  "pricing": {
+    "metaTitle": "Tarifs — Spotifood",
+    "title": "Des tarifs simples",
+    "subtitle": "Menu QR, commandes, caisse et cuisine : commencez gratuitement, passez au forfait supérieur quand vous grandissez.",
+    "yearly": "Payez 12 mois, 2 mois sont offerts. Sans engagement.",
+    "trial": "{days} jours d’essai gratuit, sans carte",
+    "popular": "Le plus choisi",
+    "onQuote": "Sur devis",
+    "free": "Gratuit",
+    "contact": "Nous contacter",
+    "start": "Commencer"
   }
 }

@@ -9,7 +9,8 @@ import { Link } from "@/i18n/navigation";
 import { requireSuperAdmin } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { listRestaurantsForAdmin } from "@/server/modules/admin/service";
-import { setRestaurantStatusAction } from "../actions";
+import { grantPlanAction, setRestaurantStatusAction } from "../actions";
+import { adminListPlans, subscriptionsByOrganization } from "@/server/modules/billing/service";
 
 export default function AdminRestaurantsPage({ searchParams }: PageProps<"/[locale]/admin/restaurants">) {
   return (
@@ -28,12 +29,25 @@ async function RestaurantsTable({
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.slice(0, 100) : undefined;
   const status = sp.status === "active" || sp.status === "suspended" ? sp.status : undefined;
-  const [t, tc, format, rows] = await Promise.all([
+  const [t, tc, format, rows, plans] = await Promise.all([
     getTranslations("admin"),
     getTranslations("common"),
     getFormatter(),
     listRestaurantsForAdmin(db, { q, status }),
+    adminListPlans(db),
   ]);
+  const subs = await subscriptionsByOrganization(
+    db,
+    rows.map((r) => r.organizationId),
+  );
+  const subLine = (orgId: string) => {
+    const s = subs.get(orgId);
+    if (!s || s.kind === "free") return t("plans.stateFree");
+    const d = (x: Date) => format.dateTime(x, { dateStyle: "medium" });
+    if (s.kind === "trial") return t("plans.stateTrial", { plan: s.planName, date: d(s.endsAt) });
+    if (s.kind === "expired") return t("plans.stateExpired", { plan: s.planName, date: d(s.endedAt) });
+    return s.endsAt ? t("plans.statePaid", { plan: s.planName, date: d(s.endsAt) }) : s.planName;
+  };
 
   return (
     <>
@@ -77,6 +91,48 @@ async function RestaurantsTable({
                   </Link>
                   <Badge tone={r.status === "active" ? "success" : "danger"}>{t(`status.${r.status}`)}</Badge>
                 </div>
+                <p className="text-sm">
+                  <span className="text-fg-muted">{t("plans.current")}</span> {subLine(r.organizationId)}
+                </p>
+                <details className="rounded-xl bg-surface-2 p-3 text-sm">
+                  <summary className="cursor-pointer font-medium">{t("plans.grant")}</summary>
+                  <form action={grantPlanAction} className="mt-3 grid gap-2 sm:grid-cols-3">
+                    <input type="hidden" name="restaurantId" value={r.id} />
+                    <select
+                      name="planCode"
+                      className="h-10 rounded-lg border border-border bg-surface px-2"
+                      aria-label={t("plans.title")}
+                    >
+                      {plans.map((p) => (
+                        <option key={p.id} value={p.code}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      name="months"
+                      defaultValue="1"
+                      className="h-10 rounded-lg border border-border bg-surface px-2"
+                      aria-label={t("plans.months")}
+                    >
+                      <option value="0">{t("plans.noEnd")}</option>
+                      {[1, 3, 6, 12].map((m) => (
+                        <option key={m} value={m}>
+                          {t("plans.monthsN", { count: m })}
+                        </option>
+                      ))}
+                    </select>
+                    <Input
+                      name="amount"
+                      inputMode="numeric"
+                      placeholder={t("plans.amount")}
+                      className="h-10"
+                    />
+                    <Button type="submit" size="sm" variant="secondary" className="sm:col-span-3">
+                      {t("plans.apply")}
+                    </Button>
+                  </form>
+                </details>
                 <div className="mt-auto flex items-center gap-2">
                   <span className="text-sm text-fg-muted">
                     {t("restaurants.orders")}{" "}

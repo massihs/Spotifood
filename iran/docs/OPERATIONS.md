@@ -57,3 +57,22 @@ jamais restaurée n'est pas une sauvegarde.
 - l'exécution échoue et GitHub envoie un e-mail au propriétaire du dépôt ;
 - avec les secrets `KAVENEGAR_API_KEY` et `ALERT_PHONE`, un SMS part quand le site tombe, et un
   autre quand il revient (pas toutes les 10 minutes).
+
+## Abonnements payants (Zarinpal de Spotifood)
+
+Tant que `BILLING_ZARINPAL_MERCHANT_ID` est vide, rien ne change : pas d'essai, pas de paiement,
+chaque restaurant garde son forfait actuel. La page `/pricing` et **Admin → Forfaits** (noms, prix,
+limites) fonctionnent déjà.
+
+Quand Zarinpal confirme le compte marchand de Spotifood :
+
+1. Mettre l'identifiant marchand dans `BILLING_ZARINPAL_MERCHANT_ID` (variables Liara), redémarrer.
+2. Adresse de retour à déclarer si Zarinpal la demande : `https://spotifood.ir/api/v1/billing/return`.
+3. Désormais : chaque **nouveau** restaurant démarre un essai de 14 jours du forfait Professional ;
+   le propriétaire paie 1, 3 ou 12 mois (12 mois = prix de 10) dans **Tableau de bord → Abonnement** ;
+   une facture numérotée `SF-1405-000001` est créée à chaque paiement.
+4. À la fin d'une période (essai ou payée), le restaurant **continue de fonctionner** avec les
+   limites du forfait Gratuit et voit un bandeau « Renouveler » : rien n'est supprimé.
+
+L'admin peut aussi attribuer un forfait à la main (paiement par virement, geste commercial) :
+**Admin → Restaurants → Attribuer un forfait** (avec durée et montant, facture créée).

@@ -61,6 +61,7 @@ export async function listRestaurantsForAdmin(
       status: restaurants.status,
       city: restaurants.city,
       createdAt: restaurants.createdAt,
+      organizationId: restaurants.organizationId,
       organizationName: organizations.name,
       ordersCount:
         sql<number>`(select count(*) from orders o where o.restaurant_id = "restaurants"."id")`.mapWith(

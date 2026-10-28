@@ -4,6 +4,7 @@
  * Creates plans, global category templates, a super admin and "Restaurant Demo" (20 tables, menu).
  */
 import "dotenv/config";
+import { edition } from "@/config/edition";
 import { randomUUID } from "node:crypto";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import sharp from "sharp";
@@ -267,16 +268,9 @@ async function seedPlatform() {
   for (const p of DEFAULT_PLANS) {
     await db
       .insert(plans)
-      .values(p)
-      .onConflictDoUpdate({
-        target: plans.code,
-        set: {
-          name: p.name,
-          limits: p.limits,
-          priceMonthlyCents: p.priceMonthlyCents,
-          sortOrder: p.sortOrder,
-        },
-      });
+      .values({ ...p, currency: edition.platformCurrency })
+      // Names, prices and limits are the admin's (Admin > Plans) once a plan exists.
+      .onConflictDoUpdate({ target: plans.code, set: { currency: edition.platformCurrency } });
   }
   for (const [i, key] of DEFAULT_CATEGORY_TEMPLATES.entries()) {
     await db.insert(globalCategoryTemplates).values({ key, sortOrder: i }).onConflictDoNothing();

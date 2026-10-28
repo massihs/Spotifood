@@ -1,3 +1,4 @@
+import { COMPANY } from "@/lib/company";
 import {
   ArrowLeft,
   BarChart3,
@@ -399,7 +400,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 }
 
 /** Spotifood's own contact details (the "Contact us" section and the footer). */
-const CONTACT = { phone: "021 2212 5555", phoneE164: "+982122125555", email: "contact@spotifood.ir" };
+const CONTACT = COMPANY;
 
 /** The real restaurants of the public guide (left out while there are fewer than two). */
 async function RestaurantsStrip({ locale }: { locale: string }) {

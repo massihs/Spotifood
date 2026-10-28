@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, isNull, or, sql } from "drizzle-orm";
 import type { DbOrTx } from "@/server/db/client";
 import {
   diningTables,
@@ -15,14 +15,23 @@ const FALLBACK = DEFAULT_PLANS.find((p) => p.code === "free")!;
 
 export type Entitlements = { planCode: string; limits: PlanLimits };
 
-/** Plan of the restaurant's organization (active/trialing subscription), falling back to Free. */
+/**
+ * Plan of the restaurant's organization (active/trialing subscription whose period has not
+ * ended), falling back to Free: an expired trial or paid period keeps working on Free limits.
+ */
 export async function getEntitlements(db: DbOrTx, restaurantId: string): Promise<Entitlements> {
   const [row] = await db
     .select({ code: plans.code, limits: plans.limits })
     .from(restaurants)
     .innerJoin(subscriptions, eq(subscriptions.organizationId, restaurants.organizationId))
     .innerJoin(plans, eq(plans.id, subscriptions.planId))
-    .where(and(eq(restaurants.id, restaurantId), inArray(subscriptions.status, ["active", "trialing"])))
+    .where(
+      and(
+        eq(restaurants.id, restaurantId),
+        inArray(subscriptions.status, ["active", "trialing"]),
+        or(isNull(subscriptions.currentPeriodEnd), gt(subscriptions.currentPeriodEnd, sql`now()`)),
+      ),
+    )
     .orderBy(desc(subscriptions.createdAt))
     .limit(1);
   return row

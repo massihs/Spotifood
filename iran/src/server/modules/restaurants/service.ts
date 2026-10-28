@@ -1,3 +1,4 @@
+import { startingSubscription } from "@/server/modules/billing/service";
 import type { RestaurantKind } from "@/lib/restaurant-kind";
 import { edition } from "@/config/edition";
 import { and, eq, isNull, sql } from "drizzle-orm";
@@ -5,11 +6,9 @@ import type { DbOrTx } from "@/server/db/client";
 import {
   organizationMembers,
   organizations,
-  plans,
   restaurantMembers,
   restaurantSettings,
   restaurants,
-  subscriptions,
   taxRates,
 } from "@/server/db/schema";
 import { slugify } from "@/lib/slug";
@@ -79,7 +78,7 @@ export async function createRestaurant(
   return restaurant!;
 }
 
-/** New organization + free-plan subscription (if a free plan is configured). */
+/** New organization + its first subscription (a trial when billing is on, else Free). */
 export async function createOrganization(
   tx: DbOrTx,
   input: { name: string; ownerUserId: string; billingEmail?: string },
@@ -92,10 +91,7 @@ export async function createOrganization(
     .insert(organizationMembers)
     .values({ organizationId: org!.id, userId: input.ownerUserId, role: "owner" });
 
-  const [free] = await tx.select({ id: plans.id }).from(plans).where(eq(plans.code, "free")).limit(1);
-  if (free) {
-    await tx.insert(subscriptions).values({ organizationId: org!.id, planId: free.id, status: "active" });
-  }
+  await startingSubscription(tx, org!.id);
   return org!;
 }
 

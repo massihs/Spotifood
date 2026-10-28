@@ -9,6 +9,7 @@ import {
   CalendarClock,
   Network,
   Calculator,
+  CreditCard,
   ChefHat,
   FileText,
   LayoutDashboard,
@@ -38,6 +39,8 @@ import { OrderAlerts } from "@/components/dashboard/order-alerts";
 import { countNewOrders } from "@/server/modules/orders/service";
 import { countLowStock } from "@/server/modules/inventory/service";
 import { countToDispatch } from "@/server/modules/delivery/service";
+import { getSubscriptionNotice } from "@/server/modules/billing/service";
+import { SubscriptionBanner } from "@/components/dashboard/subscription-banner";
 
 export default function RestaurantLayout({
   children,
@@ -62,12 +65,13 @@ async function RestaurantShell({
   const t = await getTranslations();
   const base = `/dashboard/${ctx.restaurant.id}`;
 
-  const [{ unread }, newOrders, lowStock, undeliveredCount, disabled] = await Promise.all([
+  const [{ unread }, newOrders, lowStock, undeliveredCount, disabled, notice] = await Promise.all([
     listNotifications(db, ctx, 1),
     countNewOrders(db, ctx),
     countLowStock(db, ctx),
     countToDispatch(db, ctx),
     getDisabledModules(db, ctx),
+    can(ctx, "restaurant.manage") ? getSubscriptionNotice(db, ctx.restaurant.id) : null,
   ]);
   const off = new Set(disabled);
   const on = (m: ModuleKey) => !off.has(m);
@@ -240,6 +244,14 @@ async function RestaurantShell({
         group: g.manage,
       },
       {
+        show: can(ctx, "restaurant.manage"),
+        href: `${base}/billing`,
+        label: t("nav.billing"),
+        icon: <CreditCard />,
+        groupKey: "manage",
+        group: g.manage,
+      },
+      {
         show: can(ctx, "restaurant.view"),
         href: `${base}/settings`,
         label: t("nav.settings"),
@@ -324,6 +336,7 @@ async function RestaurantShell({
           </div>
         }
       >
+        {notice ? <SubscriptionBanner restaurantId={ctx.restaurant.id} notice={notice} /> : null}
         {children}
       </AppShell>
     </LiveProvider>
