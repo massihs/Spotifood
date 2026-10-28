@@ -630,7 +630,10 @@
     "already_answered": "Vous avez déjà donné votre avis, merci !",
     "wheel_off": "La roue n’est pas disponible.",
     "rate_first": "Donnez d’abord votre note.",
-    "already_spun": "La roue a déjà été tournée."
+    "already_spun": "La roue a déjà été tournée.",
+    "sign_in_required": "Connectez-vous avec votre mobile pour commander.",
+    "zone_required": "Choisissez votre zone de livraison.",
+    "channel_disabled": "Ce mode de commande n’est pas disponible."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -947,7 +950,9 @@
       "revokeConfirm": "Retirer « {name} » ? Ce PC ne pourra plus travailler pour le restaurant."
     },
     "security": "Sécurité",
-    "securityHint": "Évitez les commandes et appels abusifs (QR scanné puis réutilisé de loin)."
+    "securityHint": "Évitez les commandes et appels abusifs (QR scanné puis réutilisé de loin).",
+    "online": "Commande en ligne",
+    "onlineHint": "Votre site de commande : à emporter et livraison, un lien à mettre dans votre bio Instagram."
   },
   "guest": {
     "table": "Table {label}",
@@ -2679,7 +2684,8 @@
       "more": "{count, plural, one {+# autre plat} other {+# autres plats}}",
       "soldOut": "Épuisé"
     },
-    "kmUnit": "km"
+    "kmUnit": "km",
+    "orderOnline": "Commander en ligne"
   },
   "listing": {
     "listed": "Afficher dans le guide des restaurants",
@@ -3250,6 +3256,67 @@
       "save": "Enregistrer",
       "saved": "Enregistré",
       "error": "Erreur : vérifiez les cases."
+    }
+  },
+  "online": {
+    "metaTitle": "Commander chez {name}",
+    "title": "Commander en ligne",
+    "takeaway": "À emporter",
+    "delivery": "Livraison",
+    "takeawayOnly": "À emporter",
+    "deliveryOnly": "Livraison",
+    "viewCart": "Voir le panier ({count})",
+    "checkout": "Votre commande",
+    "back": "Retour",
+    "less": "Moins",
+    "more": "Plus",
+    "signIn": "Connectez-vous avec votre mobile (code par SMS) pour commander :",
+    "name": "Votre nom",
+    "zone": "Zone de livraison",
+    "fee": "livraison {fee}",
+    "address": "Adresse complète (rue, n°, étage…)",
+    "note": "Remarque pour le restaurant (facultatif)",
+    "coupon": "Code promo (facultatif)",
+    "subtotal": "Sous-total",
+    "deliveryFee": "Livraison",
+    "discount": "Réduction",
+    "total": "Total",
+    "payOnDelivery": "Paiement à la livraison.",
+    "payAtPickup": "Paiement au retrait.",
+    "belowMin": "Minimum de commande pour cette zone : {amount}",
+    "place": "Commander · {total}",
+    "statusTitle": "Commande {number}",
+    "cancelled": "Cette commande a été annulée par le restaurant.",
+    "call": "Appeler le restaurant",
+    "again": "Commander à nouveau",
+    "steps": {
+      "takeaway": {
+        "received": "Commande envoyée",
+        "accepted": "Acceptée par le restaurant",
+        "preparing": "En préparation",
+        "ready": "Prête : venez la chercher",
+        "served": "Récupérée"
+      },
+      "delivery": {
+        "received": "Commande envoyée",
+        "accepted": "Acceptée par le restaurant",
+        "preparing": "En préparation",
+        "ready": "Prête, bientôt en route",
+        "served": "Livrée"
+      }
+    },
+    "settings": {
+      "enabled": "Activer la commande en ligne",
+      "enabledHint": "Les clients commandent depuis le lien ci-dessous, après vérification de leur mobile par SMS. Les commandes arrivent dans Commandes, à accepter.",
+      "takeaway": "À emporter",
+      "delivery": "Livraison",
+      "deliveryHint": "Selon vos zones de livraison (frais et minimum).",
+      "noZones": "Créez d’abord une zone dans Livraison > Réglages.",
+      "link": "Votre lien de commande",
+      "linkHint": "À mettre dans la bio Instagram, sur WhatsApp ou Telegram.",
+      "copy": "Copier le lien",
+      "copied": "Copié !",
+      "open": "Ouvrir"
     }
   }
 }

@@ -110,6 +110,10 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   /** Wheel of fortune after a rating: prizes become single-use coupons. */
   wheelEnabled: boolean().notNull().default(false),
   wheelPrizes: jsonb().$type<WheelPrize[]>().notNull().default([]),
+  /** Online ordering site (/r/{slug}/order): takeaway and/or delivery, by signed-in guests. */
+  onlineOrderingEnabled: boolean().notNull().default(false),
+  onlineTakeaway: boolean().notNull().default(true),
+  onlineDelivery: boolean().notNull().default(false),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */
   zarinpalMerchantId: varchar({ length: 64 }),
   /** Auto-close idle table sessions after N minutes (null = manual only). */

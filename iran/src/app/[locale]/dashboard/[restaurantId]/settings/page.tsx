@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/dashboard/app-shell";
 import {
   Blocks,
   Building2,
+  Globe,
   Clock,
   CreditCard,
   Laptop,
@@ -43,6 +44,9 @@ import { env } from "@/server/env";
 import { isModule } from "@/lib/modules";
 import { listGuestBlocks } from "@/server/modules/guest/safety";
 import { SecurityPanel } from "./security-panel";
+import { OnlinePanel } from "./online-panel";
+import { getOnlineSettings } from "@/server/modules/online/service";
+import { listZones } from "@/server/modules/delivery/service";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
 
@@ -61,17 +65,20 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view, payment, printing, setup, listing, cover, devices, blocks] = await Promise.all([
-    getTranslations("settings"),
-    getRestaurantSettingsView(db, ctx),
-    getPaymentSettingsView(db, ctx),
-    listPrinters(db, ctx),
-    can(ctx, "orders.view") ? listStations(db, ctx) : { stations: [] },
-    getListing(db, ctx),
-    getCoverChoices(db, ctx),
-    listDevices(db, ctx),
-    listGuestBlocks(db, ctx),
-  ]);
+  const [t, view, payment, printing, setup, listing, cover, devices, blocks, online, zones] =
+    await Promise.all([
+      getTranslations("settings"),
+      getRestaurantSettingsView(db, ctx),
+      getPaymentSettingsView(db, ctx),
+      listPrinters(db, ctx),
+      can(ctx, "orders.view") ? listStations(db, ctx) : { stations: [] },
+      getListing(db, ctx),
+      getCoverChoices(db, ctx),
+      listDevices(db, ctx),
+      listGuestBlocks(db, ctx),
+      getOnlineSettings(db, ctx),
+      can(ctx, "orders.view") ? listZones(db, ctx) : [],
+    ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
   const rid = ctx.restaurant.id;
@@ -226,6 +233,21 @@ async function Settings({ params }: { params: Params }) {
               />
             </div>
           </Card>
+          <Card id="online" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<Globe />}>{t("online")}</SectionTitle>}
+              description={t("onlineHint")}
+            />
+            <div className="p-5 sm:p-6">
+              <OnlinePanel
+                restaurantId={rid}
+                url={`${env().APP_URL}/r/${r.slug}/order`}
+                hasZones={zones.length > 0}
+                disabled={readOnly}
+                values={online}
+              />
+            </div>
+          </Card>
           <Card id="security" className="scroll-mt-24">
             <CardHeader
               title={<SectionTitle icon={<ShieldCheck />}>{t("security")}</SectionTitle>}
@@ -302,6 +324,7 @@ const SECTIONS = [
   { key: "printers", icon: <Printer aria-hidden="true" /> },
   { key: "desktopTitle", icon: <Laptop aria-hidden="true" /> },
   { key: "service", icon: <Clock aria-hidden="true" /> },
+  { key: "online", icon: <Globe aria-hidden="true" /> },
   { key: "security", icon: <ShieldCheck aria-hidden="true" /> },
   { key: "payments", icon: <CreditCard aria-hidden="true" /> },
   { key: "taxes", icon: <Percent aria-hidden="true" /> },

@@ -31,8 +31,11 @@ export function ProductSheet({
   inCart = 0,
   suggestions = [],
   onPick,
+  addLocal,
 }: {
   product: PublicProduct;
+  /** Online ordering: the cart lives in the browser, nothing is sent to the server here. */
+  addLocal?: (line: { optionValueIds: string[]; quantity: number; note: string }) => CartSummary;
   currency: string;
   popular?: boolean;
   /** Units of this dish already in the cart. */
@@ -91,6 +94,10 @@ export function ProductSheet({
 
   function add() {
     setError(null);
+    if (addLocal) {
+      onAdded(addLocal({ optionValueIds: valueIds, quantity, note }));
+      return;
+    }
     startTransition(async () => {
       const res = await addToCartAction({ productId: p.id, optionValueIds: valueIds, quantity, note });
       if (res?.ok && res.data) onAdded(res.data);

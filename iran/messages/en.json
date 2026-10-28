@@ -630,7 +630,10 @@
     "already_answered": "You already gave your feedback, thank you!",
     "wheel_off": "The wheel is not available.",
     "rate_first": "Rate first.",
-    "already_spun": "The wheel was already spun."
+    "already_spun": "The wheel was already spun.",
+    "sign_in_required": "Sign in with your mobile to order.",
+    "zone_required": "Choose your delivery zone.",
+    "channel_disabled": "This ordering mode is not available."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -947,7 +950,9 @@
       "revokeConfirm": "Remove \"{name}\"? This PC will no longer work for the restaurant."
     },
     "security": "Security",
-    "securityHint": "Prevent abusive orders and calls (a QR scanned once and reused from afar)."
+    "securityHint": "Prevent abusive orders and calls (a QR scanned once and reused from afar).",
+    "online": "Online ordering",
+    "onlineHint": "Your ordering site: takeaway and delivery, a link for your Instagram bio."
   },
   "guest": {
     "table": "Table {label}",
@@ -2671,7 +2676,8 @@
       "more": "{count, plural, one {+# more dish} other {+# more dishes}}",
       "soldOut": "Sold out"
     },
-    "kmUnit": "km"
+    "kmUnit": "km",
+    "orderOnline": "Order online"
   },
   "listing": {
     "listed": "Show in the restaurant guide",
@@ -3242,6 +3248,67 @@
       "save": "Save",
       "saved": "Saved",
       "error": "Error: check the slices."
+    }
+  },
+  "online": {
+    "metaTitle": "Order from {name}",
+    "title": "Order online",
+    "takeaway": "Takeaway",
+    "delivery": "Delivery",
+    "takeawayOnly": "Takeaway",
+    "deliveryOnly": "Delivery",
+    "viewCart": "View cart ({count})",
+    "checkout": "Your order",
+    "back": "Back",
+    "less": "Less",
+    "more": "More",
+    "signIn": "Sign in with your mobile (SMS code) to order:",
+    "name": "Your name",
+    "zone": "Delivery zone",
+    "fee": "delivery {fee}",
+    "address": "Full address (street, number, floor…)",
+    "note": "Note for the restaurant (optional)",
+    "coupon": "Promo code (optional)",
+    "subtotal": "Subtotal",
+    "deliveryFee": "Delivery",
+    "discount": "Discount",
+    "total": "Total",
+    "payOnDelivery": "Pay on delivery.",
+    "payAtPickup": "Pay at pickup.",
+    "belowMin": "Minimum order for this zone: {amount}",
+    "place": "Order · {total}",
+    "statusTitle": "Order {number}",
+    "cancelled": "This order was cancelled by the restaurant.",
+    "call": "Call the restaurant",
+    "again": "Order again",
+    "steps": {
+      "takeaway": {
+        "received": "Order sent",
+        "accepted": "Accepted by the restaurant",
+        "preparing": "Being prepared",
+        "ready": "Ready: come and pick it up",
+        "served": "Picked up"
+      },
+      "delivery": {
+        "received": "Order sent",
+        "accepted": "Accepted by the restaurant",
+        "preparing": "Being prepared",
+        "ready": "Ready, on its way soon",
+        "served": "Delivered"
+      }
+    },
+    "settings": {
+      "enabled": "Turn on online ordering",
+      "enabledHint": "Guests order from the link below after verifying their mobile by SMS. Orders arrive in Orders, to accept.",
+      "takeaway": "Takeaway",
+      "delivery": "Delivery",
+      "deliveryHint": "Following your delivery zones (fee and minimum).",
+      "noZones": "First create a zone in Delivery > Settings.",
+      "link": "Your ordering link",
+      "linkHint": "For your Instagram bio, WhatsApp or Telegram.",
+      "copy": "Copy link",
+      "copied": "Copied!",
+      "open": "Open"
     }
   }
 }

@@ -1,4 +1,14 @@
-import { ArrowRight, CalendarCheck, Clock, MapPin, Navigation, Phone, Star, Ticket } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarCheck,
+  Clock,
+  MapPin,
+  Navigation,
+  Phone,
+  ShoppingBag,
+  Star,
+  Ticket,
+} from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -14,6 +24,8 @@ import { formatMoney } from "@/lib/money";
 import { getDirectory } from "@/server/modules/directory/cache";
 import { searchDirectory, type DirectoryResult } from "@/server/modules/directory/service";
 import { getPublicMenu } from "@/server/modules/menu/public-cache";
+import { getOnlineStore } from "@/server/modules/online/service";
+import { db } from "@/server/db/client";
 
 type Props = PageProps<"/[locale]/r/[slug]">;
 
@@ -64,6 +76,7 @@ async function Place({ params }: Pick<Props, "params">) {
     getFormatter(),
     getPublicMenu(place.id),
   ]);
+  const orderOnline = Boolean(await getOnlineStore(db, place.slug).catch(() => null));
   const where = place.city ? cityLabel(place.city, locale) : place.cityText;
   const pos = place.position;
   const mapsUrl = pos
@@ -81,6 +94,15 @@ async function Place({ params }: Pick<Props, "params">) {
     <div
       className={cn("rounded-3xl bg-surface p-5 ring-1 ring-border", place.reservable && "hidden lg:block")}
     >
+      {orderOnline ? (
+        <Link
+          href={`/r/${place.slug}/order`}
+          className="mb-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-fg text-base font-bold text-bg"
+        >
+          <ShoppingBag className="size-5" aria-hidden="true" />
+          {t("orderOnline")}
+        </Link>
+      ) : null}
       <h2 className="text-lg font-bold">{t("profile.bookTitle")}</h2>
       {place.reservable ? (
         <>
@@ -342,15 +364,26 @@ async function Place({ params }: Pick<Props, "params">) {
         </aside>
       </div>
 
-      {place.reservable ? (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
-          <Link
-            href={`/r/${place.slug}/book`}
-            className="flex h-12 items-center justify-center gap-2 rounded-full bg-accent text-base font-bold text-accent-fg"
-          >
-            <CalendarCheck className="size-5" aria-hidden="true" />
-            {t("book")}
-          </Link>
+      {place.reservable || orderOnline ? (
+        <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-bg/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+          {orderOnline ? (
+            <Link
+              href={`/r/${place.slug}/order`}
+              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-fg text-base font-bold text-bg"
+            >
+              <ShoppingBag className="size-5" aria-hidden="true" />
+              {t("orderOnline")}
+            </Link>
+          ) : null}
+          {place.reservable ? (
+            <Link
+              href={`/r/${place.slug}/book`}
+              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-accent text-base font-bold text-accent-fg"
+            >
+              <CalendarCheck className="size-5" aria-hidden="true" />
+              {t("book")}
+            </Link>
+          ) : null}
         </div>
       ) : null}
     </div>
