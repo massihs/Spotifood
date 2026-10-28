@@ -344,7 +344,8 @@
     "adminErrors": "Erreurs",
     "billing": "Abonnement",
     "adminPlans": "Forfaits",
-    "feedback": "Avis clients"
+    "feedback": "Avis clients",
+    "callcenter": "Centre d’appels"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -515,7 +516,7 @@
     "currency_locked": "La devise ne peut plus être modifiée : des commandes existent déjà.",
     "invalid_currency": "Devise inconnue.",
     "invalid_timezone": "Fuseau horaire inconnu.",
-    "invalid_phone": "Ce numéro de mobile n'est pas valide (ex. 09123456789).",
+    "invalid_phone": "Numéro de mobile invalide.",
     "invalid_country": "Code pays à 2 lettres (ex. FR).",
     "invalid_prefix": "1 à 4 lettres, sans chiffre.",
     "invalid_url": "L'adresse doit commencer par https://",
@@ -952,7 +953,9 @@
     "security": "Sécurité",
     "securityHint": "Évitez les commandes et appels abusifs (QR scanné puis réutilisé de loin).",
     "online": "Commande en ligne",
-    "onlineHint": "Votre site de commande : à emporter et livraison, un lien à mettre dans votre bio Instagram."
+    "onlineHint": "Votre site de commande : à emporter et livraison, un lien à mettre dans votre bio Instagram.",
+    "goals": "Objectifs",
+    "goalsHint": "Chiffre d’affaires du jour, temps en cuisine et note des clients : suivis sur l’accueil, alerte si un objectif est manqué."
   },
   "guest": {
     "table": "Table {label}",
@@ -1550,6 +1553,11 @@
       },
       "feedback": {
         "unhappy": "Client mécontent ({rating}/5) · commande {number}"
+      },
+      "kpi": {
+        "prep_slow": "Cuisine lente : {minutes} min en moyenne sur la dernière heure (objectif {goal} min)",
+        "rating_low": "Note des clients en baisse : {rating}/5 sur 7 jours (objectif {goal})",
+        "revenue_missed": "Objectif du jour non atteint"
       }
     }
   },
@@ -3317,6 +3325,54 @@
       "copy": "Copier le lien",
       "copied": "Copié !",
       "open": "Ouvrir"
+    },
+    "dineIn": "Sur place",
+    "phoneOptional": "Mobile (facultatif, pour être prévenu)",
+    "payAtCounter": "Paiement à la caisse.",
+    "kioskTitle": "Commandez ici",
+    "kioskThanks": "Merci ! Votre numéro",
+    "kioskHint": "Payez à la caisse et gardez un œil sur l’écran : on vous appelle avec ce numéro.",
+    "kioskNext": "Nouvelle commande",
+    "kiosk": {
+      "enabled": "Kiosque de commande (borne)",
+      "hint": "Une tablette en libre-service au comptoir : le client choisit, commande sur place ou à emporter, et paie à la caisse.",
+      "open": "Ouvrir sur la tablette",
+      "regenerate": "Nouveau lien",
+      "regenerateConfirm": "Créer un nouveau lien ? Les tablettes qui utilisent l’ancien ne pourront plus commander.",
+      "private": "Ce lien donne accès à la commande sans connexion : ne l’ouvrez que sur vos tablettes."
     }
+  },
+  "kpi": {
+    "title": "Objectifs du jour",
+    "edit": "Modifier",
+    "revenue": "Chiffre d’affaires",
+    "prep": "Temps moyen en cuisine",
+    "rating": "Note des clients (7 j)",
+    "minutes": "{n} min",
+    "max": "Objectif : {value} maximum",
+    "min": "Objectif : {value} minimum",
+    "settings": {
+      "revenue": "Chiffre d’affaires par jour",
+      "prep": "Temps en cuisine max. (min)",
+      "rating": "Note minimale (1–5)",
+      "none": "Aucun",
+      "hint": "Laissez vide pour ne pas suivre. Alertes : cuisine lente (dernière heure), note sur 7 jours, chiffre du jour manqué (après 22 h).",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "error": "Valeurs invalides."
+    }
+  },
+  "callcenter": {
+    "title": "Centre d’appels",
+    "subtitle": "Un numéro, toutes les succursales ({count}) : fiche du client, adresses, dernières commandes, et commande dans la bonne succursale.",
+    "phonePlaceholder": "Numéro de l’appelant",
+    "search": "Rechercher",
+    "invalid": "Numéro de mobile invalide.",
+    "empty": "Tapez le numéro qui appelle pour voir le client dans chaque succursale.",
+    "orders": "{count, plural, =0 {aucune commande} one {# commande} other {# commandes}}",
+    "points": "{count} points",
+    "unknown": "Nouveau client ici",
+    "newDelivery": "Livraison",
+    "newTakeaway": "À emporter"
   }
 }

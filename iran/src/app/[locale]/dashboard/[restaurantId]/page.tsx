@@ -21,6 +21,7 @@ import {
 import { Suspense, type ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
+import { KpiCard } from "@/components/dashboard/kpi-card";
 import { buttonClasses } from "@/components/ui/button";
 import { Card, CardHeader, StatCard, TONE_TILE, type Tone } from "@/components/ui/card";
 import { Link, redirect } from "@/i18n/navigation";
@@ -437,6 +438,10 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
           </ol>
         </Card>
       ) : null}
+
+      <Suspense fallback={null}>
+        <KpiCard ctx={ctx} canManage={can(ctx, "restaurant.manage")} />
+      </Suspense>
 
       <div className={cn("mt-4 grid gap-4", showReservations ? "lg:grid-cols-3" : "lg:grid-cols-2")}>
         {/* Live orders, oldest first: what the team should look at next */}

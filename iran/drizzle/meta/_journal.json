@@ -246,6 +246,20 @@
       "when": 1793183550812,
       "tag": "0034_online_ordering",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1793185382013,
+      "tag": "0035_kiosk",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1793185707722,
+      "tag": "0036_kpi_goals",
+      "breakpoints": true
     }
   ]
 }

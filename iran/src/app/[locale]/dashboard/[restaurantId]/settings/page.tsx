@@ -6,6 +6,7 @@ import {
   Blocks,
   Building2,
   Globe,
+  Target,
   Clock,
   CreditCard,
   Laptop,
@@ -45,7 +46,10 @@ import { isModule } from "@/lib/modules";
 import { listGuestBlocks } from "@/server/modules/guest/safety";
 import { SecurityPanel } from "./security-panel";
 import { OnlinePanel } from "./online-panel";
-import { getOnlineSettings } from "@/server/modules/online/service";
+import { KioskPanel } from "./kiosk-panel";
+import { GoalsForm } from "./goals-form";
+import { getKpiGoals } from "@/server/modules/kpi/service";
+import { getKioskSettings, getOnlineSettings } from "@/server/modules/online/service";
 import { listZones } from "@/server/modules/delivery/service";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
@@ -65,7 +69,7 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view, payment, printing, setup, listing, cover, devices, blocks, online, zones] =
+  const [t, view, payment, printing, setup, listing, cover, devices, blocks, online, zones, kiosk, goals] =
     await Promise.all([
       getTranslations("settings"),
       getRestaurantSettingsView(db, ctx),
@@ -78,6 +82,8 @@ async function Settings({ params }: { params: Params }) {
       listGuestBlocks(db, ctx),
       getOnlineSettings(db, ctx),
       can(ctx, "orders.view") ? listZones(db, ctx) : [],
+      getKioskSettings(db, ctx),
+      getKpiGoals(db, ctx.restaurant.id),
     ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
@@ -233,6 +239,15 @@ async function Settings({ params }: { params: Params }) {
               />
             </div>
           </Card>
+          <Card id="goals" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<Target />}>{t("goals")}</SectionTitle>}
+              description={t("goalsHint")}
+            />
+            <div className="p-5 sm:p-6">
+              <GoalsForm restaurantId={rid} currency={r.currency} disabled={readOnly} values={goals} />
+            </div>
+          </Card>
           <Card id="online" className="scroll-mt-24">
             <CardHeader
               title={<SectionTitle icon={<Globe />}>{t("online")}</SectionTitle>}
@@ -246,6 +261,9 @@ async function Settings({ params }: { params: Params }) {
                 disabled={readOnly}
                 values={online}
               />
+              <div className="mt-4">
+                <KioskPanel restaurantId={rid} appUrl={env().APP_URL} disabled={readOnly} values={kiosk} />
+              </div>
             </div>
           </Card>
           <Card id="security" className="scroll-mt-24">
@@ -324,6 +342,7 @@ const SECTIONS = [
   { key: "printers", icon: <Printer aria-hidden="true" /> },
   { key: "desktopTitle", icon: <Laptop aria-hidden="true" /> },
   { key: "service", icon: <Clock aria-hidden="true" /> },
+  { key: "goals", icon: <Target aria-hidden="true" /> },
   { key: "online", icon: <Globe aria-hidden="true" /> },
   { key: "security", icon: <ShieldCheck aria-hidden="true" /> },
   { key: "payments", icon: <CreditCard aria-hidden="true" /> },

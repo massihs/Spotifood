@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { Bike, Minus, Plus, ShoppingBag, Store } from "lucide-react";
+import { Bike, Minus, Plus, ShoppingBag, Store, UtensilsCrossed } from "lucide-react";
 import { DinerLogin } from "@/components/account/diner-login";
 import { ProductImage } from "@/components/guest/parts";
 import { ProductSheet } from "@/components/guest/product-sheet";
@@ -14,9 +14,9 @@ import { forChannel } from "@/lib/channel-price";
 import { cn } from "@/lib/cn";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
 import { priceLine } from "@/server/modules/pricing";
-import { placeOnlineOrderAction } from "./actions";
+import { placeKioskOrderAction, placeOnlineOrderAction } from "./actions";
 
-type Channel = "takeaway" | "delivery";
+type Channel = "dine_in" | "takeaway" | "delivery";
 type Line = { key: string; productId: string; optionValueIds: string[]; quantity: number; note: string };
 type Zone = { id: string; name: string; feeCents: number; minOrderCents: number };
 
@@ -33,7 +33,10 @@ export function OrderApp({
   signedIn,
   hasPhone,
   defaultName,
+  kioskToken,
 }: {
+  /** Kiosk mode: eat in / take away, no sign-in, the order number shown big, then a new customer. */
+  kioskToken?: string;
   slug: string;
   menu: PublicMenu;
   currency: string;
@@ -49,7 +52,10 @@ export function OrderApp({
   const locale = useLocale();
   const router = useRouter();
   const money = useMoney(currency);
-  const [channel, setChannel] = useState<Channel>(takeaway ? "takeaway" : "delivery");
+  const kiosk = Boolean(kioskToken);
+  const [channel, setChannel] = useState<Channel>(kiosk ? "dine_in" : takeaway ? "takeaway" : "delivery");
+  const [phone, setPhone] = useState("");
+  const [placed, setPlaced] = useState<string | null>(null);
   const [lines, setLines] = useState<Line[]>([]);
   const [open, setOpen] = useState<string | null>(null);
   const [checkout, setCheckout] = useState(false);
@@ -64,17 +70,32 @@ export function OrderApp({
 
   // The cart survives a reload and the SMS sign-in round trip.
   useEffect(() => {
+    if (kiosk) return;
     try {
       const raw = localStorage.getItem(storageKey(slug));
       // After the first paint, so the server and client renders match.
       if (raw) queueMicrotask(() => setLines(JSON.parse(raw) as Line[]));
     } catch {}
-  }, [slug]);
+  }, [slug, kiosk]);
   useEffect(() => {
+    if (kiosk) return;
     try {
       localStorage.setItem(storageKey(slug), JSON.stringify(lines));
     } catch {}
-  }, [slug, lines]);
+  }, [slug, lines, kiosk]);
+  // Kiosk: the number stays on screen, then the tablet is ready for the next customer.
+  useEffect(() => {
+    if (!placed) return;
+    const id = setTimeout(() => {
+      setPlaced(null);
+      setCheckout(false);
+      setName("");
+      setPhone("");
+      setNote("");
+      setCoupon("");
+    }, 15_000);
+    return () => clearTimeout(id);
+  }, [placed]);
 
   const productFor = (id: string): PublicProduct | undefined => {
     const p = menu.products[id];
@@ -108,6 +129,29 @@ export function OrderApp({
   const place = () =>
     startTransition(async () => {
       setError(null);
+      if (kioskToken) {
+        const res = await placeKioskOrderAction(kioskToken, {
+          channel,
+          lines: lines.map(({ productId, optionValueIds, quantity, note }) => ({
+            productId,
+            optionValueIds,
+            quantity,
+            note,
+          })),
+          customerName: name,
+          phone,
+          note,
+          couponCode: coupon,
+        });
+        if (res?.ok && res.data) {
+          setLines([]);
+          setPlaced(res.data.number);
+          return;
+        }
+        const code = res?.ok === false ? res.error : "internal";
+        setError(te.has(`errorCodes.${code}`) ? te(`errorCodes.${code}`) : te("errorCodes.internal"));
+        return;
+      }
       const res = await placeOnlineOrderAction(slug, {
         channel,
         lines: lines.map(({ productId, optionValueIds, quantity, note }) => ({
@@ -135,13 +179,17 @@ export function OrderApp({
 
   return (
     <div className="pb-28">
-      {takeaway && delivery ? (
+      {kiosk || (takeaway && delivery) ? (
         <div className="mx-4 mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-surface-2 p-1" role="tablist">
-          {(
-            [
-              ["takeaway", Store, t("takeaway")],
-              ["delivery", Bike, t("delivery")],
-            ] as const
+          {(kiosk
+            ? ([
+                ["dine_in", UtensilsCrossed, t("dineIn")],
+                ["takeaway", Store, t("takeaway")],
+              ] as const)
+            : ([
+                ["takeaway", Store, t("takeaway")],
+                ["delivery", Bike, t("delivery")],
+              ] as const)
           ).map(([id, Icon, label]) => (
             <button
               key={id}
@@ -309,7 +357,7 @@ export function OrderApp({
               ))}
             </ul>
 
-            {!signedIn || !hasPhone ? (
+            {!kiosk && (!signedIn || !hasPhone) ? (
               <div className="mt-5 rounded-2xl bg-surface p-4 ring-1 ring-border">
                 <p className="mb-3 text-sm font-semibold">{t("signIn")}</p>
                 <DinerLogin phoneOnly />
@@ -324,6 +372,18 @@ export function OrderApp({
                   maxLength={120}
                   className="h-12 w-full rounded-2xl border border-border bg-surface px-4 text-sm"
                 />
+                {kiosk ? (
+                  <input
+                    value={phone}
+                    onChange={(e) => setPhone(e.currentTarget.value)}
+                    placeholder={t("phoneOptional")}
+                    aria-label={t("phoneOptional")}
+                    inputMode="tel"
+                    dir="ltr"
+                    maxLength={20}
+                    className="h-12 w-full rounded-2xl border border-border bg-surface px-4 text-sm"
+                  />
+                ) : null}
                 {channel === "delivery" ? (
                   <>
                     <select
@@ -382,7 +442,11 @@ export function OrderApp({
                     <dd className="tabular-nums">{money(subtotal + fee)}</dd>
                   </div>
                   <p className="pt-1 text-xs text-fg-muted">
-                    {channel === "delivery" ? t("payOnDelivery") : t("payAtPickup")}
+                    {kiosk
+                      ? t("payAtCounter")
+                      : channel === "delivery"
+                        ? t("payOnDelivery")
+                        : t("payAtPickup")}
                   </p>
                 </dl>
                 {belowMin ? (
@@ -411,6 +475,32 @@ export function OrderApp({
                 </Button>
               </div>
             )}
+          </div>
+        </div>
+      ) : null}
+
+      {placed ? (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-bg p-6 text-center" role="status">
+          <div>
+            <p className="text-lg text-fg-muted">{t("kioskThanks")}</p>
+            <p className="mt-4 text-8xl font-black tabular-nums" dir="ltr">
+              {placed}
+            </p>
+            <p className="mt-6 max-w-sm text-base text-fg-muted">{t("kioskHint")}</p>
+            <Button
+              size="lg"
+              className="mt-8"
+              onClick={() => {
+                setPlaced(null);
+                setCheckout(false);
+                setName("");
+                setPhone("");
+                setNote("");
+                setCoupon("");
+              }}
+            >
+              {t("kioskNext")}
+            </Button>
           </div>
         </div>
       ) : null}

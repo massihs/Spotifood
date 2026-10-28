@@ -344,7 +344,8 @@
     "adminErrors": "Errors",
     "billing": "Subscription",
     "adminPlans": "Plans",
-    "feedback": "Guest feedback"
+    "feedback": "Guest feedback",
+    "callcenter": "Call centre"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -515,7 +516,7 @@
     "currency_locked": "The currency can no longer be changed: orders already exist.",
     "invalid_currency": "Unknown currency.",
     "invalid_timezone": "Unknown time zone.",
-    "invalid_phone": "This mobile number is not valid (e.g. 09123456789).",
+    "invalid_phone": "Invalid mobile number.",
     "invalid_country": "2-letter country code (e.g. FR).",
     "invalid_prefix": "1 to 4 letters, no digits.",
     "invalid_url": "The address must start with https://",
@@ -952,7 +953,9 @@
     "security": "Security",
     "securityHint": "Prevent abusive orders and calls (a QR scanned once and reused from afar).",
     "online": "Online ordering",
-    "onlineHint": "Your ordering site: takeaway and delivery, a link for your Instagram bio."
+    "onlineHint": "Your ordering site: takeaway and delivery, a link for your Instagram bio.",
+    "goals": "Targets",
+    "goalsHint": "Today’s takings, kitchen time and guest rating: tracked on the overview, alert when a target is missed."
   },
   "guest": {
     "table": "Table {label}",
@@ -1550,6 +1553,11 @@
       },
       "feedback": {
         "unhappy": "Unhappy guest ({rating}/5) · order {number}"
+      },
+      "kpi": {
+        "prep_slow": "Slow kitchen: {minutes} min on average over the last hour (target {goal} min)",
+        "rating_low": "Guest rating dropping: {rating}/5 over 7 days (target {goal})",
+        "revenue_missed": "Today’s takings target missed"
       }
     }
   },
@@ -3309,6 +3317,54 @@
       "copy": "Copy link",
       "copied": "Copied!",
       "open": "Open"
+    },
+    "dineIn": "Eat in",
+    "phoneOptional": "Mobile (optional, to be notified)",
+    "payAtCounter": "Pay at the counter.",
+    "kioskTitle": "Order here",
+    "kioskThanks": "Thank you! Your number",
+    "kioskHint": "Pay at the counter and keep an eye on the screen: we call this number.",
+    "kioskNext": "New order",
+    "kiosk": {
+      "enabled": "Self-order kiosk",
+      "hint": "A self-service tablet at the counter: guests pick, eat in or take away, and pay at the till.",
+      "open": "Open on the tablet",
+      "regenerate": "New link",
+      "regenerateConfirm": "Create a new link? Tablets using the old one will stop ordering.",
+      "private": "This link orders without sign-in: open it only on your tablets."
     }
+  },
+  "kpi": {
+    "title": "Today’s targets",
+    "edit": "Edit",
+    "revenue": "Takings",
+    "prep": "Average kitchen time",
+    "rating": "Guest rating (7 d)",
+    "minutes": "{n} min",
+    "max": "Target: {value} max",
+    "min": "Target: {value} min",
+    "settings": {
+      "revenue": "Takings per day",
+      "prep": "Max kitchen time (min)",
+      "rating": "Minimum rating (1–5)",
+      "none": "None",
+      "hint": "Leave empty not to track. Alerts: slow kitchen (last hour), 7-day rating, missed takings (after 10 pm).",
+      "save": "Save",
+      "saved": "Saved",
+      "error": "Invalid values."
+    }
+  },
+  "callcenter": {
+    "title": "Call centre",
+    "subtitle": "One number, every branch ({count}): the caller’s file, addresses, last orders, and the order in the right branch.",
+    "phonePlaceholder": "Caller’s number",
+    "search": "Search",
+    "invalid": "Invalid mobile number.",
+    "empty": "Type the calling number to see the guest in each branch.",
+    "orders": "{count, plural, =0 {no order} one {# order} other {# orders}}",
+    "points": "{count} points",
+    "unknown": "New guest here",
+    "newDelivery": "Delivery",
+    "newTakeaway": "Takeaway"
   }
 }

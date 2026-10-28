@@ -11,18 +11,24 @@ import { listTables } from "@/server/modules/tables/service";
 import { listZones } from "@/server/modules/delivery/service";
 import { can } from "@/server/tenancy";
 
-type Params = PageProps<"/[locale]/dashboard/[restaurantId]/pos">["params"];
+type Props = PageProps<"/[locale]/dashboard/[restaurantId]/pos">;
 
-export default function PosPage({ params }: { params: Params }) {
+export default function PosPage({ params, searchParams }: Props) {
   return (
     <Suspense fallback={<div className="h-96 animate-pulse rounded-2xl bg-surface-2" />}>
-      <Pos params={params} />
+      <Pos params={params} searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function Pos({ params }: { params: Params }) {
+async function Pos({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
+  const sp = await searchParams;
+  const initialPhone = typeof sp.phone === "string" ? sp.phone.slice(0, 20) : "";
+  const initialChannel =
+    sp.channel === "delivery" || sp.channel === "takeaway" || sp.channel === "dine_in"
+      ? sp.channel
+      : undefined;
   const ctx = await requireRestaurant(restaurantId, "orders.create");
   const [menu, tables, config, shift, format, zones] = await Promise.all([
     getPublicMenu(ctx.restaurant.id),
@@ -62,6 +68,8 @@ async function Pos({ params }: { params: Params }) {
         }
       />
       <PosTerminal
+        initialPhone={initialPhone}
+        initialChannel={initialChannel}
         restaurantId={ctx.restaurant.id}
         menu={menu}
         currency={ctx.restaurant.currency}

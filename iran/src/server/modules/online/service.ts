@@ -14,7 +14,8 @@ import { emit, topics } from "@/server/infra/realtime";
 import { AppError, conflict, forbidden, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { taxFromGross, taxFromNet } from "@/lib/money";
-import { isUuid } from "@/lib/ids";
+import { isUuid, randomToken } from "@/lib/ids";
+import { normalizeIranMobile } from "@/lib/phone";
 import { forChannel, loadPricedProducts } from "@/server/modules/menu/public";
 import { computeTotals, priceLine, type PricedLine } from "@/server/modules/pricing";
 import { nextCounterValue } from "@/server/modules/restaurants/service";
@@ -126,22 +127,39 @@ export async function placeOnlineOrder(db: Database, diner: OnlineDiner, slug: s
       throw new AppError("VALIDATION", "address_required", { field: "address" });
     if (!input.deliveryZoneId) throw new AppError("VALIDATION", "zone_required", { field: "zone" });
   }
+  return insertGuestOrder(db, store, input, { dinerId: diner.id, phone: diner.phone, source: "online" });
+}
+
+type Store = NonNullable<Awaited<ReturnType<typeof storeBySlug>>>;
+type GuestOrderInput = Omit<z.output<typeof onlineOrderSchema>, "channel"> & {
+  channel: "dine_in" | "takeaway" | "delivery";
+};
+
+/** Shared by the online site and the kiosk: prices from the database, order "received". */
+async function insertGuestOrder(
+  db: Database,
+  store: Store,
+  input: GuestOrderInput,
+  who: { dinerId: string | null; phone: string | null; source: "online" | "kiosk" },
+) {
   const rid = store.id;
-  const phone = diner.phone;
+  const phone = who.phone;
 
   return db.transaction(async (tx) => {
     // Few orders may wait for the team at once, per guest.
-    const open = await tx
-      .select({ id: orders.id })
-      .from(orders)
-      .where(
-        and(
-          eq(orders.restaurantId, rid),
-          eq(orders.dinerId, diner.id),
-          inArray(orders.status, ["received", "pending_payment"]),
-        ),
-      );
-    if (open.length >= MAX_OPEN_ONLINE_ORDERS) throw conflict("too_many_pending");
+    if (who.dinerId) {
+      const open = await tx
+        .select({ id: orders.id })
+        .from(orders)
+        .where(
+          and(
+            eq(orders.restaurantId, rid),
+            eq(orders.dinerId, who.dinerId),
+            inArray(orders.status, ["received", "pending_payment"]),
+          ),
+        );
+      if (open.length >= MAX_OPEN_ONLINE_ORDERS) throw conflict("too_many_pending");
+    }
 
     const products = await loadPricedProducts(tx, rid, {
       productIds: [...new Set(input.lines.map((l) => l.productId))],
@@ -211,7 +229,7 @@ export async function placeOnlineOrder(db: Database, diner: OnlineDiner, slug: s
         pricesIncludeTax,
         note: [input.customerName, input.note].filter(Boolean).join(" · ").slice(0, 500) || null,
         customerPhone: phone,
-        dinerId: diner.id,
+        dinerId: who.dinerId,
         ...(input.channel === "delivery"
           ? { deliveryAddress: input.deliveryAddress, deliveryZoneId: zone?.id ?? null, deliveryFeeCents }
           : {}),
@@ -253,27 +271,27 @@ export async function placeOnlineOrder(db: Database, diner: OnlineDiner, slug: s
       actorUserId: null,
     });
     await applyOrderToStock(tx, rid, order!.id, -1);
-    const customer = await linkOrderCustomer(tx, rid, order!.id, phone, input.customerName);
-    if (input.channel === "delivery")
+    const customer = phone ? await linkOrderCustomer(tx, rid, order!.id, phone, input.customerName) : null;
+    if (customer && input.channel === "delivery")
       await rememberAddress(tx, rid, customer.id, input.deliveryAddress, zone?.id ?? null);
     await commitDiscounts(
       tx,
       rid,
       order!.id,
-      { couponId: extra.couponId, pointsRedeemed: 0, customerId: customer.id },
+      { couponId: extra.couponId, pointsRedeemed: 0, customerId: customer?.id ?? null },
       null,
     );
 
     await tx.insert(notifications).values({
       restaurantId: rid,
       type: "order.created",
-      payload: { orderId: order!.id, number, tableLabel: null, totalCents, source: "online" },
+      payload: { orderId: order!.id, number, tableLabel: null, totalCents, source: who.source },
     });
     await emit(tx, { topic: topics.restaurant(rid), type: "notification.created" });
     await emit(tx, {
       topic: topics.restaurant(rid),
       type: "order.created",
-      data: { orderId: order!.id, number, tableId: null, tableLabel: "", source: "online" },
+      data: { orderId: order!.id, number, tableId: null, tableLabel: "", source: who.source },
     });
     return order!;
   });
@@ -341,4 +359,86 @@ export async function updateOnlineSettings(db: Database, ctx: RestaurantContext,
     restaurantId: ctx.restaurant.id,
     metadata: { online: input },
   });
+}
+
+// ── Kiosk ─────────────────────────────────────────────────────────────────────
+
+/** The kiosk link carries the restaurant's kiosk token: whoever holds the tablet may order. */
+async function storeByKiosk(db: DbOrTx, token: string) {
+  if (!/^[A-Za-z0-9_-]{16,32}$/.test(token)) return null;
+  const [row] = await db
+    .select({ slug: restaurants.slug, enabled: restaurantSettings.kioskEnabled })
+    .from(restaurantSettings)
+    .innerJoin(restaurants, eq(restaurants.id, restaurantSettings.restaurantId))
+    .where(and(eq(restaurantSettings.kioskToken, token), isNull(restaurants.deletedAt)));
+  if (!row?.enabled) return null;
+  const store = await storeBySlug(db, row.slug);
+  return store && store.status === "active" ? store : null;
+}
+
+export async function getKioskStore(db: Database, token: string) {
+  const s = await storeByKiosk(db, token);
+  if (!s) return null;
+  return {
+    id: s.id,
+    name: s.name,
+    slug: s.slug,
+    currency: s.currency,
+    logoKey: s.logoKey,
+    brandColor: s.brandColor,
+  };
+}
+
+export const kioskOrderSchema = onlineOrderSchema.extend({
+  channel: z.enum(["dine_in", "takeaway"]),
+  phone: z.string().trim().max(32).default(""),
+});
+
+export async function placeKioskOrder(db: Database, token: string, raw: unknown) {
+  const store = await storeByKiosk(db, token);
+  if (!store) throw notFound();
+  const { phone: rawPhone, ...input } = kioskOrderSchema.parse(raw);
+  const phone = rawPhone ? normalizeIranMobile(rawPhone) : null;
+  if (rawPhone && !phone) throw new AppError("VALIDATION", "invalid_phone", { field: "phone" });
+  return insertGuestOrder(
+    db,
+    store,
+    { ...input, deliveryAddress: "", deliveryZoneId: null },
+    {
+      dinerId: null,
+      phone,
+      source: "kiosk",
+    },
+  );
+}
+
+export async function getKioskSettings(db: DbOrTx, ctx: RestaurantContext) {
+  assertCan(ctx, "restaurant.view");
+  const [s] = await db
+    .select({ enabled: restaurantSettings.kioskEnabled, token: restaurantSettings.kioskToken })
+    .from(restaurantSettings)
+    .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
+  return s ?? { enabled: false, token: null };
+}
+
+/** On/off; a new link (old tablets stop working) when `regenerate`. */
+export async function updateKiosk(
+  db: Database,
+  ctx: RestaurantContext,
+  opts: { enabled: boolean; regenerate?: boolean },
+) {
+  assertCan(ctx, "restaurant.manage");
+  const current = await getKioskSettings(db, ctx);
+  const token = opts.regenerate || !current.token ? randomToken(24) : current.token;
+  await db
+    .update(restaurantSettings)
+    .set({ kioskEnabled: opts.enabled, kioskToken: token })
+    .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
+  await recordAudit(db, {
+    action: "restaurant.settings_updated",
+    actorUserId: ctx.user.id,
+    restaurantId: ctx.restaurant.id,
+    metadata: { kiosk: opts.enabled, regenerated: Boolean(opts.regenerate) },
+  });
+  return { enabled: opts.enabled, token };
 }

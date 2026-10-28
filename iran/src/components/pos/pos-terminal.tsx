@@ -59,7 +59,12 @@ export function PosTerminal({
   methods,
   canPay,
   zones,
+  initialPhone = "",
+  initialChannel,
 }: {
+  /** Call centre: opened for a caller (phone and sales type prefilled). */
+  initialPhone?: string;
+  initialChannel?: "takeaway" | "dine_in" | "delivery";
   restaurantId: string;
   menu: PublicMenu;
   currency: string;
@@ -74,11 +79,11 @@ export function PosTerminal({
   const [category, setCategory] = useState<string | "all">("all");
   const [query, setQuery] = useState("");
   const [lines, setLines] = useState<Line[]>([]);
-  const [channel, setChannel] = useState<"takeaway" | "dine_in" | "delivery">("takeaway");
+  const [channel, setChannel] = useState<"takeaway" | "dine_in" | "delivery">(initialChannel ?? "takeaway");
   const [address, setAddress] = useState("");
   const [zoneId, setZoneId] = useState(zones[0]?.id ?? "");
   const [tableId, setTableId] = useState<string>("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(initialPhone);
   const [discount, setDiscount] = useState(0);
   const [club, setClub] = useState<{
     phone: string;
@@ -151,11 +156,13 @@ export function PosTerminal({
   const feeCents = zone?.feeCents ?? 0;
   const total = subtotal - discountCents + feeCents;
 
-  const onPhone = (v: string) => {
-    setPhone(v);
-    setUsePoints(false);
-    const n = normalizeIranMobile(v);
-    if (!n || n === club?.phone) return;
+  // The caller's file (points, credit, last address) for a prefilled number.
+  useEffect(() => {
+    const n = initialPhone ? normalizeIranMobile(initialPhone) : null;
+    if (n) lookup(n);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  function lookup(n: string) {
     void lookupCustomerAction(restaurantId, n).then((res) => {
       if (res?.ok && res.data) {
         setClub({ phone: n, ...res.data });
@@ -166,6 +173,13 @@ export function PosTerminal({
         }
       }
     });
+  }
+  const onPhone = (v: string) => {
+    setPhone(v);
+    setUsePoints(false);
+    const n = normalizeIranMobile(v);
+    if (!n || n === club?.phone) return;
+    lookup(n);
   };
   const applyCoupon = () =>
     start(async () => {

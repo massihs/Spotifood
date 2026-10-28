@@ -10,6 +10,7 @@ import {
   Network,
   Calculator,
   CreditCard,
+  Headset,
   ChefHat,
   FileText,
   LayoutDashboard,
@@ -42,6 +43,7 @@ import { countLowStock } from "@/server/modules/inventory/service";
 import { countToDispatch } from "@/server/modules/delivery/service";
 import { getSubscriptionNotice } from "@/server/modules/billing/service";
 import { sendDueFeedback } from "@/server/modules/feedback/service";
+import { checkKpiAlerts } from "@/server/modules/kpi/service";
 import { after } from "next/server";
 import { SubscriptionBanner } from "@/components/dashboard/subscription-banner";
 
@@ -78,6 +80,8 @@ async function RestaurantShell({
   ]);
   // Satisfaction texts that are due go out after this page is sent (no cron needed).
   after(() => sendDueFeedback(db, ctx.restaurant.id).catch(() => 0));
+  // Missed targets (kitchen time, rating, takings) become notifications.
+  after(() => checkKpiAlerts(db, ctx.restaurant).catch(() => []));
   const off = new Set(disabled);
   const on = (m: ModuleKey) => !off.has(m);
   const g = {
@@ -142,6 +146,14 @@ async function RestaurantShell({
         href: `${base}/floor`,
         label: t("nav.floor"),
         icon: <LayoutGrid />,
+        groupKey: "sales",
+        group: g.sales,
+      },
+      {
+        show: on("branches") && can(ctx, "orders.create") && can(ctx, "customers.view"),
+        href: `${base}/callcenter`,
+        label: t("nav.callcenter"),
+        icon: <Headset />,
         groupKey: "sales",
         group: g.sales,
       },

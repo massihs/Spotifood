@@ -19,6 +19,12 @@ import {
 import { money, pk, softDelete, timestamps } from "./_helpers";
 
 /** A slice of the wheel: a discount (percent or amount in minor units) or nothing, and its odds. */
+export type KpiGoals = {
+  dailyRevenueCents?: number | null;
+  maxPrepMinutes?: number | null;
+  minRating?: number | null;
+};
+
 export type WheelPrize = {
   label: string;
   kind: "percent" | "amount" | "none";
@@ -114,6 +120,11 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   onlineOrderingEnabled: boolean().notNull().default(false),
   onlineTakeaway: boolean().notNull().default(true),
   onlineDelivery: boolean().notNull().default(false),
+  /** Self-order kiosk (/kiosk/{token}): a tablet at the counter, eat in or take away. */
+  kioskEnabled: boolean().notNull().default(false),
+  kioskToken: varchar({ length: 32 }),
+  /** Targets on the overview, with alerts: null = no target. */
+  kpiGoals: jsonb().$type<KpiGoals>().notNull().default({}),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */
   zarinpalMerchantId: varchar({ length: 64 }),
   /** Auto-close idle table sessions after N minutes (null = manual only). */
