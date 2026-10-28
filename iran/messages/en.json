@@ -269,7 +269,8 @@
         }
       }
     },
-    "howEyebrow": "Simple start"
+    "howEyebrow": "Simple start",
+    "ctaDemo": "Try the demo"
   },
   "auth": {
     "loginTitle": "Welcome back",
@@ -352,8 +353,10 @@
     "setup": {
       "profile": "Complete restaurant details",
       "tables": "Create your tables",
-      "menu": "Build your menu",
-      "payments": "Configure payment methods"
+      "menu": "Create your menu (or import it from Excel)",
+      "payments": "Configure payment methods",
+      "logo": "Add your logo",
+      "firstOrder": "Place a test order (scan a QR)"
     },
     "stats": {
       "tables": "Tables",
@@ -619,7 +622,10 @@
     "not_a_guest_order": "This order was entered by the staff: there is no device to block.",
     "billing_disabled": "Subscription payment is not open yet.",
     "billing_provider_error": "Zarinpal is not responding. Please try again shortly.",
-    "plan_not_payable": "This plan cannot be paid online."
+    "plan_not_payable": "This plan cannot be paid online.",
+    "import_empty": "The file is empty or has no readable dish.",
+    "import_unreadable": "Unreadable file. Save it as .xlsx or .csv and try again.",
+    "import_too_big": "File too large (5 MB max)."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1248,7 +1254,8 @@
       "apply": "Apply to {count} dishes",
       "done": "{count, plural, =0 {No price changed} one {# price updated} other {# prices updated}}."
     },
-    "nutritionLink": "Nutrition database"
+    "nutritionLink": "Nutrition database",
+    "importLink": "Import (Excel/CSV)"
   },
   "product": {
     "new": "New product",
@@ -3137,5 +3144,37 @@
     "free": "Free",
     "contact": "Contact us",
     "start": "Get started"
+  },
+  "menuImport": {
+    "title": "Import the menu",
+    "subtitle": "From an Excel (.xlsx) or CSV file: categories, dishes and prices at once.",
+    "back": "Menu",
+    "pick": "Choose your file",
+    "pickHint": "Columns: category, name, price, description (in this order or with these headers).",
+    "choose": "Choose a file",
+    "another": "Choose another file",
+    "template": "Template to fill in",
+    "colCategory": "Category",
+    "colName": "Name",
+    "colPrice": "Price",
+    "colDescription": "Description",
+    "sampleCategory": "Mains",
+    "sampleName": "Kebab koobideh",
+    "samplePrice": "350000",
+    "sampleDescription": "Two skewers, saffron rice",
+    "summary": "{ok} dishes ready to import out of {total} lines",
+    "newCategories": "new categories: {list}",
+    "import": "Import {count, plural, one {# dish} other {# dishes}}",
+    "status": "Status",
+    "duplicate": "Already on the menu",
+    "done": "{created, plural, one {# dish imported} other {# dishes imported}}, {categories, plural, =0 {no new category} one {# category created} other {# categories created}}.",
+    "skipped": "{count, plural, one {# dish already there skipped} other {# dishes already there skipped}}.",
+    "toMenu": "See the menu",
+    "errors": {
+      "missing_name": "Missing name",
+      "missing_category": "Missing category",
+      "bad_price": "Invalid price"
+    },
+    "help": "Tip: an empty category cell repeats the one above. Prices in tomans, with or without separators. Photos and options are added afterwards, dish by dish."
   }
 }

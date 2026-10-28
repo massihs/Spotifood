@@ -100,10 +100,17 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: tz });
 
   const steps = [
-    { key: "profile", done: overview.profileComplete, href: `${base}/settings` },
+    { key: "profile", done: overview.profileComplete, href: `${base}/settings#profile` },
+    { key: "logo", done: overview.hasLogo, href: `${base}/settings#profile` },
+    // An empty menu starts from the spreadsheet import: the fastest way in.
+    {
+      key: "menu",
+      done: overview.products > 0,
+      href: overview.products > 0 ? `${base}/menu` : `${base}/menu/import`,
+    },
     { key: "tables", done: overview.tables > 0, href: `${base}/tables` },
-    { key: "menu", done: overview.products > 0, href: `${base}/menu` },
-    { key: "payments", done: overview.paymentsReady, href: `${base}/settings` },
+    { key: "payments", done: overview.paymentsReady, href: `${base}/settings#payments` },
+    { key: "firstOrder", done: overview.hasOrders, href: `${base}/tables` },
   ] as const;
   const doneCount = steps.filter((s) => s.done).length;
 
@@ -402,7 +409,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
               </span>
             }
           />
-          <ol className="grid gap-1 p-3 sm:grid-cols-2 xl:grid-cols-4">
+          <ol className="grid gap-1 p-3 sm:grid-cols-2 xl:grid-cols-3">
             {steps.map((s, i) => (
               <li key={s.key}>
                 <Link

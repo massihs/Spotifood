@@ -297,8 +297,18 @@ async function seedDemoRestaurant() {
     return;
   }
 
-  const owner = await upsertUser(DEMO_OWNER.email, DEMO_OWNER.password, DEMO_OWNER.fullName);
-  const staff = await upsertUser(DEMO_STAFF.email, DEMO_STAFF.password, DEMO_STAFF.fullName);
+  // In production (public demo) nobody may sign in with the well-known demo passwords.
+  const prod = process.env.NODE_ENV === "production";
+  const owner = await upsertUser(
+    DEMO_OWNER.email,
+    prod ? randomUUID() : DEMO_OWNER.password,
+    DEMO_OWNER.fullName,
+  );
+  const staff = await upsertUser(
+    DEMO_STAFF.email,
+    prod ? randomUUID() : DEMO_STAFF.password,
+    DEMO_STAFF.fullName,
+  );
 
   await db.transaction(async (tx) => {
     const org = await createOrganization(tx, {
@@ -327,6 +337,8 @@ async function seedDemoRestaurant() {
       .update(restaurantSettings)
       .set({
         orderPrefix: "D",
+        // Public demo (/demo): a visitor's table frees itself after 20 idle minutes.
+        sessionAutoCloseMinutes: 20,
         legalName: "شرکت نمونه رستوران",
         // Online payment uses whatever this deployment offers (Stripe keys / dev simulator).
         onlinePaymentEnabled: true,
@@ -845,6 +857,13 @@ async function main() {
   if (process.env.SEED_BRIELLE !== "false") await seedBrielle();
   // Production containers run this on every start with SEED_DEMO unset: platform data only.
   const demo = process.env.SEED_DEMO ?? (process.env.NODE_ENV === "production" ? "false" : "true");
+  // SEED_PUBLIC_DEMO=true: the demo restaurant behind /demo, in production too (no demo orders).
+  if (process.env.SEED_PUBLIC_DEMO === "true" && demo !== "true") {
+    await seedDemoRestaurant();
+    await ensureDemoPlan();
+    await seedDemoImages();
+    return;
+  }
   if (demo !== "true") return;
   await seedDemoRestaurant();
   await ensureDemoPlan();

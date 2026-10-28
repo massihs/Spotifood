@@ -39,7 +39,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { buttonClasses } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { getPathname, Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { getDirectory } from "@/server/modules/directory/cache";
 
@@ -129,12 +129,12 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                   {t("ctaPrimary")}
                   <ArrowLeft className="size-4 ltr:rotate-180" aria-hidden="true" />
                 </Link>
-                <Link
-                  href="/login"
+                <a
+                  href={getPathname({ href: "/demo", locale })}
                   className="inline-flex h-12 items-center rounded-full bg-white/10 px-7 font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15"
                 >
-                  {t("ctaSecondary")}
-                </Link>
+                  {t("ctaDemo")}
+                </a>
               </div>
               <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/65">
                 {(["noApp", "zarinpal", "invoice"] as const).map((k) => (

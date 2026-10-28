@@ -42,6 +42,14 @@ async function Menu({ params, searchParams }: Pick<Props, "params" | "searchPara
         description={t("subtitle")}
         actions={
           <>
+            {can(ctx, "menu.manage") ? (
+              <Link
+                href={`/dashboard/${ctx.restaurant.id}/menu/import`}
+                className={buttonClasses("secondary")}
+              >
+                {t("importLink")}
+              </Link>
+            ) : null}
             <Link
               href={`/dashboard/${ctx.restaurant.id}/menu/stations`}
               className={buttonClasses("secondary")}

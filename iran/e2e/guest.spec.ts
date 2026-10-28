@@ -24,3 +24,8 @@ test("a guest scans the QR, adds a dish and places the order", async ({ page }) 
   await page.getByRole("button", { name: /ثبت سفارش|Place order/ }).click();
   await expect(page).toHaveURL(/\/table\/orders/, { timeout: 15_000 });
 });
+
+test("the public demo seats the visitor at a demo table", async ({ page }) => {
+  await page.goto("/demo");
+  await expect(page).toHaveURL(/\/table/, { timeout: 15_000 });
+});

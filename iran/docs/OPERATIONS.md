@@ -76,3 +76,11 @@ Quand Zarinpal confirme le compte marchand de Spotifood :
 
 L'admin peut aussi attribuer un forfait à la main (paiement par virement, geste commercial) :
 **Admin → Restaurants → Attribuer un forfait** (avec durée et montant, facture créée).
+
+## Démo publique (/demo)
+
+Le bouton « Essayer la démo » de l'accueil place le visiteur à une table libre du restaurant de
+démonstration (`restaurant-demo`), comme s'il avait scanné son QR. Pour l'activer en production,
+ajouter `SEED_PUBLIC_DEMO=true` aux variables Liara et redémarrer : le restaurant de démo est créé
+au démarrage (mots de passe aléatoires, personne ne peut s'y connecter), ses tables se libèrent
+après 20 minutes d'inactivité. Sans cette variable, `/demo` mène à l'annuaire des restaurants.

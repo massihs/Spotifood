@@ -269,7 +269,8 @@
         }
       }
     },
-    "howEyebrow": "Démarrage simple"
+    "howEyebrow": "Démarrage simple",
+    "ctaDemo": "Essayer la démo"
   },
   "auth": {
     "loginTitle": "Bon retour",
@@ -352,8 +353,10 @@
     "setup": {
       "profile": "Compléter les informations du restaurant",
       "tables": "Créer vos tables",
-      "menu": "Créer votre menu",
-      "payments": "Configurer les moyens de paiement"
+      "menu": "Créer votre menu (ou l’importer depuis Excel)",
+      "payments": "Configurer les moyens de paiement",
+      "logo": "Ajouter votre logo",
+      "firstOrder": "Passer une commande test (scannez un QR)"
     },
     "stats": {
       "tables": "Tables",
@@ -619,7 +622,10 @@
     "not_a_guest_order": "Cette commande a été saisie par l’équipe : aucun appareil à bloquer.",
     "billing_disabled": "Le paiement de l’abonnement n’est pas encore ouvert.",
     "billing_provider_error": "Zarinpal ne répond pas. Réessayez dans un instant.",
-    "plan_not_payable": "Ce forfait ne se paie pas en ligne."
+    "plan_not_payable": "Ce forfait ne se paie pas en ligne.",
+    "import_empty": "Le fichier est vide ou ne contient aucun plat lisible.",
+    "import_unreadable": "Fichier illisible. Enregistrez-le en .xlsx ou .csv et réessayez.",
+    "import_too_big": "Fichier trop volumineux (5 Mo maximum)."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1248,7 +1254,8 @@
       "apply": "Appliquer à {count} plats",
       "done": "{count, plural, =0 {Aucun prix modifié} one {# prix mis à jour} other {# prix mis à jour}}."
     },
-    "nutritionLink": "Base nutritionnelle"
+    "nutritionLink": "Base nutritionnelle",
+    "importLink": "Importer (Excel/CSV)"
   },
   "product": {
     "new": "Nouveau produit",
@@ -3145,5 +3152,37 @@
     "free": "Gratuit",
     "contact": "Nous contacter",
     "start": "Commencer"
+  },
+  "menuImport": {
+    "title": "Importer le menu",
+    "subtitle": "Depuis un fichier Excel (.xlsx) ou CSV : catégories, plats et prix en une fois.",
+    "back": "Menu",
+    "pick": "Choisissez votre fichier",
+    "pickHint": "Colonnes : catégorie, nom, prix, description (dans cet ordre ou avec ces titres).",
+    "choose": "Choisir un fichier",
+    "another": "Choisir un autre fichier",
+    "template": "Modèle à remplir",
+    "colCategory": "Catégorie",
+    "colName": "Nom",
+    "colPrice": "Prix",
+    "colDescription": "Description",
+    "sampleCategory": "Plats",
+    "sampleName": "Kebab koubideh",
+    "samplePrice": "350000",
+    "sampleDescription": "Deux brochettes, riz safrané",
+    "summary": "{ok} plats prêts à importer sur {total} lignes",
+    "newCategories": "nouvelles catégories : {list}",
+    "import": "Importer {count, plural, one {# plat} other {# plats}}",
+    "status": "État",
+    "duplicate": "Déjà au menu",
+    "done": "{created, plural, one {# plat importé} other {# plats importés}}, {categories, plural, =0 {aucune nouvelle catégorie} one {# catégorie créée} other {# catégories créées}}.",
+    "skipped": "{count, plural, one {# plat déjà présent ignoré} other {# plats déjà présents ignorés}}.",
+    "toMenu": "Voir le menu",
+    "errors": {
+      "missing_name": "Nom manquant",
+      "missing_category": "Catégorie manquante",
+      "bad_price": "Prix invalide"
+    },
+    "help": "Astuce : une cellule de catégorie vide reprend celle de la ligne du dessus. Les prix sont en tomans, sans séparateur ou avec. Photos et options s’ajoutent ensuite plat par plat."
   }
 }

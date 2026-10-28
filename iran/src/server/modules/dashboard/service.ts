@@ -38,7 +38,15 @@ export async function getSetupOverview(db: DbOrTx, ctx: RestaurantContext) {
       .from(restaurantMembers)
       .where(and(eq(restaurantMembers.restaurantId, rid), eq(restaurantMembers.status, "active"))),
     db
-      .select({ phone: restaurants.phone, address: restaurants.addressLine1 })
+      .select({
+        phone: restaurants.phone,
+        address: restaurants.addressLine1,
+        logo: restaurants.logoKey,
+        orders:
+          sql<number>`(select count(*) from orders o where o.restaurant_id = ${restaurants.id})`.mapWith(
+            Number,
+          ),
+      })
       .from(restaurants)
       .where(eq(restaurants.id, rid)),
     db
@@ -57,6 +65,8 @@ export async function getSetupOverview(db: DbOrTx, ctx: RestaurantContext) {
     products: p?.n ?? 0,
     members: m?.n ?? 0,
     profileComplete: Boolean(r?.phone && r?.address),
+    hasLogo: Boolean(r?.logo),
+    hasOrders: (r?.orders ?? 0) > 0,
     // Payments count as set up once online payment is on, or once the restaurant has collected.
     paymentsReady: Boolean(pay?.online) || (paid?.n ?? 0) > 0,
   };
