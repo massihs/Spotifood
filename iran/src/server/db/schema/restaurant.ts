@@ -47,7 +47,7 @@ export const restaurants = pgTable(
     kind: restaurantKind().notNull().default("restaurant"),
     logoKey: text(),
     /** Brand color key (lib/brand-colors): menu and dashboard accent. */
-    brandColor: varchar({ length: 16 }).notNull().default("violet"),
+    brandColor: varchar({ length: 16 }).notNull().default("orange"),
     /** Guest menu look: atelier | nuit | doux. */
     menuTheme: varchar({ length: 16 }).notNull().default("doux"),
     /** Guest menu shows prices in thousand tomans (1 319 instead of 1 319 000 tomans). */

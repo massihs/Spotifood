@@ -1,4 +1,10 @@
 /* Generated from src/lib/brand-colors.ts: one rule per restaurant brand color. */
+[data-brand="orange"] {
+  --brand-h: 47;
+  --brand-c: 0.19;
+  --brand-l: 0.66;
+  --brand-fg: oklch(1 0 0);
+}
 [data-brand="violet"] {
   --brand-h: 292;
   --brand-c: 0.2;
