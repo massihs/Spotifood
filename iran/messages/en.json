@@ -338,7 +338,8 @@
     "noResults": "Nothing found",
     "searchMove": "move",
     "searchOpen": "open",
-    "waiter": "Take orders"
+    "waiter": "Take orders",
+    "adminErrors": "Errors"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -447,6 +448,15 @@
       "active": "Active",
       "suspended": "Suspended",
       "disabled": "Disabled"
+    },
+    "errors": {
+      "title": "Server errors",
+      "subtitle": "{open} open · SMS alert {phone, select, on {on} other {off (ALERT_PHONE variable)}}",
+      "empty": "No error recorded.",
+      "seen": "{count, plural, one {# time} other {# times}} · first {first} · last {last}",
+      "resolved": "Resolved",
+      "resolve": "Mark resolved",
+      "stack": "Technical details"
     }
   },
   "errors": {

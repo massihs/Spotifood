@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 import { config } from "dotenv";
 import { fileURLToPath } from "node:url";
 
@@ -14,6 +14,8 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    // Browser tests (Playwright) live in e2e/.
+    exclude: [...configDefaults.exclude, "e2e/**"],
     globalSetup: ["./tests/helpers/global-setup.ts"],
     env: {
       NODE_ENV: "test",

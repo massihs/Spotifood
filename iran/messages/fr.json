@@ -338,7 +338,8 @@
     "more": "Plus",
     "close": "Fermer",
     "mainNav": "Navigation principale",
-    "waiter": "Prise de commande"
+    "waiter": "Prise de commande",
+    "adminErrors": "Erreurs"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -447,6 +448,15 @@
       "active": "Actif",
       "suspended": "Suspendu",
       "disabled": "Désactivé"
+    },
+    "errors": {
+      "title": "Erreurs serveur",
+      "subtitle": "{open} à traiter · alerte SMS {phone, select, on {activée} other {désactivée (variable ALERT_PHONE)}}",
+      "empty": "Aucune erreur enregistrée.",
+      "seen": "{count, plural, one {# fois} other {# fois}} · première {first} · dernière {last}",
+      "resolved": "Traitée",
+      "resolve": "Marquer traitée",
+      "stack": "Détails techniques"
     }
   },
   "errors": {

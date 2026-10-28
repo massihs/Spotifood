@@ -338,7 +338,8 @@
     "noResults": "لا توجد نتائج",
     "searchMove": "تنقّل",
     "searchOpen": "فتح",
-    "waiter": "أخذ الطلبات"
+    "waiter": "أخذ الطلبات",
+    "adminErrors": "الأخطاء"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -447,6 +448,15 @@
       "active": "نشط",
       "suspended": "معلّق",
       "disabled": "معطّل"
+    },
+    "errors": {
+      "title": "أخطاء الخادم",
+      "subtitle": "{open} مفتوحة · تنبيه SMS {phone, select, on {مفعّل} other {معطّل (المتغير ALERT_PHONE)}}",
+      "empty": "لا توجد أخطاء مسجلة.",
+      "seen": "{count} مرة · الأولى {first} · الأخيرة {last}",
+      "resolved": "تمت المعالجة",
+      "resolve": "تعليم كمعالج",
+      "stack": "تفاصيل تقنية"
     }
   },
   "errors": {

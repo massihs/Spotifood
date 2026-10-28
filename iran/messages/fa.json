@@ -338,7 +338,8 @@
     "noResults": "چیزی پیدا نشد",
     "searchMove": "جابجایی",
     "searchOpen": "باز کردن",
-    "waiter": "سفارش‌گیری"
+    "waiter": "سفارش‌گیری",
+    "adminErrors": "خطاها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -447,6 +448,15 @@
       "active": "فعال",
       "suspended": "معلق",
       "disabled": "غیرفعال"
+    },
+    "errors": {
+      "title": "خطاهای سرور",
+      "subtitle": "{open} مورد باز · هشدار پیامکی {phone, select, on {فعال} other {غیرفعال (متغیر ALERT_PHONE)}}",
+      "empty": "هیچ خطایی ثبت نشده است.",
+      "seen": "{count} بار · اولین {first} · آخرین {last}",
+      "resolved": "رسیدگی شد",
+      "resolve": "علامت رسیدگی",
+      "stack": "جزئیات فنی"
     }
   },
   "errors": {

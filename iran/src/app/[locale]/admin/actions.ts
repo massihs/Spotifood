@@ -6,6 +6,7 @@ import { db } from "@/server/db/client";
 import { requestMeta, requireSuperAdmin } from "@/server/auth/current";
 import { recordAudit } from "@/server/audit";
 import { setRestaurantStatus } from "@/server/modules/restaurants/service";
+import { resolveError } from "@/server/modules/ops/errors";
 
 const statusSchema = z.object({
   restaurantId: z.uuid(),
@@ -34,4 +35,11 @@ export async function setRestaurantStatusAction(formData: FormData) {
     return row;
   });
   if (updated) refresh();
+}
+
+export async function resolveErrorAction(formData: FormData) {
+  await requireSuperAdmin();
+  const id = z.uuid().parse(formData.get("id"));
+  await resolveError(db, id);
+  refresh();
 }

@@ -1,0 +1,59 @@
+# Exploitation : sauvegardes, alertes, surveillance
+
+## Sauvegardes de la base
+
+Trois niveaux, du plus simple au plus sûr :
+
+1. **Sauvegardes Liara** : dans le panel Liara → base PostgreSQL → _Backups_, activer les
+   sauvegardes automatiques quotidiennes (et en faire une à la main avant chaque grosse
+   mise à jour). La restauration se fait depuis le même écran.
+2. **Sauvegarde nocturne GitHub** (`.github/workflows/db-backup.yml`) : chaque nuit, la base
+   est copiée, **restaurée dans une base de test pour vérifier que la copie fonctionne**,
+   chiffrée puis gardée 14 jours dans GitHub Actions. À activer avec deux secrets du dépôt
+   (_Settings → Secrets and variables → Actions_) :
+   - `BACKUP_DATABASE_URL` : l'adresse publique de la base Liara (onglet _Connexion_), avec
+     un utilisateur qui peut créer une base ;
+   - `BACKUP_PASSPHRASE` : une longue phrase secrète, à garder aussi hors de GitHub.
+3. **À la main**, depuis n'importe quel poste avec `pg_dump` :
+   ```sh
+   iran/scripts/backup-restore-test.sh "postgres://…" spotifood-$(date +%F).dump
+   ```
+
+### Restaurer
+
+```sh
+gpg -d spotifood.dump.gpg > spotifood.dump          # si chiffrée
+createdb -h HOTE -U UTILISATEUR spotifood_restored
+pg_restore --no-owner --no-privileges -d "postgres://…/spotifood_restored" spotifood.dump
+```
+
+Puis pointer `DATABASE_URL` de l'application vers la base restaurée (ou renommer les bases),
+et redémarrer. `APP_SECRET` doit rester **le même** : sinon sessions, codes QR et
+identifiants chiffrés deviennent illisibles.
+
+**Photos et fichiers** : le disque `uploads` de Liara n'est pas dans la sauvegarde de la base.
+Le copier de temps en temps depuis le panel (ou passer au stockage objet compatible S3, qui
+a son propre versionnage).
+
+### Test de restauration
+
+La CI exécute `scripts/backup-restore-test.sh` à chaque modification : copie de la base de test,
+restauration, et comparaison du nombre de lignes de chaque table. Une sauvegarde qu'on n'a
+jamais restaurée n'est pas une sauvegarde.
+
+## Alertes d'erreurs
+
+- Chaque erreur serveur (page, API, action) est enregistrée et regroupée : **Admin → Erreurs**
+  (`/admin/errors`), avec le nombre d'occurrences, la route et les détails techniques.
+- Avec la variable `ALERT_PHONE` (numéro de l'administrateur, ex. `0912…`) et l'envoi de SMS
+  Kavenegar configuré, un SMS part pour chaque nouvelle erreur, au plus une fois par heure
+  par erreur et 5 par heure au total.
+
+## Surveillance de disponibilité
+
+`.github/workflows/uptime.yml` interroge `https://spotifood.ir/api/health` toutes les 10 minutes
+(application + base de données, 3 essais). Si le site ne répond pas :
+
+- l'exécution échoue et GitHub envoie un e-mail au propriétaire du dépôt ;
+- avec les secrets `KAVENEGAR_API_KEY` et `ALERT_PHONE`, un SMS part quand le site tombe, et un
+  autre quand il revient (pas toutes les 10 minutes).
