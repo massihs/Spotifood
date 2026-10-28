@@ -1,4 +1,6 @@
 import webpush from "web-push";
+import { createTranslator } from "next-intl";
+import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
@@ -116,8 +118,6 @@ export async function pushToGuest(
 
 /** A push text in the restaurant's language (messages: push.*). */
 export async function pushText(locale: string, key: string, values: Record<string, string | number>) {
-  const { createTranslator } = await import("next-intl");
-  const { DEFAULT_LOCALE, isLocale } = await import("@/i18n/config");
   const l = isLocale(locale) ? locale : DEFAULT_LOCALE;
   const messages = (await import(`../../../../messages/${l}.json`)).default;
   return createTranslator({ locale: l, messages, namespace: "push" })(key, values);
