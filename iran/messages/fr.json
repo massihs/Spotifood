@@ -2371,6 +2371,7 @@
   "brandColors": {
     "label": "Couleur de marque",
     "hint": "Utilisée sur le menu client, les boutons et le tableau de bord. Aperçu immédiat.",
+    "orange": "Orange",
     "violet": "Violet",
     "indigo": "Indigo",
     "sky": "Ciel",

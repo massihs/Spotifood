@@ -2363,6 +2363,7 @@
   "brandColors": {
     "label": "Brand color",
     "hint": "Used on your guest menu, buttons and dashboard. Previews instantly.",
+    "orange": "Orange",
     "violet": "Violet",
     "indigo": "Indigo",
     "sky": "Sky",
