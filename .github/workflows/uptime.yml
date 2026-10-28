@@ -20,6 +20,11 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # Secrets are not allowed in step conditions: expose them (empty when unset) at job level.
+    env:
+      KEY: ${{ secrets.KAVENEGAR_API_KEY }}
+      TO: ${{ secrets.ALERT_PHONE }}
+      CRON: ${{ secrets.CRON_SECRET }}
     steps:
       - name: Previous result
         id: prev
@@ -40,14 +45,11 @@ jobs:
           echo "up=0" >> "$GITHUB_OUTPUT"
       - name: Periodic jobs (satisfaction texts)
         if: steps.health.outputs.up == '1' && env.CRON != ''
-        env:
-          CRON: ${{ secrets.CRON_SECRET }}
-        run: curl -fsS -m 30 -X POST -H "x-cron-key: $CRON" https://spotifood.ir/api/v1/cron || echo "cron call failed"
+        run: |
+          curl -fsS -m 30 -X POST -H "x-cron-key: $CRON" https://spotifood.ir/api/v1/cron || echo "cron call failed"
       - name: SMS on change
         if: env.KEY != '' && env.TO != '' && ((steps.health.outputs.up == '0' && steps.prev.outputs.last != 'failure') || (steps.health.outputs.up == '1' && steps.prev.outputs.last == 'failure'))
         env:
-          KEY: ${{ secrets.KAVENEGAR_API_KEY }}
-          TO: ${{ secrets.ALERT_PHONE }}
           UP: ${{ steps.health.outputs.up }}
         run: |
           if [ "$UP" = "1" ]; then msg="Spotifood: spotifood.ir est de nouveau en ligne."; else msg="Spotifood: spotifood.ir ne répond plus (/api/health)."; fi
