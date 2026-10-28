@@ -15,6 +15,8 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { GuestTopBar } from "@/components/guest/cart-view";
 import { PaymentPanel } from "@/components/guest/payment-panel";
 import { ReadyWatcher } from "@/components/guest/ready-watcher";
+import { PushButton } from "@/components/push/push-button";
+import { vapidPublicKey } from "@/server/modules/push/service";
 import { GuestSkeleton, SessionExpired } from "@/components/guest/states";
 import { LiveIndicator, LiveProvider, LiveRefresh } from "@/components/realtime/live";
 import { Link } from "@/i18n/navigation";
@@ -59,6 +61,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
   const money = (c: number) => formatMoney(c, guest.restaurant.currency, locale);
   const total = orders.filter((o) => o.status !== "cancelled").reduce((s, o) => s + o.totalCents, 0);
 
+  const pushKey = vapidPublicKey();
   return (
     <LiveProvider url="/api/v1/realtime/guest">
       <div data-brand={guest.restaurant.brandColor} className="contents">
@@ -71,6 +74,11 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
           />
           <main className="mx-auto max-w-2xl px-4 pt-4 pb-32 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-x-6 lg:pt-6 lg:pb-12">
             {orders.length > 0 ? <ReadyWatcher /> : null}
+            {orders.length > 0 && pushKey ? (
+              <div className="mb-4 lg:col-span-2">
+                <PushButton publicKey={pushKey} className="w-full" />
+              </div>
+            ) : null}
             {sp.placed ? (
               <div
                 role="status"

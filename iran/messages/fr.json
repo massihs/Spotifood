@@ -3374,5 +3374,16 @@
     "unknown": "Nouveau client ici",
     "newDelivery": "Livraison",
     "newTakeaway": "À emporter"
+  },
+  "push": {
+    "newOrderTitle": "Nouvelle commande {number}",
+    "newOrderTable": "Table {table}",
+    "newOrderOnline": "Commande en ligne",
+    "readyBody": "Votre commande {number} est prête !",
+    "onStaff": "Recevoir les commandes sur cet appareil",
+    "onGuest": "Me prévenir quand c’est prêt",
+    "off": "Notifications activées (désactiver)",
+    "denied": "Notifications bloquées dans le navigateur",
+    "unavailable": "Notifications indisponibles sur ce navigateur"
   }
 }

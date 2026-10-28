@@ -11,6 +11,8 @@ import { formatMoney } from "@/lib/money";
 import { getCurrentDiner } from "@/server/auth/diner";
 import { db } from "@/server/db/client";
 import { getOnlineOrder } from "@/server/modules/online/service";
+import { PushButton } from "@/components/push/push-button";
+import { vapidPublicKey } from "@/server/modules/push/service";
 
 type Props = PageProps<"/[locale]/r/[slug]/o/[orderId]">;
 
@@ -111,6 +113,7 @@ async function Status({ params }: Pick<Props, "params">) {
           </p>
           {o.deliveryAddress ? <p className="mt-3 text-fg-muted">{o.deliveryAddress}</p> : null}
         </div>
+        {!done && vapidPublicKey() ? <PushButton publicKey={vapidPublicKey()!} className="w-full" /> : null}
         {found.restaurantPhone ? (
           <a
             href={`tel:${found.restaurantPhone}`}

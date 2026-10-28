@@ -4,6 +4,7 @@ import { formatMoney } from "@/lib/money";
 import { useTranslations, useLocale } from "next-intl";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { cn } from "@/lib/cn";
+import { PushButton } from "@/components/push/push-button";
 import { useLiveEvent } from "@/components/realtime/live";
 import { TimeAgo } from "@/components/ui/time-ago";
 import {
@@ -17,7 +18,10 @@ export function NotificationBell({
   restaurantId,
   timeZone,
   initialUnread,
+  pushKey = null,
 }: {
+  /** VAPID public key when Web Push is on: lets this browser receive new orders closed. */
+  pushKey?: string | null;
   restaurantId: string;
   timeZone: string;
   initialUnread: number;
@@ -145,6 +149,16 @@ export function NotificationBell({
               ))
             )}
           </ul>
+          {pushKey ? (
+            <div className="border-t border-border p-3">
+              <PushButton
+                publicKey={pushKey}
+                restaurantId={restaurantId}
+                compact
+                className="w-full justify-center"
+              />
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

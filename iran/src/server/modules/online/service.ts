@@ -25,6 +25,7 @@ import { applyOrderToStock } from "@/server/modules/inventory/service";
 import { commitDiscounts, computeDiscounts, linkOrderCustomer } from "@/server/modules/customers/service";
 import { getZone, rememberAddress } from "@/server/modules/delivery/service";
 import { recordAudit } from "@/server/audit";
+import { notifyNewOrder } from "@/server/modules/push/service";
 
 /**
  * Online ordering (Z-6): /r/{slug}/order, a link for the Instagram bio. Takeaway or delivery,
@@ -52,6 +53,7 @@ async function storeBySlug(db: DbOrTx, slug: string) {
       delivery: restaurantSettings.onlineDelivery,
       orderPrefix: restaurantSettings.orderPrefix,
       pricesIncludeTax: restaurantSettings.pricesIncludeTax,
+      defaultLocale: restaurants.defaultLocale,
     })
     .from(restaurants)
     .innerJoin(restaurantSettings, eq(restaurantSettings.restaurantId, restaurants.id))
@@ -145,7 +147,7 @@ async function insertGuestOrder(
   const rid = store.id;
   const phone = who.phone;
 
-  return db.transaction(async (tx) => {
+  const placed = await db.transaction(async (tx) => {
     // Few orders may wait for the team at once, per guest.
     if (who.dinerId) {
       const open = await tx
@@ -295,6 +297,12 @@ async function insertGuestOrder(
     });
     return order!;
   });
+  notifyNewOrder(
+    db,
+    { id: store.id, defaultLocale: store.defaultLocale },
+    { number: placed.number, tableLabel: null },
+  );
+  return placed;
 }
 
 /** The guest's own order, for the tracking page. */

@@ -44,6 +44,7 @@ import { countToDispatch } from "@/server/modules/delivery/service";
 import { getSubscriptionNotice } from "@/server/modules/billing/service";
 import { sendDueFeedback } from "@/server/modules/feedback/service";
 import { checkKpiAlerts } from "@/server/modules/kpi/service";
+import { vapidPublicKey } from "@/server/modules/push/service";
 import { after } from "next/server";
 import { SubscriptionBanner } from "@/components/dashboard/subscription-banner";
 
@@ -337,6 +338,7 @@ async function RestaurantShell({
               restaurantId={ctx.restaurant.id}
               timeZone={ctx.restaurant.timezone}
               initialUnread={unread}
+              pushKey={vapidPublicKey()}
             />
           </>
         }

@@ -1777,12 +1777,20 @@
       "weekly": {
         "name": "Weekly playlist",
         "body": "A fresh playlist every Saturday.",
-        "features": ["30 new tracks every week", "No tiring repeats", "Plays on any device"]
+        "features": [
+          "30 new tracks every week",
+          "No tiring repeats",
+          "Plays on any device"
+        ]
       },
       "monthly": {
         "name": "Monthly playlist",
         "body": "A fresh playlist every month.",
-        "features": ["30 new tracks every month", "Ideal for calm venues", "Plays on any device"]
+        "features": [
+          "30 new tracks every month",
+          "Ideal for calm venues",
+          "Plays on any device"
+        ]
       }
     },
     "status": {
@@ -3366,5 +3374,16 @@
     "unknown": "New guest here",
     "newDelivery": "Delivery",
     "newTakeaway": "Takeaway"
+  },
+  "push": {
+    "newOrderTitle": "New order {number}",
+    "newOrderTable": "Table {table}",
+    "newOrderOnline": "Online order",
+    "readyBody": "Your order {number} is ready!",
+    "onStaff": "Get orders on this device",
+    "onGuest": "Notify me when it’s ready",
+    "off": "Notifications on (turn off)",
+    "denied": "Notifications blocked in the browser",
+    "unavailable": "Notifications unavailable in this browser"
   }
 }

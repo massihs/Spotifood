@@ -1777,12 +1777,20 @@
       "weekly": {
         "name": "قائمة أسبوعية",
         "body": "A fresh playlist every Saturday.",
-        "features": ["30 new tracks every week", "No tiring repeats", "Plays on any device"]
+        "features": [
+          "30 new tracks every week",
+          "No tiring repeats",
+          "Plays on any device"
+        ]
       },
       "monthly": {
         "name": "قائمة شهرية",
         "body": "A fresh playlist every month.",
-        "features": ["30 new tracks every month", "Ideal for calm venues", "Plays on any device"]
+        "features": [
+          "30 new tracks every month",
+          "Ideal for calm venues",
+          "Plays on any device"
+        ]
       }
     },
     "status": {
@@ -3366,5 +3374,16 @@
     "unknown": "زبون جديد هنا",
     "newDelivery": "توصيل",
     "newTakeaway": "سفري"
+  },
+  "push": {
+    "newOrderTitle": "طلب جديد {number}",
+    "newOrderTable": "الطاولة {table}",
+    "newOrderOnline": "طلب أونلاين",
+    "readyBody": "طلبك {number} جاهز!",
+    "onStaff": "استلام الطلبات على هذا الجهاز",
+    "onGuest": "نبّهني عندما يجهز",
+    "off": "الإشعارات مفعّلة (إيقاف)",
+    "denied": "الإشعارات محظورة في المتصفح",
+    "unavailable": "الإشعارات غير متاحة في هذا المتصفح"
   }
 }

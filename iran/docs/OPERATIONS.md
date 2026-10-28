@@ -95,3 +95,15 @@ Les SMS dus partent quand l'équipe utilise le tableau de bord. Pour qu'ils part
 quand personne n'est connecté : choisir une longue valeur secrète, la mettre dans `CRON_SECRET`
 (variables Liara) **et** dans le secret GitHub `CRON_SECRET` ; le workflow de surveillance appelle
 alors `/api/v1/cron` toutes les 10 minutes.
+
+## Notifications push
+
+Les alertes push (nouvelle commande pour l'équipe, « commande prête » pour le client) marchent
+même page fermée. Activation : générer une fois une paire de clés avec
+`npx web-push generate-vapid-keys`, puis mettre `VAPID_PUBLIC_KEY` et `VAPID_PRIVATE_KEY`
+(variables Liara) — **ne jamais les changer ensuite**, sinon chaque appareil doit se réabonner.
+L'équipe active les push depuis la cloche de notifications ; le client depuis le suivi de commande.
+
+Attention : Chrome et Android passent par le service de Google (FCM), souvent filtré en Iran ;
+quand il est injoignable, l'envoi échoue sans rien bloquer et les SMS / alertes du tableau de bord
+restent la solution sûre.

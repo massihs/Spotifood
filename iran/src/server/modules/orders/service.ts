@@ -1,3 +1,4 @@
+import { notifyNewOrder, notifyOrderReady } from "@/server/modules/push/service";
 import { scheduleFeedback } from "@/server/modules/feedback/service";
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { assertGuestMayAct } from "@/server/modules/guest/limits";
@@ -266,6 +267,7 @@ export async function placeOrder(
     });
     return created!;
   });
+  notifyNewOrder(db, guest.restaurant, { number: order.number, tableLabel: order.tableLabel });
   return order;
 }
 
@@ -469,6 +471,13 @@ export async function updateOrderStatus(
     }
     return updated;
   });
+  if (to === "ready")
+    notifyOrderReady(db, ctx.restaurant, {
+      id: updated.id,
+      number: updated.number,
+      participantId: updated.participantId,
+      dinerId: updated.dinerId,
+    });
   // Food courts text the guest; after the commit, and a failed SMS never blocks the kitchen.
   if (to === "ready" && ctx.restaurant.kind === "food_court" && updated.customerPhone)
     await sendReadySms(db, ctx, updated).catch((e) => console.error("[sms] order ready", e));
