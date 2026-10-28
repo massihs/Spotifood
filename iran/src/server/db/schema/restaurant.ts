@@ -17,6 +17,14 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { money, pk, softDelete, timestamps } from "./_helpers";
+
+/** A slice of the wheel: a discount (percent or amount in minor units) or nothing, and its odds. */
+export type WheelPrize = {
+  label: string;
+  kind: "percent" | "amount" | "none";
+  value: number;
+  weight: number;
+};
 import { memberRole, memberStatus, restaurantKind, restaurantStatus } from "./enums";
 import { organizations, users } from "./platform";
 
@@ -96,6 +104,12 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   requirePaymentBeforeOrder: boolean().notNull().default(false),
   /** Anti-abuse: a table opened by a QR scan may only order / call once a waiter confirms it. */
   guestOrdersNeedStaff: boolean().notNull().default(false),
+  /** Satisfaction: an SMS asks the guest (phone on the order) how it was, after serving. */
+  feedbackSmsEnabled: boolean().notNull().default(false),
+  feedbackDelayMinutes: integer().notNull().default(60),
+  /** Wheel of fortune after a rating: prizes become single-use coupons. */
+  wheelEnabled: boolean().notNull().default(false),
+  wheelPrizes: jsonb().$type<WheelPrize[]>().notNull().default([]),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */
   zarinpalMerchantId: varchar({ length: 64 }),
   /** Auto-close idle table sessions after N minutes (null = manual only). */

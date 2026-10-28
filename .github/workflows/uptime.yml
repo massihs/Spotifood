@@ -38,6 +38,11 @@ jobs:
             sleep 20
           done
           echo "up=0" >> "$GITHUB_OUTPUT"
+      - name: Periodic jobs (satisfaction texts)
+        if: steps.health.outputs.up == '1' && env.CRON != ''
+        env:
+          CRON: ${{ secrets.CRON_SECRET }}
+        run: curl -fsS -m 30 -X POST -H "x-cron-key: $CRON" https://spotifood.ir/api/v1/cron || echo "cron call failed"
       - name: SMS on change
         if: env.KEY != '' && env.TO != '' && ((steps.health.outputs.up == '0' && steps.prev.outputs.last != 'failure') || (steps.health.outputs.up == '1' && steps.prev.outputs.last == 'failure'))
         env:

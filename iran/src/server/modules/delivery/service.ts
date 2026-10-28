@@ -1,3 +1,4 @@
+import { scheduleFeedback } from "@/server/modules/feedback/service";
 import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, ne, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
@@ -331,6 +332,8 @@ export async function markDelivered(db: Database, ctx: RestaurantContext, orderI
         toStatus: "served",
         actorUserId: ctx.user.id,
       });
+    const [phone] = await tx.select({ p: orders.customerPhone }).from(orders).where(eq(orders.id, o.id));
+    await scheduleFeedback(tx, { id: o.id, restaurantId: rid, customerPhone: phone?.p ?? null });
     await emitUpdated(tx, rid, o.id);
   });
 }

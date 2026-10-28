@@ -343,7 +343,8 @@
     "waiter": "Prise de commande",
     "adminErrors": "Erreurs",
     "billing": "Abonnement",
-    "adminPlans": "Forfaits"
+    "adminPlans": "Forfaits",
+    "feedback": "Avis clients"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -625,7 +626,11 @@
     "plan_not_payable": "Ce forfait ne se paie pas en ligne.",
     "import_empty": "Le fichier est vide ou ne contient aucun plat lisible.",
     "import_unreadable": "Fichier illisible. Enregistrez-le en .xlsx ou .csv et réessayez.",
-    "import_too_big": "Fichier trop volumineux (5 Mo maximum)."
+    "import_too_big": "Fichier trop volumineux (5 Mo maximum).",
+    "already_answered": "Vous avez déjà donné votre avis, merci !",
+    "wheel_off": "La roue n’est pas disponible.",
+    "rate_first": "Donnez d’abord votre note.",
+    "already_spun": "La roue a déjà été tournée."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1537,6 +1542,9 @@
       "reservation": {
         "created": "Nouvelle réservation : {name} · {partySize} pers.",
         "cancelled": "Réservation annulée : {name}"
+      },
+      "feedback": {
+        "unhappy": "Client mécontent ({rating}/5) · commande {number}"
       }
     }
   },
@@ -1706,6 +1714,9 @@
       "queued": "Votre place chez {restaurant} : numéro {number}. Suivi : {link}",
       "tableReady": "{name}, votre table chez {restaurant} est prête. Vous pouvez venir.",
       "reminder": "Rappel : votre réservation aujourd’hui à {time} chez {restaurant}. {link}"
+    },
+    "feedback": {
+      "ask": "{restaurant} : merci de votre visite ! Comment était-ce ? Donnez votre avis : {link}"
     }
   },
   "alerts": {
@@ -3184,5 +3195,61 @@
       "bad_price": "Prix invalide"
     },
     "help": "Astuce : une cellule de catégorie vide reprend celle de la ligne du dessus. Les prix sont en tomans, sans séparateur ou avec. Photos et options s’ajoutent ensuite plat par plat."
+  },
+  "feedbackPage": {
+    "title": "Votre avis",
+    "subtitle": "Commande {number} : notez votre expérience.",
+    "rate": "Note",
+    "stars": "{count, plural, one {# étoile} other {# étoiles}}",
+    "label1": "Très déçu",
+    "label2": "Déçu",
+    "label3": "Correct",
+    "label4": "Bien",
+    "label5": "Excellent !",
+    "whatWrong": "Qu’est-ce qui n’a pas été ? Le restaurant sera prévenu.",
+    "commentPlaceholder": "Un mot pour l’équipe (facultatif)",
+    "send": "Envoyer",
+    "thanks": "Merci pour votre avis !",
+    "sorry": "Merci, et désolé. L’équipe a été prévenue.",
+    "spinHint": "Tournez la roue pour gagner une réduction sur votre prochaine visite.",
+    "spin": "Tourner la roue",
+    "wheel": "Roue de la chance",
+    "youWon": "Vous avez gagné",
+    "couponHint": "Code à donner à la caisse lors de votre prochaine visite (valable 30 jours, une fois).",
+    "noLuck": "Pas de chance cette fois…"
+  },
+  "feedback": {
+    "title": "Avis clients",
+    "subtitle": "Satisfaction après chaque commande : SMS, notes, clients mécontents et roue de la chance.",
+    "average": "Note moyenne (30 j)",
+    "answered": "Réponses (30 j)",
+    "rate": "Taux de réponse",
+    "unhappy": "Clients mécontents",
+    "latest": "Derniers avis",
+    "latestHint": "Les notes de 2 ou moins sont signalées tout de suite dans les notifications.",
+    "empty": "Aucun avis pour l’instant. Activez le SMS de satisfaction à droite.",
+    "stars": "{count} sur 5",
+    "settingsTitle": "Réglages",
+    "settings": {
+      "sms": "SMS de satisfaction",
+      "smsHint": "Après le service (ou la livraison), les commandes avec un numéro de téléphone reçoivent un lien pour noter.",
+      "delay": "Envoyer après",
+      "minutes": "minutes",
+      "wheel": "Roue de la chance",
+      "wheelHint": "Après sa note, le client tourne la roue : un gain devient un coupon à usage unique valable 30 jours.",
+      "prizeLabel": "Gain (ex. 10 % de réduction)",
+      "kind": "Type",
+      "kindPercent": "%",
+      "kindAmount": "Montant",
+      "kindNone": "Perdu",
+      "value": "Valeur",
+      "weight": "Chance",
+      "remove": "Supprimer",
+      "addPrize": "Ajouter une case",
+      "weightHint": "Chance : poids relatif de chaque case (ex. 1, 3, 6). Au moins deux cases.",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "error": "Erreur : vérifiez les cases."
+    }
   }
 }

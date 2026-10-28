@@ -84,3 +84,14 @@ démonstration (`restaurant-demo`), comme s'il avait scanné son QR. Pour l'acti
 ajouter `SEED_PUBLIC_DEMO=true` aux variables Liara et redémarrer : le restaurant de démo est créé
 au démarrage (mots de passe aléatoires, personne ne peut s'y connecter), ses tables se libèrent
 après 20 minutes d'inactivité. Sans cette variable, `/demo` mène à l'annuaire des restaurants.
+
+## Satisfaction (SMS après le service)
+
+Chaque restaurant l'active dans **Avis clients** : après le service (ou la livraison), une commande
+avec un numéro de téléphone reçoit un lien de notation. Une note de 2 ou moins apparaît tout de suite
+dans les notifications ; la roue de la chance (facultative) donne un coupon à usage unique.
+
+Les SMS dus partent quand l'équipe utilise le tableau de bord. Pour qu'ils partent aussi la nuit ou
+quand personne n'est connecté : choisir une longue valeur secrète, la mettre dans `CRON_SECRET`
+(variables Liara) **et** dans le secret GitHub `CRON_SECRET` ; le workflow de surveillance appelle
+alors `/api/v1/cron` toutes les 10 minutes.

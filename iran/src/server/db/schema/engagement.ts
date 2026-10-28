@@ -1,5 +1,16 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, index, integer, jsonb, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  check,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { pk, timestamps, tstz } from "./_helpers";
 import { complaintCategory, complaintStatus, emailStatus } from "./enums";
 import { orders } from "./orders";
@@ -134,5 +145,42 @@ export const auditLogs = pgTable(
   (t) => [
     index("audit_logs_restaurant_created_idx").on(t.restaurantId, t.createdAt),
     index("audit_logs_actor_idx").on(t.actorUserId, t.createdAt),
+  ],
+);
+
+/**
+ * Satisfaction survey of one order: texted to the guest's phone some time after serving,
+ * answered on /f/{token}; a low rating alerts the team; a wheel spin may win a coupon.
+ */
+export const feedbackRequests = pgTable(
+  "feedback_requests",
+  {
+    id: pk(),
+    restaurantId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    orderId: uuid()
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    token: varchar({ length: 32 }).notNull(),
+    phone: varchar({ length: 20 }).notNull(),
+    dueAt: tstz().notNull(),
+    sentAt: tstz(),
+    rating: integer(),
+    comment: text(),
+    answeredAt: tstz(),
+    prizeLabel: varchar({ length: 60 }),
+    couponCode: varchar({ length: 32 }),
+    spunAt: tstz(),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("feedback_requests_order_uq").on(t.orderId),
+    uniqueIndex("feedback_requests_token_uq").on(t.token),
+    index("feedback_requests_due_idx")
+      .on(t.dueAt)
+      .where(sql`${t.sentAt} IS NULL`),
+    index("feedback_requests_restaurant_idx").on(t.restaurantId, t.answeredAt),
+    check("feedback_requests_rating_chk", sql`${t.rating} IS NULL OR ${t.rating} BETWEEN 1 AND 5`),
   ],
 );

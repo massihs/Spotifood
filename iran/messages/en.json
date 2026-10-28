@@ -343,7 +343,8 @@
     "waiter": "Take orders",
     "adminErrors": "Errors",
     "billing": "Subscription",
-    "adminPlans": "Plans"
+    "adminPlans": "Plans",
+    "feedback": "Guest feedback"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -625,7 +626,11 @@
     "plan_not_payable": "This plan cannot be paid online.",
     "import_empty": "The file is empty or has no readable dish.",
     "import_unreadable": "Unreadable file. Save it as .xlsx or .csv and try again.",
-    "import_too_big": "File too large (5 MB max)."
+    "import_too_big": "File too large (5 MB max).",
+    "already_answered": "You already gave your feedback, thank you!",
+    "wheel_off": "The wheel is not available.",
+    "rate_first": "Rate first.",
+    "already_spun": "The wheel was already spun."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1537,6 +1542,9 @@
       "reservation": {
         "created": "New booking: {name} · {partySize} people",
         "cancelled": "Booking cancelled: {name}"
+      },
+      "feedback": {
+        "unhappy": "Unhappy guest ({rating}/5) · order {number}"
       }
     }
   },
@@ -1706,6 +1714,9 @@
       "queued": "Your place in line at {restaurant}: number {number}. Status: {link}",
       "tableReady": "{name}, your table at {restaurant} is ready. Please come in.",
       "reminder": "Reminder: your booking today at {time} at {restaurant}. {link}"
+    },
+    "feedback": {
+      "ask": "{restaurant}: thanks for your visit! How was it? Tell us: {link}"
     }
   },
   "alerts": {
@@ -3176,5 +3187,61 @@
       "bad_price": "Invalid price"
     },
     "help": "Tip: an empty category cell repeats the one above. Prices in tomans, with or without separators. Photos and options are added afterwards, dish by dish."
+  },
+  "feedbackPage": {
+    "title": "Your feedback",
+    "subtitle": "Order {number}: rate your experience.",
+    "rate": "Rating",
+    "stars": "{count, plural, one {# star} other {# stars}}",
+    "label1": "Very disappointed",
+    "label2": "Disappointed",
+    "label3": "OK",
+    "label4": "Good",
+    "label5": "Excellent!",
+    "whatWrong": "What went wrong? The restaurant will be told.",
+    "commentPlaceholder": "A word for the team (optional)",
+    "send": "Send",
+    "thanks": "Thanks for your feedback!",
+    "sorry": "Thank you, and sorry. The team has been told.",
+    "spinHint": "Spin the wheel to win a discount on your next visit.",
+    "spin": "Spin the wheel",
+    "wheel": "Wheel of fortune",
+    "youWon": "You won",
+    "couponHint": "Give this code at the till on your next visit (valid 30 days, once).",
+    "noLuck": "No luck this time…"
+  },
+  "feedback": {
+    "title": "Guest feedback",
+    "subtitle": "Satisfaction after each order: SMS, ratings, unhappy guests and the wheel of fortune.",
+    "average": "Average rating (30 d)",
+    "answered": "Answers (30 d)",
+    "rate": "Response rate",
+    "unhappy": "Unhappy guests",
+    "latest": "Latest feedback",
+    "latestHint": "Ratings of 2 or less are flagged at once in the notifications.",
+    "empty": "No feedback yet. Turn on the satisfaction SMS on the right.",
+    "stars": "{count} out of 5",
+    "settingsTitle": "Settings",
+    "settings": {
+      "sms": "Satisfaction SMS",
+      "smsHint": "After serving (or delivery), orders with a phone number get a link to rate.",
+      "delay": "Send after",
+      "minutes": "minutes",
+      "wheel": "Wheel of fortune",
+      "wheelHint": "After rating, the guest spins: a win becomes a single-use coupon valid 30 days.",
+      "prizeLabel": "Prize (e.g. 10% off)",
+      "kind": "Type",
+      "kindPercent": "%",
+      "kindAmount": "Amount",
+      "kindNone": "Lose",
+      "value": "Value",
+      "weight": "Odds",
+      "remove": "Remove",
+      "addPrize": "Add a slice",
+      "weightHint": "Odds: relative weight of each slice (e.g. 1, 3, 6). At least two slices.",
+      "save": "Save",
+      "saved": "Saved",
+      "error": "Error: check the slices."
+    }
   }
 }

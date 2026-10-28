@@ -1,3 +1,4 @@
+import { scheduleFeedback } from "@/server/modules/feedback/service";
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { assertGuestMayAct } from "@/server/modules/guest/limits";
 import { createTranslator } from "next-intl";
@@ -448,6 +449,12 @@ export async function updateOrderStatus(
       });
       await emit(tx, { topic: topics.restaurant(ctx.restaurant.id), type: "notification.created" });
     }
+    if (to === "served")
+      await scheduleFeedback(tx, {
+        id: orderId,
+        restaurantId: ctx.restaurant.id,
+        customerPhone: updated.customerPhone,
+      });
     if (to === "cancelled") {
       await applyOrderToStock(tx, ctx.restaurant.id, orderId, 1);
       await onOrderCancelled(tx, ctx.restaurant.id, orderId);

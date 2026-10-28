@@ -19,6 +19,7 @@ import {
   QrCode,
   ReceiptText,
   Settings,
+  Star,
   Shield,
   UtensilsCrossed,
   Users,
@@ -40,6 +41,8 @@ import { countNewOrders } from "@/server/modules/orders/service";
 import { countLowStock } from "@/server/modules/inventory/service";
 import { countToDispatch } from "@/server/modules/delivery/service";
 import { getSubscriptionNotice } from "@/server/modules/billing/service";
+import { sendDueFeedback } from "@/server/modules/feedback/service";
+import { after } from "next/server";
 import { SubscriptionBanner } from "@/components/dashboard/subscription-banner";
 
 export default function RestaurantLayout({
@@ -73,6 +76,8 @@ async function RestaurantShell({
     getDisabledModules(db, ctx),
     can(ctx, "restaurant.manage") ? getSubscriptionNotice(db, ctx.restaurant.id) : null,
   ]);
+  // Satisfaction texts that are due go out after this page is sent (no cron needed).
+  after(() => sendDueFeedback(db, ctx.restaurant.id).catch(() => 0));
   const off = new Set(disabled);
   const on = (m: ModuleKey) => !off.has(m);
   const g = {
@@ -190,6 +195,14 @@ async function RestaurantShell({
         href: `${base}/customers`,
         label: t("nav.customers"),
         icon: <HeartHandshake />,
+        groupKey: "guests",
+        group: g.guests,
+      },
+      {
+        show: on("customers") && can(ctx, "customers.view"),
+        href: `${base}/feedback`,
+        label: t("nav.feedback"),
+        icon: <Star />,
         groupKey: "guests",
         group: g.guests,
       },
