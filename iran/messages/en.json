@@ -666,7 +666,10 @@
     "already_spun": "The wheel was already spun.",
     "sign_in_required": "Sign in with your mobile to order.",
     "zone_required": "Choose your delivery zone.",
-    "channel_disabled": "This ordering mode is not available."
+    "channel_disabled": "This ordering mode is not available.",
+    "too_many_sections": "30 sections at most.",
+    "label_required": "Give every bell option a name.",
+    "invalid_call": "This option is no longer offered."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -768,6 +771,69 @@
         "name": "Kitchen",
         "desc": "Sees only the accepted orders of their station, with sound and ticket."
       }
+    },
+    "sections": {
+      "title": "Sections",
+      "hint": "Create your sections (Hookah, Terrace, Bar…): each has its own access level and only receives its notifications.",
+      "new": "New section",
+      "members": "{count, plural, =0 {No members} one {# member} other {# members}}",
+      "accessCustom": "Section access: {count} permissions",
+      "accessRole": "Access from each member’s role",
+      "notifyNone": "No notifications",
+      "empty": "No sections yet. Example: a “Hookah” section that gets the charcoal requests.",
+      "name": "Section name",
+      "namePlaceholder": "e.g. Hookah, Terrace, Bar",
+      "access": "Access level",
+      "accessRoleLabel": "From the member’s role",
+      "accessCustomLabel": "Section’s own access",
+      "accessRoleHint": "Each member keeps the permissions of their role and job.",
+      "presets": "Start from:",
+      "notifyTitle": "Notifications received",
+      "notifyHint": "Section members only receive what you tick. The owner and members without a section receive everything.",
+      "notify": {
+        "orders": "New orders",
+        "ready": "Orders ready",
+        "calls": "Guest calls",
+        "payments": "Payments",
+        "reservations": "Bookings",
+        "feedback": "Unhappy guests",
+        "stock": "Low stock",
+        "goals": "Goals"
+      },
+      "stations": "Stations concerned",
+      "stationsHint": "For orders: only those with a product from these stations. Nothing ticked = all.",
+      "delete": "Delete section",
+      "deleteConfirm": "Delete the “{name}” section? Its members go back to their role’s access.",
+      "column": "Sections",
+      "noneShort": "None",
+      "assign": "{name}’s sections",
+      "assignHint": "The member gets their sections’ notifications and, if they set one, their access level.",
+      "accessFromSection": "This member’s access is set by their section: edit the section to change it."
+    },
+    "calls": {
+      "title": "Guest menu bell",
+      "hint": "Choose the options guests see on the menu’s bell and which section gets each request.",
+      "label": "Option name",
+      "labelPlaceholder": "e.g. Hookah charcoal",
+      "icon": "Icon",
+      "icons": {
+        "hand": "Waiter",
+        "receipt": "Bill",
+        "droplets": "Water",
+        "flame": "Charcoal",
+        "wind": "Hookah",
+        "utensils": "Cutlery",
+        "coffee": "Coffee",
+        "baby": "High chair",
+        "sparkles": "Cleaning",
+        "bell": "Bell"
+      },
+      "routeTo": "Send to",
+      "routeDefault": "“Guest calls” sections (or the whole team)",
+      "shown": "Shown",
+      "remove": "Remove option",
+      "add": "Add an option",
+      "saved": "Saved."
     }
   },
   "permissions": {
@@ -1138,7 +1204,8 @@
       "sentHint": {
         "waiter": "A waiter is on the way.",
         "bill": "We’ll bring your bill.",
-        "water": "We’ll bring water."
+        "water": "We’ll bring water.",
+        "custom": "The team is on its way."
       },
       "tooSoon": "Your request is on its way — please wait a moment.",
       "failed": "Could not send, try again.",
@@ -1577,7 +1644,7 @@
         "low": "{name} is running low ({quantity} {unit})"
       },
       "waiter": {
-        "call": "Table {table}: {kind, select, bill {bill} water {water} other {waiter}}"
+        "call": "Table {table}: {kind, select, bill {bill} water {water} waiter {waiter} other {{label}}}"
       },
       "reservation": {
         "created": "New booking: {name} · {partySize} people",
@@ -1775,7 +1842,8 @@
       "bill": "Table {table} wants the bill",
       "water": "Table {table} wants water",
       "body": "Please go to the table.",
-      "confirm": "Table {table}: new guest to approve"
+      "confirm": "Table {table}: new guest to approve",
+      "custom": "Table {table}: {label}"
     },
     "kitchenTitle": "Order {number} to prepare"
   },

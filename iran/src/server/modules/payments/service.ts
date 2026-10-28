@@ -1,11 +1,11 @@
 import { MAX_AMOUNT_CENTS } from "@/lib/money";
+import { notifyTeam } from "@/server/modules/team/sections";
 import { onOrdersPaid } from "@/server/modules/customers/service";
 import { and, asc, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
   diningTables,
-  notifications,
   orderStatusEvents,
   orders,
   paymentAllocations,
@@ -208,7 +208,7 @@ async function notifyPayment(
   type: "payment.received" | "payment.needs_review",
   extra: Record<string, unknown> = {},
 ) {
-  await tx.insert(notifications).values({
+  await notifyTeam(tx, {
     restaurantId: p.restaurantId,
     type,
     payload: {
@@ -220,7 +220,6 @@ async function notifyPayment(
       ...extra,
     },
   });
-  await emit(tx, { topic: topics.restaurant(p.restaurantId), type: "notification.created" });
 }
 
 // ─── Guest side ──────────────────────────────────────────────────────────────
@@ -507,7 +506,7 @@ export async function requestPaymentAtTable(
   const state = await getGuestPaymentState(db, guest);
   if (state.dueCents <= 0) throw conflict("nothing_to_pay");
   await db.transaction(async (tx) => {
-    await tx.insert(notifications).values({
+    await notifyTeam(tx, {
       restaurantId: guest.restaurant.id,
       type: "payment.requested",
       payload: {
@@ -520,7 +519,6 @@ export async function requestPaymentAtTable(
         method: input.method,
       },
     });
-    await emit(tx, { topic: topics.restaurant(guest.restaurant.id), type: "notification.created" });
   });
   return { dueCents: state.dueCents };
 }

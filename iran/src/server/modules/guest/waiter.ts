@@ -1,22 +1,24 @@
 import { and, eq, gt, sql } from "drizzle-orm";
-import { z } from "zod";
 import type { Database } from "@/server/db/client";
 import { notifications, tableSessions } from "@/server/db/schema";
 import { assertGuestMayAct } from "./limits";
 import { emit, topics } from "@/server/infra/realtime";
-import { conflict } from "@/server/errors";
+import { conflict, validation } from "@/server/errors";
+import { guestCallsOf, notifyTeam } from "@/server/modules/team/sections";
 import type { GuestContext } from "./sessions";
 
-export const WAITER_CALLS = ["waiter", "bill", "water"] as const;
 const COOLDOWN_MS = 45_000;
 
 /**
- * A guest calls the staff from the table (فراخوان گارسون): waiter, the bill, or water. The
- * dashboard rings and shows the table. One call per guest every 45 seconds.
+ * A guest calls the staff from the table (فراخوان گارسون) with one of the bell's options the
+ * restaurant offers (waiter, the bill, water, or its own: "charcoal for the hookah"…). The call
+ * rings the section the option is routed to. One call per guest every 45 seconds.
  */
 export async function callWaiter(db: Database, guest: GuestContext, raw: string, now = new Date()) {
-  const kind = z.enum(WAITER_CALLS).parse(raw);
   const rid = guest.restaurant.id;
+  const option = (await guestCallsOf(db, rid)).find((o) => o.key === raw);
+  if (!option) throw validation("invalid_call");
+  const kind = option.key;
   return db.transaction(async (tx) => {
     const [session] = await tx
       .select({ confirmedAt: tableSessions.confirmedAt })
@@ -40,15 +42,30 @@ export async function callWaiter(db: Database, guest: GuestContext, raw: string,
       )
       .limit(1);
     if (recent) throw conflict("too_soon");
-    await tx.insert(notifications).values({
-      restaurantId: rid,
-      type: "waiter.call",
-      payload: { tableLabel: guest.table.label, kind, participantId: guest.participant.id },
-    });
+    const sections = await notifyTeam(
+      tx,
+      {
+        restaurantId: rid,
+        type: "waiter.call",
+        payload: {
+          tableLabel: guest.table.label,
+          kind,
+          ...(option.label ? { label: option.label } : {}),
+          participantId: guest.participant.id,
+        },
+      },
+      { sectionId: option.sectionId },
+    );
     await emit(tx, {
       topic: topics.restaurant(rid),
       type: "waiter.called",
-      data: { tableLabel: guest.table.label, tableId: guest.table.id, kind },
+      data: {
+        tableLabel: guest.table.label,
+        tableId: guest.table.id,
+        kind,
+        ...(option.label ? { label: option.label } : {}),
+        ...(sections ? { sections } : {}),
+      },
     });
   });
 }

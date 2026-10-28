@@ -4,7 +4,13 @@ import { PageHeader } from "@/components/dashboard/app-shell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { requireRestaurant } from "@/server/auth/current";
-import { canAssignRole, PERMISSIONS, ROLE_PERMISSIONS } from "@/server/auth/permissions";
+import {
+  canAssignRole,
+  JOB_PRESETS,
+  PERMISSIONS,
+  resolvePermissions,
+  ROLE_PERMISSIONS,
+} from "@/server/auth/permissions";
 import { db } from "@/server/db/client";
 import { listMembers } from "@/server/modules/members/service";
 import { AddMemberDialog, EditMemberDialog } from "./member-forms";
@@ -14,6 +20,9 @@ import { cn } from "@/lib/cn";
 import { isJob } from "@/lib/jobs";
 import { JOB_TONES } from "./job-meta";
 import { listStations } from "@/server/modules/kitchen/stations";
+import { CALL_ICONS, listGuestCalls, listSections, NOTIFY_KEYS } from "@/server/modules/team/sections";
+import { MemberSections, SectionsPanel } from "./sections";
+import { GuestCallsPanel } from "./guest-calls";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/team">["params"];
 
@@ -28,12 +37,21 @@ export default function TeamPage({ params }: { params: Params }) {
 async function Team({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "members.manage");
-  const [t, format, members, { stations }] = await Promise.all([
+  const [t, format, members, { stations }, sections, calls] = await Promise.all([
     getTranslations(),
     getFormatter(),
     listMembers(db, ctx),
     listStations(db, ctx),
+    listSections(db, ctx),
+    listGuestCalls(db, ctx),
   ]);
+  const sectionList = sections.map((s) => ({ id: s.id, name: s.name, color: s.color }));
+  const presets = Object.fromEntries(
+    (["waiter", "cashier", "bar", "kitchen"] as const).map((j) => [
+      j,
+      [...resolvePermissions("staff", JOB_PRESETS[j].granted, JOB_PRESETS[j].revoked)],
+    ]),
+  );
   const stationList = stations.map((s) => ({ id: s.id, name: s.name }));
   const roles = (["admin", "staff"] as const).filter((r) => canAssignRole(ctx.role, r));
   const roleDefaults = { admin: [...ROLE_PERMISSIONS.admin], staff: [...ROLE_PERMISSIONS.staff] };
@@ -53,13 +71,31 @@ async function Team({ params }: { params: Params }) {
           return acc;
         }, {})}
       />
-      <Card className="overflow-x-auto">
+      <SectionsPanel
+        restaurantId={ctx.restaurant.id}
+        sections={sections.map((s) => ({
+          id: s.id,
+          name: s.name,
+          color: s.color,
+          permissions: s.permissions,
+          notify: s.notify,
+          stationIds: s.stationIds,
+          members: members.filter((m) => m.sectionIds.includes(s.id)).length,
+        }))}
+        stations={stationList}
+        allPermissions={[...PERMISSIONS]}
+        assignable={[...ctx.permissions]}
+        presets={presets}
+        notifyKeys={[...NOTIFY_KEYS]}
+      />
+      <Card className="mb-4 overflow-x-auto">
         {/* Phones: each member is a card (the table rows turn into small grids). */}
         <table className="w-full text-sm max-sm:block">
           <thead className="border-b border-border text-fg-muted max-sm:hidden">
             <tr>
               <th className="px-5 py-3 text-start font-medium">{t("team.fullName")}</th>
               <th className="px-5 py-3 text-start font-medium">{t("team.jobs.label")}</th>
+              <th className="px-5 py-3 text-start font-medium">{t("team.sections.column")}</th>
               <th className="px-5 py-3 text-start font-medium">{t("team.role")}</th>
               <th className="px-5 py-3 text-start font-medium">{t("team.lastLogin")}</th>
               <th className="px-5 py-3 text-start font-medium">{t("team.status")}</th>
@@ -120,6 +156,16 @@ async function Team({ params }: { params: Params }) {
                       </span>
                     )}
                   </td>
+                  <td className="px-5 py-3 max-sm:col-span-2">
+                    <MemberSections
+                      restaurantId={ctx.restaurant.id}
+                      memberId={m.id}
+                      memberName={m.fullName}
+                      value={m.sectionIds}
+                      sections={sectionList}
+                      editable={editable || isSelf}
+                    />
+                  </td>
                   <td className="px-5 py-3">
                     <Badge tone={m.role === "owner" ? "accent" : "neutral"}>{t(`roles.${m.role}`)}</Badge>
                   </td>
@@ -155,6 +201,12 @@ async function Team({ params }: { params: Params }) {
           </tbody>
         </table>
       </Card>
+      <GuestCallsPanel
+        restaurantId={ctx.restaurant.id}
+        calls={calls}
+        sections={sectionList}
+        icons={[...CALL_ICONS]}
+      />
     </>
   );
 }

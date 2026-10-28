@@ -25,6 +25,19 @@ export type KpiGoals = {
   minRating?: number | null;
 };
 
+/**
+ * An option of the guest's call bell on the menu. Built-in keys (waiter, bill, water) use the
+ * translated labels; custom ones ("c-…") carry the restaurant's own label. sectionId routes
+ * the call to one team section (null = the sections that take calls, or everyone).
+ */
+export type GuestCallOption = {
+  key: string;
+  label?: string;
+  icon?: string;
+  sectionId?: string | null;
+  enabled: boolean;
+};
+
 export type WheelPrize = {
   label: string;
   kind: "percent" | "amount" | "none";
@@ -123,6 +136,8 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   /** Self-order kiosk (/kiosk/{token}): a tablet at the counter, eat in or take away. */
   kioskEnabled: boolean().notNull().default(false),
   kioskToken: varchar({ length: 32 }),
+  /** Options of the guest call bell on the menu (null = waiter, bill and water for everyone). */
+  guestCalls: jsonb().$type<GuestCallOption[]>(),
   /** Targets on the overview, with alerts: null = no target. */
   kpiGoals: jsonb().$type<KpiGoals>().notNull().default({}),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */
@@ -190,12 +205,46 @@ export const restaurantMembers = pgTable(
     job: varchar({ length: 16 }),
     /** Kitchen station a bar / kitchen member works at (their screen shows only its items). */
     stationId: uuid(),
+    /** Team sections the member belongs to (access level and which notifications they get). */
+    sectionIds: uuid()
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::uuid[]`),
     ...timestamps,
   },
   (t) => [
     uniqueIndex("restaurant_members_restaurant_user_uq").on(t.restaurantId, t.userId),
     index("restaurant_members_user_idx").on(t.userId),
   ],
+);
+
+/**
+ * A team section the owner creates (Chicha, Terrasse, Bar…): an access level for its members
+ * (null = the members keep their role's permissions), the notifications it receives, and the
+ * kitchen stations whose orders concern it (empty = every order).
+ */
+export const teamSections = pgTable(
+  "team_sections",
+  {
+    id: pk(),
+    restaurantId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    name: varchar({ length: 48 }).notNull(),
+    color: varchar({ length: 16 }).notNull().default("orange"),
+    permissions: text().array(),
+    notify: text()
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    stationIds: uuid()
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::uuid[]`),
+    position: integer().notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index("team_sections_restaurant_idx").on(t.restaurantId)],
 );
 
 export const taxRates = pgTable(

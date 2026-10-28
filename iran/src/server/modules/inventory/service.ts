@@ -1,8 +1,8 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { notifyTeam } from "@/server/modules/team/sections";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
-  notifications,
   orderItems,
   products,
   purchaseLines,
@@ -13,7 +13,6 @@ import {
   suppliers,
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
-import { emit, topics } from "@/server/infra/realtime";
 import { conflict, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { isUuid } from "@/lib/ids";
@@ -442,14 +441,12 @@ async function notifyIfLow(
       c.after <= c.item.lowStockThreshold,
   );
   if (!crossed.length) return;
-  await tx.insert(notifications).values(
-    crossed.map((c) => ({
+  for (const c of crossed)
+    await notifyTeam(tx, {
       restaurantId,
       type: "stock.low",
       payload: { stockItemId: c.item.id, name: c.item.name, quantity: c.after, unit: c.item.unit },
-    })),
-  );
-  await emit(tx, { topic: topics.restaurant(restaurantId), type: "notification.created" });
+    });
 }
 
 /**

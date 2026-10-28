@@ -95,6 +95,8 @@ export const notifications = pgTable(
     userId: uuid().references(() => users.id, { onDelete: "cascade" }),
     type: varchar({ length: 48 }).notNull(),
     payload: jsonb().$type<Record<string, unknown>>().notNull().default({}),
+    /** Team sections it concerns (null = everyone; members without a section see it all). */
+    sectionIds: uuid().array(),
     readAt: tstz(),
     createdAt: timestamps.createdAt,
   },

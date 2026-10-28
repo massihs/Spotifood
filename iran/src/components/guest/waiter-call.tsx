@@ -1,19 +1,17 @@
 "use client";
 
-import { BellRing, Check, Droplets, HandPlatter, Receipt, X } from "lucide-react";
+import { BellRing, Check, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { callWaiterAction } from "@/app/[locale]/table/actions";
 import { cn } from "@/lib/cn";
+import { CALL_ICON, CALL_TONES } from "./call-icons";
 
-const KINDS = [
-  { key: "waiter", Icon: HandPlatter, tone: "bg-tone-orange/12 text-tone-orange" },
-  { key: "bill", Icon: Receipt, tone: "bg-tone-emerald/12 text-tone-emerald" },
-  { key: "water", Icon: Droplets, tone: "bg-tone-sky/12 text-tone-sky" },
-] as const;
+export type CallOption = { key: string; label: string | null; icon: string };
+const BUILTIN = ["waiter", "bill", "water"];
 
-/** "Call the waiter" button on the identity card: waiter, the bill, or water. */
-export function WaiterCall({ className }: { className?: string }) {
+/** "Call the waiter" bell on the identity card, with the options the restaurant chose. */
+export function WaiterCall({ options, className }: { options: CallOption[]; className?: string }) {
   const t = useTranslations("guest.waiter");
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState<string | null>(null);
@@ -65,31 +63,37 @@ export function WaiterCall({ className }: { className?: string }) {
                   <Check className="size-8" />
                 </span>
                 <p className="font-bold">{t("sent")}</p>
-                <p className="text-sm text-fg-muted">{t(`sentHint.${sent}`)}</p>
+                <p className="text-sm text-fg-muted">
+                  {BUILTIN.includes(sent) ? t(`sentHint.${sent as "waiter"}`) : t("sentHint.custom")}
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-3">
-                {KINDS.map(({ key, Icon, tone }) => (
-                  <button
-                    key={key}
-                    type="button"
-                    disabled={pending}
-                    onClick={() =>
-                      start(async () => {
-                        setError(null);
-                        const res = await callWaiterAction(key);
-                        if (res?.ok) setSent(key);
-                        else setError(res?.error === "too_soon" ? t("tooSoon") : t("failed"));
-                      })
-                    }
-                    className="flex flex-col items-center gap-2 rounded-2xl border border-border p-4 text-sm font-semibold active:scale-95 disabled:opacity-50"
-                  >
-                    <span className={cn("grid size-12 place-items-center rounded-2xl", tone)}>
-                      <Icon className="size-6" />
-                    </span>
-                    {t(`kinds.${key}`)}
-                  </button>
-                ))}
+                {options.map(({ key, label, icon }, i) => {
+                  const Icon = CALL_ICON[icon] ?? BellRing;
+                  const tone = CALL_TONES[i % CALL_TONES.length];
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      disabled={pending}
+                      onClick={() =>
+                        start(async () => {
+                          setError(null);
+                          const res = await callWaiterAction(key);
+                          if (res?.ok) setSent(key);
+                          else setError(res?.error === "too_soon" ? t("tooSoon") : t("failed"));
+                        })
+                      }
+                      className="flex flex-col items-center gap-2 rounded-2xl border border-border p-4 text-sm font-semibold active:scale-95 disabled:opacity-50"
+                    >
+                      <span className={cn("grid size-12 place-items-center rounded-2xl", tone)}>
+                        <Icon className="size-6" />
+                      </span>
+                      {label ?? t(`kinds.${key as "waiter"}`)}
+                    </button>
+                  );
+                })}
               </div>
             )}
             {error ? <p className="mt-3 text-center text-sm font-medium text-danger">{error}</p> : null}

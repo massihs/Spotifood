@@ -28,6 +28,8 @@ export const updateMemberSchema = z.object({
   grantedPermissions: z.array(z.enum(PERMISSIONS)).max(PERMISSIONS.length),
   revokedPermissions: z.array(z.enum(PERMISSIONS)).max(PERMISSIONS.length),
   status: z.enum(["active", "disabled"]),
+  /** Keep the stored per-member permissions (their access comes from a section). */
+  keepPermissions: z.boolean().optional(),
 });
 export type UpdateMemberInput = z.infer<typeof updateMemberSchema>;
 

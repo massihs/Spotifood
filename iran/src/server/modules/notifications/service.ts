@@ -2,13 +2,31 @@ import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { notifications } from "@/server/db/schema";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
+import { sectionFilterOf } from "@/server/modules/team/sections";
 
-/** Restaurant-wide notifications (userId null) plus those addressed to the current user. */
-const visibleTo = (ctx: RestaurantContext) =>
-  and(
+/**
+ * Restaurant-wide notifications (userId null) plus those addressed to the current user. A member
+ * in team sections only sees the ones meant for everyone or for one of their sections.
+ */
+const visibleTo = (ctx: RestaurantContext) => {
+  const mine = sectionFilterOf(ctx);
+  const shared = mine
+    ? and(
+        isNull(notifications.userId),
+        or(
+          isNull(notifications.sectionIds),
+          sql`${notifications.sectionIds} && ARRAY[${sql.join(
+            mine.map((id) => sql`${id}`),
+            sql`, `,
+          )}]::uuid[]`,
+        ),
+      )
+    : isNull(notifications.userId);
+  return and(
     eq(notifications.restaurantId, ctx.restaurant.id),
-    or(isNull(notifications.userId), eq(notifications.userId, ctx.user.id)),
+    or(shared, eq(notifications.userId, ctx.user.id)),
   );
+};
 
 export async function listNotifications(db: Database, ctx: RestaurantContext, limit = 20) {
   assertCan(ctx, "restaurant.view");

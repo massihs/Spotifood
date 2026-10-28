@@ -1,4 +1,5 @@
 import { notifyNewOrder, notifyOrderReady } from "@/server/modules/push/service";
+import { notifyTeam } from "@/server/modules/team/sections";
 import { scheduleFeedback } from "@/server/modules/feedback/service";
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { assertGuestMayAct } from "@/server/modules/guest/limits";
@@ -9,7 +10,6 @@ import {
   cartItems,
   carts,
   diningTables,
-  notifications,
   orderItems,
   orderStatusEvents,
   orders,
@@ -232,22 +232,31 @@ export async function placeOrder(
     );
     await tx.delete(cartItems).where(eq(cartItems.cartId, cart!.id));
     await touchSession(tx, guest.session.id);
-    await tx.insert(notifications).values({
-      restaurantId: rid,
-      type: "order.created",
-      payload: {
-        orderId: created!.id,
-        number,
-        tableLabel: guest.table.label,
-        totalCents,
-        seq: guest.participant.seq,
+    const sections = await notifyTeam(
+      tx,
+      {
+        restaurantId: rid,
+        type: "order.created",
+        payload: {
+          orderId: created!.id,
+          number,
+          tableLabel: guest.table.label,
+          totalCents,
+          seq: guest.participant.seq,
+        },
       },
-    });
-    await emit(tx, { topic: topics.restaurant(rid), type: "notification.created" });
+      { orderId: created!.id },
+    );
     await emit(tx, {
       topic: topics.restaurant(rid),
       type: "order.created",
-      data: { orderId: created!.id, number, tableId: guest.table.id, tableLabel: guest.table.label },
+      data: {
+        orderId: created!.id,
+        number,
+        tableId: guest.table.id,
+        tableLabel: guest.table.label,
+        ...(sections ? { sections } : {}),
+      },
     });
     // Without acceptance at the till, a guest order goes straight to the kitchen.
     if (status === "received" && settings && !settings.cashierAcceptance)
@@ -267,7 +276,7 @@ export async function placeOrder(
     });
     return created!;
   });
-  notifyNewOrder(db, guest.restaurant, { number: order.number, tableLabel: order.tableLabel });
+  notifyNewOrder(db, guest.restaurant, { id: order.id, number: order.number, tableLabel: order.tableLabel });
   return order;
 }
 
@@ -444,12 +453,15 @@ export async function updateOrderStatus(
     // First time past "received": the order leaves the till for the kitchen and bar.
     if (!current.acceptedAt && to !== "cancelled") await sendToKitchen(tx, ctx.restaurant.id, current);
     if (to === "ready") {
-      await tx.insert(notifications).values({
-        restaurantId: ctx.restaurant.id,
-        type: "order.ready",
-        payload: { orderId, number: current.number, tableLabel: current.tableLabel },
-      });
-      await emit(tx, { topic: topics.restaurant(ctx.restaurant.id), type: "notification.created" });
+      await notifyTeam(
+        tx,
+        {
+          restaurantId: ctx.restaurant.id,
+          type: "order.ready",
+          payload: { orderId, number: current.number, tableLabel: current.tableLabel },
+        },
+        { orderId },
+      );
     }
     if (to === "served")
       await scheduleFeedback(tx, {

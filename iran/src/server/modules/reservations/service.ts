@@ -1,15 +1,9 @@
 import { and, asc, eq, gte, inArray, isNull, lt, ne, notInArray, sql } from "drizzle-orm";
+import { notifyTeam } from "@/server/modules/team/sections";
 import { createTranslator } from "next-intl";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
-import {
-  customers,
-  diningTables,
-  notifications,
-  reservations,
-  restaurantSettings,
-  restaurants,
-} from "@/server/db/schema";
+import { customers, diningTables, reservations, restaurantSettings, restaurants } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import { emit, topics } from "@/server/infra/realtime";
 import { sms } from "@/server/infra/sms";
@@ -361,7 +355,7 @@ async function create(
         createdByUserId: opts.actorUserId,
       })
       .returning();
-    await tx.insert(notifications).values({
+    await notifyTeam(tx, {
       restaurantId: place.id,
       type: "reservation.created",
       payload: {
@@ -371,7 +365,6 @@ async function create(
         startsAt: r!.startsAt.toISOString(),
       },
     });
-    await emit(tx, { topic: topics.restaurant(place.id), type: "notification.created" });
     return r!;
   });
   const when = new Intl.DateTimeFormat(
@@ -917,7 +910,7 @@ export async function cancelByCode(db: Database, slug: string, code: string) {
     .update(reservations)
     .set({ status: "cancelled" })
     .where(and(eq(reservations.id, r.id), ne(reservations.status, "cancelled")));
-  await db.insert(notifications).values({
+  await notifyTeam(db, {
     restaurantId: found.place.id,
     type: "reservation.cancelled",
     payload: {
@@ -927,5 +920,4 @@ export async function cancelByCode(db: Database, slug: string, code: string) {
       startsAt: r.startsAt.toISOString(),
     },
   });
-  await emit(db, { topic: topics.restaurant(found.place.id), type: "notification.created" });
 }

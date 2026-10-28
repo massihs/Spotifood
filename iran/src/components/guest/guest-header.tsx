@@ -11,6 +11,8 @@ import { menuThemeOf } from "@/lib/menu-themes";
 import { cn } from "@/lib/cn";
 import type { GuestContext } from "@/server/modules/guest/sessions";
 import { logoUrl } from "@/server/modules/restaurants/settings";
+import { db } from "@/server/db/client";
+import { guestCallsOf } from "@/server/modules/team/sections";
 
 type Store = { open: OpenState; address: string | null };
 
@@ -37,6 +39,12 @@ export async function GuestHeader({
   const who = guest.participant.displayName ?? t("you", { n: guest.participant.seq });
   const locales = guest.restaurant.enabledLocales.filter(isLocale) as AppLocale[];
   const name = guest.restaurant.name;
+  const calls = (await guestCallsOf(db, guest.restaurant.id)).map(({ key, label, icon }) => ({
+    key,
+    label,
+    icon,
+  }));
+  const bell = calls.length ? <WaiterCall options={calls} /> : null;
 
   const actions = (
     <div className="flex items-center justify-end gap-2">
@@ -86,7 +94,7 @@ export async function GuestHeader({
       <header className="mx-auto max-w-3xl px-5 pt-[max(0.75rem,env(safe-area-inset-top))] lg:max-w-6xl">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <WaiterCall />
+            {bell}
             <GamesButton />
           </div>
           {actions}
@@ -134,7 +142,7 @@ export async function GuestHeader({
             </div>
             <div className="flex items-center gap-2">
               <GamesButton />
-              <WaiterCall />
+              {bell}
             </div>
           </div>
         </div>
@@ -171,7 +179,7 @@ export async function GuestHeader({
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <GamesButton />
-            <WaiterCall />
+            {bell}
           </div>
         </div>
       </div>

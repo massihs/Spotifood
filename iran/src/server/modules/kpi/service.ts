@@ -1,4 +1,5 @@
 import { and, avg, eq, gte, isNotNull, sql } from "drizzle-orm";
+import { notifyTeam } from "@/server/modules/team/sections";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
@@ -10,7 +11,6 @@ import {
   type KpiGoals,
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
-import { emit, topics } from "@/server/infra/realtime";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 
 /**
@@ -155,10 +155,7 @@ export async function checkKpiAlerts(
       )
       .limit(1);
     if (recent) continue;
-    await db
-      .insert(notifications)
-      .values({ restaurantId: restaurant.id, type: a.type, payload: a.payload, createdAt: now });
-    await emit(db, { topic: topics.restaurant(restaurant.id), type: "notification.created" });
+    await notifyTeam(db, { restaurantId: restaurant.id, type: a.type, payload: a.payload, createdAt: now });
     sent.push(a.type);
   }
   return sent;

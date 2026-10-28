@@ -4,7 +4,8 @@ import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
-import { pushSubscriptions } from "@/server/db/schema";
+import { pushSubscriptions, restaurantMembers } from "@/server/db/schema";
+import { concerns, sectionsFor } from "@/server/modules/team/sections";
 
 /**
  * Web Push: alerts that reach a phone or a computer even when the page is closed.
@@ -85,13 +86,31 @@ async function deliver(db: Database, subs: (typeof pushSubscriptions.$inferSelec
   return sent;
 }
 
-/** The restaurant's team (staff who turned push on). */
-export async function pushToRestaurant(db: Database, restaurantId: string, payload: PushPayload) {
+/**
+ * The restaurant's team (staff who turned push on). With `sections`, only the owner, members
+ * without a section and members of those sections.
+ */
+export async function pushToRestaurant(
+  db: Database,
+  restaurantId: string,
+  payload: PushPayload,
+  sections: string[] | null = null,
+) {
   if (!pushEnabled()) return 0;
-  const subs = await db
-    .select()
+  const rows = await db
+    .select({ sub: pushSubscriptions, role: restaurantMembers.role, mine: restaurantMembers.sectionIds })
     .from(pushSubscriptions)
+    .innerJoin(
+      restaurantMembers,
+      and(
+        eq(restaurantMembers.userId, pushSubscriptions.userId),
+        eq(restaurantMembers.restaurantId, restaurantId),
+      ),
+    )
     .where(and(eq(pushSubscriptions.restaurantId, restaurantId), isNotNull(pushSubscriptions.userId)));
+  const subs = rows
+    .filter((r) => r.role === "owner" || !r.mine.length || concerns(r.mine, sections))
+    .map((r) => r.sub);
   return deliver(db, subs, payload);
 }
 
@@ -127,20 +146,26 @@ export async function pushText(locale: string, key: string, values: Record<strin
 export function notifyNewOrder(
   db: Database,
   restaurant: { id: string; defaultLocale: string },
-  order: { number: string; tableLabel: string | null },
+  order: { id: string; number: string; tableLabel: string | null },
 ) {
   if (!pushEnabled()) return;
   void (async () => {
+    const sections = await sectionsFor(db, restaurant.id, "order.created", { orderId: order.id });
     const title = await pushText(restaurant.defaultLocale, "newOrderTitle", { number: order.number });
     const body = order.tableLabel
       ? await pushText(restaurant.defaultLocale, "newOrderTable", { table: order.tableLabel })
       : await pushText(restaurant.defaultLocale, "newOrderOnline", {});
-    await pushToRestaurant(db, restaurant.id, {
-      title,
-      body,
-      url: `/dashboard/${restaurant.id}/orders`,
-      tag: `order-${order.number}`,
-    });
+    await pushToRestaurant(
+      db,
+      restaurant.id,
+      {
+        title,
+        body,
+        url: `/dashboard/${restaurant.id}/orders`,
+        tag: `order-${order.number}`,
+      },
+      sections,
+    );
   })().catch((e) => console.error("[push] new order", e));
 }
 

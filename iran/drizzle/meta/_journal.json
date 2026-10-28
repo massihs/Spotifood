@@ -281,6 +281,13 @@
       "when": 1793188875290,
       "tag": "0039_brand_orange",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1793189039198,
+      "tag": "0040_team_sections",
+      "breakpoints": true
     }
   ]
 }

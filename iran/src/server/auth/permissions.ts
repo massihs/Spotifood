@@ -60,12 +60,21 @@ export const ROLE_PERMISSIONS: Record<MemberRole, ReadonlySet<Permission>> = {
 
 export const isPermission = (v: string): v is Permission => ALL.has(v as Permission);
 
-/** Effective permissions = role defaults + granted − revoked. Owners can never lose permissions. */
+/**
+ * Effective permissions = role defaults + granted − revoked. Owners can never lose permissions.
+ * A staff member in team sections that set an access level gets exactly those sections' access.
+ */
 export function resolvePermissions(
   role: MemberRole,
   granted: readonly string[] = [],
   revoked: readonly string[] = [],
+  sectionAccess: readonly (readonly string[])[] = [],
 ): Set<Permission> {
+  if (role === "staff" && sectionAccess.length) {
+    const fromSections = new Set<Permission>(["restaurant.view"]);
+    for (const list of sectionAccess) for (const p of list) if (isPermission(p)) fromSections.add(p);
+    return fromSections;
+  }
   const result = new Set(ROLE_PERMISSIONS[role]);
   if (role === "owner") return result;
   for (const p of granted) if (isPermission(p)) result.add(p);

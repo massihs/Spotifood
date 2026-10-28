@@ -1,4 +1,5 @@
 import { and, desc, eq, gte, isNull, lte, sql } from "drizzle-orm";
+import { notifyTeam } from "@/server/modules/team/sections";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
@@ -6,7 +7,6 @@ import {
   cashShifts,
   customers,
   diningTables,
-  notifications,
   orderItems,
   orderStatusEvents,
   orders,
@@ -312,11 +312,15 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       await issueInvoiceInTx(tx, rid, payment!.id, ctx.user.id);
     }
 
-    await tx.insert(notifications).values({
-      restaurantId: rid,
-      type: "order.created",
-      payload: { orderId: order!.id, number, tableLabel: table?.label ?? null, totalCents, source: "pos" },
-    });
+    await notifyTeam(
+      tx,
+      {
+        restaurantId: rid,
+        type: "order.created",
+        payload: { orderId: order!.id, number, tableLabel: table?.label ?? null, totalCents, source: "pos" },
+      },
+      { orderId: order!.id },
+    );
     await emit(tx, {
       topic: topics.restaurant(rid),
       type: "order.created",

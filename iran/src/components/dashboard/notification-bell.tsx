@@ -73,6 +73,7 @@ export function NotificationBell({
           client: String(n.payload.seq ?? ""),
           method: String(n.payload.method ?? "any"),
           kind: String(n.payload.kind ?? "waiter"),
+          label: String(n.payload.label ?? ""),
           name: String(n.payload.name ?? ""),
           partySize: String(n.payload.partySize ?? ""),
           quantity: String(n.payload.quantity ?? ""),

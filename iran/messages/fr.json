@@ -666,7 +666,10 @@
     "already_spun": "La roue a déjà été tournée.",
     "sign_in_required": "Connectez-vous avec votre mobile pour commander.",
     "zone_required": "Choisissez votre zone de livraison.",
-    "channel_disabled": "Ce mode de commande n’est pas disponible."
+    "channel_disabled": "Ce mode de commande n’est pas disponible.",
+    "too_many_sections": "30 sections au maximum.",
+    "label_required": "Donnez un nom à chaque option de la cloche.",
+    "invalid_call": "Cette option n’est plus proposée."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -768,6 +771,69 @@
         "name": "Cuisine",
         "desc": "Ne voit que les commandes acceptées de son poste, avec son et ticket."
       }
+    },
+    "sections": {
+      "title": "Sections",
+      "hint": "Créez vos sections (Chicha, Terrasse, Bar…) : chacune a son niveau d’accès et reçoit seulement ses notifications.",
+      "new": "Nouvelle section",
+      "members": "{count, plural, =0 {Aucun membre} one {# membre} other {# membres}}",
+      "accessCustom": "Accès de la section : {count} droits",
+      "accessRole": "Accès selon le rôle de chaque membre",
+      "notifyNone": "Aucune notification",
+      "empty": "Aucune section pour l’instant. Exemple : une section « Chicha » qui reçoit les demandes de charbon.",
+      "name": "Nom de la section",
+      "namePlaceholder": "Ex. Chicha, Terrasse, Bar",
+      "access": "Niveau d’accès",
+      "accessRoleLabel": "Selon le rôle du membre",
+      "accessCustomLabel": "Accès propre à la section",
+      "accessRoleHint": "Chaque membre garde les droits de son rôle et de son poste.",
+      "presets": "Partir de :",
+      "notifyTitle": "Notifications reçues",
+      "notifyHint": "Les membres de la section reçoivent seulement ce que vous cochez. Le propriétaire et les membres sans section reçoivent tout.",
+      "notify": {
+        "orders": "Nouvelles commandes",
+        "ready": "Commandes prêtes",
+        "calls": "Appels des clients",
+        "payments": "Paiements",
+        "reservations": "Réservations",
+        "feedback": "Clients mécontents",
+        "stock": "Stock bas",
+        "goals": "Objectifs"
+      },
+      "stations": "Postes concernés",
+      "stationsHint": "Pour les commandes : seulement celles qui contiennent un produit de ces postes. Rien de coché = toutes.",
+      "delete": "Supprimer la section",
+      "deleteConfirm": "Supprimer la section « {name} » ? Ses membres reprennent l’accès de leur rôle.",
+      "column": "Sections",
+      "noneShort": "Aucune",
+      "assign": "Sections de {name}",
+      "assignHint": "Le membre reçoit les notifications de ses sections et, si elles en fixent un, leur niveau d’accès.",
+      "accessFromSection": "L’accès de ce membre est fixé par sa section : modifiez la section pour le changer."
+    },
+    "calls": {
+      "title": "Cloche du menu client",
+      "hint": "Choisissez les options que le client voit sur la cloche du menu et la section qui reçoit chaque demande.",
+      "label": "Nom de l’option",
+      "labelPlaceholder": "Ex. Charbon chicha",
+      "icon": "Icône",
+      "icons": {
+        "hand": "Serveur",
+        "receipt": "Addition",
+        "droplets": "Eau",
+        "flame": "Charbon",
+        "wind": "Chicha",
+        "utensils": "Couverts",
+        "coffee": "Café",
+        "baby": "Chaise bébé",
+        "sparkles": "Nettoyage",
+        "bell": "Cloche"
+      },
+      "routeTo": "Envoyer à",
+      "routeDefault": "Sections « Appels des clients » (ou toute l’équipe)",
+      "shown": "Affichée",
+      "remove": "Supprimer l’option",
+      "add": "Ajouter une option",
+      "saved": "Enregistré."
     }
   },
   "permissions": {
@@ -1114,7 +1180,8 @@
       "sentHint": {
         "waiter": "Un serveur arrive.",
         "bill": "Nous apportons l’addition.",
-        "water": "Nous apportons de l’eau."
+        "water": "Nous apportons de l’eau.",
+        "custom": "L’équipe arrive."
       },
       "tooSoon": "Votre demande est déjà partie, patientez un instant.",
       "failed": "Envoi impossible, réessayez.",
@@ -1577,7 +1644,7 @@
         "low": "{name} est presque épuisé ({quantity} {unit})"
       },
       "waiter": {
-        "call": "Table {table} : {kind, select, bill {addition} water {eau} other {serveur}}"
+        "call": "Table {table} : {kind, select, bill {addition} water {eau} waiter {serveur} other {{label}}}"
       },
       "reservation": {
         "created": "Nouvelle réservation : {name} · {partySize} pers.",
@@ -1775,7 +1842,8 @@
       "bill": "Table {table} demande l’addition",
       "water": "Table {table} demande de l’eau",
       "body": "Merci de passer à la table.",
-      "confirm": "Table {table} : nouveau client à valider"
+      "confirm": "Table {table} : nouveau client à valider",
+      "custom": "Table {table} : {label}"
     },
     "kitchenTitle": "Commande {number} à préparer"
   },

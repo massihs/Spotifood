@@ -1,6 +1,6 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 import type { DbOrTx } from "@/server/db/client";
-import { restaurantMembers, restaurants } from "@/server/db/schema";
+import { restaurantMembers, restaurants, teamSections } from "@/server/db/schema";
 import { resolvePermissions, type MemberRole, type Permission } from "@/server/auth/permissions";
 import type { SessionUser } from "@/server/auth/sessions";
 import { AppError, forbidden, notFound } from "@/server/errors";
@@ -34,6 +34,8 @@ export type RestaurantContext = {
   /** The member's job (manager, cashier, waiter, bar, kitchen) and station, when set. */
   job?: string | null;
   stationId?: string | null;
+  /** Team sections the member belongs to (their access and which notifications they get). */
+  sectionIds?: string[];
 };
 
 const restaurantColumns = {
@@ -68,6 +70,7 @@ export async function loadRestaurantContext(
         revoked: restaurantMembers.revokedPermissions,
         job: restaurantMembers.job,
         stationId: restaurantMembers.stationId,
+        sectionIds: restaurantMembers.sectionIds,
       },
     })
     .from(restaurants)
@@ -97,15 +100,34 @@ export async function loadRestaurantContext(
     throw new AppError("TENANT_SUSPENDED", "This restaurant is suspended");
   }
 
+  const access =
+    activeMember.role === "staff" ? await sectionAccess(db, row.restaurant.id, activeMember.sectionIds) : [];
   return {
     user,
     restaurant: row.restaurant,
     role: activeMember.role,
-    permissions: resolvePermissions(activeMember.role, activeMember.granted, activeMember.revoked),
+    permissions: resolvePermissions(activeMember.role, activeMember.granted, activeMember.revoked, access),
     viaSuperAdmin: false,
     job: activeMember.job,
     stationId: activeMember.stationId,
+    sectionIds: activeMember.sectionIds,
   };
+}
+
+/** Access lists of a member's sections (only the sections that set one). */
+export async function sectionAccess(db: DbOrTx, restaurantId: string, ids: readonly string[]) {
+  if (!ids.length) return [];
+  const rows = await db
+    .select({ permissions: teamSections.permissions })
+    .from(teamSections)
+    .where(
+      and(
+        eq(teamSections.restaurantId, restaurantId),
+        inArray(teamSections.id, [...ids]),
+        isNotNull(teamSections.permissions),
+      ),
+    );
+  return rows.map((r) => r.permissions ?? []);
 }
 
 export function can(ctx: RestaurantContext, permission: Permission): boolean {

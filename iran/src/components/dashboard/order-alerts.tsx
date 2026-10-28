@@ -61,9 +61,12 @@ export function OrderAlerts({
   restaurantId,
   newOrders,
   kitchen = false,
+  sections = null,
 }: {
   restaurantId: string;
   newOrders: number;
+  /** The member's team sections: alerts meant for other sections stay silent (null = all). */
+  sections?: string[] | null;
   /** Bar / kitchen screens ring when the till sends an order, not when a guest places it. */
   kitchen?: boolean;
 }) {
@@ -103,7 +106,12 @@ export function OrderAlerts({
   useLiveEvent((type, data) => {
     if (type === "order.updated") return refreshSoon();
     let alert: Alert;
-    if (kitchen && type === "waiter.called") return;
+    const target = data.sections;
+    if (sections && Array.isArray(target) && !target.some((s) => sections.includes(String(s)))) {
+      if (type === "order.created") refreshSoon();
+      return;
+    }
+    if (kitchen && type === "waiter.called" && !(sections && Array.isArray(target))) return;
     if (type === "waiter.called") {
       const kind =
         data.kind === "bill"
@@ -113,9 +121,13 @@ export function OrderAlerts({
             : data.kind === "confirm"
               ? "confirm"
               : "waiter";
+      const table = String(data.tableLabel ?? "");
       alert = {
         id: `w-${data.tableLabel}-${Date.now()}`,
-        title: t(`waiter.${kind}`, { table: String(data.tableLabel ?? "") }),
+        title:
+          typeof data.label === "string" && data.label
+            ? t("waiter.custom", { table, label: data.label })
+            : t(`waiter.${kind}`, { table }),
         body: t("waiter.body"),
         href: `/dashboard/${restaurantId}/floor`,
         waiter: true,

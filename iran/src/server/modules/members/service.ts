@@ -1,6 +1,6 @@
 import { and, asc, eq, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
-import { authSessions, kitchenStations, restaurantMembers, users } from "@/server/db/schema";
+import { authSessions, kitchenStations, restaurantMembers, teamSections, users } from "@/server/db/schema";
 import type { DbOrTx } from "@/server/db/client";
 import { STATION_JOBS, type Job } from "@/lib/jobs";
 import { recordAudit } from "@/server/audit";
@@ -38,6 +38,7 @@ export async function listMembers(db: Database, ctx: RestaurantContext) {
       revokedPermissions: restaurantMembers.revokedPermissions,
       job: restaurantMembers.job,
       stationId: restaurantMembers.stationId,
+      sectionIds: restaurantMembers.sectionIds,
       lastLoginAt: users.lastLoginAt,
       createdAt: restaurantMembers.createdAt,
     })
@@ -48,10 +49,25 @@ export async function listMembers(db: Database, ctx: RestaurantContext) {
       sql`case ${restaurantMembers.role} when 'owner' then 0 when 'admin' then 1 else 2 end`,
       asc(users.fullName),
     );
-  return rows.map((r) => ({
-    ...r,
-    effectivePermissions: [...resolvePermissions(r.role, r.grantedPermissions, r.revokedPermissions)],
-  }));
+  const access = new Map(
+    (
+      await db
+        .select({ id: teamSections.id, permissions: teamSections.permissions })
+        .from(teamSections)
+        .where(eq(teamSections.restaurantId, ctx.restaurant.id))
+    ).map((s) => [s.id, s.permissions]),
+  );
+  return rows.map((r) => {
+    const fromSections = r.sectionIds.map((id) => access.get(id)).filter((p): p is string[] => p != null);
+    return {
+      ...r,
+      /** Access set by a section (the per-member permissions then do not apply). */
+      accessFromSection: r.role === "staff" && fromSections.length > 0,
+      effectivePermissions: [
+        ...resolvePermissions(r.role, r.grantedPermissions, r.revokedPermissions, fromSections),
+      ],
+    };
+  });
 }
 
 /**
@@ -148,8 +164,11 @@ export async function updateMember(
 
   // Only store real deltas from the role defaults; an actor cannot grant what they don't have.
   const defaults = ROLE_PERMISSIONS[input.role];
-  const granted = input.grantedPermissions.filter((p) => !defaults.has(p) && ctx.permissions.has(p));
-  const revoked = input.revokedPermissions.filter((p) => defaults.has(p));
+  const keep = input.keepPermissions && input.role === current.role;
+  const granted = keep
+    ? current.grantedPermissions
+    : input.grantedPermissions.filter((p) => !defaults.has(p) && ctx.permissions.has(p));
+  const revoked = keep ? current.revokedPermissions : input.revokedPermissions.filter((p) => defaults.has(p));
 
   return db.transaction(async (tx) => {
     if (current.status !== "active" && input.status === "active") {

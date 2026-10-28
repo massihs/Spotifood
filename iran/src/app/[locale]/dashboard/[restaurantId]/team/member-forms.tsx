@@ -25,6 +25,8 @@ export type MemberView = {
   role: "owner" | "admin" | "staff";
   status: "active" | "invited" | "disabled";
   effectivePermissions: string[];
+  /** Access set by the member's section: the permissions below are read-only. */
+  accessFromSection?: boolean;
 };
 
 function AddMemberForm({
@@ -140,6 +142,7 @@ function EditMemberForm({
     <div className="space-y-5">
       <ActionForm form={form} className="space-y-4">
         <FormFeedback state={state} />
+        {member.accessFromSection ? <input type="hidden" name="keepPermissions" value="1" /> : null}
         <div className="grid grid-cols-2 gap-3">
           <SelectField
             label={t("team.role")}
@@ -168,7 +171,9 @@ function EditMemberForm({
         </div>
         <fieldset>
           <legend className="text-sm font-medium">{t("team.permissions")}</legend>
-          <p className="mb-3 text-sm text-fg-muted">{t("team.permissionsHint")}</p>
+          <p className="mb-3 text-sm text-fg-muted">
+            {member.accessFromSection ? t("team.sections.accessFromSection") : t("team.permissionsHint")}
+          </p>
           <div className="grid gap-2.5 sm:grid-cols-2">
             {allPermissions.map((p) => (
               <Checkbox
@@ -177,7 +182,7 @@ function EditMemberForm({
                 value={p}
                 label={t(`permissions.${p}`)}
                 checked={perms.has(p)}
-                disabled={!assignable.includes(p) && !perms.has(p)}
+                disabled={member.accessFromSection || (!assignable.includes(p) && !perms.has(p))}
                 onChange={(e) =>
                   setPerms((prev) => {
                     const next = new Set(prev);

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { sectionFilterOf } from "@/server/modules/team/sections";
 import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import {
@@ -333,6 +334,7 @@ async function RestaurantShell({
               restaurantId={ctx.restaurant.id}
               newOrders={newOrders}
               kitchen={ctx.job === "kitchen" || ctx.job === "bar"}
+              sections={sectionFilterOf(ctx)}
             />
             <NotificationBell
               restaurantId={ctx.restaurant.id}

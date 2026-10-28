@@ -1,4 +1,5 @@
 import { randomBytes, randomInt } from "node:crypto";
+import { notifyTeam } from "@/server/modules/team/sections";
 import { and, avg, count, desc, eq, gte, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import { z } from "zod";
@@ -6,7 +7,6 @@ import type { Database, DbOrTx } from "@/server/db/client";
 import {
   coupons,
   feedbackRequests,
-  notifications,
   orders,
   restaurantSettings,
   restaurants,
@@ -17,7 +17,6 @@ import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { recordAudit } from "@/server/audit";
 import { env } from "@/server/env";
 import { conflict, notFound } from "@/server/errors";
-import { emit, topics } from "@/server/infra/realtime";
 import { sms } from "@/server/infra/sms";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 
@@ -157,7 +156,7 @@ export async function submitFeedback(db: Database, token: string, raw: unknown) 
       comment: input.comment || null,
     });
     if (input.rating <= UNHAPPY_MAX) {
-      await tx.insert(notifications).values({
+      await notifyTeam(tx, {
         restaurantId: row.f.restaurantId,
         type: "feedback.unhappy",
         payload: {
@@ -167,7 +166,6 @@ export async function submitFeedback(db: Database, token: string, raw: unknown) 
           phone: row.f.phone,
         },
       });
-      await emit(tx, { topic: topics.restaurant(row.f.restaurantId), type: "notification.created" });
     }
     return { rating: input.rating };
   });

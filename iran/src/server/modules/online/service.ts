@@ -1,9 +1,9 @@
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { notifyTeam } from "@/server/modules/team/sections";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
   deliveryZones,
-  notifications,
   orderItems,
   orderStatusEvents,
   orders,
@@ -284,23 +284,33 @@ async function insertGuestOrder(
       null,
     );
 
-    await tx.insert(notifications).values({
-      restaurantId: rid,
-      type: "order.created",
-      payload: { orderId: order!.id, number, tableLabel: null, totalCents, source: who.source },
-    });
-    await emit(tx, { topic: topics.restaurant(rid), type: "notification.created" });
+    const sections = await notifyTeam(
+      tx,
+      {
+        restaurantId: rid,
+        type: "order.created",
+        payload: { orderId: order!.id, number, tableLabel: null, totalCents, source: who.source },
+      },
+      { orderId: order!.id },
+    );
     await emit(tx, {
       topic: topics.restaurant(rid),
       type: "order.created",
-      data: { orderId: order!.id, number, tableId: null, tableLabel: "", source: who.source },
+      data: {
+        orderId: order!.id,
+        number,
+        tableId: null,
+        tableLabel: "",
+        source: who.source,
+        ...(sections ? { sections } : {}),
+      },
     });
     return order!;
   });
   notifyNewOrder(
     db,
     { id: store.id, defaultLocale: store.defaultLocale },
-    { number: placed.number, tableLabel: null },
+    { id: placed.id, number: placed.number, tableLabel: null },
   );
   return placed;
 }

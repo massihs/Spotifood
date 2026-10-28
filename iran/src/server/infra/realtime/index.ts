@@ -20,7 +20,7 @@ export type RealtimeEvent = {
     | "payment.updated"
     | "waiter.called"
     | "game.updated";
-  data?: Record<string, string | number | boolean | null>;
+  data?: Record<string, string | number | boolean | null | string[]>;
 };
 
 export type Unsubscribe = () => void;
