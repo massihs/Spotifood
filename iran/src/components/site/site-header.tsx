@@ -5,6 +5,7 @@ import { buttonClasses } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
+import { Beacon } from "./beacon";
 
 /** The public site's top bar (landing, restaurant guide). `home`: anchors scroll in place. */
 export async function SiteHeader({
@@ -18,6 +19,7 @@ export async function SiteHeader({
   const anchor = (id: string) => (home ? `#${id}` : `/#${id}`);
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-bg/80 backdrop-blur-xl">
+      <Beacon />
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-3 sm:px-6">
         <Logo />
         <nav className="ms-6 hidden items-center gap-5 text-sm font-medium whitespace-nowrap text-fg-muted lg:flex">

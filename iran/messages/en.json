@@ -345,7 +345,8 @@
     "billing": "Subscription",
     "adminPlans": "Plans",
     "feedback": "Guest feedback",
-    "callcenter": "Call centre"
+    "callcenter": "Call centre",
+    "adminAudience": "Audience"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -490,6 +491,37 @@
       "monthsN": "{count} months",
       "amount": "Amount received (optional)",
       "apply": "Apply"
+    },
+    "growth": {
+      "active7d": "Active restaurants (7 d)",
+      "active30d": "Active restaurants (30 d)",
+      "lost30d": "Restaurants lost (30 d)",
+      "lostHint": "Ordered the month before, nothing this month.",
+      "ordersPerDay": "Orders per day (30 d)",
+      "restaurantsPerDay": "Restaurants with orders, per day",
+      "orders": "{count, plural, one {# order} other {# orders}}",
+      "restaurants": "{count, plural, one {# restaurant} other {# restaurants}}",
+      "signups": "Sign-ups per week",
+      "weekOf": "Week of {date}",
+      "atRisk": "At risk of leaving",
+      "atRiskHint": "Last order 14 to 60 days ago: give them a call.",
+      "noRisk": "No restaurant at risk.",
+      "lastOrder": "last order {time}"
+    },
+    "audience": {
+      "title": "Site audience",
+      "subtitle": "Visits to public pages (home, pricing, guide, restaurant pages) over 30 days. No cookie, no third party.",
+      "views": "Page views",
+      "visitors": "Unique visitors",
+      "visitorsHint": "Counted per day: a visitor coming back another day counts again.",
+      "mobile": "On mobile",
+      "perDay": "Page views per day",
+      "viewsN": "{count} page views",
+      "pages": "Most viewed pages",
+      "referrers": "Referrers",
+      "referrersHint": "Sites visitors come from (Instagram, Google…).",
+      "empty": "No visit recorded.",
+      "noReferrer": "No known referrer yet."
     }
   },
   "errors": {
@@ -1777,20 +1809,12 @@
       "weekly": {
         "name": "Weekly playlist",
         "body": "A fresh playlist every Saturday.",
-        "features": [
-          "30 new tracks every week",
-          "No tiring repeats",
-          "Plays on any device"
-        ]
+        "features": ["30 new tracks every week", "No tiring repeats", "Plays on any device"]
       },
       "monthly": {
         "name": "Monthly playlist",
         "body": "A fresh playlist every month.",
-        "features": [
-          "30 new tracks every month",
-          "Ideal for calm venues",
-          "Plays on any device"
-        ]
+        "features": ["30 new tracks every month", "Ideal for calm venues", "Plays on any device"]
       }
     },
     "status": {

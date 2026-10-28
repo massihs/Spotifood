@@ -6,7 +6,10 @@ import { PageHeader } from "@/components/dashboard/app-shell";
 import { Card, CardHeader, StatCard } from "@/components/ui/card";
 import { requireSuperAdmin } from "@/server/auth/current";
 import { db } from "@/server/db/client";
-import { getPlatformStats } from "@/server/modules/admin/service";
+import { getGrowthMetrics, getPlatformStats } from "@/server/modules/admin/service";
+import { DayBars, lastDays } from "@/components/dashboard/day-bars";
+import { Link } from "@/i18n/navigation";
+import { getFormatter } from "next-intl/server";
 
 export default function AdminOverviewPage() {
   return (
@@ -18,7 +21,12 @@ export default function AdminOverviewPage() {
 
 async function AdminOverview() {
   await requireSuperAdmin();
-  const [t, stats] = await Promise.all([getTranslations("admin"), getPlatformStats(db)]);
+  const [t, stats, growth, format] = await Promise.all([
+    getTranslations("admin"),
+    getPlatformStats(db),
+    getGrowthMetrics(db),
+    getFormatter(),
+  ]);
   const locale = await getLocale();
   const plans = Object.entries(stats.subscriptionsByPlan);
 
@@ -35,6 +43,67 @@ async function AdminOverview() {
           label={t("stats.revenue")}
           value={formatMoney(stats.revenueCents, edition.platformCurrency, locale)}
         />
+      </div>
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <StatCard label={t("growth.active7d")} value={growth.active7d} />
+        <StatCard label={t("growth.active30d")} value={growth.active30d} />
+        <StatCard label={t("growth.lost30d")} value={growth.lost30d} hint={t("growth.lostHint")} />
+      </div>
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <Card>
+          <CardHeader title={t("growth.ordersPerDay")} />
+          <div className="p-5">
+            <DayBars
+              data={lastDays(growth.byDay, 30, (r) => r.orders)}
+              label={(v) => t("growth.orders", { count: v })}
+              locale={locale}
+            />
+          </div>
+        </Card>
+        <Card>
+          <CardHeader title={t("growth.restaurantsPerDay")} />
+          <div className="p-5">
+            <DayBars
+              data={lastDays(growth.byDay, 30, (r) => r.restaurants)}
+              label={(v) => t("growth.restaurants", { count: v })}
+              locale={locale}
+            />
+          </div>
+        </Card>
+      </div>
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <Card>
+          <CardHeader title={t("growth.signups")} />
+          <ul className="divide-y divide-border">
+            {growth.signups.length === 0 ? <li className="px-5 py-4 text-sm text-fg-muted">—</li> : null}
+            {growth.signups.map((w) => (
+              <li key={w.week} className="flex justify-between px-5 py-2.5 text-sm">
+                <span>
+                  {t("growth.weekOf", { date: format.dateTime(new Date(w.week), { dateStyle: "medium" }) })}
+                </span>
+                <span className="font-semibold tabular-nums">{w.n}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+        <Card>
+          <CardHeader title={t("growth.atRisk")} description={t("growth.atRiskHint")} />
+          <ul className="divide-y divide-border">
+            {growth.atRisk.length === 0 ? (
+              <li className="px-5 py-4 text-sm text-fg-muted">{t("growth.noRisk")}</li>
+            ) : null}
+            {growth.atRisk.map((r) => (
+              <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
+                <Link href={`/dashboard/${r.id}`} className="font-medium hover:underline">
+                  {r.name}
+                </Link>
+                <span className="text-fg-muted">
+                  {t("growth.lastOrder", { time: format.relativeTime(r.lastOrderAt) })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
       </div>
       <Card className="mt-6">
         <CardHeader title={t("subscriptions")} />

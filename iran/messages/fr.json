@@ -345,7 +345,8 @@
     "billing": "Abonnement",
     "adminPlans": "Forfaits",
     "feedback": "Avis clients",
-    "callcenter": "Centre d’appels"
+    "callcenter": "Centre d’appels",
+    "adminAudience": "Audience"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -490,6 +491,37 @@
       "monthsN": "{count} mois",
       "amount": "Montant reçu (facultatif)",
       "apply": "Appliquer"
+    },
+    "growth": {
+      "active7d": "Restaurants actifs (7 j)",
+      "active30d": "Restaurants actifs (30 j)",
+      "lost30d": "Restaurants perdus (30 j)",
+      "lostHint": "Ont commandé le mois d’avant, plus rien ce mois-ci.",
+      "ordersPerDay": "Commandes par jour (30 j)",
+      "restaurantsPerDay": "Restaurants qui commandent, par jour",
+      "orders": "{count, plural, one {# commande} other {# commandes}}",
+      "restaurants": "{count, plural, one {# restaurant} other {# restaurants}}",
+      "signups": "Inscriptions par semaine",
+      "weekOf": "Semaine du {date}",
+      "atRisk": "À risque de départ",
+      "atRiskHint": "Dernière commande il y a 14 à 60 jours : à appeler.",
+      "noRisk": "Aucun restaurant à risque.",
+      "lastOrder": "dernière commande {time}"
+    },
+    "audience": {
+      "title": "Audience du site",
+      "subtitle": "Visites des pages publiques (accueil, tarifs, annuaire, fiches) sur 30 jours. Sans cookie ni service tiers.",
+      "views": "Pages vues",
+      "visitors": "Visiteurs uniques",
+      "visitorsHint": "Comptés par jour : un visiteur qui revient un autre jour compte à nouveau.",
+      "mobile": "Sur mobile",
+      "perDay": "Pages vues par jour",
+      "viewsN": "{count} pages vues",
+      "pages": "Pages les plus vues",
+      "referrers": "Provenance",
+      "referrersHint": "Sites d’où viennent les visiteurs (Instagram, Google…).",
+      "empty": "Aucune visite enregistrée.",
+      "noReferrer": "Pas encore de provenance connue."
     }
   },
   "errors": {

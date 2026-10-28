@@ -30,3 +30,22 @@ export const appErrors = pgTable(
     index("app_errors_last_idx").on(t.lastAt),
   ],
 );
+
+/**
+ * Self-hosted audience of the public site: one row per page view, no cookie, no third party.
+ * `visitor` is a daily salted hash of IP + browser (unique visitors per day, not trackable
+ * across days). Rows older than 90 days are pruned.
+ */
+export const siteHits = pgTable(
+  "site_hits",
+  {
+    id: pk(),
+    at: tstz().notNull().defaultNow(),
+    path: varchar({ length: 200 }).notNull(),
+    referrer: varchar({ length: 120 }),
+    visitor: varchar({ length: 32 }).notNull(),
+    device: varchar({ length: 8 }).notNull(),
+    locale: varchar({ length: 8 }),
+  },
+  (t) => [index("site_hits_at_idx").on(t.at), index("site_hits_path_idx").on(t.path, t.at)],
+);

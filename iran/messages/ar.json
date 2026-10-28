@@ -345,7 +345,8 @@
     "billing": "الاشتراك",
     "adminPlans": "الباقات",
     "feedback": "آراء الزبائن",
-    "callcenter": "مركز الاتصال"
+    "callcenter": "مركز الاتصال",
+    "adminAudience": "زوار الموقع"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -490,6 +491,37 @@
       "monthsN": "{count} شهر",
       "amount": "المبلغ المستلم (اختياري)",
       "apply": "تطبيق"
+    },
+    "growth": {
+      "active7d": "المطاعم النشطة (7 أيام)",
+      "active30d": "المطاعم النشطة (30 يومًا)",
+      "lost30d": "مطاعم مفقودة (30 يومًا)",
+      "lostHint": "طلبت الشهر الماضي ولا شيء هذا الشهر.",
+      "ordersPerDay": "الطلبات يوميًا (30 يومًا)",
+      "restaurantsPerDay": "المطاعم التي لديها طلبات يوميًا",
+      "orders": "{count} طلب",
+      "restaurants": "{count} مطعم",
+      "signups": "التسجيلات أسبوعيًا",
+      "weekOf": "أسبوع {date}",
+      "atRisk": "معرضة للمغادرة",
+      "atRiskHint": "آخر طلب قبل 14 إلى 60 يومًا: اتصل بهم.",
+      "noRisk": "لا يوجد مطعم معرض للخطر.",
+      "lastOrder": "آخر طلب {time}"
+    },
+    "audience": {
+      "title": "زوار الموقع",
+      "subtitle": "زيارات الصفحات العامة (الرئيسية، الأسعار، الدليل، صفحات المطاعم) خلال 30 يومًا. بلا ملفات تعريف ولا طرف ثالث.",
+      "views": "مشاهدات الصفحات",
+      "visitors": "زوار فريدون",
+      "visitorsHint": "يُحسبون يوميًا: الزائر العائد في يوم آخر يُحسب مجددًا.",
+      "mobile": "على الجوال",
+      "perDay": "المشاهدات يوميًا",
+      "viewsN": "{count} مشاهدة",
+      "pages": "الصفحات الأكثر مشاهدة",
+      "referrers": "المصادر",
+      "referrersHint": "المواقع التي يأتي منها الزوار (إنستغرام، غوغل…).",
+      "empty": "لا زيارات مسجلة.",
+      "noReferrer": "لا مصدر معروف بعد."
     }
   },
   "errors": {
@@ -1777,20 +1809,12 @@
       "weekly": {
         "name": "قائمة أسبوعية",
         "body": "A fresh playlist every Saturday.",
-        "features": [
-          "30 new tracks every week",
-          "No tiring repeats",
-          "Plays on any device"
-        ]
+        "features": ["30 new tracks every week", "No tiring repeats", "Plays on any device"]
       },
       "monthly": {
         "name": "قائمة شهرية",
         "body": "A fresh playlist every month.",
-        "features": [
-          "30 new tracks every month",
-          "Ideal for calm venues",
-          "Plays on any device"
-        ]
+        "features": ["30 new tracks every month", "Ideal for calm venues", "Plays on any device"]
       }
     },
     "status": {

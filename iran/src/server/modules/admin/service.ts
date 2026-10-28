@@ -105,3 +105,78 @@ export async function listUsersForAdmin(
     .limit(Math.min(opts.limit ?? 50, 200))
     .offset(opts.offset ?? 0);
 }
+
+/**
+ * Growth (admin overview): orders per day, restaurants that order (7 / 30 days), new sign-ups
+ * per week, restaurants lost (ordered in the 30 days before, not in the last 30), and those at
+ * risk (last order 14 to 60 days ago).
+ */
+export async function getGrowthMetrics(db: DbOrTx, now = new Date()) {
+  const d = (n: number) => new Date(now.getTime() - n * 86_400_000);
+  const live = sql`${orders.status} <> 'cancelled'`;
+  const [byDay, [active], [lost], signups, atRisk] = await Promise.all([
+    db
+      .select({
+        day: sql<string>`to_char(date_trunc('day', ${orders.placedAt} at time zone 'Asia/Tehran'), 'YYYY-MM-DD')`,
+        orders: sql<number>`count(*)`.mapWith(Number),
+        restaurants: sql<number>`count(distinct ${orders.restaurantId})`.mapWith(Number),
+      })
+      .from(orders)
+      .where(sql`${live} and ${orders.placedAt} >= ${d(30)}`)
+      .groupBy(sql`1`)
+      .orderBy(sql`1`),
+    db
+      .select({
+        d7: sql<number>`count(distinct ${orders.restaurantId}) filter (where ${orders.placedAt} >= ${d(7)})`.mapWith(
+          Number,
+        ),
+        d30: sql<number>`count(distinct ${orders.restaurantId}) filter (where ${orders.placedAt} >= ${d(30)})`.mapWith(
+          Number,
+        ),
+      })
+      .from(orders)
+      .where(live),
+    db
+      .execute<{ n: number }>(
+        sql`
+      select count(*)::int as n from (
+        select restaurant_id from orders
+        where status <> 'cancelled' and placed_at >= ${d(60)} and placed_at < ${d(30)}
+        except
+        select restaurant_id from orders where status <> 'cancelled' and placed_at >= ${d(30)}
+      ) x`,
+      )
+      .then((r) => r.rows as { n: number }[]),
+    db
+      .select({
+        week: sql<string>`to_char(date_trunc('week', ${restaurants.createdAt}), 'YYYY-MM-DD')`,
+        n: sql<number>`count(*)`.mapWith(Number),
+      })
+      .from(restaurants)
+      .where(sql`${restaurants.deletedAt} is null and ${restaurants.createdAt} >= ${d(56)}`)
+      .groupBy(sql`1`)
+      .orderBy(sql`1`),
+    db
+      .select({
+        id: restaurants.id,
+        name: restaurants.name,
+        lastOrderAt: sql<Date>`max(${orders.placedAt})`.mapWith((v: string) => new Date(v)),
+        orders30: sql<number>`count(*) filter (where ${orders.placedAt} >= ${d(60)})`.mapWith(Number),
+      })
+      .from(orders)
+      .innerJoin(restaurants, eq(restaurants.id, orders.restaurantId))
+      .where(sql`${live} and ${restaurants.deletedAt} is null and ${restaurants.status} = 'active'`)
+      .groupBy(restaurants.id, restaurants.name)
+      .having(sql`max(${orders.placedAt}) < ${d(14)} and max(${orders.placedAt}) >= ${d(60)}`)
+      .orderBy(sql`3`)
+      .limit(20),
+  ]);
+  return {
+    byDay,
+    active7d: active?.d7 ?? 0,
+    active30d: active?.d30 ?? 0,
+    lost30d: lost?.n ?? 0,
+    signups,
+    atRisk,
+  };
+}
