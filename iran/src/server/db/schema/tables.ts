@@ -48,6 +48,11 @@ export const tableSessions = pgTable(
     status: tableSessionStatus().notNull().default("open"),
     openedAt: tstz().notNull().defaultNow(),
     lastActivityAt: tstz().notNull().defaultNow(),
+    /**
+     * When the staff let the table order. Set at once unless the restaurant asks for it
+     * (guestOrdersNeedStaff): a table opened by a scan then waits for a waiter (null).
+     */
+    confirmedAt: tstz().defaultNow(),
     closedAt: tstz(),
     closedByUserId: uuid().references(() => users.id, { onDelete: "set null" }),
     /** 'staff' | 'auto' | 'system' */
@@ -96,4 +101,25 @@ export const sessionParticipants = pgTable(
     uniqueIndex("session_participants_session_seq_uq").on(t.tableSessionId, t.seq),
     index("session_participants_guest_idx").on(t.guestId),
   ],
+);
+
+/** Devices the staff blocked: they can no longer enter or act in this restaurant. */
+export const guestBlocks = pgTable(
+  "guest_blocks",
+  {
+    id: pk(),
+    restaurantId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    guestId: uuid()
+      .notNull()
+      .references(() => guests.id, { onDelete: "cascade" }),
+    /** Where it came from, for the list: table and order number. */
+    tableLabel: varchar({ length: 50 }),
+    orderNumber: varchar({ length: 32 }),
+    reason: varchar({ length: 200 }),
+    blockedByUserId: uuid().references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("guest_blocks_restaurant_guest_uq").on(t.restaurantId, t.guestId)],
 );

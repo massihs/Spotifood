@@ -3,6 +3,7 @@ import { formatMoney } from "@/lib/money";
 import { notFound } from "next/navigation";
 import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
+import { BlockParticipantButton, ConfirmTableButton } from "@/components/dashboard/guest-safety-buttons";
 import { OrderCard } from "@/components/dashboard/order-card";
 import { CloseTableButton } from "@/components/dashboard/close-table-button";
 import { LiveRefresh } from "@/components/realtime/live";
@@ -75,6 +76,9 @@ async function TableDetail({ params }: { params: Params }) {
           actions={
             view.session ? (
               <div className="flex flex-wrap items-start gap-2">
+                {!view.session.confirmedAt && can(ctx, "orders.update_status") ? (
+                  <ConfirmTableButton restaurantId={ctx.restaurant.id} tableId={view.table.id} size="md" />
+                ) : null}
                 {canCollect && tablePayable > 0 ? (
                   <CollectPaymentDialog
                     restaurantId={ctx.restaurant.id}
@@ -107,6 +111,11 @@ async function TableDetail({ params }: { params: Params }) {
         </Card>
       ) : (
         <>
+          {!view.session.confirmedAt ? (
+            <p className="mb-4 rounded-xl bg-warning-soft px-4 py-3 text-sm font-medium text-warning">
+              {t("safety.waitingBody")}
+            </p>
+          ) : null}
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard label={t("tableView.tableTotal")} value={money(view.tableTotalCents)} />
             <StatCard
@@ -171,6 +180,13 @@ async function TableDetail({ params }: { params: Params }) {
                         name: p.displayName ?? t("orders.client", { n: p.seq }),
                       })}
                       variant="secondary"
+                    />
+                  ) : null}
+                  {can(ctx, "orders.cancel") ? (
+                    <BlockParticipantButton
+                      restaurantId={ctx.restaurant.id}
+                      participantId={p.id}
+                      name={p.displayName ?? t("orders.client", { n: p.seq })}
                     />
                   ) : null}
                 </div>

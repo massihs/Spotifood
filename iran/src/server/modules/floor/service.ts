@@ -18,6 +18,8 @@ export type FloorTable = {
   state: TableState;
   sessionId: string | null;
   openedAt: Date | null;
+  /** Opened by a scan, waiting for a waiter to let it order (guestOrdersNeedStaff). */
+  waiting: boolean;
   people: number;
   ordersCount: number;
   activeOrders: number;
@@ -38,6 +40,7 @@ export async function getFloor(db: Database, ctx: RestaurantContext): Promise<Fl
       capacity: diningTables.capacity,
       sessionId: tableSessions.id,
       openedAt: tableSessions.openedAt,
+      waiting: sql<boolean>`(${tableSessions.id} is not null and ${tableSessions.confirmedAt} is null)`,
       people:
         sql<number>`(select count(*) from session_participants sp where sp.table_session_id = "table_sessions"."id")`.mapWith(
           Number,

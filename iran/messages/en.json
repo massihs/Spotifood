@@ -575,7 +575,10 @@
     "table_taken": "This table is already booked for that time.",
     "table_too_small": "This table is too small for the party.",
     "slot_full": "This slot is full.",
-    "payment_in_progress": "An online payment is in progress for this order."
+    "payment_in_progress": "An online payment is in progress for this order.",
+    "table_not_confirmed": "A waiter must approve your table first. They’re on their way!",
+    "too_many_pending": "You already have orders waiting. Please wait until they are accepted.",
+    "not_a_guest_order": "This order was entered by the staff: there is no device to block."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -890,7 +893,9 @@
       "synced": "{n, plural, =0 {no offline order} one {# offline order synced} other {# offline orders synced}}",
       "revoke": "Remove",
       "revokeConfirm": "Remove \"{name}\"? This PC will no longer work for the restaurant."
-    }
+    },
+    "security": "Security",
+    "securityHint": "Prevent abusive orders and calls (a QR scanned once and reused from afar)."
   },
   "guest": {
     "table": "Table {label}",
@@ -1066,7 +1071,8 @@
     "filtered": "Filter:",
     "show": "Show",
     "priceUnit": "Prices in thousand tomans",
-    "couponHint": "Got a code?"
+    "couponHint": "Got a code?",
+    "waitingConfirm": "A waiter will approve your table. You can already browse the menu."
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -1347,7 +1353,10 @@
     },
     "noMatch": "No order matches this search",
     "clear": "Clear",
-    "newWaiting": "{n} new orders waiting"
+    "newWaiting": "{n} new orders waiting",
+    "block": "Block this guest",
+    "blockConfirm": "Block the device that placed order {number}? It will no longer be able to order or call, and its waiting orders will be cancelled.",
+    "blockReason": "Reason (optional)"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1453,7 +1462,8 @@
     "summary": "{free} free · {inProgress} in progress · {occupied} occupied",
     "move": "Move",
     "moveTo": "Move to…",
-    "tableN": "Table {label}"
+    "tableN": "Table {label}",
+    "waitingConfirm": "To approve"
   },
   "notifications": {
     "title": "Notifications",
@@ -1660,7 +1670,8 @@
       "waiter": "Table {table} is calling a waiter",
       "bill": "Table {table} wants the bill",
       "water": "Table {table} wants water",
-      "body": "Please go to the table."
+      "body": "Please go to the table.",
+      "confirm": "Table {table}: new guest to approve"
     },
     "kitchenTitle": "Order {number} to prepare"
   },
@@ -2995,5 +3006,18 @@
     "soundOn": "Sound on",
     "soundOff": "Sound off",
     "doubleHint": "Double {n}: play {n} four times."
+  },
+  "safety": {
+    "confirmTable": "Approve table",
+    "blockConfirm": "Block {name}’s device? It will no longer be able to order or call, and its waiting orders will be cancelled.",
+    "unblock": "Unblock",
+    "waitingBody": "This table was opened by a scan: it can only order or call once a waiter approves it.",
+    "needStaff": "Tables opened by the staff",
+    "needStaffHint": "A guest scanning the QR sees the menu but can only order or call once a waiter approves the table (alert on the floor plan).",
+    "limitsHint": "Always on: at most 2 waiting orders per guest and 4 per table until the staff accept them.",
+    "blockedTitle": "Blocked devices ({count})",
+    "blockedEmpty": "No blocked device. Block one from an order or a table.",
+    "blockedTable": "Table {label}",
+    "blockedDevice": "Device"
   }
 }

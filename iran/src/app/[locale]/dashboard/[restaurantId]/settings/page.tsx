@@ -2,7 +2,18 @@ import { edition } from "@/config/edition";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
-import { Blocks, Building2, Clock, CreditCard, Laptop, Percent, Printer, Scale, Store } from "lucide-react";
+import {
+  Blocks,
+  Building2,
+  Clock,
+  CreditCard,
+  Laptop,
+  Percent,
+  Printer,
+  Scale,
+  ShieldCheck,
+  Store,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { requireRestaurant } from "@/server/auth/current";
@@ -30,6 +41,8 @@ import { listPrinters } from "@/server/modules/printing/service";
 import { listStations } from "@/server/modules/kitchen/stations";
 import { env } from "@/server/env";
 import { isModule } from "@/lib/modules";
+import { listGuestBlocks } from "@/server/modules/guest/safety";
+import { SecurityPanel } from "./security-panel";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
 
@@ -48,7 +61,7 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view, payment, printing, setup, listing, cover, devices] = await Promise.all([
+  const [t, view, payment, printing, setup, listing, cover, devices, blocks] = await Promise.all([
     getTranslations("settings"),
     getRestaurantSettingsView(db, ctx),
     getPaymentSettingsView(db, ctx),
@@ -57,6 +70,7 @@ async function Settings({ params }: { params: Params }) {
     getListing(db, ctx),
     getCoverChoices(db, ctx),
     listDevices(db, ctx),
+    listGuestBlocks(db, ctx),
   ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
@@ -212,6 +226,22 @@ async function Settings({ params }: { params: Params }) {
               />
             </div>
           </Card>
+          <Card id="security" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<ShieldCheck />}>{t("security")}</SectionTitle>}
+              description={t("securityHint")}
+            />
+            <div className="p-5 sm:p-6">
+              <SecurityPanel
+                restaurantId={rid}
+                needStaff={s.guestOrdersNeedStaff}
+                blocks={blocks}
+                canManage={!readOnly}
+                canUnblock={can(ctx, "orders.cancel")}
+                timeZone={r.timezone}
+              />
+            </div>
+          </Card>
           <Card id="payments" className="scroll-mt-24">
             <CardHeader
               title={<SectionTitle icon={<CreditCard />}>{t("payments")}</SectionTitle>}
@@ -272,6 +302,7 @@ const SECTIONS = [
   { key: "printers", icon: <Printer aria-hidden="true" /> },
   { key: "desktopTitle", icon: <Laptop aria-hidden="true" /> },
   { key: "service", icon: <Clock aria-hidden="true" /> },
+  { key: "security", icon: <ShieldCheck aria-hidden="true" /> },
   { key: "payments", icon: <CreditCard aria-hidden="true" /> },
   { key: "taxes", icon: <Percent aria-hidden="true" /> },
   { key: "legal", icon: <Scale aria-hidden="true" /> },

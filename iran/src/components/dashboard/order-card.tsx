@@ -5,13 +5,14 @@ import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { ArrowRight, Clock, MessageSquareText, Phone, Timer, X } from "lucide-react";
+import { ArrowRight, Ban, Clock, MessageSquareText, Phone, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CollectPaymentDialog } from "@/components/dashboard/payment-dialogs";
 import { cn } from "@/lib/cn";
 import { nextStatus, type OrderStatus } from "@/server/modules/orders/status";
 import { updateOrderStatusAction } from "@/app/[locale]/dashboard/[restaurantId]/orders/actions";
+import { blockGuestAction } from "@/app/[locale]/dashboard/[restaurantId]/security-actions";
 
 export type OrderCardData = {
   id: string;
@@ -88,6 +89,18 @@ export function OrderCard({
         if (res.error === "status_changed" || res.error === "invalid_transition") router.refresh();
       } else setError(null);
     });
+
+  const block = () => {
+    if (!window.confirm(t("orders.blockConfirm", { number: o.number }))) return;
+    const reason = window.prompt(t("orders.blockReason")) ?? "";
+    startTransition(async () => {
+      const res = await blockGuestAction(restaurantId, { orderId: o.id }, reason);
+      if (res && !res.ok) {
+        setError(t.has(`errorCodes.${res.error}`) ? t(`errorCodes.${res.error}`) : t("errorCodes.internal"));
+      } else setError(null);
+      router.refresh();
+    });
+  };
 
   const tone = TONE[o.status];
   const isNew = o.status === "received" || o.status === "pending_payment";
@@ -336,6 +349,19 @@ export function OrderCard({
             }}
           >
             <X className="size-4" aria-hidden="true" />
+          </Button>
+        ) : null}
+        {canCancel && !kitchen && o.participantSeq != null && isNew ? (
+          <Button
+            variant="secondary"
+            size="md"
+            disabled={pending}
+            aria-label={t("orders.block")}
+            title={t("orders.block")}
+            className="shrink-0 px-3.5 text-danger"
+            onClick={block}
+          >
+            <Ban className="size-4" aria-hidden="true" />
           </Button>
         ) : null}
         {canUpdate && next ? (

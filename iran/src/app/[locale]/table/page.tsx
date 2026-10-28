@@ -59,6 +59,7 @@ async function GuestMenu() {
     getPopularProductIds(guest.restaurant.id),
     getStorefront(db, guest.restaurant.id),
   ]);
+  const waitingText = guest.session.confirmed ? "" : (await getTranslations("guest"))("waitingConfirm");
   const byProduct: Record<string, number> = {};
   for (const l of cart.lines) byProduct[l.productId] = (byProduct[l.productId] ?? 0) + l.quantity;
   const playing = music ? await restaurantNowPlaying(db, guest.restaurant.id) : null;
@@ -70,7 +71,9 @@ async function GuestMenu() {
     <LiveProvider url="/api/v1/realtime/guest">
       <div data-brand={guest.restaurant.brandColor} className="contents">
         <div data-menu-theme={menuThemeOf(guest.restaurant.menuTheme)}>
-          <LiveRefresh types={["session.closed"]} />
+          <LiveRefresh
+            types={guest.session.confirmed ? ["session.closed"] : ["session.closed", "session.opened"]}
+          />
           <MenuApp
             menu={menu}
             currency={guest.restaurant.currency}
@@ -83,6 +86,14 @@ async function GuestMenu() {
             header={
               <>
                 <GuestHeader guest={guest} orderCount={orders.length} cover={cover} store={store} />
+                {guest.session.confirmed ? null : (
+                  <p
+                    role="status"
+                    className="mx-4 mt-3 rounded-2xl bg-warning-soft px-4 py-3 text-sm font-medium text-warning"
+                  >
+                    {waitingText}
+                  </p>
+                )}
                 {music ? <NowPlaying initial={playing} restaurantName={guest.restaurant.name} /> : null}
               </>
             }

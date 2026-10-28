@@ -4,6 +4,7 @@ import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { CloseTableButton } from "@/components/dashboard/close-table-button";
 import { MoveTableButton } from "@/components/dashboard/move-table-button";
+import { ConfirmTableButton } from "@/components/dashboard/guest-safety-buttons";
 import { LiveIndicator, LiveRefresh } from "@/components/realtime/live";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { Link } from "@/i18n/navigation";
@@ -38,6 +39,7 @@ async function Floor({ params }: { params: Params }) {
   const count = (s: TableState) => floor.filter((x) => x.state === s).length;
   const canClose = can(ctx, "sessions.close");
   const canForce = can(ctx, "restaurant.manage");
+  const canConfirm = can(ctx, "orders.update_status");
   const tz = ctx.restaurant.timezone;
 
   return (
@@ -80,6 +82,11 @@ async function Floor({ params }: { params: Params }) {
                 </span>
               </div>
               <p className="mt-1 text-xs font-medium text-fg-muted">{t(tbl.state)}</p>
+              {tbl.waiting ? (
+                <p className="mt-1.5 inline-flex w-fit rounded-full bg-warning-soft px-2 py-0.5 text-xs font-semibold text-warning">
+                  {t("waitingConfirm")}
+                </p>
+              ) : null}
               {tbl.state === "free" ? (
                 <p className="mt-auto pt-3 text-xs text-fg-subtle">{tbl.zone ?? " "}</p>
               ) : (
@@ -115,6 +122,11 @@ async function Floor({ params }: { params: Params }) {
                 </dl>
               )}
             </Link>
+            {tbl.waiting && canConfirm ? (
+              <div className="mt-1.5 flex justify-end">
+                <ConfirmTableButton restaurantId={ctx.restaurant.id} tableId={tbl.id} />
+              </div>
+            ) : null}
             {canClose && tbl.state !== "free" ? (
               <div className="mt-1.5 flex items-start justify-end gap-2">
                 <MoveTableButton

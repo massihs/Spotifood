@@ -131,7 +131,10 @@ describe("placing orders", () => {
     const numbers: string[] = [];
     for (let i = 0; i < 3; i++) {
       await addToCart(db, ga, { productId: a.coca.id });
-      numbers.push((await placeOrder(db, ga)).number);
+      const o = await placeOrder(db, ga);
+      numbers.push(o.number);
+      // Accepted by the staff, so the guest stays under the waiting-orders cap.
+      await updateOrderStatus(db, a.owner.ctx, o.id, "accepted");
     }
     await addToCart(db, gb, { productId: b.coca.id });
     expect(numbers).toEqual(["B-1001", "B-1002", "B-1003"]);

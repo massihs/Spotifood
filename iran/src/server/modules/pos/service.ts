@@ -362,7 +362,11 @@ export async function seatTable(tx: DbOrTx, restaurantId: string, tableId: strin
     )[0]?.id ?? null;
   const open = await current();
   if (open) {
-    await tx.update(tableSessions).set({ lastActivityAt: new Date() }).where(eq(tableSessions.id, open));
+    // The staff seating a table also lets a guest-opened one order (anti-abuse option).
+    await tx
+      .update(tableSessions)
+      .set({ lastActivityAt: new Date(), confirmedAt: sql`coalesce(${tableSessions.confirmedAt}, now())` })
+      .where(eq(tableSessions.id, open));
     return open;
   }
   // A guest scanning the QR at the same instant may win the one-open-session index.

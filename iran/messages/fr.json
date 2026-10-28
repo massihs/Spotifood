@@ -575,7 +575,10 @@
     "table_taken": "Cette table est déjà réservée sur ce créneau.",
     "table_too_small": "Cette table est trop petite pour ce groupe.",
     "slot_full": "Ce créneau est complet.",
-    "payment_in_progress": "Un paiement en ligne est en cours pour cette commande."
+    "payment_in_progress": "Un paiement en ligne est en cours pour cette commande.",
+    "table_not_confirmed": "Un serveur doit d’abord valider votre table. Il arrive !",
+    "too_many_pending": "Vous avez déjà des commandes en attente. Patientez qu’elles soient acceptées.",
+    "not_a_guest_order": "Cette commande a été saisie par l’équipe : aucun appareil à bloquer."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -890,7 +893,9 @@
       "synced": "{n, plural, =0 {aucune commande hors ligne} one {# commande hors ligne remontée} other {# commandes hors ligne remontées}}",
       "revoke": "Retirer",
       "revokeConfirm": "Retirer « {name} » ? Ce PC ne pourra plus travailler pour le restaurant."
-    }
+    },
+    "security": "Sécurité",
+    "securityHint": "Évitez les commandes et appels abusifs (QR scanné puis réutilisé de loin)."
   },
   "guest": {
     "table": "Table {label}",
@@ -1066,7 +1071,8 @@
     "filtered": "Filtre :",
     "show": "Afficher",
     "priceUnit": "Prix en milliers de tomans",
-    "couponHint": "Vous avez un code ?"
+    "couponHint": "Vous avez un code ?",
+    "waitingConfirm": "Un serveur va valider votre table. Vous pouvez déjà parcourir le menu."
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -1347,7 +1353,10 @@
     },
     "noMatch": "Aucune commande ne correspond",
     "clear": "Effacer",
-    "newWaiting": "{n} nouvelles commandes attendent"
+    "newWaiting": "{n} nouvelles commandes attendent",
+    "block": "Bloquer ce client",
+    "blockConfirm": "Bloquer l’appareil qui a passé la commande {number} ? Il ne pourra plus commander ni appeler, et ses commandes en attente seront annulées.",
+    "blockReason": "Raison (facultatif)"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1453,7 +1462,8 @@
     "summary": "{free} libres · {inProgress} en cours · {occupied} occupées",
     "move": "Déplacer",
     "moveTo": "Déplacer vers…",
-    "tableN": "Table {label}"
+    "tableN": "Table {label}",
+    "waitingConfirm": "À valider"
   },
   "notifications": {
     "title": "Notifications",
@@ -1660,7 +1670,8 @@
       "waiter": "Table {table} appelle un serveur",
       "bill": "Table {table} demande l’addition",
       "water": "Table {table} demande de l’eau",
-      "body": "Merci de passer à la table."
+      "body": "Merci de passer à la table.",
+      "confirm": "Table {table} : nouveau client à valider"
     },
     "kitchenTitle": "Commande {number} à préparer"
   },
@@ -3003,5 +3014,18 @@
     "soundOn": "Son activé",
     "soundOff": "Son coupé",
     "doubleHint": "Double {n} : jouez {n} quatre fois."
+  },
+  "safety": {
+    "confirmTable": "Valider la table",
+    "blockConfirm": "Bloquer l’appareil de {name} ? Il ne pourra plus commander ni appeler, et ses commandes en attente seront annulées.",
+    "unblock": "Débloquer",
+    "waitingBody": "Cette table a été ouverte par un scan : elle ne peut commander ou appeler qu’après validation par un serveur.",
+    "needStaff": "Tables ouvertes par l’équipe",
+    "needStaffHint": "Un client qui scanne le QR voit le menu mais ne peut commander ou appeler qu’après validation d’un serveur (alerte sur le plan de salle).",
+    "limitsHint": "Toujours actif : au plus 2 commandes en attente par client et 4 par table, tant que l’équipe ne les a pas acceptées.",
+    "blockedTitle": "Appareils bloqués ({count})",
+    "blockedEmpty": "Aucun appareil bloqué. Bloquez-en un depuis une commande ou une table.",
+    "blockedTable": "Table {label}",
+    "blockedDevice": "Appareil"
   }
 }

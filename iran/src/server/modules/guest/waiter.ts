@@ -1,7 +1,8 @@
 import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database } from "@/server/db/client";
-import { notifications } from "@/server/db/schema";
+import { notifications, tableSessions } from "@/server/db/schema";
+import { assertGuestMayAct } from "./limits";
 import { emit, topics } from "@/server/infra/realtime";
 import { conflict } from "@/server/errors";
 import type { GuestContext } from "./sessions";
@@ -17,6 +18,15 @@ export async function callWaiter(db: Database, guest: GuestContext, raw: string,
   const kind = z.enum(WAITER_CALLS).parse(raw);
   const rid = guest.restaurant.id;
   return db.transaction(async (tx) => {
+    const [session] = await tx
+      .select({ confirmedAt: tableSessions.confirmedAt })
+      .from(tableSessions)
+      .where(eq(tableSessions.id, guest.session.id));
+    await assertGuestMayAct(
+      tx,
+      { ...guest, session: { ...guest.session, confirmed: session?.confirmedAt != null } },
+      "call",
+    );
     const [recent] = await tx
       .select({ id: notifications.id })
       .from(notifications)

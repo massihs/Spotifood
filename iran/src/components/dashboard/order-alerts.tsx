@@ -105,7 +105,14 @@ export function OrderAlerts({
     let alert: Alert;
     if (kitchen && type === "waiter.called") return;
     if (type === "waiter.called") {
-      const kind = data.kind === "bill" ? "bill" : data.kind === "water" ? "water" : "waiter";
+      const kind =
+        data.kind === "bill"
+          ? "bill"
+          : data.kind === "water"
+            ? "water"
+            : data.kind === "confirm"
+              ? "confirm"
+              : "waiter";
       alert = {
         id: `w-${data.tableLabel}-${Date.now()}`,
         title: t(`waiter.${kind}`, { table: String(data.tableLabel ?? "") }),

@@ -11,6 +11,7 @@ import {
 } from "@/server/db/schema";
 import { isUniqueViolation } from "@/server/db/errors";
 import { recordAudit } from "@/server/audit";
+import { isGuestBlocked, scansNeedStaff } from "./limits";
 import { emit, topics } from "@/server/infra/realtime";
 import { isUuid } from "@/lib/ids";
 import { resolveQrToken } from "@/server/modules/tables/service";
@@ -66,8 +67,25 @@ export async function openOrJoinTableSession(db: Database, restaurantId: string,
             entityId: current.id,
           });
         }
-        const [created] = await tx.insert(tableSessions).values({ restaurantId, tableId }).returning();
+        // Anti-abuse option: a table opened by a scan waits for a waiter before it can order.
+        const waitForStaff = await scansNeedStaff(tx, restaurantId);
+        const [created] = await tx
+          .insert(tableSessions)
+          .values({ restaurantId, tableId, confirmedAt: waitForStaff ? null : new Date() })
+          .returning();
         await emit(tx, { topic: topics.restaurant(restaurantId), type: "session.opened", data: { tableId } });
+        if (waitForStaff) {
+          // The staff gets a call: a waiter checks the guest is really at the table.
+          const [table] = await tx
+            .select({ label: diningTables.label })
+            .from(diningTables)
+            .where(eq(diningTables.id, tableId));
+          await emit(tx, {
+            topic: topics.restaurant(restaurantId),
+            type: "waiter.called",
+            data: { tableLabel: table?.label ?? "", tableId, kind: "confirm" },
+          });
+        }
         return created!;
       });
     } catch (e) {
@@ -123,6 +141,8 @@ export async function joinSession(
 export async function enterTableByQr(db: Database, qrToken: string, guestId: string) {
   const resolved = await resolveQrToken(db, qrToken);
   if (!resolved) return null;
+  // A device the staff blocked does not get a seat.
+  if (await isGuestBlocked(db, resolved.restaurant.id, guestId)) return null;
   const session = await openOrJoinTableSession(db, resolved.restaurant.id, resolved.table.id);
   const participant = await joinSession(db, session, guestId);
   await touchSession(db, session.id);
@@ -136,7 +156,8 @@ export async function touchSession(db: DbOrTx, sessionId: string) {
 export type GuestContext = {
   guestId: string;
   participant: { id: string; seq: number; displayName: string | null };
-  session: { id: string; openedAt: Date };
+  /** `confirmed`: the table may order and call (see guestOrdersNeedStaff). */
+  session: { id: string; openedAt: Date; confirmed: boolean };
   table: { id: string; label: string };
   restaurant: {
     id: string;
@@ -174,7 +195,13 @@ export async function loadGuestContext(
         displayName: sessionParticipants.displayName,
         guestId: sessionParticipants.guestId,
       },
-      session: { id: tableSessions.id, openedAt: tableSessions.openedAt, status: tableSessions.status },
+      session: {
+        id: tableSessions.id,
+        openedAt: tableSessions.openedAt,
+        status: tableSessions.status,
+        confirmedAt: tableSessions.confirmedAt,
+      },
+      blocked: sql<boolean>`exists (select 1 from guest_blocks b where b.restaurant_id = ${tableSessions.restaurantId} and b.guest_id = ${guestId})`,
       table: {
         id: diningTables.id,
         label: diningTables.label,
@@ -211,6 +238,7 @@ export async function loadGuestContext(
   if (row.session.status !== "open") return null;
   if (!row.table.qrEnabled || row.table.deletedAt) return null;
   if (row.restaurant.status !== "active") return null;
+  if (row.blocked) return null; // blocked by the staff
 
   const { status: _s, ...restaurant } = row.restaurant;
   return {
@@ -220,7 +248,11 @@ export async function loadGuestContext(
       seq: row.participant.seq,
       displayName: row.participant.displayName,
     },
-    session: { id: row.session.id, openedAt: row.session.openedAt },
+    session: {
+      id: row.session.id,
+      openedAt: row.session.openedAt,
+      confirmed: row.session.confirmedAt != null,
+    },
     table: { id: row.table.id, label: row.table.label },
     restaurant,
   };

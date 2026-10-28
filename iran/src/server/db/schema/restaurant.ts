@@ -94,6 +94,8 @@ export const restaurantSettings = pgTable("restaurant_settings", {
     .notNull()
     .default(sql`ARRAY['cash','on_site_terminal']::text[]`),
   requirePaymentBeforeOrder: boolean().notNull().default(false),
+  /** Anti-abuse: a table opened by a QR scan may only order / call once a waiter confirms it. */
+  guestOrdersNeedStaff: boolean().notNull().default(false),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */
   zarinpalMerchantId: varchar({ length: 64 }),
   /** Auto-close idle table sessions after N minutes (null = manual only). */

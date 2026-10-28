@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { assertGuestMayAct } from "@/server/modules/guest/limits";
 import { createTranslator } from "next-intl";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
@@ -101,11 +102,17 @@ export async function placeOrder(
 
     // The session must still be open at the moment of ordering.
     const [session] = await tx
-      .select({ status: tableSessions.status })
+      .select({ status: tableSessions.status, confirmedAt: tableSessions.confirmedAt })
       .from(tableSessions)
       .where(eq(tableSessions.id, guest.session.id))
       .for("update");
     if (session?.status !== "open") throw new AppError("UNAUTHENTICATED", "session_expired");
+    // Anti-abuse: table confirmed by a waiter (when asked), few orders waiting at once.
+    await assertGuestMayAct(
+      tx,
+      { ...guest, session: { ...guest.session, confirmed: session.confirmedAt != null } },
+      "order",
+    );
 
     const products = await loadPricedProducts(tx, rid, {
       productIds: [...new Set(items.map((i) => i.productId))],
