@@ -7,6 +7,7 @@ import {
   DirectoryFilters,
   ThemeChips,
   directoryHref,
+  type BookingChoices,
   type DirectoryParams,
 } from "@/components/directory/filters";
 import { RestaurantCard, cityLabel } from "@/components/directory/restaurant-card";
@@ -16,8 +17,11 @@ import { buttonClasses } from "@/components/ui/button";
 import type { AppLocale } from "@/i18n/config";
 import { Link } from "@/i18n/navigation";
 import { CUISINES, IRAN_CITIES, cityByKey, isCuisine, NEAR_RADII } from "@/lib/directory";
+import { localDay } from "@/lib/period";
+import { db } from "@/server/db/client";
 import { getDirectory } from "@/server/modules/directory/cache";
 import { directoryFacets, searchDirectory } from "@/server/modules/directory/service";
+import { defaultWishTime, slotsNear } from "@/server/modules/reservations/service";
 
 type Props = PageProps<"/[locale]/restaurants">;
 
@@ -63,6 +67,52 @@ export default async function RestaurantsPage({ params, searchParams }: Props) {
 
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) || undefined;
 
+/** Times the booking bar offers, every half hour. */
+const TIMES = Array.from({ length: 26 }, (_, i) => {
+  const m = 11 * 60 + i * 30;
+  return `${String(Math.floor(m / 60)).padStart(2, "0")}:${m % 60 ? "30" : "00"}`;
+});
+/** Cards that get live time chips (each one is cheap, but the page stays bounded). */
+const SLOT_CARDS = 36;
+
+/** Party, day and time of the booking bar: what the URL asks for, else 2 people tonight. */
+async function bookingChoices(
+  sp: Record<string, string | string[] | undefined>,
+  timezone: string,
+  locale: AppLocale,
+): Promise<BookingChoices> {
+  const t = await getTranslations("directory");
+  const today = localDay(new Date(), timezone);
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(Date.parse(`${today}T12:00:00Z`) + i * 86_400_000);
+    const key = d.toISOString().slice(0, 10);
+    const label =
+      i === 0
+        ? t("bar.today")
+        : i === 1
+          ? t("bar.tomorrow")
+          : new Intl.DateTimeFormat(locale, {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              timeZone: "UTC",
+            }).format(d);
+    return { key, label };
+  });
+  const maxParty = 20;
+  const p = Math.trunc(Number(one(sp.p)));
+  const d = one(sp.d);
+  const time = one(sp.t);
+  return {
+    party: p >= 1 && p <= maxParty ? p : 2,
+    day: days.some((x) => x.key === d) ? d! : today,
+    time: time && TIMES.includes(time) ? time : defaultWishTime(timezone),
+    maxParty,
+    days,
+    times: TIMES,
+  };
+}
+
 async function Results({ searchParams }: Pick<Props, "searchParams">) {
   // Open / closed is computed per visit.
   await connection();
@@ -96,6 +146,10 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
     open: one(sp.open) === "1" ? "1" : undefined,
     book: one(sp.book) === "1" ? "1" : undefined,
   };
+  const booking = await bookingChoices(sp, all[0]?.timezone ?? "Asia/Tehran", locale);
+  // Kept in the URL only once the guest touched the bar, so "clear" stays meaningful.
+  if (one(sp.p) || one(sp.d) || one(sp.t))
+    Object.assign(current, { p: String(booking.party), d: booking.day, t: booking.time });
   const results = searchDirectory(all, {
     q: current.q,
     city: current.city,
@@ -118,13 +172,22 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
     count: perTheme.get(k) ?? 0,
   })).sort((a, b) => b.count - a.count);
   const popular = cityOptions.filter((c) => c.count > 0).slice(0, 8);
+  const slots = await slotsNear(
+    db,
+    results
+      .filter((r) => r.reservable)
+      .slice(0, SLOT_CARDS)
+      .map((r) => r.id),
+    { day: booking.day, partySize: booking.party, time: booking.time },
+  );
+  const bookQuery = `p=${booking.party}&d=${booking.day}`;
   const filtered = Object.entries(current).some(([, v]) => v);
 
   return (
     <>
       <section className="border-b border-border/60 bg-bg/90 backdrop-blur-xl lg:sticky lg:top-16 lg:z-30">
         <div className="mx-auto max-w-6xl space-y-3 px-4 py-3 sm:px-6">
-          <DirectoryFilters current={current} cities={cityOptions} />
+          <DirectoryFilters current={current} cities={cityOptions} booking={booking} />
           <ThemeChips current={current} themes={themes} />
         </div>
       </section>
@@ -151,7 +214,12 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
             {results.map((r) => (
               <li key={r.id} className="flex">
                 <div className="flex w-full flex-col [&>article]:flex-1">
-                  <RestaurantCard r={r} locale={locale} />
+                  <RestaurantCard
+                    r={r}
+                    locale={locale}
+                    slots={slots.get(r.id)}
+                    booking={{ query: bookQuery, time: booking.time }}
+                  />
                 </div>
               </li>
             ))}

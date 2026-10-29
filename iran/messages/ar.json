@@ -2571,6 +2571,7 @@
     "title": "الحجوزات وقائمة الانتظار",
     "subtitle": "حجوزات الطاولات (هاتفياً وأونلاين) وقائمة انتظار مع SMS.",
     "tabs": {
+      "plan": "مخطط الصالة",
       "bookings": "القائمة",
       "queue": "قائمة الانتظار",
       "settings": "الإعدادات",
@@ -2667,6 +2668,67 @@
       "tapToBook": "اضغط على موعد متاح لحجز طاولة.",
       "clash": "حجز متعارض",
       "clashes": "{n, plural, one {حجز واحد يتشارك طاولته مع آخر: انقله.} other {# حجوزات تتشارك طاولة في الوقت نفسه: انقلها.}}"
+    },
+    "host": {
+      "mainRoom": "الصالة",
+      "coversAt": "{count, plural, =0 {لا ضيوف} one {ضيف واحد} other {# ضيوف}} في هذا الوقت",
+      "tidy": "ترتيب",
+      "cancelEdit": "إلغاء",
+      "savePlan": "حفظ المخطط",
+      "editPlan": "تعديل المخطط",
+      "timeAt": "عرض المخطط في",
+      "now": "الآن",
+      "editHint": "اسحب الطاولات لتطابق صالتك، والمس طاولة لتغيير شكلها.",
+      "pickSeat": "المس طاولة شاغرة لإجلاس {name} ({count} أشخاص)",
+      "pickAssign": "المس طاولة لـ {name}",
+      "close": "إغلاق",
+      "qrGuests": "ضيوف QR",
+      "seats": "{count, plural, =0 {—} one {مقعد} other {# مقاعد}}",
+      "noTables": "لا طاولات في هذه المنطقة. أضف طاولات في «الطاولات وQR».",
+      "shapes": {
+        "square": "مربعة",
+        "round": "دائرية",
+        "rect": "طويلة"
+      },
+      "state": {
+        "free": "شاغرة",
+        "soon": "محجوزة قريبًا",
+        "reserved": "محجوزة",
+        "seated": "مشغولة",
+        "occupied": "مشغولة"
+      },
+      "groups": {
+        "upcoming": "القادمة",
+        "seated": "جالسون",
+        "done": "منتهية"
+      },
+      "noneUpcoming": "لا حجوزات قادمة.",
+      "noTable": "بلا طاولة",
+      "more": "إجراءات أخرى",
+      "confirm": "تأكيد",
+      "finish": "إنهاء",
+      "seat": "إجلاس",
+      "moveTable": "تغيير الطاولة",
+      "giveTable": "تخصيص طاولة",
+      "noShow": "لم يحضر",
+      "cancel": "إلغاء الحجز",
+      "cancelConfirm": "إلغاء هذا الحجز؟",
+      "seatedSince": "جلس الساعة {time} · {count} أشخاص",
+      "free": "تحرير الطاولة",
+      "walkIn": "ضيف بلا حجز",
+      "walkInNamePlaceholder": "الاسم (اختياري)",
+      "seatNow": "إجلاس",
+      "walkInName": "بلا حجز",
+      "todayOnTable": "اليوم على هذه الطاولة",
+      "nothingToday": "لا شيء مخطط لهذه الطاولة اليوم.",
+      "bookThisTable": "حجز هذه الطاولة",
+      "occasion": {
+        "birthday": "عيد ميلاد",
+        "anniversary": "ذكرى زواج",
+        "date": "موعد",
+        "business": "عمل",
+        "family": "عائلي"
+      }
     }
   },
   "booking": {
@@ -2704,7 +2766,63 @@
       "no_show": "منتهٍ"
     },
     "cancel": "إلغاء الحجز",
-    "cancelConfirm": "إلغاء هذا الحجز؟"
+    "cancelConfirm": "إلغاء هذا الحجز؟",
+    "steps": {
+      "table": "طاولتك",
+      "details": "بياناتك"
+    },
+    "lunch": "الغداء",
+    "dinner": "العشاء",
+    "morePeople": "المزيد",
+    "phone": "رقم الجوال",
+    "phoneHint": "نرسل لك التأكيد برسالة نصية.",
+    "occasionTitle": "مناسبة خاصة؟ (اختياري)",
+    "occasion": {
+      "birthday": "عيد ميلاد",
+      "anniversary": "ذكرى زواج",
+      "date": "موعد ثنائي",
+      "business": "عمل",
+      "family": "عائلي"
+    },
+    "summary": "ملخص الحجز",
+    "pickTime": "اختر وقتًا",
+    "instant": "تأكيد فوري",
+    "onRequest": "يؤكد المطعم طلبك برسالة نصية",
+    "edit": "تغيير",
+    "confirmCta": "تأكيد الحجز",
+    "noteLabel": "طلب خاص",
+    "area": "مكان الجلوس",
+    "details": "التفاصيل",
+    "reference": "رقم المرجع",
+    "addToCalendar": "أضف إلى التقويم",
+    "directions": "الاتجاهات",
+    "call": "اتصال",
+    "seeMenu": "عرض القائمة",
+    "bookAnother": "احجز مطعمًا آخر",
+    "icsTitle": "طاولة في {restaurant} ({count} أشخاص)",
+    "back": "العودة إلى المطعم",
+    "remembered": "تبقى بياناتك على هذا الجهاز.",
+    "done": {
+      "title": {
+        "pending": "تم إرسال الطلب",
+        "confirmed": "تم الحجز!",
+        "notified": "طاولتك جاهزة",
+        "seated": "أهلًا بك!",
+        "completed": "شكرًا لزيارتك",
+        "cancelled": "تم إلغاء الحجز",
+        "no_show": "انتهت صلاحية الحجز"
+      },
+      "body": {
+        "pending": "سيؤكد المطعم قريبًا وستصلك رسالة نصية.",
+        "confirmed": "ستصلك رسالة تذكير قبل موعدك.",
+        "notified": "يمكنك الحضور الآن.",
+        "seated": "بالهناء والشفاء.",
+        "completed": "نأمل أن نراك مجددًا.",
+        "cancelled": "يمكنك حجز موعد آخر متى شئت.",
+        "no_show": "يمكنك حجز موعد آخر متى شئت."
+      }
+    },
+    "guests": "{count, plural, one {شخص واحد} two {شخصان} few {# أشخاص} many {# شخصًا} other {# شخص}}"
   },
   "menuThemes": {
     "label": "مظهر قائمة الزبائن",
@@ -2856,7 +2974,21 @@
       "soldOut": "نفد"
     },
     "kmUnit": "كم",
-    "orderOnline": "اطلب أونلاين"
+    "orderOnline": "اطلب أونلاين",
+    "bar": {
+      "label": "طاولتك",
+      "people": "{count, plural, one {شخص واحد} two {شخصان} few {# أشخاص} many {# شخصًا} other {# شخص}}",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "day": "التاريخ",
+      "time": "الوقت",
+      "party": "عدد الأشخاص"
+    },
+    "slots": {
+      "none": "محجوز بالكامل حوالي {time}",
+      "more": "أوقات أخرى",
+      "at": "احجز الساعة {time}"
+    }
   },
   "listing": {
     "listed": "العرض في دليل المطاعم",

@@ -2571,6 +2571,7 @@
     "title": "رزرو و نوبت‌دهی",
     "subtitle": "رزرو میز (تلفنی و آنلاین) و صف انتظار حضوری با پیامک.",
     "tabs": {
+      "plan": "نقشهٔ سالن",
       "bookings": "فهرست",
       "queue": "صف انتظار",
       "settings": "تنظیمات",
@@ -2667,6 +2668,67 @@
       "tapToBook": "برای رزرو، روی یک بازهٔ خالی بزنید.",
       "clash": "رزرو هم‌زمان",
       "clashes": "{n} رزرو در یک زمان روی یک میز ثبت شده‌اند؛ آن‌ها را جابه‌جا کنید."
+    },
+    "host": {
+      "mainRoom": "سالن",
+      "coversAt": "{count, plural, =0 {بدون مهمان} other {# نفر}} در این ساعت",
+      "tidy": "مرتب کردن",
+      "cancelEdit": "انصراف",
+      "savePlan": "ذخیرهٔ نقشه",
+      "editPlan": "ویرایش نقشه",
+      "timeAt": "نمایش نقشه در ساعت",
+      "now": "الان",
+      "editHint": "میزها را بکشید تا شبیه سالن شما شود؛ برای تغییر شکل، روی میز بزنید.",
+      "pickSeat": "روی یک میز آزاد بزنید تا {name} ({count} نفر) را بنشانید",
+      "pickAssign": "روی یک میز برای {name} بزنید",
+      "close": "بستن",
+      "qrGuests": "مهمان QR",
+      "seats": "{count, plural, =0 {—} other {# صندلی}}",
+      "noTables": "در این بخش میزی نیست. میزها را در «میزها و QR» اضافه کنید.",
+      "shapes": {
+        "square": "مربع",
+        "round": "گرد",
+        "rect": "بلند"
+      },
+      "state": {
+        "free": "آزاد",
+        "soon": "به‌زودی رزرو",
+        "reserved": "رزرو شده",
+        "seated": "پر",
+        "occupied": "پر"
+      },
+      "groups": {
+        "upcoming": "پیش رو",
+        "seated": "نشسته‌اند",
+        "done": "تمام‌شده"
+      },
+      "noneUpcoming": "رزرو پیش رویی نیست.",
+      "noTable": "بدون میز",
+      "more": "کارهای بیشتر",
+      "confirm": "تأیید",
+      "finish": "پایان",
+      "seat": "نشاندن",
+      "moveTable": "تغییر میز",
+      "giveTable": "دادن میز",
+      "noShow": "نیامد",
+      "cancel": "لغو رزرو",
+      "cancelConfirm": "این رزرو لغو شود؟",
+      "seatedSince": "از ساعت {time} نشسته · {count} نفر",
+      "free": "آزاد کردن",
+      "walkIn": "مهمان بدون رزرو",
+      "walkInNamePlaceholder": "نام (اختیاری)",
+      "seatNow": "نشاندن",
+      "walkInName": "بدون رزرو",
+      "todayOnTable": "امروز روی این میز",
+      "nothingToday": "امروز برای این میز برنامه‌ای نیست.",
+      "bookThisTable": "رزرو این میز",
+      "occasion": {
+        "birthday": "تولد",
+        "anniversary": "سالگرد ازدواج",
+        "date": "قرار دونفره",
+        "business": "کاری",
+        "family": "خانوادگی"
+      }
     }
   },
   "booking": {
@@ -2704,7 +2766,63 @@
       "no_show": "منقضی شد"
     },
     "cancel": "لغو رزرو",
-    "cancelConfirm": "رزرو لغو شود؟"
+    "cancelConfirm": "رزرو لغو شود؟",
+    "steps": {
+      "table": "میز شما",
+      "details": "مشخصات شما"
+    },
+    "lunch": "ناهار",
+    "dinner": "شام",
+    "morePeople": "بیشتر",
+    "phone": "شمارهٔ موبایل",
+    "phoneHint": "تأیید رزرو را پیامک می‌کنیم.",
+    "occasionTitle": "مناسبت خاصی دارید؟ (اختیاری)",
+    "occasion": {
+      "birthday": "تولد",
+      "anniversary": "سالگرد ازدواج",
+      "date": "قرار دونفره",
+      "business": "کاری",
+      "family": "خانوادگی"
+    },
+    "summary": "خلاصهٔ رزرو",
+    "pickTime": "یک ساعت انتخاب کنید",
+    "instant": "تأیید فوری",
+    "onRequest": "رستوران درخواست شما را با پیامک تأیید می‌کند",
+    "edit": "تغییر",
+    "confirmCta": "تأیید رزرو",
+    "noteLabel": "درخواست خاص",
+    "area": "محل نشستن",
+    "details": "جزئیات",
+    "reference": "کد پیگیری",
+    "addToCalendar": "افزودن به تقویم",
+    "directions": "مسیریابی",
+    "call": "تماس",
+    "seeMenu": "دیدن منو",
+    "bookAnother": "رزرو رستوران دیگر",
+    "icsTitle": "میز در {restaurant} ({count} نفر)",
+    "back": "بازگشت به رستوران",
+    "remembered": "مشخصات شما روی همین دستگاه می‌ماند.",
+    "done": {
+      "title": {
+        "pending": "درخواست ثبت شد",
+        "confirmed": "رزرو شما قطعی شد!",
+        "notified": "میز شما آماده است",
+        "seated": "خوش آمدید!",
+        "completed": "ممنون از حضورتان",
+        "cancelled": "رزرو لغو شد",
+        "no_show": "رزرو منقضی شد"
+      },
+      "body": {
+        "pending": "رستوران به‌زودی تأیید می‌کند و پیامک دریافت می‌کنید.",
+        "confirmed": "پیش از آمدن، پیامک یادآوری برایتان می‌فرستیم.",
+        "notified": "همین حالا می‌توانید تشریف بیاورید.",
+        "seated": "نوش جان.",
+        "completed": "امیدواریم باز هم ببینیمتان.",
+        "cancelled": "هر وقت خواستید، زمان دیگری رزرو کنید.",
+        "no_show": "هر وقت خواستید، زمان دیگری رزرو کنید."
+      }
+    },
+    "guests": "{count, plural, other {# نفر}}"
   },
   "menuThemes": {
     "label": "ظاهر منوی مشتری",
@@ -2856,7 +2974,21 @@
       "soldOut": "تمام شد"
     },
     "kmUnit": "کیلومتر",
-    "orderOnline": "سفارش آنلاین"
+    "orderOnline": "سفارش آنلاین",
+    "bar": {
+      "label": "میز شما",
+      "people": "{count, plural, other {# نفر}}",
+      "today": "امروز",
+      "tomorrow": "فردا",
+      "day": "تاریخ",
+      "time": "ساعت",
+      "party": "تعداد نفرات"
+    },
+    "slots": {
+      "none": "حوالی {time} پر است",
+      "more": "ساعت‌های دیگر",
+      "at": "رزرو ساعت {time}"
+    }
   },
   "listing": {
     "listed": "نمایش در راهنمای رستوران‌ها",

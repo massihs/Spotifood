@@ -2571,6 +2571,7 @@
     "title": "Bookings & queue",
     "subtitle": "Table bookings (phone and online) and a walk-in waitlist with SMS.",
     "tabs": {
+      "plan": "Floor plan",
       "bookings": "List",
       "queue": "Waitlist",
       "settings": "Settings",
@@ -2667,6 +2668,67 @@
       "tapToBook": "Tap a free slot to book a table.",
       "clash": "Clashing booking",
       "clashes": "{n, plural, one {# booking shares its table with another: move it.} other {# bookings share a table at the same time: move them.}}"
+    },
+    "host": {
+      "mainRoom": "Dining room",
+      "coversAt": "{count, plural, =0 {No covers} one {# cover} other {# covers}} at this time",
+      "tidy": "Tidy up",
+      "cancelEdit": "Cancel",
+      "savePlan": "Save plan",
+      "editPlan": "Edit plan",
+      "timeAt": "Show the plan at",
+      "now": "Now",
+      "editHint": "Drag tables to match your room; tap a table to change its shape.",
+      "pickSeat": "Tap a free table to seat {name} ({count} guests)",
+      "pickAssign": "Tap a table for {name}",
+      "close": "Close",
+      "qrGuests": "QR guests",
+      "seats": "{count, plural, =0 {—} one {# seat} other {# seats}}",
+      "noTables": "No tables in this area. Add tables in “Tables & QR”.",
+      "shapes": {
+        "square": "Square",
+        "round": "Round",
+        "rect": "Long"
+      },
+      "state": {
+        "free": "Free",
+        "soon": "Booked soon",
+        "reserved": "Booked",
+        "seated": "Seated",
+        "occupied": "Seated"
+      },
+      "groups": {
+        "upcoming": "Upcoming",
+        "seated": "Seated",
+        "done": "Done"
+      },
+      "noneUpcoming": "No upcoming bookings.",
+      "noTable": "No table",
+      "more": "More actions",
+      "confirm": "Confirm",
+      "finish": "Finish",
+      "seat": "Seat",
+      "moveTable": "Change table",
+      "giveTable": "Give a table",
+      "noShow": "No-show",
+      "cancel": "Cancel booking",
+      "cancelConfirm": "Cancel this booking?",
+      "seatedSince": "Seated at {time} · {count} guests",
+      "free": "Free table",
+      "walkIn": "Walk-in",
+      "walkInNamePlaceholder": "Name (optional)",
+      "seatNow": "Seat",
+      "walkInName": "Walk-in",
+      "todayOnTable": "Today on this table",
+      "nothingToday": "Nothing planned on this table today.",
+      "bookThisTable": "Book this table",
+      "occasion": {
+        "birthday": "Birthday",
+        "anniversary": "Anniversary",
+        "date": "Date night",
+        "business": "Business",
+        "family": "Family"
+      }
     }
   },
   "booking": {
@@ -2704,7 +2766,63 @@
       "no_show": "Expired"
     },
     "cancel": "Cancel booking",
-    "cancelConfirm": "Cancel this booking?"
+    "cancelConfirm": "Cancel this booking?",
+    "steps": {
+      "table": "Your table",
+      "details": "Your details"
+    },
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "morePeople": "More",
+    "phone": "Mobile",
+    "phoneHint": "We text you the confirmation.",
+    "occasionTitle": "A special occasion? (optional)",
+    "occasion": {
+      "birthday": "Birthday",
+      "anniversary": "Anniversary",
+      "date": "Date night",
+      "business": "Business",
+      "family": "Family"
+    },
+    "summary": "Summary",
+    "pickTime": "Pick a time",
+    "instant": "Instant confirmation",
+    "onRequest": "The restaurant confirms your request by text",
+    "edit": "Change",
+    "confirmCta": "Confirm booking",
+    "noteLabel": "Special request",
+    "area": "Seating",
+    "details": "Details",
+    "reference": "Reference",
+    "addToCalendar": "Add to calendar",
+    "directions": "Directions",
+    "call": "Call",
+    "seeMenu": "See the menu",
+    "bookAnother": "Book another restaurant",
+    "icsTitle": "Table at {restaurant} ({count} guests)",
+    "back": "Back to the restaurant",
+    "remembered": "Your details are kept on this device.",
+    "done": {
+      "title": {
+        "pending": "Request sent",
+        "confirmed": "You're booked!",
+        "notified": "Your table is ready",
+        "seated": "Welcome!",
+        "completed": "Thanks for coming",
+        "cancelled": "Booking cancelled",
+        "no_show": "Booking expired"
+      },
+      "body": {
+        "pending": "The restaurant will confirm shortly; you'll get a text.",
+        "confirmed": "You'll get a reminder text before your visit.",
+        "notified": "You can come in now.",
+        "seated": "Enjoy your meal.",
+        "completed": "Hope to see you again.",
+        "cancelled": "You can book another time whenever you like.",
+        "no_show": "You can book another time whenever you like."
+      }
+    },
+    "guests": "{count, plural, one {# guest} other {# guests}}"
   },
   "menuThemes": {
     "label": "Guest menu look",
@@ -2856,7 +2974,21 @@
       "soldOut": "Sold out"
     },
     "kmUnit": "km",
-    "orderOnline": "Order online"
+    "orderOnline": "Order online",
+    "bar": {
+      "label": "Your table",
+      "people": "{count, plural, one {# guest} other {# guests}}",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "day": "Date",
+      "time": "Time",
+      "party": "Guests"
+    },
+    "slots": {
+      "none": "Fully booked around {time}",
+      "more": "Other times",
+      "at": "Book at {time}"
+    }
   },
   "listing": {
     "listed": "Show in the restaurant guide",

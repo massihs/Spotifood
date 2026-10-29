@@ -10,9 +10,22 @@ export function cityLabel(city: { fa: string; en: string }, locale: string) {
 }
 
 /** One restaurant of the guide: photo, name, styles, rating, open state, distance, actions. */
-export async function RestaurantCard({ r, locale }: { r: DirectoryResult; locale: AppLocale }) {
+export async function RestaurantCard({
+  r,
+  locale,
+  slots,
+  booking,
+}: {
+  r: DirectoryResult;
+  locale: AppLocale;
+  /** Free times near the one asked for (reservable places only). */
+  slots?: { time: string }[];
+  /** The guest's party and day, carried to the booking page (`p=2&d=2026-10-29`). */
+  booking?: { query: string; time: string };
+}) {
   const [t, format] = await Promise.all([getTranslations("directory"), getFormatter()]);
   const where = r.city ? cityLabel(r.city, locale) : r.cityText;
+  const bookHref = `/r/${r.slug}/book${booking ? `?${booking.query}` : ""}`;
   return (
     <article
       data-brand={r.brandColor}
@@ -87,6 +100,31 @@ export async function RestaurantCard({ r, locale }: { r: DirectoryResult; locale
             })}
           </ul>
         ) : null}
+        {r.reservable && slots && booking ? (
+          slots.length ? (
+            <ul className="relative z-10 flex flex-wrap gap-1.5 pt-1" aria-label={t("bar.label")}>
+              {slots.map((s) => (
+                <li key={s.time}>
+                  <Link
+                    href={`${bookHref}&t=${s.time}`}
+                    aria-label={t("slots.at", { time: s.time })}
+                    className="inline-flex h-9 min-w-[3.75rem] items-center justify-center rounded-xl bg-accent px-2.5 text-sm font-bold text-accent-fg tabular-nums shadow-sm transition-colors hover:bg-accent-hover"
+                    dir="ltr"
+                  >
+                    {s.time}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="relative z-10 flex flex-wrap items-center gap-x-2 pt-1 text-sm text-fg-muted">
+              {t("slots.none", { time: booking.time })}
+              <Link href={bookHref} className="font-semibold text-accent-text hover:underline">
+                {t("slots.more")}
+              </Link>
+            </p>
+          )
+        ) : null}
         <div className="relative z-10 mt-auto flex gap-2 pt-2">
           <Link
             href={`/r/${r.slug}`}
@@ -96,7 +134,7 @@ export async function RestaurantCard({ r, locale }: { r: DirectoryResult; locale
           </Link>
           {r.reservable ? (
             <Link
-              href={`/r/${r.slug}/book`}
+              href={bookHref}
               className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg hover:bg-accent-hover"
             >
               <CalendarCheck className="size-4" aria-hidden="true" />

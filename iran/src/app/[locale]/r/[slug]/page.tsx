@@ -25,6 +25,8 @@ import { getDirectory } from "@/server/modules/directory/cache";
 import { searchDirectory, type DirectoryResult } from "@/server/modules/directory/service";
 import { getPublicMenu } from "@/server/modules/menu/public-cache";
 import { getOnlineStore } from "@/server/modules/online/service";
+import { defaultWishTime, slotsNear } from "@/server/modules/reservations/service";
+import { localDay } from "@/lib/period";
 import { db } from "@/server/db/client";
 
 type Props = PageProps<"/[locale]/r/[slug]">;
@@ -76,7 +78,18 @@ async function Place({ params }: Pick<Props, "params">) {
     getFormatter(),
     getPublicMenu(place.id),
   ]);
-  const orderOnline = Boolean(await getOnlineStore(db, place.slug).catch(() => null));
+  const [orderOnline, tonight] = await Promise.all([
+    getOnlineStore(db, place.slug)
+      .then(Boolean)
+      .catch(() => false),
+    place.reservable
+      ? slotsNear(db, [place.id], {
+          day: localDay(new Date(), place.timezone),
+          partySize: 2,
+          time: defaultWishTime(place.timezone),
+        }).then((m) => m.get(place.id) ?? [])
+      : Promise.resolve([]),
+  ]);
   const where = place.city ? cityLabel(place.city, locale) : place.cityText;
   const pos = place.position;
   const mapsUrl = pos
@@ -89,11 +102,9 @@ async function Place({ params }: Pick<Props, "params">) {
     .map((c) => ({ ...c, items: c.productIds.map((id) => menu.products[id]).filter((p) => p != null) }))
     .filter((c) => c.items.length > 0);
 
-  // On phones the sticky bottom bar books; the card stays for the desktop column.
+  const bookQuery = `p=2&d=${localDay(new Date(), place.timezone)}`;
   const bookCard = (
-    <div
-      className={cn("rounded-3xl bg-surface p-5 ring-1 ring-border", place.reservable && "hidden lg:block")}
-    >
+    <div className="rounded-3xl bg-surface p-5 ring-1 ring-border">
       {orderOnline ? (
         <Link
           href={`/r/${place.slug}/order`}
@@ -107,8 +118,32 @@ async function Place({ params }: Pick<Props, "params">) {
       {place.reservable ? (
         <>
           <p className="mt-1 text-sm leading-6 text-fg-muted">{t("profile.bookBody")}</p>
+          {/* Tonight for two, one tap away (OpenTable style); other choices on the booking page. */}
+          <p className="mt-4 text-xs font-bold text-fg-subtle">
+            {t("bar.today")} · {t("bar.people", { count: 2 })}
+          </p>
+          {tonight.length ? (
+            <ul className="mt-2 flex flex-wrap gap-1.5">
+              {tonight.map((s) => (
+                <li key={s.time}>
+                  <Link
+                    href={`/r/${place.slug}/book?${bookQuery}&t=${s.time}`}
+                    aria-label={t("slots.at", { time: s.time })}
+                    className="inline-flex h-10 min-w-16 items-center justify-center rounded-xl bg-accent px-3 text-sm font-bold text-accent-fg tabular-nums hover:bg-accent-hover"
+                    dir="ltr"
+                  >
+                    {s.time}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-sm text-fg-muted">
+              {t("slots.none", { time: defaultWishTime(place.timezone) })}
+            </p>
+          )}
           <Link
-            href={`/r/${place.slug}/book`}
+            href={`/r/${place.slug}/book?${bookQuery}`}
             className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-accent text-base font-bold text-accent-fg hover:bg-accent-hover"
           >
             <CalendarCheck className="size-5" aria-hidden="true" />

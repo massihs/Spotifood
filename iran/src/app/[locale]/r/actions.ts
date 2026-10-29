@@ -9,6 +9,7 @@ import {
   bookOnline,
   cancelByCode,
   joinQueueOnline,
+  OCCASIONS,
   placeBySlug,
   slotsForDay,
 } from "@/server/modules/reservations/service";
@@ -35,6 +36,7 @@ export async function bookAction(
     startsAt: string;
     note: string;
     area: "any" | "indoor" | "outdoor";
+    occasion?: (typeof OCCASIONS)[number] | null;
   },
 ) {
   return runAction(async () => {

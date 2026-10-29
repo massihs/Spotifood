@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, Clock, LocateFixed, MapPin, Search, X } from "lucide-react";
+import { CalendarCheck, CalendarDays, Clock, LocateFixed, MapPin, Search, Users, X } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
@@ -17,6 +17,19 @@ export type DirectoryParams = {
   r?: string;
   open?: string;
   book?: string;
+  /** The table asked for: party, day (YYYY-MM-DD) and time (HH:MM). */
+  p?: string;
+  d?: string;
+  t?: string;
+};
+
+export type BookingChoices = {
+  party: number;
+  day: string;
+  time: string;
+  maxParty: number;
+  days: { key: string; label: string }[];
+  times: string[];
 };
 
 export function directoryHref(p: DirectoryParams) {
@@ -29,9 +42,11 @@ export function directoryHref(p: DirectoryParams) {
 export function DirectoryFilters({
   current,
   cities,
+  booking,
 }: {
   current: DirectoryParams;
   cities: { key: string; label: string; count: number }[];
+  booking: BookingChoices;
 }) {
   const t = useTranslations("directory");
   const format = useFormatter();
@@ -129,6 +144,37 @@ export function DirectoryFilters({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2 px-1">
+        <div
+          role="group"
+          aria-label={t("bar.label")}
+          className="flex w-full items-center gap-1 rounded-2xl bg-surface p-1 ring-1 ring-border sm:w-auto"
+        >
+          <PillSelect
+            icon={<Users className="size-4" aria-hidden="true" />}
+            label={t("bar.party")}
+            value={String(booking.party)}
+            onChange={(p) => go({ p, d: booking.day, t: booking.time })}
+            options={Array.from({ length: booking.maxParty }, (_, i) => ({
+              value: String(i + 1),
+              label: t("bar.people", { count: i + 1 }),
+            }))}
+          />
+          <PillSelect
+            icon={<CalendarDays className="size-4" aria-hidden="true" />}
+            label={t("bar.day")}
+            value={booking.day}
+            onChange={(d) => go({ p: String(booking.party), d, t: booking.time })}
+            options={booking.days.map((d) => ({ value: d.key, label: d.label }))}
+            wide
+          />
+          <PillSelect
+            icon={<Clock className="size-4" aria-hidden="true" />}
+            label={t("bar.time")}
+            value={booking.time}
+            onChange={(time) => go({ p: String(booking.party), d: booking.day, t: time })}
+            options={booking.times.map((v) => ({ value: v, label: v }))}
+          />
+        </div>
         {near ? (
           <span className="flex items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-border">
             <span className="px-2 text-xs font-semibold whitespace-nowrap text-fg-muted">
@@ -175,6 +221,46 @@ export function DirectoryFilters({
         </Toggle>
       </div>
     </div>
+  );
+}
+
+/** A compact select of the booking bar: icon, value, native picker (fast on phones). */
+function PillSelect({
+  icon,
+  label,
+  value,
+  onChange,
+  options,
+  wide,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  wide?: boolean;
+}) {
+  return (
+    <label
+      className={cn(
+        "relative flex h-9 min-w-0 items-center gap-1.5 rounded-xl px-2.5 text-fg-muted hover:bg-surface-2",
+        wide ? "flex-[1.4]" : "flex-1",
+      )}
+    >
+      {icon}
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-full min-w-0 flex-1 cursor-pointer appearance-none bg-transparent text-sm font-bold text-fg tabular-nums outline-none"
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 

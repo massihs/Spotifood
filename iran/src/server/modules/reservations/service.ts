@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, isNull, lt, ne, notInArray, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNull, lt, ne, notInArray, sql, type SQL } from "drizzle-orm";
 import { notifyTeam } from "@/server/modules/team/sections";
 import { createTranslator } from "next-intl";
 import { z } from "zod";
@@ -17,6 +17,8 @@ import { normalizeIranMobile } from "@/lib/phone";
 import { nextCounterValue } from "@/server/modules/restaurants/service";
 
 const SLOT_MIN = 30;
+/** What a guest may say the evening is for (the host sees it on the booking). */
+export const OCCASIONS = ["birthday", "anniversary", "date", "business", "family"] as const;
 const ACTIVE = ["pending", "confirmed", "notified", "seated"] as const;
 const DAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
@@ -36,8 +38,8 @@ type Place = {
   openingHours: Record<string, { open: string; close: string }[]> | null;
 };
 
-async function loadPlace(db: DbOrTx, where: ReturnType<typeof eq>): Promise<Place | null> {
-  const [r] = await db
+async function loadPlaces(db: DbOrTx, where: SQL | undefined): Promise<Place[]> {
+  const rows = await db
     .select({
       id: restaurants.id,
       name: restaurants.name,
@@ -57,8 +59,10 @@ async function loadPlace(db: DbOrTx, where: ReturnType<typeof eq>): Promise<Plac
     .from(restaurants)
     .innerJoin(restaurantSettings, eq(restaurantSettings.restaurantId, restaurants.id))
     .where(and(where, isNull(restaurants.deletedAt)));
-  if (!r || r.status !== "active") return null;
-  return r as Place;
+  return rows.filter((r) => r.status === "active") as Place[];
+}
+async function loadPlace(db: DbOrTx, where: SQL): Promise<Place | null> {
+  return (await loadPlaces(db, where))[0] ?? null;
 }
 export const placeBySlug = (db: DbOrTx, slug: string) => loadPlace(db, eq(restaurants.slug, slug));
 const placeById = (db: DbOrTx, id: string) => loadPlace(db, eq(restaurants.id, id));
@@ -70,21 +74,11 @@ const toMin = (hhmm: string) => {
   return (h ?? 0) * 60 + (m ?? 0);
 };
 
-/** Bookable start times of a day, with what is left of each slot's capacity. */
-export async function slotsForDay(
-  db: DbOrTx,
-  place: Place,
-  day: string,
-  partySize: number,
-  now = new Date(),
-) {
-  const start = dayStart(day, place.timezone);
-  const weekday = DAYS[new Date(`${day}T12:00:00Z`).getUTCDay()]!;
-  const ranges = place.openingHours
-    ? (place.openingHours[weekday] ?? [])
-    : [{ open: "12:00", close: "23:00" }];
-  const booked = await db
+/** Active bookings that may overlap a day (from 6 h before it to 6 h after it). */
+function bookedAround(db: DbOrTx, ids: string[], from: Date, to: Date) {
+  return db
     .select({
+      restaurantId: reservations.restaurantId,
       startsAt: reservations.startsAt,
       durationMin: reservations.durationMin,
       partySize: reservations.partySize,
@@ -92,13 +86,27 @@ export async function slotsForDay(
     .from(reservations)
     .where(
       and(
-        eq(reservations.restaurantId, place.id),
+        inArray(reservations.restaurantId, ids),
         eq(reservations.kind, "booking"),
         inArray(reservations.status, [...ACTIVE]),
-        gte(reservations.startsAt, new Date(start.getTime() - 6 * 3600_000)),
-        lt(reservations.startsAt, new Date(start.getTime() + 30 * 3600_000)),
+        gte(reservations.startsAt, new Date(from.getTime() - 6 * 3600_000)),
+        lt(reservations.startsAt, new Date(to.getTime() + 30 * 3600_000)),
       ),
     );
+}
+
+function slotsFrom(
+  place: Place,
+  day: string,
+  booked: { startsAt: Date; durationMin: number; partySize: number }[],
+  partySize: number,
+  now: Date,
+) {
+  const start = dayStart(day, place.timezone);
+  const weekday = DAYS[new Date(`${day}T12:00:00Z`).getUTCDay()]!;
+  const ranges = place.openingHours
+    ? (place.openingHours[weekday] ?? [])
+    : [{ open: "12:00", close: "23:00" }];
   const out: { time: string; at: Date; left: number }[] = [];
   for (const r of ranges) {
     // Last booking starts one duration before closing (closing after midnight wraps).
@@ -123,10 +131,108 @@ export async function slotsForDay(
   return out;
 }
 
+/** Bookable start times of a day, with what is left of each slot's capacity. */
+export async function slotsForDay(
+  db: DbOrTx,
+  place: Place,
+  day: string,
+  partySize: number,
+  now = new Date(),
+) {
+  const start = dayStart(day, place.timezone);
+  const booked = await bookedAround(db, [place.id], start, start);
+  return slotsFrom(place, day, booked, partySize, now);
+}
+
+/**
+ * The time a guest most likely wants when they have not said: 20:00, or later in the evening the
+ * next half hour that can still be booked (never past 23:30).
+ */
+export function defaultWishTime(timezone: string, now = new Date()) {
+  const [h, m] = new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  })
+    .format(now)
+    .split(":")
+    .map(Number);
+  const soonest = Math.ceil(((h ?? 0) * 60 + (m ?? 0) + 30) / 30) * 30;
+  const at = Math.min(Math.max(20 * 60, soonest), 23 * 60 + 30);
+  return `${String(Math.floor(at / 60)).padStart(2, "0")}:${at % 60 ? "30" : "00"}`;
+}
+
+/**
+ * The directory's time chips: for each restaurant taking bookings, up to `n` free start times
+ * closest to the one the guest asked for (two queries whatever the number of restaurants).
+ */
+export async function slotsNear(
+  db: DbOrTx,
+  ids: string[],
+  q: { day: string; partySize: number; time: string },
+  n = 5,
+  now = new Date(),
+) {
+  const out = new Map<string, { time: string; at: string }[]>();
+  if (!ids.length) return out;
+  const places = (await loadPlaces(db, inArray(restaurants.id, ids))).filter((p) => p.enabled);
+  if (!places.length) return out;
+  const starts = places.map((p) => dayStart(q.day, p.timezone).getTime());
+  const booked = await bookedAround(
+    db,
+    places.map((p) => p.id),
+    new Date(Math.min(...starts)),
+    new Date(Math.max(...starts)),
+  );
+  const wished = toMin(q.time);
+  for (const p of places) {
+    if (q.partySize > p.maxParty) {
+      out.set(p.id, []);
+      continue;
+    }
+    const start = dayStart(q.day, p.timezone).getTime();
+    const slots = slotsFrom(
+      p,
+      q.day,
+      booked.filter((b) => b.restaurantId === p.id),
+      q.partySize,
+      now,
+    );
+    const gap = (at: Date) => Math.abs((at.getTime() - start) / 60_000 - wished);
+    out.set(
+      p.id,
+      slots
+        .sort((a, b) => gap(a.at) - gap(b.at))
+        .slice(0, n)
+        .sort((a, b) => a.at.getTime() - b.at.getTime())
+        .map((s) => ({ time: s.time, at: s.at.toISOString() })),
+    );
+  }
+  return out;
+}
+
 const OUTDOOR = /out|terrace|garden|بیرون|تراس|حیاط|باغ|فضای باز/i;
 /** Tables in the wished area first (outdoor = zone name like "terrace"/"حیاط"). */
 const zoneRank = (zone: string | null, area: string) =>
   area === "any" ? 0 : (area === "outdoor") === OUTDOOR.test(zone ?? "") ? 0 : 1;
+
+/** Which areas a guest can wish for: the choice only shows when the place has both. */
+export async function bookingAreas(db: DbOrTx, restaurantId: string) {
+  const zones = await db
+    .selectDistinct({ zone: diningTables.zone })
+    .from(diningTables)
+    .where(
+      and(
+        eq(diningTables.restaurantId, restaurantId),
+        isNull(diningTables.deletedAt),
+        eq(diningTables.kind, "table"),
+      ),
+    );
+  const outdoor = zones.some((z) => OUTDOOR.test(z.zone ?? ""));
+  const indoor = zones.some((z) => !OUTDOOR.test(z.zone ?? ""));
+  return { indoor, outdoor };
+}
 
 /** Smallest free table that seats the party for the whole booking, in the wished area if possible. */
 async function pickTable(
@@ -141,7 +247,9 @@ async function pickTable(
   const tables = await tx
     .select({ id: diningTables.id, capacity: diningTables.capacity, zone: diningTables.zone })
     .from(diningTables)
-    .where(and(eq(diningTables.restaurantId, rid), isNull(diningTables.deletedAt)));
+    .where(
+      and(eq(diningTables.restaurantId, rid), isNull(diningTables.deletedAt), eq(diningTables.kind, "table")),
+    );
   const end = new Date(at.getTime() + durationMin * 60_000);
   const busy = await tx
     .select({ tableId: reservations.tableId })
@@ -200,6 +308,7 @@ export const bookingSchema = z.object({
   startsAt: z.coerce.date(),
   area: z.enum(["any", "indoor", "outdoor"]).default("any"),
   note: z.string().trim().max(500).default(""),
+  occasion: z.enum(OCCASIONS).nullable().optional(),
   /** undefined = pick a free table, null = no table (staff only), uuid = this table. */
   tableId: z.uuid().nullable().optional(),
   /** Staff may book a longer or shorter sitting than the default. */
@@ -258,7 +367,7 @@ async function overlapping(tx: DbOrTx, rid: string, at: Date, durationMin: numbe
  */
 async function resolveSlot(tx: DbOrTx, place: Place, slot: Slot, excludeId?: string) {
   const others = await overlapping(tx, place.id, slot.startsAt, slot.durationMin, excludeId);
-  if (others.some((o) => o.phone === slot.phone)) throw conflict("duplicate_booking");
+  if (slot.phone && others.some((o) => o.phone === slot.phone)) throw conflict("duplicate_booking");
   if (slot.tableId) {
     const [table] = await tx
       .select({ id: diningTables.id, capacity: diningTables.capacity })
@@ -351,6 +460,7 @@ async function create(
         status: opts.source === "online" && !place.autoConfirm ? "pending" : "confirmed",
         source: opts.source,
         note: input.note || null,
+        occasion: input.occasion ?? null,
         customerId: await upsertCustomer(tx, place.id, input.phone, input.name),
         createdByUserId: opts.actorUserId,
       })
@@ -499,7 +609,13 @@ export async function availability(
         zone: diningTables.zone,
       })
       .from(diningTables)
-      .where(and(eq(diningTables.restaurantId, place.id), isNull(diningTables.deletedAt)))
+      .where(
+        and(
+          eq(diningTables.restaurantId, place.id),
+          isNull(diningTables.deletedAt),
+          eq(diningTables.kind, "table"),
+        ),
+      )
       .orderBy(asc(diningTables.sortOrder), asc(diningTables.label)),
     overlapping(db, place.id, q.startsAt, durationMin, excludeId),
   ]);
@@ -585,7 +701,13 @@ export async function agendaDay(db: Database, ctx: RestaurantContext, day: strin
         zone: diningTables.zone,
       })
       .from(diningTables)
-      .where(and(eq(diningTables.restaurantId, place.id), isNull(diningTables.deletedAt)))
+      .where(
+        and(
+          eq(diningTables.restaurantId, place.id),
+          isNull(diningTables.deletedAt),
+          eq(diningTables.kind, "table"),
+        ),
+      )
       .orderBy(asc(diningTables.sortOrder), asc(diningTables.label)),
     db
       .select()
@@ -762,6 +884,7 @@ export async function setReservationStatus(
   if (!r) throw notFound();
   if (!TRANSITIONS[r.status]?.includes(to)) throw conflict("invalid_transition");
   const now = new Date();
+  if (tableId && to === "seated") await assertTableFree(db, ctx.restaurant.id, tableId, r.partySize, r.id);
   await db
     .update(reservations)
     .set({
@@ -800,6 +923,38 @@ export async function setReservationStatus(
   });
 }
 
+/** A table the host seats someone at: theirs, big enough, and nobody else seated there now. */
+export async function assertTableFree(
+  db: DbOrTx,
+  rid: string,
+  tableId: string,
+  partySize: number,
+  excludeId?: string,
+) {
+  if (!isUuid(tableId)) throw notFound();
+  const [table] = await db
+    .select({ id: diningTables.id, capacity: diningTables.capacity })
+    .from(diningTables)
+    .where(
+      and(eq(diningTables.id, tableId), eq(diningTables.restaurantId, rid), isNull(diningTables.deletedAt)),
+    );
+  if (!table) throw notFound();
+  if (table.capacity != null && table.capacity < partySize) throw conflict("table_too_small");
+  const [seated] = await db
+    .select({ id: reservations.id })
+    .from(reservations)
+    .where(
+      and(
+        eq(reservations.restaurantId, rid),
+        eq(reservations.tableId, tableId),
+        eq(reservations.status, "seated"),
+        ...(excludeId ? [ne(reservations.id, excludeId)] : []),
+      ),
+    )
+    .limit(1);
+  if (seated) throw conflict("table_taken");
+}
+
 /** Confirmed bookings starting within 2 hours get one reminder text. */
 export async function sendDueReminders(db: Database, restaurantId: string, now = new Date()) {
   const place = await placeById(db, restaurantId);
@@ -829,6 +984,25 @@ export async function sendDueReminders(db: Database, restaurantId: string, now =
     );
   }
   return due.length;
+}
+
+/** The cron's sweep: every restaurant with a reminder due (opening the agenda also sends them). */
+export async function sendAllDueReminders(db: Database, now = new Date()) {
+  const rows = await db
+    .selectDistinct({ id: reservations.restaurantId })
+    .from(reservations)
+    .where(
+      and(
+        eq(reservations.kind, "booking"),
+        eq(reservations.status, "confirmed"),
+        isNull(reservations.reminderSentAt),
+        gte(reservations.startsAt, new Date(now.getTime() + 15 * 60_000)),
+        lt(reservations.startsAt, new Date(now.getTime() + 2 * 3600_000)),
+      ),
+    );
+  let sent = 0;
+  for (const r of rows) sent += await sendDueReminders(db, r.id, now);
+  return sent;
 }
 
 export const reservationSettingsSchema = z.object({

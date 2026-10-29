@@ -2579,6 +2579,7 @@
     "title": "Réservations & file d’attente",
     "subtitle": "Réservations (téléphone et en ligne) et file d’attente sur place avec SMS.",
     "tabs": {
+      "plan": "Plan de salle",
       "bookings": "Liste",
       "queue": "File d’attente",
       "settings": "Réglages",
@@ -2675,6 +2676,67 @@
       "tapToBook": "Touchez un créneau libre pour réserver une table.",
       "clash": "Réservations en conflit",
       "clashes": "{n, plural, one {# réservation partage sa table avec une autre : déplacez-la.} other {# réservations partagent une table au même moment : déplacez-les.}}"
+    },
+    "host": {
+      "mainRoom": "Salle",
+      "coversAt": "{count, plural, =0 {Aucun couvert} one {# couvert} other {# couverts}} à cette heure",
+      "tidy": "Ranger",
+      "cancelEdit": "Annuler",
+      "savePlan": "Enregistrer le plan",
+      "editPlan": "Modifier le plan",
+      "timeAt": "Voir le plan à",
+      "now": "Maintenant",
+      "editHint": "Faites glisser les tables pour reproduire votre salle, touchez une table pour changer sa forme.",
+      "pickSeat": "Touchez une table libre pour installer {name} ({count} pers.)",
+      "pickAssign": "Touchez une table pour {name}",
+      "close": "Fermer",
+      "qrGuests": "Clients QR",
+      "seats": "{count, plural, =0 {—} one {# place} other {# places}}",
+      "noTables": "Aucune table dans cette zone. Ajoutez des tables dans « Tables & QR ».",
+      "shapes": {
+        "square": "Carrée",
+        "round": "Ronde",
+        "rect": "Longue"
+      },
+      "state": {
+        "free": "Libre",
+        "soon": "Réservée bientôt",
+        "reserved": "Réservée",
+        "seated": "Occupée",
+        "occupied": "Occupée"
+      },
+      "groups": {
+        "upcoming": "À venir",
+        "seated": "Installés",
+        "done": "Terminés"
+      },
+      "noneUpcoming": "Aucune réservation à venir.",
+      "noTable": "Sans table",
+      "more": "Plus d’actions",
+      "confirm": "Confirmer",
+      "finish": "Terminer",
+      "seat": "Installer",
+      "moveTable": "Changer de table",
+      "giveTable": "Donner une table",
+      "noShow": "Absent",
+      "cancel": "Annuler la réservation",
+      "cancelConfirm": "Annuler cette réservation ?",
+      "seatedSince": "Installé à {time} · {count} pers.",
+      "free": "Libérer",
+      "walkIn": "Client sans réservation",
+      "walkInNamePlaceholder": "Nom (facultatif)",
+      "seatNow": "Installer",
+      "walkInName": "Sans réservation",
+      "todayOnTable": "Aujourd’hui sur cette table",
+      "nothingToday": "Rien de prévu sur cette table aujourd’hui.",
+      "bookThisTable": "Réserver cette table",
+      "occasion": {
+        "birthday": "Anniversaire",
+        "anniversary": "Anniversaire de mariage",
+        "date": "Rendez-vous",
+        "business": "Affaires",
+        "family": "En famille"
+      }
     }
   },
   "booking": {
@@ -2712,7 +2774,63 @@
       "no_show": "Expirée"
     },
     "cancel": "Annuler la réservation",
-    "cancelConfirm": "Annuler cette réservation ?"
+    "cancelConfirm": "Annuler cette réservation ?",
+    "steps": {
+      "table": "Votre table",
+      "details": "Vos coordonnées"
+    },
+    "lunch": "Midi",
+    "dinner": "Soir",
+    "morePeople": "Plus",
+    "phone": "Mobile",
+    "phoneHint": "Pour vous envoyer la confirmation par SMS.",
+    "occasionTitle": "Une occasion ? (facultatif)",
+    "occasion": {
+      "birthday": "Anniversaire",
+      "anniversary": "Anniversaire de couple",
+      "date": "Rendez-vous",
+      "business": "Affaires",
+      "family": "En famille"
+    },
+    "summary": "Récapitulatif",
+    "pickTime": "Choisissez une heure",
+    "instant": "Confirmation immédiate",
+    "onRequest": "Le restaurant confirme votre demande par SMS",
+    "edit": "Modifier",
+    "confirmCta": "Confirmer la réservation",
+    "noteLabel": "Demande particulière",
+    "area": "Emplacement",
+    "details": "Détails",
+    "reference": "Référence",
+    "addToCalendar": "Ajouter à l'agenda",
+    "directions": "Itinéraire",
+    "call": "Appeler",
+    "seeMenu": "Voir le menu",
+    "bookAnother": "Réserver un autre restaurant",
+    "icsTitle": "Table chez {restaurant} ({count} pers.)",
+    "back": "Retour au restaurant",
+    "remembered": "Vos coordonnées sont gardées sur cet appareil.",
+    "done": {
+      "title": {
+        "pending": "Demande envoyée",
+        "confirmed": "C'est réservé !",
+        "notified": "Votre table est prête",
+        "seated": "Bienvenue !",
+        "completed": "Merci de votre visite",
+        "cancelled": "Réservation annulée",
+        "no_show": "Réservation expirée"
+      },
+      "body": {
+        "pending": "Le restaurant confirme au plus vite ; vous recevrez un SMS.",
+        "confirmed": "Vous recevrez un SMS de rappel avant de venir.",
+        "notified": "Vous pouvez venir dès maintenant.",
+        "seated": "Bon appétit.",
+        "completed": "Au plaisir de vous revoir.",
+        "cancelled": "Vous pouvez réserver un autre créneau quand vous voulez.",
+        "no_show": "Vous pouvez réserver un autre créneau quand vous voulez."
+      }
+    },
+    "guests": "{count, plural, one {# personne} other {# personnes}}"
   },
   "menuThemes": {
     "label": "Apparence du menu client",
@@ -2864,7 +2982,21 @@
       "soldOut": "Épuisé"
     },
     "kmUnit": "km",
-    "orderOnline": "Commander en ligne"
+    "orderOnline": "Commander en ligne",
+    "bar": {
+      "label": "Votre table",
+      "people": "{count, plural, one {# pers.} other {# pers.}}",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "day": "Date",
+      "time": "Heure",
+      "party": "Personnes"
+    },
+    "slots": {
+      "none": "Complet vers {time}",
+      "more": "Autres horaires",
+      "at": "Réserver à {time}"
+    }
   },
   "listing": {
     "listed": "Afficher dans le guide des restaurants",
