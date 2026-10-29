@@ -1,5 +1,6 @@
 import { COMPANY } from "@/lib/company";
 import {
+  BedDouble,
   ArrowLeft,
   BarChart3,
   Bike,
@@ -11,7 +12,6 @@ import {
   ChefHat,
   ChevronDown,
   Clock,
-  Compass,
   CreditCard,
   Dices,
   Gift,
@@ -64,11 +64,11 @@ const MODULES = [
   { key: "club", Icon: Gift },
   { key: "inventory", Icon: Boxes },
   { key: "branches", Icon: Building2 },
+  { key: "hotel", Icon: BedDouble },
   { key: "offline", Icon: WifiOff },
   { key: "music", Icon: Music },
   { key: "games", Icon: Dices },
   { key: "nutrition", Icon: Salad },
-  { key: "guide", Icon: Compass },
 ] as const;
 
 const MADE_FOR_IRAN = [

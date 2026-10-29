@@ -142,7 +142,11 @@
     "footer": {
       "rights": "© Spotifood — made for restaurants in Iran",
       "login": "Log in",
-      "signup": "Sign up"
+      "signup": "Sign up",
+      "product": "Product",
+      "explore": "Explore",
+      "account": "Account",
+      "tagline": "Your restaurant's QR menu, till and kitchen on one platform."
     },
     "findRestaurant": "Looking for a restaurant or café? Browse the guide",
     "contact": {
@@ -236,6 +240,10 @@
         "guide": {
           "title": "Restaurant guide",
           "body": "Public page, map and online booking on spotifood.ir."
+        },
+        "hotel": {
+          "title": "Hotels & room service",
+          "body": "A QR code in every room: guests order, call housekeeping or the front desk, and the right team is notified."
         }
       }
     },
@@ -723,7 +731,8 @@
       "room": "Room",
       "scanRoom": "Scan to order to your room",
       "roomService": "24/7 room service"
-    }
+    },
+    "editRoom": "Edit room"
   },
   "print": {
     "title": "Print QR codes",
@@ -3331,7 +3340,8 @@
     "onQuote": "On quote",
     "free": "Free",
     "contact": "Contact us",
-    "start": "Get started"
+    "start": "Get started",
+    "eyebrow": "Pricing"
   },
   "menuImport": {
     "title": "Import the menu",

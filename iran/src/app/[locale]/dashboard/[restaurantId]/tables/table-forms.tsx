@@ -177,12 +177,13 @@ export function EditTableDialog({
   hotel?: boolean;
 }) {
   const t = useTranslations("tables");
+  const label = table.kind === "room" ? t("editRoom") : t("edit");
   return (
     <Dialog
-      title={t("edit")}
+      title={label}
       trigger={(open) => (
         <Button variant="ghost" size="sm" onClick={open}>
-          {t("edit")}
+          {label}
         </Button>
       )}
     >

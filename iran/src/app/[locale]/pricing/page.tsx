@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, CreditCard, FileText, Smartphone } from "lucide-react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -29,17 +29,31 @@ export default async function PricingPage({ params }: Props) {
   return (
     <div className="min-h-dvh bg-bg">
       <SiteHeader active="pricing" />
-      <main className="mx-auto max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pt-16">
-        <h1 className="text-center text-3xl font-bold tracking-tight text-balance sm:text-5xl">
-          {t("title")}
-        </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-base text-pretty text-fg-muted sm:text-lg">
-          {t("subtitle")}
-        </p>
-        <Suspense fallback={<div className="mt-12 h-96 animate-pulse rounded-3xl bg-surface-2" />}>
-          <Plans />
-        </Suspense>
-        <p className="mt-10 text-center text-sm text-fg-muted">{t("yearly")}</p>
+      <main className="relative overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[26rem] bg-gradient-to-b from-accent-soft/80 to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute start-1/2 -top-40 size-[36rem] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl"
+        />
+        <div className="relative mx-auto max-w-6xl px-4 pt-14 pb-20 sm:px-6 sm:pt-20">
+          <p className="mx-auto w-fit rounded-full bg-surface px-3.5 py-1 text-xs font-bold text-accent-text shadow-[var(--shadow-soft)] ring-1 ring-border">
+            {t("eyebrow")}
+          </p>
+          <h1 className="mt-4 text-center text-3xl font-black tracking-tight text-balance sm:text-5xl">
+            {t("title")}
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-base text-pretty text-fg-muted sm:text-lg">
+            {t("subtitle")}
+          </p>
+          <Suspense fallback={<div className="mt-12 h-96 animate-pulse rounded-3xl bg-surface-2" />}>
+            <Plans />
+          </Suspense>
+          <p className="mt-10 text-center text-sm text-fg-muted">{t("yearly")}</p>
+          <TrustStrip />
+        </div>
       </main>
       <SiteFooter />
     </div>
@@ -72,10 +86,17 @@ async function Plans() {
             <li
               key={p.id}
               className={cn(
-                "flex flex-col rounded-3xl bg-surface p-6 shadow-[var(--shadow-soft)] ring-1 ring-border",
-                hot && "ring-2 ring-accent",
+                "relative flex flex-col rounded-3xl bg-surface p-6 shadow-[var(--shadow-soft)] ring-1 ring-border transition-transform hover:-translate-y-1",
+                hot &&
+                  "bg-[#1c1917] text-white shadow-[0_30px_70px_-30px_rgb(234_88_12/0.65)] ring-0 lg:-my-3 lg:py-9",
               )}
             >
+              {hot ? (
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-6 -top-px h-px bg-gradient-to-r from-transparent via-accent to-transparent"
+                />
+              ) : null}
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-xl font-bold">{p.name}</h2>
                 {hot ? (
@@ -94,21 +115,35 @@ async function Plans() {
                     <span className="text-3xl font-bold tabular-nums">
                       {formatMoney(p.priceMonthlyCents, edition.platformCurrency, locale)}
                     </span>{" "}
-                    <span className="text-sm text-fg-muted">{tb("perMonth")}</span>
+                    <span className={cn("text-sm", hot ? "text-white/60" : "text-fg-muted")}>
+                      {tb("perMonth")}
+                    </span>
                   </>
                 )}
               </p>
-              <ul className="mt-6 flex-1 space-y-2 text-sm">
+              <ul
+                className={cn(
+                  "mt-6 flex-1 space-y-2.5 border-t pt-6 text-sm",
+                  hot ? "border-white/10" : "border-border",
+                )}
+              >
                 {planFeatureLines(p.limits, tb).map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
+                  <li key={f} className="flex items-start gap-2.5">
+                    <span
+                      className={cn(
+                        "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full",
+                        hot ? "bg-accent text-accent-fg" : "bg-success-soft text-success",
+                      )}
+                    >
+                      <Check className="size-3" aria-hidden="true" />
+                    </span>
                     {f}
                   </li>
                 ))}
               </ul>
               <Link
                 href={custom ? "/#contact" : "/signup"}
-                className={cn(buttonClasses(hot ? "accent" : "secondary", "md"), "mt-6 w-full")}
+                className={cn(buttonClasses(hot ? "accent" : "secondary", "lg"), "mt-7 w-full")}
               >
                 {custom ? t("contact") : t("start")}
               </Link>
@@ -117,5 +152,29 @@ async function Plans() {
         })}
       </ul>
     </>
+  );
+}
+
+async function TrustStrip() {
+  const t = await getTranslations("landing");
+  const items = [
+    { Icon: Smartphone, text: t("trust.noApp") },
+    { Icon: CreditCard, text: t("trust.zarinpal") },
+    { Icon: FileText, text: t("trust.invoice") },
+  ];
+  return (
+    <ul className="mx-auto mt-12 grid max-w-3xl gap-3 sm:grid-cols-3">
+      {items.map(({ Icon, text }) => (
+        <li
+          key={text}
+          className="flex items-center gap-3 rounded-2xl bg-surface p-4 text-sm font-semibold shadow-[var(--shadow-soft)] ring-1 ring-border"
+        >
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+            <Icon className="size-5" aria-hidden="true" />
+          </span>
+          {text}
+        </li>
+      ))}
+    </ul>
   );
 }

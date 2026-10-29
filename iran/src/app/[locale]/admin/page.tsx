@@ -1,3 +1,14 @@
+import {
+  Activity,
+  CalendarDays,
+  CirclePause,
+  ReceiptText,
+  Sparkles,
+  Store,
+  TrendingDown,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { edition } from "@/config/edition";
 import { formatMoney } from "@/lib/money";
 import { Suspense } from "react";
@@ -34,20 +45,48 @@ async function AdminOverview() {
     <>
       <PageHeader title={t("title")} description={t("subtitle")} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard label={t("stats.activeRestaurants")} value={stats.restaurants.active} />
-        <StatCard label={t("stats.suspendedRestaurants")} value={stats.restaurants.suspended} />
-        <StatCard label={t("stats.newRestaurants")} value={stats.restaurants.new30d} />
-        <StatCard label={t("stats.users")} value={stats.users} />
-        <StatCard label={t("stats.orders")} value={stats.orders} />
+        <StatCard
+          label={t("stats.activeRestaurants")}
+          value={stats.restaurants.active}
+          icon={<Store />}
+          tone="emerald"
+        />
+        <StatCard
+          label={t("stats.suspendedRestaurants")}
+          value={stats.restaurants.suspended}
+          icon={<CirclePause />}
+          tone="rose"
+        />
+        <StatCard
+          label={t("stats.newRestaurants")}
+          value={stats.restaurants.new30d}
+          icon={<Sparkles />}
+          tone="amber"
+        />
+        <StatCard label={t("stats.users")} value={stats.users} icon={<Users />} tone="sky" />
+        <StatCard label={t("stats.orders")} value={stats.orders} icon={<ReceiptText />} tone="orange" />
         <StatCard
           label={t("stats.revenue")}
           value={formatMoney(stats.revenueCents, edition.platformCurrency, locale)}
+          icon={<Wallet />}
+          tone="gradient"
         />
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <StatCard label={t("growth.active7d")} value={growth.active7d} />
-        <StatCard label={t("growth.active30d")} value={growth.active30d} />
-        <StatCard label={t("growth.lost30d")} value={growth.lost30d} hint={t("growth.lostHint")} />
+        <StatCard label={t("growth.active7d")} value={growth.active7d} icon={<Activity />} tone="teal" />
+        <StatCard
+          label={t("growth.active30d")}
+          value={growth.active30d}
+          icon={<CalendarDays />}
+          tone="indigo"
+        />
+        <StatCard
+          label={t("growth.lost30d")}
+          value={growth.lost30d}
+          hint={t("growth.lostHint")}
+          icon={<TrendingDown />}
+          tone="fuchsia"
+        />
       </div>
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
         <Card>

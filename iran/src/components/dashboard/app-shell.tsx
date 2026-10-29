@@ -92,6 +92,33 @@ export async function AppShell({
     </div>
   );
 
+  // Desktop sidebar: one compact row so the navigation keeps the height.
+  const accountRow = (
+    <div className="flex items-center gap-2.5 rounded-2xl border border-border bg-surface/70 p-2.5">
+      <span
+        className="grid size-9 shrink-0 place-items-center rounded-full text-sm font-bold text-white"
+        style={{ background: "var(--brand-gradient)" }}
+        aria-hidden="true"
+      >
+        {initials || "•"}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold">{user.fullName}</p>
+        <p className="truncate text-xs text-fg-muted">{user.email}</p>
+      </div>
+      <form action={logoutAction}>
+        <button
+          type="submit"
+          title={t("common.logout")}
+          aria-label={t("common.logout")}
+          className="grid size-9 place-items-center rounded-full text-fg-muted ring-1 ring-border hover:bg-surface-2 hover:text-fg"
+        >
+          <LogOut className="size-4" aria-hidden="true" />
+        </button>
+      </form>
+    </div>
+  );
+
   return (
     <div
       data-brand={brand}
@@ -121,11 +148,18 @@ export async function AppShell({
           <div className="mx-3 rounded-2xl border border-border bg-surface/70 p-2.5 backdrop-blur">
             {identity}
           </div>
-          <div className="flex-1 [scrollbar-width:thin] overflow-y-auto px-3 pt-1 pb-4">
-            <SidebarNav items={nav} label={title} />
-            {footer ? <div className="mt-4 border-t border-border pt-4">{footer}</div> : null}
+          <div className="relative min-h-0 flex-1">
+            <div className="h-full [scrollbar-width:thin] overflow-y-auto px-3 pt-2 pb-8">
+              <SidebarNav items={nav} label={title} />
+              {footer ? <div className="mt-4 border-t border-border pt-4">{footer}</div> : null}
+            </div>
+            {/* Fades the list out above the account row instead of cutting a label in half. */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-sidebar to-transparent"
+              aria-hidden="true"
+            />
           </div>
-          <div className="p-3">{account}</div>
+          <div className="p-3">{accountRow}</div>
         </aside>
       </div>
 
@@ -147,6 +181,7 @@ export async function AppShell({
             </div>
             <NavTrail items={nav} />
             <div className="ms-auto flex items-center gap-1.5">
+              <LanguageSwitcher className="hidden lg:inline-flex" />
               <CommandPalette
                 entries={[
                   ...nav.map((n) => ({ href: n.href, label: n.label, hint: n.group, icon: n.icon })),
@@ -190,8 +225,10 @@ export function PageHeader({
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4 lg:mb-8">
       <div className="min-w-0">
-        <h1 className="text-[26px] leading-tight font-bold tracking-tight">{title}</h1>
-        {description ? <p className="mt-1 text-sm text-fg-muted">{description}</p> : null}
+        <h1 className="text-[26px] leading-tight font-extrabold tracking-tight sm:text-[30px]">{title}</h1>
+        {description ? (
+          <p className="mt-1.5 max-w-3xl text-sm leading-6 text-fg-muted">{description}</p>
+        ) : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </div>

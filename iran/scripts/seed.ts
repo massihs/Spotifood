@@ -32,7 +32,8 @@ import { DEFAULT_CATEGORY_TEMPLATES, DEFAULT_PLANS } from "@/server/modules/cata
 import { createOrganization, createRestaurant } from "@/server/modules/restaurants/service";
 import { randomToken } from "@/lib/ids";
 import { loadRestaurantContext } from "@/server/tenancy";
-import { addProductImage } from "@/server/modules/menu/images";
+import { addProductImage, deleteProductImage } from "@/server/modules/menu/images";
+import { dishSvg } from "./demo-art";
 import { loadPublicMenu } from "@/server/modules/menu/public";
 import { enterTableByQr, loadGuestContext, renameParticipant } from "@/server/modules/guest/sessions";
 import { addToCart } from "@/server/modules/cart/service";
@@ -476,33 +477,14 @@ async function ensureDemoPlan() {
   console.log("✓ demo organization on the Professional plan");
 }
 
-const PALETTE: Record<string, [string, string]> = {
-  starters: ["#f4a261", "#e76f51"],
-  salads: ["#8ac926", "#2a9d8f"],
-  mains: ["#e9c46a", "#d62828"],
-  steak: ["#9d0208", "#370617"],
-  pasta: ["#ffb703", "#fb8500"],
-  desserts: ["#ffafcc", "#cdb4db"],
-  coffee: ["#7f5539", "#3e2723"],
-  soft_drinks: ["#48cae4", "#0077b6"],
-  soups: ["#e9c46a", "#bc6c25"],
-  meat: ["#c1121f", "#780000"],
-  tea: ["#b5651d", "#5c2e0e"],
-};
+/** Marks the illustrated demo photos (older generated placeholders get replaced). */
+const DEMO_ART = "demo-art-v2";
 
-const escapeXml = (v: string) => v.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
-
-/** Placeholder photo for demo products, processed by the same pipeline as real uploads. */
+/** Illustrated photo for demo products, processed by the same pipeline as real uploads. */
 async function placeholderPhoto(name: string, key: string) {
-  const [a, b] = PALETTE[key] ?? ["#adb5bd", "#495057"];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900">
-    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>
-    <rect width="1200" height="900" fill="url(#g)"/>
-    <circle cx="600" cy="400" r="230" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="28"/>
-    <circle cx="600" cy="400" r="150" fill="rgba(255,255,255,0.18)"/>
-    <text x="600" y="780" font-family="DejaVu Sans, sans-serif" font-size="64" font-weight="700" fill="white" text-anchor="middle">${escapeXml(name)}</text>
-  </svg>`;
-  return sharp(Buffer.from(svg)).jpeg({ quality: 90 }).toBuffer();
+  return sharp(Buffer.from(dishSvg(name, key)))
+    .jpeg({ quality: 88 })
+    .toBuffer();
 }
 
 async function seedDemoImages() {
@@ -520,13 +502,26 @@ async function seedDemoImages() {
   const ctx = await loadRestaurantContext(db, { ...owner!, locale: owner!.locale }, demo.id);
   let added = 0;
   for (const p of rows) {
-    const [has] = await db
-      .select({ id: productImages.id })
+    const images = await db
+      .select({
+        id: productImages.id,
+        altText: productImages.altText,
+        width: productImages.width,
+        height: productImages.height,
+      })
       .from(productImages)
-      .where(eq(productImages.productId, p.id))
-      .limit(1);
-    if (has) continue;
-    await addProductImage(db, ctx, p.id, await placeholderPhoto(p.name, p.key ?? ""));
+      .where(eq(productImages.productId, p.id));
+    // Earlier seeds drew a plain gradient (1200×900, no alt text) or an older illustration:
+    // swap it for the current one. Photos the restaurant uploaded itself are kept.
+    const stale = images.filter(
+      (i) =>
+        (i.altText == null && i.width === 1200 && i.height === 900) ||
+        (i.altText?.startsWith("demo-art-") && i.altText !== DEMO_ART),
+    );
+    if (images.length > stale.length) continue;
+    for (const i of stale) await deleteProductImage(db, ctx, i.id);
+    const img = await addProductImage(db, ctx, p.id, await placeholderPhoto(p.name, p.key ?? ""));
+    await db.update(productImages).set({ altText: DEMO_ART }).where(eq(productImages.id, img.id));
     added++;
   }
   console.log(`✓ demo product photos: ${added} generated (${rows.length - added} already present)`);
