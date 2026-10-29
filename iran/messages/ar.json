@@ -346,7 +346,8 @@
     "adminPlans": "الباقات",
     "feedback": "آراء الزبائن",
     "callcenter": "مركز الاتصال",
-    "adminAudience": "زوار الموقع"
+    "adminAudience": "زوار الموقع",
+    "tablesHotel": "الغرف وQR"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -704,7 +705,25 @@
     "deleteConfirm": "حذف الطاولة «{label}»؟ سيتوقف رمز QR الخاص بها عن العمل.",
     "count": "{count, plural, =0 {لا توجد طاولات} one {طاولة واحدة} other {# طاولة}}",
     "openLink": "فتح رابط الضيف",
-    "edit": "تعديل الطاولة"
+    "edit": "تعديل الطاولة",
+    "kindLabel": "النوع",
+    "kindTable": "طاولة",
+    "kindRoom": "غرفة",
+    "addRoom": "إضافة غرفة",
+    "bulkRooms": "إنشاء عدة غرف",
+    "roomsTitle": "الغرف",
+    "tablesTitle": "الطاولات",
+    "roomLabelHint": "مثل 101، 204، جناح 3",
+    "roomsCount": "{count, plural, =0 {لا غرف} one {غرفة واحدة} other {# غرف}}",
+    "deleteConfirmRoom": "حذف الغرفة «{label}»؟ سيتوقف رمز QR الخاص بها.",
+    "titleHotel": "الغرف والطاولات ورموز QR",
+    "subtitleHotel": "لكل غرفة وطاولة رمز QR خاص. يمسحه الضيوف للطلب، حتى من غرفهم.",
+    "roomBadge": "خدمة الغرف",
+    "printRoom": {
+      "room": "الغرفة",
+      "scanRoom": "امسح للطلب إلى غرفتك",
+      "roomService": "خدمة الغرف على مدار الساعة"
+    }
   },
   "print": {
     "title": "طباعة رموز QR",
@@ -833,7 +852,12 @@
       "shown": "ظاهر",
       "remove": "حذف الخيار",
       "add": "إضافة خيار",
-      "saved": "تم الحفظ."
+      "saved": "تم الحفظ.",
+      "builtin": {
+        "housekeeping": "تنظيف الغرفة",
+        "towels": "مناشف",
+        "reception": "الاستقبال"
+      }
     }
   },
   "permissions": {
@@ -1198,14 +1222,20 @@
       "kinds": {
         "waiter": "النادل",
         "bill": "الفاتورة",
-        "water": "ماء"
+        "water": "ماء",
+        "housekeeping": "تنظيف الغرفة",
+        "towels": "مناشف",
+        "reception": "الاستقبال"
       },
       "sent": "تم إرسال طلبك",
       "sentHint": {
         "waiter": "النادل في الطريق.",
         "bill": "سنحضر الفاتورة.",
         "water": "سنحضر الماء.",
-        "custom": "الفريق في الطريق."
+        "custom": "الفريق في الطريق.",
+        "housekeeping": "الفريق في الطريق.",
+        "towels": "الفريق في الطريق.",
+        "reception": "الفريق في الطريق."
       },
       "tooSoon": "طلبك قيد التنفيذ، انتظر قليلاً.",
       "failed": "تعذر الإرسال، حاول مجدداً.",
@@ -1231,7 +1261,12 @@
     "show": "عرض",
     "priceUnit": "الأسعار بآلاف التومان",
     "couponHint": "هل لديك رمز؟",
-    "waitingConfirm": "سيوافق النادل على طاولتك قريبًا. يمكنك تصفح القائمة الآن."
+    "waitingConfirm": "سيوافق النادل على طاولتك قريبًا. يمكنك تصفح القائمة الآن.",
+    "tableRoom": "الغرفة {label}",
+    "seatOfRoom": "الغرفة {table} · {who}",
+    "tableBadgeRoom": "الغرفة {table}",
+    "roomService": "خدمة الغرف",
+    "roomServiceHint": "يُوصَل طلبك إلى غرفتك."
   },
   "categoryTemplates": {
     "starters": "المقبلات",
@@ -1516,7 +1551,8 @@
     "newWaiting": "{n} طلبات جديدة بانتظار",
     "block": "حظر هذا الزبون",
     "blockConfirm": "حظر الجهاز الذي أرسل الطلب {number}؟ لن يتمكن من الطلب أو النداء، وستُلغى طلباته المنتظرة.",
-    "blockReason": "السبب (اختياري)"
+    "blockReason": "السبب (اختياري)",
+    "tableRoom": "الغرفة {label}"
   },
   "tableView": {
     "title": "طاولة {label}",
@@ -1530,7 +1566,8 @@
     "view": "عرض الطاولة",
     "back": "العودة إلى الطاولات",
     "clientTotal": "الإجمالي",
-    "noOrdersYet": "لا يوجد طلب بعد"
+    "noOrdersYet": "لا يوجد طلب بعد",
+    "titleRoom": "الغرفة {label}"
   },
   "live": {
     "connecting": "جارٍ الاتصال…",
@@ -1586,7 +1623,8 @@
       "deliveryFee": "رسوم التوصيل",
       "total": "المجموع",
       "paid": "مدفوع",
-      "unpaid": "غير مدفوع"
+      "unpaid": "غير مدفوع",
+      "tableRoom": "الغرفة {table}"
     },
     "tillPrintOn": "طباعة تذكرة الصندوق تلقائياً: مفعّلة",
     "tillPrintOff": "طباعة تذكرة الصندوق تلقائياً",
@@ -1623,7 +1661,12 @@
     "move": "نقل",
     "moveTo": "نقل إلى…",
     "tableN": "الطاولة {label}",
-    "waitingConfirm": "بانتظار الموافقة"
+    "waitingConfirm": "بانتظار الموافقة",
+    "closeConfirmRoom": "تحرير الغرفة {label}؟ سيحتاج الضيوف إلى مسح رمز QR مجددًا.",
+    "closedRoom": "تم تحرير الغرفة {label}.",
+    "tableNRoom": "الغرفة {label}",
+    "tables": "الطاولات",
+    "rooms": "الغرف"
   },
   "notifications": {
     "title": "الإشعارات",
@@ -1633,18 +1676,24 @@
     "types": {
       "order": {
         "created": "طلب جديد {number} · طاولة {table}",
-        "ready": "الطلب {number} جاهز · طاولة {table}"
+        "ready": "الطلب {number} جاهز · طاولة {table}",
+        "createdRoom": "طلب جديد {number} · الغرفة {table}",
+        "readyRoom": "الطلب {number} جاهز · الغرفة {table}"
       },
       "payment": {
         "received": "تم استلام دفع {amount} · طاولة {table}",
         "requested": "طاولة {table} · العميل {client} يريد دفع {amount} ({method, select, cash {نقدًا} card {بطاقة} other {على الطاولة}})",
-        "needs_review": "دفع يحتاج إلى مراجعة · طاولة {table}"
+        "needs_review": "دفع يحتاج إلى مراجعة · طاولة {table}",
+        "receivedRoom": "تم استلام دفع {amount} · الغرفة {table}",
+        "requestedRoom": "الغرفة {table} · العميل {client} يريد دفع {amount} ({method, select, cash {نقدًا} card {بطاقة} other {على الطاولة}})",
+        "needs_reviewRoom": "دفع يحتاج إلى مراجعة · الغرفة {table}"
       },
       "stock": {
         "low": "{name} على وشك النفاد ({quantity} {unit})"
       },
       "waiter": {
-        "call": "الطاولة {table}: {kind, select, bill {فاتورة} water {ماء} waiter {نادل} other {{label}}}"
+        "call": "الطاولة {table}: {kind, select, bill {فاتورة} water {ماء} waiter {نادل} housekeeping {تنظيف الغرفة} towels {مناشف} reception {الاستقبال} other {{label}}}",
+        "callRoom": "الغرفة {table}: {kind, select, bill {فاتورة} water {ماء} waiter {نادل} housekeeping {تنظيف الغرفة} towels {مناشف} reception {الاستقبال} other {{label}}}"
       },
       "reservation": {
         "created": "حجز جديد: {name} · {partySize}",
@@ -1762,7 +1811,9 @@
       "refunded": "مسترد",
       "partially_refunded": "مسترد جزئيًا"
     },
-    "collectOrder": "تحصيل الطلب {number}"
+    "collectOrder": "تحصيل الطلب {number}",
+    "collectTableRoom": "تحصيل الغرفة {label} بالكامل",
+    "tableLabelRoom": "الغرفة {label}"
   },
   "invoice": {
     "title": "فاتورة مبيعات",
@@ -1816,7 +1867,9 @@
     "restaurant": "مطعم",
     "cafe": "مقهى",
     "food_court": "ردهة طعام",
-    "foodCourtHint": "في ردهة الطعام يتلقى العميل رسالة نصية عند جاهزية طلبه."
+    "foodCourtHint": "في ردهة الطعام يتلقى العميل رسالة نصية عند جاهزية طلبه.",
+    "hotel": "فندق",
+    "hotelHint": "في الفندق لكل غرفة رمز QR خاص: يطلب الضيوف من غرفهم (خدمة الغرف)."
   },
   "sms": {
     "orderReady": "طلبك رقم {number} في {restaurant} جاهز. يرجى الحضور لاستلامه.",
@@ -1843,9 +1896,16 @@
       "water": "الطاولة {table} تطلب ماء",
       "body": "يرجى التوجه إلى الطاولة.",
       "confirm": "الطاولة {table}: زبون جديد بانتظار الموافقة",
-      "custom": "الطاولة {table}: {label}"
+      "custom": "الطاولة {table}: {label}",
+      "waiterRoom": "الغرفة {table} تنادي النادل",
+      "billRoom": "الغرفة {table} تطلب الفاتورة",
+      "waterRoom": "الغرفة {table} تطلب ماء",
+      "confirmRoom": "الغرفة {table}: زبون جديد بانتظار الموافقة",
+      "customRoom": "الغرفة {table}: {label}"
     },
-    "kitchenTitle": "الطلب {number} للتحضير"
+    "kitchenTitle": "الطلب {number} للتحضير",
+    "bodyRoom": "الغرفة {table}",
+    "roomOrder": "خدمة الغرف"
   },
   "music": {
     "title": "الموسيقى",
@@ -2105,7 +2165,8 @@
     "deliveryFee": "رسوم التوصيل",
     "accountInfo": "المستحق: {balance} · الرصيد المتاح: {available}",
     "densityPhotos": "مع الصور",
-    "densityCompact": "مضغوط"
+    "densityCompact": "مضغوط",
+    "tableNRoom": "Table {label}"
   },
   "inventory": {
     "title": "المخزون",
@@ -2866,7 +2927,8 @@
     "decrease": "تقليل",
     "increase": "زيادة",
     "viewTicket": "عرض الطلب",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "tableRoom": "الغرفة {label}"
   },
   "routing": {
     "title": "التوجيه إلى المطبخ / البار",
@@ -3477,6 +3539,7 @@
     "onGuest": "نبّهني عندما يجهز",
     "off": "الإشعارات مفعّلة (إيقاف)",
     "denied": "الإشعارات محظورة في المتصفح",
-    "unavailable": "الإشعارات غير متاحة في هذا المتصفح"
+    "unavailable": "الإشعارات غير متاحة في هذا المتصفح",
+    "newOrderTableRoom": "الغرفة {table}"
   }
 }

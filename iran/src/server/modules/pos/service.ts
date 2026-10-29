@@ -114,11 +114,11 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
   }
 
   return db.transaction(async (tx) => {
-    let table: { id: string; label: string } | null = null;
+    let table: { id: string; label: string; kind: string } | null = null;
     let sessionId: string | null = null;
     if (input.channel === "dine_in" && input.tableId) {
       const [t] = await tx
-        .select({ id: diningTables.id, label: diningTables.label })
+        .select({ id: diningTables.id, label: diningTables.label, kind: diningTables.kind })
         .from(diningTables)
         .where(
           and(
@@ -206,6 +206,7 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
         tableId: table?.id ?? null,
         tableSessionId: sessionId,
         tableLabel: table?.label ?? null,
+        placeKind: table?.kind === "room" ? "room" : null,
         status: "accepted",
         acceptedAt: now,
         paymentStatus: "unpaid",
@@ -317,7 +318,14 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       {
         restaurantId: rid,
         type: "order.created",
-        payload: { orderId: order!.id, number, tableLabel: table?.label ?? null, totalCents, source: "pos" },
+        payload: {
+          orderId: order!.id,
+          number,
+          tableLabel: table?.label ?? null,
+          ...(table?.kind === "room" ? { place: "room" } : {}),
+          totalCents,
+          source: "pos",
+        },
       },
       { orderId: order!.id },
     );
@@ -333,7 +341,12 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       },
     });
     // Rung up at the till: already accepted, straight to the kitchen and bar.
-    await sendToKitchen(tx, rid, { id: order!.id, number, tableLabel: table?.label ?? null });
+    await sendToKitchen(tx, rid, {
+      id: order!.id,
+      number,
+      tableLabel: table?.label ?? null,
+      placeKind: table?.kind,
+    });
     await recordAudit(tx, {
       action: "order.pos_created",
       actorUserId: ctx.user.id,

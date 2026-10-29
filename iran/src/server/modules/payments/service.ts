@@ -192,14 +192,14 @@ export async function settleAllocations(tx: Tx, p: typeof payments.$inferSelect,
   return ids.filter((id) => !settledIds.has(id));
 }
 
-async function tableLabelOf(tx: Tx, sessionId: string | null) {
-  if (!sessionId) return null;
+async function placeOf(tx: Tx, sessionId: string | null) {
+  if (!sessionId) return { tableLabel: null };
   const [row] = await tx
-    .select({ label: diningTables.label })
+    .select({ label: diningTables.label, kind: diningTables.kind })
     .from(tableSessions)
     .innerJoin(diningTables, eq(diningTables.id, tableSessions.tableId))
     .where(eq(tableSessions.id, sessionId));
-  return row?.label ?? null;
+  return { tableLabel: row?.label ?? null, ...(row?.kind === "room" ? { place: "room" } : {}) };
 }
 
 async function notifyPayment(
@@ -216,7 +216,7 @@ async function notifyPayment(
       provider: p.provider,
       amountCents: p.amountCents,
       currency: p.currency,
-      tableLabel: await tableLabelOf(tx, p.tableSessionId),
+      ...(await placeOf(tx, p.tableSessionId)),
       ...extra,
     },
   });
@@ -512,6 +512,7 @@ export async function requestPaymentAtTable(
       payload: {
         tableId: guest.table.id,
         tableLabel: guest.table.label,
+        ...(guest.table.kind === "room" ? { place: "room" } : {}),
         seq: guest.participant.seq,
         displayName: guest.participant.displayName,
         amountCents: state.dueCents,

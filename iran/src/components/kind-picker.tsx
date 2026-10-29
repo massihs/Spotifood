@@ -1,6 +1,6 @@
 "use client";
 
-import { Coffee, Store, UtensilsCrossed, type LucideIcon } from "lucide-react";
+import { BedDouble, Coffee, Store, UtensilsCrossed, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { RESTAURANT_KINDS, type RestaurantKind } from "@/lib/restaurant-kind";
@@ -9,9 +9,10 @@ const ICONS: Record<RestaurantKind, LucideIcon> = {
   restaurant: UtensilsCrossed,
   cafe: Coffee,
   food_court: Store,
+  hotel: BedDouble,
 };
 
-/** Three radio cards: restaurant, café, food court. */
+/** Radio cards: restaurant, café, food court, hotel. */
 export function KindPicker({
   name = "kind",
   defaultValue = "restaurant",
@@ -25,7 +26,7 @@ export function KindPicker({
   return (
     <fieldset className="min-w-0" disabled={disabled}>
       <legend className="mb-1.5 text-sm font-medium">{t("label")}</legend>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {RESTAURANT_KINDS.map((k) => {
           const Icon = ICONS[k];
           return (
@@ -51,6 +52,7 @@ export function KindPicker({
         })}
       </div>
       <p className="mt-1.5 text-xs text-fg-muted">{t("foodCourtHint")}</p>
+      <p className="mt-1 text-xs text-fg-muted">{t("hotelHint")}</p>
     </fieldset>
   );
 }

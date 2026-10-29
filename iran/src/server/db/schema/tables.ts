@@ -22,6 +22,8 @@ export const diningTables = pgTable(
     qrEnabled: boolean().notNull().default(true),
     qrRegeneratedAt: tstz(),
     sortOrder: integer().notNull().default(0),
+    /** "table" (dining room, terrace…) or "room" (a hotel room: guests order room service). */
+    kind: varchar({ length: 8 }).notNull().default("table"),
     ...timestamps,
     ...softDelete,
   },

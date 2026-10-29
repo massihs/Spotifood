@@ -158,7 +158,8 @@ export type GuestContext = {
   participant: { id: string; seq: number; displayName: string | null };
   /** `confirmed`: the table may order and call (see guestOrdersNeedStaff). */
   session: { id: string; openedAt: Date; confirmed: boolean };
-  table: { id: string; label: string };
+  /** kind: "table" or "room" (a hotel room). */
+  table: { id: string; label: string; kind: string };
   restaurant: {
     id: string;
     name: string;
@@ -169,7 +170,7 @@ export type GuestContext = {
     defaultLocale: string;
     pricesIncludeTax: boolean;
     enabledLocales: string[];
-    kind: "restaurant" | "cafe" | "food_court";
+    kind: "restaurant" | "cafe" | "food_court" | "hotel";
     brandColor: string;
     menuTheme: string;
     menuShortPrices: boolean;
@@ -205,6 +206,7 @@ export async function loadGuestContext(
       table: {
         id: diningTables.id,
         label: diningTables.label,
+        kind: diningTables.kind,
         qrEnabled: diningTables.qrEnabled,
         deletedAt: diningTables.deletedAt,
       },
@@ -253,7 +255,7 @@ export async function loadGuestContext(
       openedAt: row.session.openedAt,
       confirmed: row.session.confirmedAt != null,
     },
-    table: { id: row.table.id, label: row.table.label },
+    table: { id: row.table.id, label: row.table.label, kind: row.table.kind },
     restaurant,
   };
 }

@@ -20,6 +20,8 @@ export type OrderCardData = {
   status: OrderStatus;
   paymentStatus: string;
   tableLabel: string | null;
+  /** "room" for room service in a hotel. */
+  placeKind?: string | null;
   totalCents: number;
   currency: string;
   note: string | null;
@@ -219,7 +221,9 @@ export function OrderCard({
               <bdi dir="ltr">#{o.number}</bdi>
             </p>
             <p className="truncate text-xs text-fg-muted">
-              {o.tableLabel ? t("orders.table", { label: o.tableLabel }) : "—"}
+              {o.tableLabel
+                ? t(o.placeKind === "room" ? "orders.tableRoom" : "orders.table", { label: o.tableLabel })
+                : "—"}
               {who ? ` · ${who}` : ""}
             </p>
           </div>

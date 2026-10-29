@@ -43,6 +43,7 @@ async function Waiter({ params }: { params: Params }) {
         tables={floor.map((f) => ({
           id: f.id,
           label: f.label,
+          kind: f.kind,
           zone: f.zone,
           capacity: f.capacity,
           state: f.state,

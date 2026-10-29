@@ -346,7 +346,8 @@
     "adminPlans": "Plans",
     "feedback": "Guest feedback",
     "callcenter": "Call centre",
-    "adminAudience": "Audience"
+    "adminAudience": "Audience",
+    "tablesHotel": "Rooms & QR"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -704,7 +705,25 @@
     "deleteConfirm": "Delete table “{label}”? Its QR code will stop working.",
     "count": "{count, plural, =0 {No tables} one {# table} other {# tables}}",
     "openLink": "Open guest link",
-    "edit": "Edit table"
+    "edit": "Edit table",
+    "kindLabel": "Type",
+    "kindTable": "Table",
+    "kindRoom": "Room",
+    "addRoom": "Add a room",
+    "bulkRooms": "Generate rooms",
+    "roomsTitle": "Rooms",
+    "tablesTitle": "Tables",
+    "roomLabelHint": "e.g. 101, 204, Suite 3",
+    "roomsCount": "{count, plural, =0 {No rooms} one {# room} other {# rooms}}",
+    "deleteConfirmRoom": "Delete room “{label}”? Its QR code will stop working.",
+    "titleHotel": "Rooms, tables & QR codes",
+    "subtitleHotel": "Every room and table has its own QR code. Guests scan it to order, even from their room.",
+    "roomBadge": "Room service",
+    "printRoom": {
+      "room": "Room",
+      "scanRoom": "Scan to order to your room",
+      "roomService": "24/7 room service"
+    }
   },
   "print": {
     "title": "Print QR codes",
@@ -833,7 +852,12 @@
       "shown": "Shown",
       "remove": "Remove option",
       "add": "Add an option",
-      "saved": "Saved."
+      "saved": "Saved.",
+      "builtin": {
+        "housekeeping": "Housekeeping",
+        "towels": "Towels",
+        "reception": "Reception"
+      }
     }
   },
   "permissions": {
@@ -1198,14 +1222,20 @@
       "kinds": {
         "waiter": "Waiter",
         "bill": "The bill",
-        "water": "Water"
+        "water": "Water",
+        "housekeeping": "Housekeeping",
+        "towels": "Towels",
+        "reception": "Reception"
       },
       "sent": "Request sent",
       "sentHint": {
         "waiter": "A waiter is on the way.",
         "bill": "We’ll bring your bill.",
         "water": "We’ll bring water.",
-        "custom": "The team is on its way."
+        "custom": "The team is on its way.",
+        "housekeeping": "The team is on its way.",
+        "towels": "The team is on its way.",
+        "reception": "The team is on its way."
       },
       "tooSoon": "Your request is on its way — please wait a moment.",
       "failed": "Could not send, try again.",
@@ -1231,7 +1261,12 @@
     "show": "Show",
     "priceUnit": "Prices in thousand tomans",
     "couponHint": "Got a code?",
-    "waitingConfirm": "A waiter will approve your table. You can already browse the menu."
+    "waitingConfirm": "A waiter will approve your table. You can already browse the menu.",
+    "tableRoom": "Room {label}",
+    "seatOfRoom": "Room {table} · {who}",
+    "tableBadgeRoom": "Room {table}",
+    "roomService": "Room service",
+    "roomServiceHint": "Your order is delivered to your room."
   },
   "categoryTemplates": {
     "starters": "Starters",
@@ -1516,7 +1551,8 @@
     "newWaiting": "{n} new orders waiting",
     "block": "Block this guest",
     "blockConfirm": "Block the device that placed order {number}? It will no longer be able to order or call, and its waiting orders will be cancelled.",
-    "blockReason": "Reason (optional)"
+    "blockReason": "Reason (optional)",
+    "tableRoom": "Room {label}"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1530,7 +1566,8 @@
     "view": "View table",
     "back": "Back to tables",
     "clientTotal": "Total",
-    "noOrdersYet": "No order yet"
+    "noOrdersYet": "No order yet",
+    "titleRoom": "Room {label}"
   },
   "live": {
     "connecting": "Connecting…",
@@ -1586,7 +1623,8 @@
       "deliveryFee": "Delivery fee",
       "total": "Total",
       "paid": "Paid",
-      "unpaid": "Not paid"
+      "unpaid": "Not paid",
+      "tableRoom": "Room {table}"
     },
     "tillPrintOn": "Till ticket auto-print: on",
     "tillPrintOff": "Auto-print till ticket",
@@ -1623,7 +1661,12 @@
     "move": "Move",
     "moveTo": "Move to…",
     "tableN": "Table {label}",
-    "waitingConfirm": "To approve"
+    "waitingConfirm": "To approve",
+    "closeConfirmRoom": "Free room {label}? Guests will need to scan the QR code again.",
+    "closedRoom": "Room {label} freed.",
+    "tableNRoom": "Room {label}",
+    "tables": "Tables",
+    "rooms": "Rooms"
   },
   "notifications": {
     "title": "Notifications",
@@ -1633,18 +1676,24 @@
     "types": {
       "order": {
         "created": "New order {number} · Table {table}",
-        "ready": "Order {number} ready · Table {table}"
+        "ready": "Order {number} ready · Table {table}",
+        "createdRoom": "New order {number} · Room {table}",
+        "readyRoom": "Order {number} ready · Room {table}"
       },
       "payment": {
         "received": "Payment received {amount} · Table {table}",
         "requested": "Table {table} · Guest {client} wants to pay {amount} ({method, select, cash {cash} card {card} other {at the table}})",
-        "needs_review": "Payment to review · Table {table}"
+        "needs_review": "Payment to review · Table {table}",
+        "receivedRoom": "Payment received {amount} · Room {table}",
+        "requestedRoom": "Room {table} · Guest {client} wants to pay {amount} ({method, select, cash {cash} card {card} other {at the table}})",
+        "needs_reviewRoom": "Payment to review · Room {table}"
       },
       "stock": {
         "low": "{name} is running low ({quantity} {unit})"
       },
       "waiter": {
-        "call": "Table {table}: {kind, select, bill {bill} water {water} waiter {waiter} other {{label}}}"
+        "call": "Table {table}: {kind, select, bill {bill} water {water} waiter {waiter} housekeeping {housekeeping} towels {towels} reception {reception} other {{label}}}",
+        "callRoom": "Room {table}: {kind, select, bill {bill} water {water} waiter {waiter} housekeeping {housekeeping} towels {towels} reception {reception} other {{label}}}"
       },
       "reservation": {
         "created": "New booking: {name} · {partySize} people",
@@ -1762,7 +1811,9 @@
       "refunded": "Refunded",
       "partially_refunded": "Partially refunded"
     },
-    "collectOrder": "Collect order {number}"
+    "collectOrder": "Collect order {number}",
+    "collectTableRoom": "Collect the whole room {label}",
+    "tableLabelRoom": "Room {label}"
   },
   "invoice": {
     "title": "Sales invoice",
@@ -1816,7 +1867,9 @@
     "restaurant": "Restaurant",
     "cafe": "Café",
     "food_court": "Food court",
-    "foodCourtHint": "In a food court, guests get a text message when their order is ready."
+    "foodCourtHint": "In a food court, guests get a text message when their order is ready.",
+    "hotel": "Hotel",
+    "hotelHint": "For a hotel, every room gets its own QR code: guests order from their room (room service)."
   },
   "sms": {
     "orderReady": "Your order {number} at {restaurant} is ready. Please come and pick it up.",
@@ -1843,9 +1896,16 @@
       "water": "Table {table} wants water",
       "body": "Please go to the table.",
       "confirm": "Table {table}: new guest to approve",
-      "custom": "Table {table}: {label}"
+      "custom": "Table {table}: {label}",
+      "waiterRoom": "Room {table} is calling a waiter",
+      "billRoom": "Room {table} wants the bill",
+      "waterRoom": "Room {table} wants water",
+      "confirmRoom": "Room {table}: new guest to approve",
+      "customRoom": "Room {table}: {label}"
     },
-    "kitchenTitle": "Order {number} to prepare"
+    "kitchenTitle": "Order {number} to prepare",
+    "bodyRoom": "Room {table}",
+    "roomOrder": "Room service"
   },
   "music": {
     "title": "Music",
@@ -2105,7 +2165,8 @@
     "deliveryFee": "Delivery fee",
     "accountInfo": "Owed: {balance} · credit left: {available}",
     "densityPhotos": "With photos",
-    "densityCompact": "Compact"
+    "densityCompact": "Compact",
+    "tableNRoom": "Room {label}"
   },
   "inventory": {
     "title": "Stock",
@@ -2866,7 +2927,8 @@
     "decrease": "Decrease",
     "increase": "Increase",
     "viewTicket": "View order",
-    "close": "Close"
+    "close": "Close",
+    "tableRoom": "Room {label}"
   },
   "routing": {
     "title": "Kitchen / bar routing",
@@ -3477,6 +3539,7 @@
     "onGuest": "Notify me when it’s ready",
     "off": "Notifications on (turn off)",
     "denied": "Notifications blocked in the browser",
-    "unavailable": "Notifications unavailable in this browser"
+    "unavailable": "Notifications unavailable in this browser",
+    "newOrderTableRoom": "Room {table}"
   }
 }

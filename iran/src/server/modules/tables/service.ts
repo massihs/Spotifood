@@ -17,6 +17,7 @@ export async function listTables(db: Database, ctx: RestaurantContext) {
     .select({
       id: diningTables.id,
       label: diningTables.label,
+      kind: diningTables.kind,
       number: diningTables.number,
       capacity: diningTables.capacity,
       zone: diningTables.zone,
@@ -123,6 +124,7 @@ export async function bulkCreateTables(db: Database, ctx: RestaurantContext, raw
         number: w.n,
         capacity: input.capacity ?? null,
         zone: input.zone ?? null,
+        kind: input.kind,
         qrToken: randomToken(),
         sortOrder: start + i,
       })),
@@ -153,7 +155,9 @@ export async function updateTable(db: Database, ctx: RestaurantContext, tableId:
   try {
     return await db.transaction(async (tx) => {
       const before = await loadTable(tx, ctx, tableId);
-      const [t] = await tx.update(diningTables).set(input).where(eq(diningTables.id, tableId)).returning();
+      // The kind only changes when the form sends it (older callers keep a room a room).
+      const values = raw.kind ? input : { ...input, kind: undefined };
+      const [t] = await tx.update(diningTables).set(values).where(eq(diningTables.id, tableId)).returning();
       await recordAudit(tx, {
         action: "table.updated",
         actorUserId: ctx.user.id,

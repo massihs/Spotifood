@@ -288,6 +288,13 @@
       "when": 1793189039198,
       "tag": "0040_team_sections",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1793238134348,
+      "tag": "0041_hotel",
+      "breakpoints": true
     }
   ]
 }

@@ -39,11 +39,13 @@ export async function GuestHeader({
   const who = guest.participant.displayName ?? t("you", { n: guest.participant.seq });
   const locales = guest.restaurant.enabledLocales.filter(isLocale) as AppLocale[];
   const name = guest.restaurant.name;
-  const calls = (await guestCallsOf(db, guest.restaurant.id)).map(({ key, label, icon }) => ({
-    key,
-    label,
-    icon,
-  }));
+  const calls = (await guestCallsOf(db, guest.restaurant.id, { room: guest.table.kind === "room" })).map(
+    ({ key, label, icon }) => ({
+      key,
+      label,
+      icon,
+    }),
+  );
   const bell = calls.length ? <WaiterCall options={calls} /> : null;
 
   const actions = (
@@ -79,7 +81,7 @@ export async function GuestHeader({
   const guestLine = (
     <>
       <span className="inline-flex items-center rounded-full bg-accent-soft px-2.5 py-0.5 font-semibold text-accent-text">
-        {t("tableBadge", { table: guest.table.label })}
+        {t(guest.table.kind === "room" ? "tableBadgeRoom" : "tableBadge", { table: guest.table.label })}
       </span>
       <span className="inline-flex min-w-0 items-center gap-1 text-fg-muted">
         <UserRound className="size-3.5 shrink-0" aria-hidden="true" />

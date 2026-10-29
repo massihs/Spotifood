@@ -146,14 +146,16 @@ export async function pushText(locale: string, key: string, values: Record<strin
 export function notifyNewOrder(
   db: Database,
   restaurant: { id: string; defaultLocale: string },
-  order: { id: string; number: string; tableLabel: string | null },
+  order: { id: string; number: string; tableLabel: string | null; room?: boolean },
 ) {
   if (!pushEnabled()) return;
   void (async () => {
     const sections = await sectionsFor(db, restaurant.id, "order.created", { orderId: order.id });
     const title = await pushText(restaurant.defaultLocale, "newOrderTitle", { number: order.number });
     const body = order.tableLabel
-      ? await pushText(restaurant.defaultLocale, "newOrderTable", { table: order.tableLabel })
+      ? await pushText(restaurant.defaultLocale, order.room ? "newOrderTableRoom" : "newOrderTable", {
+          table: order.tableLabel,
+        })
       : await pushText(restaurant.defaultLocale, "newOrderOnline", {});
     await pushToRestaurant(
       db,

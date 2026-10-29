@@ -68,7 +68,7 @@ export function PosTerminal({
   restaurantId: string;
   menu: PublicMenu;
   currency: string;
-  tables: { id: string; label: string }[];
+  tables: { id: string; label: string; kind?: string }[];
   methods: ("cash" | "on_site_terminal")[];
   canPay: boolean;
   zones: { id: string; name: string; feeCents: number; minOrderCents: number }[];
@@ -294,7 +294,7 @@ export function PosTerminal({
           <option value="">{t("noTable")}</option>
           {tables.map((tb) => (
             <option key={tb.id} value={tb.id}>
-              {t("tableN", { label: tb.label })}
+              {t(tb.kind === "room" ? "tableNRoom" : "tableN", { label: tb.label })}
             </option>
           ))}
         </select>

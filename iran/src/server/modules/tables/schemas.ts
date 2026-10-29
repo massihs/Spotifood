@@ -1,9 +1,13 @@
 import { z } from "zod";
 
 const optionalInt = (min: number, max: number) => z.number().int().min(min).max(max).nullable().optional();
+/** A dining table, or a hotel room (guests order room service from it). */
+export const PLACE_KINDS = ["table", "room"] as const;
+const placeKind = z.enum(PLACE_KINDS).default("table");
 
 export const tableSchema = z.object({
   label: z.string().trim().min(1).max(48),
+  kind: placeKind,
   number: optionalInt(0, 99_999),
   capacity: optionalInt(1, 100),
   zone: z
@@ -14,7 +18,7 @@ export const tableSchema = z.object({
     .nullable()
     .optional(),
 });
-export type TableInput = z.infer<typeof tableSchema>;
+export type TableInput = z.input<typeof tableSchema>;
 
 export const MAX_BULK_TABLES = 200;
 
@@ -24,6 +28,7 @@ export const bulkTablesSchema = z
     to: z.number().int().min(0).max(99_999),
     /** Optional label prefix: "T" → T1, T2… ; empty → 1, 2… */
     prefix: z.string().trim().max(24).default(""),
+    kind: placeKind,
     capacity: optionalInt(1, 100),
     zone: z
       .string()

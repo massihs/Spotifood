@@ -17,8 +17,11 @@ const intOrNull = (v: FormDataEntryValue | null) => {
   return s === "" ? null : Number.isInteger(Number(s)) ? Number(s) : NaN;
 };
 
+const kindOf = (fd: FormData) => (fd.get("kind") === "room" ? ("room" as const) : ("table" as const));
+
 const tableFields = (fd: FormData) => ({
   label: String(fd.get("label") ?? ""),
+  kind: kindOf(fd),
   capacity: intOrNull(fd.get("capacity")),
   zone: String(fd.get("zone") ?? ""),
 });
@@ -46,6 +49,7 @@ export async function bulkCreateTablesAction(restaurantId: string, _prev: unknow
       from: intOrNull(fd.get("from")) ?? NaN,
       to: intOrNull(fd.get("to")) ?? NaN,
       prefix: String(fd.get("prefix") ?? ""),
+      kind: kindOf(fd),
       capacity: intOrNull(fd.get("capacity")),
       zone: String(fd.get("zone") ?? ""),
     });

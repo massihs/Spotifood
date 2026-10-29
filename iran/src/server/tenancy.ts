@@ -16,7 +16,7 @@ export type RestaurantSummary = {
   timezone: string;
   defaultLocale: string;
   logoKey: string | null;
-  kind: "restaurant" | "cafe" | "food_court";
+  kind: "restaurant" | "cafe" | "food_court" | "hotel";
   brandColor: string;
 };
 

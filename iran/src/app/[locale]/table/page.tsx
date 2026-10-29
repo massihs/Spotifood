@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { BedDouble } from "lucide-react";
 import { menuThemeOf } from "@/lib/menu-themes";
 import { NowPlaying } from "@/components/guest/now-playing";
 import { hasActiveMusic, restaurantNowPlaying } from "@/server/modules/music/service";
@@ -41,7 +42,7 @@ async function Welcome({ searchParams }: Pick<PageProps<"/[locale]/table">, "sea
       name={guest.restaurant.name}
       logo={logoUrl(guest.restaurant.logoKey, "512")}
       brand={guest.restaurant.brandColor}
-      table={t("tableBadge", { table: guest.table.label })}
+      table={t(guest.table.kind === "room" ? "tableBadgeRoom" : "tableBadge", { table: guest.table.label })}
       welcome={t("welcome")}
     />
   );
@@ -59,7 +60,8 @@ async function GuestMenu() {
     getPopularProductIds(guest.restaurant.id),
     getStorefront(db, guest.restaurant.id),
   ]);
-  const waitingText = guest.session.confirmed ? "" : (await getTranslations("guest"))("waitingConfirm");
+  const t = await getTranslations("guest");
+  const waitingText = guest.session.confirmed ? "" : t("waitingConfirm");
   const byProduct: Record<string, number> = {};
   for (const l of cart.lines) byProduct[l.productId] = (byProduct[l.productId] ?? 0) + l.quantity;
   const playing = music ? await restaurantNowPlaying(db, guest.restaurant.id) : null;
@@ -81,11 +83,23 @@ async function GuestMenu() {
             popularIds={popularIds}
             restaurantName={guest.restaurant.name}
             tableLabel={guest.table.label}
+            room={guest.table.kind === "room"}
             theme={menuThemeOf(guest.restaurant.menuTheme)}
             shortPrices={guest.restaurant.menuShortPrices}
             header={
               <>
                 <GuestHeader guest={guest} orderCount={orders.length} cover={cover} store={store} />
+                {guest.table.kind === "room" ? (
+                  <div className="mx-4 mt-3 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent-soft px-4 py-3">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-fg">
+                      <BedDouble className="size-5" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-bold text-accent-text">{t("roomService")}</p>
+                      <p className="text-sm text-fg-muted">{t("roomServiceHint")}</p>
+                    </div>
+                  </div>
+                ) : null}
                 {guest.session.confirmed ? null : (
                   <p
                     role="status"

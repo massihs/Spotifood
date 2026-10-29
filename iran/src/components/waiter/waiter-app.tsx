@@ -27,6 +27,7 @@ import type { TableRound } from "@/server/modules/waiter/service";
 export type WaiterTable = {
   id: string;
   label: string;
+  kind?: string;
   zone: string | null;
   capacity: number | null;
   state: "free" | "in_progress" | "occupied";
@@ -353,7 +354,9 @@ export function WaiterApp({
             <ArrowRight className="size-4 ltr:rotate-180" aria-hidden="true" />
             {t("back")}
           </button>
-          <h2 className="text-2xl font-black">{t("table", { label: table.label })}</h2>
+          <h2 className="text-2xl font-black">
+            {t(table.kind === "room" ? "tableRoom" : "table", { label: table.label })}
+          </h2>
           {tableRounds.length ? (
             <span className="ms-auto text-sm text-fg-muted tabular-nums">
               {t("tableTotal")}: <b className="text-fg">{money(table.totalCents)}</b>
@@ -491,7 +494,7 @@ export function WaiterApp({
             <div className="flex items-center justify-between border-b border-border p-4">
               <div>
                 <p className="text-lg font-black">
-                  {t("ticket")} · {t("table", { label: table.label })}
+                  {t("ticket")} · {t(table.kind === "room" ? "tableRoom" : "table", { label: table.label })}
                 </p>
                 <p className="text-xs text-fg-muted">
                   {t("ticketItems", { count })} · {t("draftKept")}

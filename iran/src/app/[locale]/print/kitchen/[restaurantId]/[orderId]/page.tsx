@@ -48,7 +48,7 @@ async function Ticket({ params, searchParams }: Pick<Props, "params" | "searchPa
             ? t("delivery")
             : o.channel === "takeaway"
               ? t("takeaway")
-              : t("table", { table: o.tableLabel ?? "—" })}
+              : t(o.placeKind === "room" ? "tableRoom" : "table", { table: o.tableLabel ?? "—" })}
         </p>
         <p className="text-xs">
           {format.dateTime(o.placedAt, {

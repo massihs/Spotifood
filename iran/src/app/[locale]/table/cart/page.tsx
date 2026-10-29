@@ -36,7 +36,9 @@ async function GuestCart() {
             totals={cart.totals}
             currency={guest.restaurant.currency}
             pricesIncludeTax={guest.restaurant.pricesIncludeTax}
-            seatLabel={t("tableBadge", { table: guest.table.label })}
+            seatLabel={t(guest.table.kind === "room" ? "tableBadgeRoom" : "tableBadge", {
+              table: guest.table.label,
+            })}
             restaurantName={guest.restaurant.name}
             displayName={guest.participant.displayName}
             hasIssues={cart.hasIssues}

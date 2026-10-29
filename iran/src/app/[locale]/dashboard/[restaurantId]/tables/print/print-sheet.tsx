@@ -7,7 +7,14 @@ import { Card } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 
-type CardData = { id: string; label: string; zone: string | null; enabled: boolean; qr: string };
+type CardData = {
+  id: string;
+  label: string;
+  zone: string | null;
+  enabled: boolean;
+  qr: string;
+  room?: boolean;
+};
 
 export function PrintSheet({
   restaurantId,
@@ -22,7 +29,16 @@ export function PrintSheet({
   logo: string | null;
   cards: CardData[];
   initialSelection: string[] | null;
-  labels: { title: string; subtitle: string; table: string; scan: string; scanSub: string };
+  labels: {
+    title: string;
+    subtitle: string;
+    table: string;
+    scan: string;
+    scanSub: string;
+    room: string;
+    scanRoom: string;
+    roomService: string;
+  };
 }) {
   const t = useTranslations();
   const printable = useMemo(() => cards.filter((c) => c.enabled), [cards]);
@@ -165,7 +181,7 @@ export function PrintSheet({
                   size === "large" ? "text-[9pt]" : "text-[7pt]",
                 )}
               >
-                {labels.table}
+                {c.room ? labels.room : labels.table}
               </p>
               <p
                 className={cn(
@@ -178,15 +194,15 @@ export function PrintSheet({
             </div>
             <img
               src={c.qr}
-              alt={`QR ${labels.table} ${c.label}`}
+              alt={`QR ${c.room ? labels.room : labels.table} ${c.label}`}
               className={size === "large" ? "size-[55mm]" : "size-[36mm]"}
             />
             <footer>
               <p className={cn("font-semibold", size === "large" ? "text-[13pt]" : "text-[9pt]")}>
-                {labels.scan}
+                {c.room ? labels.scanRoom : labels.scan}
               </p>
               <p className={cn("text-neutral-500", size === "large" ? "text-[8pt]" : "text-[6.5pt]")}>
-                {labels.scanSub}
+                {c.room ? labels.roomService : labels.scanSub}
               </p>
             </footer>
           </article>

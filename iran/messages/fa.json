@@ -346,7 +346,8 @@
     "adminPlans": "پلن‌ها",
     "feedback": "نظر مشتریان",
     "callcenter": "مرکز تماس",
-    "adminAudience": "بازدید سایت"
+    "adminAudience": "بازدید سایت",
+    "tablesHotel": "اتاق‌ها و QR"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -704,7 +705,25 @@
     "deleteConfirm": "میز «{label}» حذف شود؟ کد QR آن دیگر کار نخواهد کرد.",
     "count": "{count, plural, =0 {بدون میز} other {# میز}}",
     "openLink": "باز کردن لینک مشتری",
-    "edit": "ویرایش میز"
+    "edit": "ویرایش میز",
+    "kindLabel": "نوع",
+    "kindTable": "میز",
+    "kindRoom": "اتاق",
+    "addRoom": "افزودن اتاق",
+    "bulkRooms": "ساخت چند اتاق",
+    "roomsTitle": "اتاق‌ها",
+    "tablesTitle": "میزها",
+    "roomLabelHint": "مثلاً ۱۰۱، ۲۰۴، سوئیت ۳",
+    "roomsCount": "{count, plural, =0 {بدون اتاق} other {# اتاق}}",
+    "deleteConfirmRoom": "اتاق «{label}» حذف شود؟ کد QR آن دیگر کار نمی‌کند.",
+    "titleHotel": "اتاق‌ها، میزها و کدهای QR",
+    "subtitleHotel": "هر اتاق و هر میز کد QR خودش را دارد. مهمان با اسکن آن سفارش می‌دهد، حتی از اتاقش.",
+    "roomBadge": "سرویس اتاق",
+    "printRoom": {
+      "room": "اتاق",
+      "scanRoom": "برای سفارش به اتاق اسکن کنید",
+      "roomService": "سرویس اتاق ۲۴ ساعته"
+    }
   },
   "print": {
     "title": "چاپ کدهای QR",
@@ -833,7 +852,12 @@
       "shown": "نمایش",
       "remove": "حذف گزینه",
       "add": "افزودن گزینه",
-      "saved": "ذخیره شد."
+      "saved": "ذخیره شد.",
+      "builtin": {
+        "housekeeping": "نظافت اتاق",
+        "towels": "حوله",
+        "reception": "پذیرش"
+      }
     }
   },
   "permissions": {
@@ -1198,14 +1222,20 @@
       "kinds": {
         "waiter": "گارسون",
         "bill": "صورتحساب",
-        "water": "آب"
+        "water": "آب",
+        "housekeeping": "نظافت اتاق",
+        "towels": "حوله",
+        "reception": "پذیرش"
       },
       "sent": "درخواست شما ارسال شد",
       "sentHint": {
         "waiter": "گارسون به‌زودی سر میز شما می‌آید.",
         "bill": "صورتحساب را برایتان می‌آوریم.",
         "water": "آب برایتان می‌آوریم.",
-        "custom": "همکاران ما به‌زودی می‌آیند."
+        "custom": "همکاران ما به‌زودی می‌آیند.",
+        "housekeeping": "همکاران ما به‌زودی می‌آیند.",
+        "towels": "همکاران ما به‌زودی می‌آیند.",
+        "reception": "همکاران ما به‌زودی می‌آیند."
       },
       "tooSoon": "درخواست قبلی شما ارسال شده؛ کمی صبر کنید.",
       "failed": "ارسال نشد، دوباره تلاش کنید.",
@@ -1231,7 +1261,12 @@
     "show": "نمایش",
     "priceUnit": "قیمت به هزار تومان",
     "couponHint": "کد تخفیف دارید؟",
-    "waitingConfirm": "گارسون به زودی میز شما را تأیید می‌کند. می‌توانید منو را ببینید."
+    "waitingConfirm": "گارسون به زودی میز شما را تأیید می‌کند. می‌توانید منو را ببینید.",
+    "tableRoom": "اتاق {label}",
+    "seatOfRoom": "اتاق {table}، {who}",
+    "tableBadgeRoom": "اتاق {table}",
+    "roomService": "سرویس اتاق",
+    "roomServiceHint": "سفارش شما به اتاقتان آورده می‌شود."
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",
@@ -1516,7 +1551,8 @@
     "newWaiting": "{n} سفارش جدید منتظر است",
     "block": "مسدود کردن این مشتری",
     "blockConfirm": "دستگاهی که سفارش {number} را ثبت کرده مسدود شود؟ دیگر نمی‌تواند سفارش دهد یا گارسون صدا کند و سفارش‌های در انتظارش لغو می‌شود.",
-    "blockReason": "دلیل (اختیاری)"
+    "blockReason": "دلیل (اختیاری)",
+    "tableRoom": "اتاق {label}"
   },
   "tableView": {
     "title": "میز {label}",
@@ -1530,7 +1566,8 @@
     "view": "مشاهده میز",
     "back": "بازگشت به میزها",
     "clientTotal": "جمع",
-    "noOrdersYet": "هنوز سفارشی نیست"
+    "noOrdersYet": "هنوز سفارشی نیست",
+    "titleRoom": "اتاق {label}"
   },
   "live": {
     "connecting": "در حال اتصال…",
@@ -1586,7 +1623,8 @@
       "deliveryFee": "هزینه ارسال",
       "total": "جمع کل",
       "paid": "پرداخت شده",
-      "unpaid": "پرداخت نشده"
+      "unpaid": "پرداخت نشده",
+      "tableRoom": "اتاق {table}"
     },
     "tillPrintOn": "چاپ خودکار فیش صندوق: روشن",
     "tillPrintOff": "چاپ خودکار فیش صندوق",
@@ -1623,7 +1661,12 @@
     "move": "جابجایی",
     "moveTo": "انتقال به…",
     "tableN": "میز {label}",
-    "waitingConfirm": "منتظر تأیید"
+    "waitingConfirm": "منتظر تأیید",
+    "closeConfirmRoom": "اتاق {label} آزاد شود؟ مشتریان باید دوباره کد QR را اسکن کنند.",
+    "closedRoom": "اتاق {label} آزاد شد.",
+    "tableNRoom": "اتاق {label}",
+    "tables": "میزها",
+    "rooms": "اتاق‌ها"
   },
   "notifications": {
     "title": "اعلان‌ها",
@@ -1633,18 +1676,24 @@
     "types": {
       "order": {
         "created": "سفارش جدید {number}، میز {table}",
-        "ready": "سفارش {number} آماده است، میز {table}"
+        "ready": "سفارش {number} آماده است، میز {table}",
+        "createdRoom": "سفارش جدید {number}، اتاق {table}",
+        "readyRoom": "سفارش {number} آماده است، اتاق {table}"
       },
       "payment": {
         "received": "پرداخت دریافت شد {amount}، میز {table}",
         "requested": "میز {table}، مشتری {client} می‌خواهد {amount} پرداخت کند ({method, select, cash {نقدی} card {کارت} other {سر میز}})",
-        "needs_review": "پرداخت نیازمند بررسی، میز {table}"
+        "needs_review": "پرداخت نیازمند بررسی، میز {table}",
+        "receivedRoom": "پرداخت دریافت شد {amount}، اتاق {table}",
+        "requestedRoom": "اتاق {table}، مشتری {client} می‌خواهد {amount} پرداخت کند ({method, select, cash {نقدی} card {کارت} other {سر میز}})",
+        "needs_reviewRoom": "پرداخت نیازمند بررسی، اتاق {table}"
       },
       "stock": {
         "low": "{name} رو به اتمام است ({quantity} {unit})"
       },
       "waiter": {
-        "call": "میز {table}: {kind, select, bill {صورتحساب} water {آب} waiter {گارسون} other {{label}}}"
+        "call": "میز {table}: {kind, select, bill {صورتحساب} water {آب} waiter {گارسون} housekeeping {نظافت اتاق} towels {حوله} reception {پذیرش} other {{label}}}",
+        "callRoom": "اتاق {table}: {kind, select, bill {صورتحساب} water {آب} waiter {گارسون} housekeeping {نظافت اتاق} towels {حوله} reception {پذیرش} other {{label}}}"
       },
       "reservation": {
         "created": "رزرو جدید: {name}، {partySize} نفر",
@@ -1762,7 +1811,9 @@
       "refunded": "بازپرداخت‌شده",
       "partially_refunded": "بخشی بازپرداخت‌شده"
     },
-    "collectOrder": "دریافت وجه سفارش {number}"
+    "collectOrder": "دریافت وجه سفارش {number}",
+    "collectTableRoom": "دریافت وجه کل اتاق {label}",
+    "tableLabelRoom": "اتاق {label}"
   },
   "invoice": {
     "title": "صورتحساب فروش کالا و خدمات",
@@ -1816,7 +1867,9 @@
     "restaurant": "رستوران",
     "cafe": "کافه",
     "food_court": "فودکورت",
-    "foodCourtHint": "در فودکورت، وقتی سفارش آماده شد برای مشتری پیامک ارسال می‌شود."
+    "foodCourtHint": "در فودکورت، وقتی سفارش آماده شد برای مشتری پیامک ارسال می‌شود.",
+    "hotel": "هتل",
+    "hotelHint": "در هتل، هر اتاق کد QR خودش را دارد: مهمان از اتاقش سفارش می‌دهد (سرویس اتاق)."
   },
   "sms": {
     "orderReady": "سفارش {number} شما در {restaurant} آماده است. لطفاً برای تحویل مراجعه کنید.",
@@ -1843,9 +1896,16 @@
       "water": "میز {table} آب می‌خواهد",
       "body": "لطفاً به میز سر بزنید.",
       "confirm": "میز {table}: مشتری جدید منتظر تأیید",
-      "custom": "میز {table}: {label}"
+      "custom": "میز {table}: {label}",
+      "waiterRoom": "اتاق {table} گارسون را صدا زد",
+      "billRoom": "اتاق {table} صورتحساب می‌خواهد",
+      "waterRoom": "اتاق {table} آب می‌خواهد",
+      "confirmRoom": "اتاق {table}: مشتری جدید منتظر تأیید",
+      "customRoom": "اتاق {table}: {label}"
     },
-    "kitchenTitle": "سفارش {number} برای آماده‌سازی"
+    "kitchenTitle": "سفارش {number} برای آماده‌سازی",
+    "bodyRoom": "اتاق {table}",
+    "roomOrder": "سرویس اتاق"
   },
   "music": {
     "title": "موسیقی",
@@ -2105,7 +2165,8 @@
     "deliveryFee": "هزینه ارسال",
     "accountInfo": "بدهی: {balance}، اعتبار باقی‌مانده: {available}",
     "densityPhotos": "نمایش با عکس",
-    "densityCompact": "نمایش فشرده"
+    "densityCompact": "نمایش فشرده",
+    "tableNRoom": "اتاق {label}"
   },
   "inventory": {
     "title": "انبار",
@@ -2866,7 +2927,8 @@
     "decrease": "کم کردن",
     "increase": "اضافه کردن",
     "viewTicket": "مشاهده سفارش",
-    "close": "بستن"
+    "close": "بستن",
+    "tableRoom": "اتاق {label}"
   },
   "routing": {
     "title": "ارسال به آشپزخانه / بار",
@@ -3477,6 +3539,7 @@
     "onGuest": "وقتی آماده شد خبرم کن",
     "off": "اعلان‌ها فعال است (غیرفعال کردن)",
     "denied": "اعلان‌ها در مرورگر مسدود است",
-    "unavailable": "اعلان در این مرورگر در دسترس نیست"
+    "unavailable": "اعلان در این مرورگر در دسترس نیست",
+    "newOrderTableRoom": "اتاق {table}"
   }
 }

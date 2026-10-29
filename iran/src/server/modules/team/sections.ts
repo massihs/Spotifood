@@ -7,6 +7,7 @@ import {
   orderItems,
   restaurantMembers,
   restaurantSettings,
+  restaurants,
   teamSections,
   type GuestCallOption,
 } from "@/server/db/schema";
@@ -273,7 +274,10 @@ export async function setMemberSections(
 // ---------------------------------------------------------------------------------------------
 // Guest call bell (options shown on the menu)
 
-export const BUILTIN_CALLS = ["waiter", "bill", "water"] as const;
+/** Hotel rooms also get housekeeping, towels and the front desk (only offered in a room). */
+export const ROOM_CALLS = ["housekeeping", "towels", "reception"] as const;
+export const BUILTIN_CALLS = ["waiter", "bill", "water", ...ROOM_CALLS] as const;
+const isRoomCall = (key: string) => (ROOM_CALLS as readonly string[]).includes(key);
 export const CALL_ICONS = [
   "hand",
   "receipt",
@@ -290,14 +294,24 @@ const BUILTIN_ICON: Record<string, (typeof CALL_ICONS)[number]> = {
   waiter: "hand",
   bill: "receipt",
   water: "droplets",
+  housekeeping: "sparkles",
+  towels: "droplets",
+  reception: "bell",
 };
 
 export type GuestCall = { key: string; label: string | null; icon: string; sectionId: string | null };
 
-/** Every option (enabled or not), built-ins first if the restaurant never saved any. */
-export function normalizeCalls(saved: GuestCallOption[] | null | undefined): GuestCallOption[] {
+/**
+ * Every option (enabled or not), built-ins first if the restaurant never saved any. The room
+ * options only exist for hotels, where they are on by default.
+ */
+export function normalizeCalls(
+  saved: GuestCallOption[] | null | undefined,
+  kind: string = "restaurant",
+): GuestCallOption[] {
   const list = saved?.length ? saved : [];
-  const out = BUILTIN_CALLS.map(
+  const hotel = kind === "hotel";
+  const out = BUILTIN_CALLS.filter((key) => hotel || !isRoomCall(key)).map(
     (key) => list.find((o) => o.key === key) ?? { key, enabled: true, sectionId: null },
   ) as GuestCallOption[];
   const ordered = list.length ? list.filter((o) => o.key.startsWith("c-")) : [];
@@ -308,14 +322,19 @@ export function normalizeCalls(saved: GuestCallOption[] | null | undefined): Gue
   }));
 }
 
-/** The options a guest sees on the bell. */
-export async function guestCallsOf(db: DbOrTx, restaurantId: string): Promise<GuestCall[]> {
+/** The options a guest sees on the bell (room options only in a hotel room). */
+export async function guestCallsOf(
+  db: DbOrTx,
+  restaurantId: string,
+  place: { room?: boolean } = {},
+): Promise<GuestCall[]> {
   const [s] = await db
-    .select({ calls: restaurantSettings.guestCalls })
-    .from(restaurantSettings)
-    .where(eq(restaurantSettings.restaurantId, restaurantId));
-  return normalizeCalls(s?.calls)
-    .filter((o) => o.enabled)
+    .select({ calls: restaurantSettings.guestCalls, kind: restaurants.kind })
+    .from(restaurants)
+    .leftJoin(restaurantSettings, eq(restaurantSettings.restaurantId, restaurants.id))
+    .where(eq(restaurants.id, restaurantId));
+  return normalizeCalls(s?.calls, s?.kind)
+    .filter((o) => o.enabled && (place.room || !isRoomCall(o.key)))
     .map((o) => ({
       key: o.key,
       label: o.key.startsWith("c-") ? (o.label ?? "") : null,
@@ -330,7 +349,7 @@ export async function listGuestCalls(db: DbOrTx, ctx: RestaurantContext) {
     .select({ calls: restaurantSettings.guestCalls })
     .from(restaurantSettings)
     .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
-  return normalizeCalls(s?.calls);
+  return normalizeCalls(s?.calls, ctx.restaurant.kind);
 }
 
 const callSchema = z.object({
@@ -370,5 +389,5 @@ export async function saveGuestCalls(db: Database, ctx: RestaurantContext, raw: 
     .insert(restaurantSettings)
     .values({ restaurantId: ctx.restaurant.id, guestCalls: calls })
     .onConflictDoUpdate({ target: restaurantSettings.restaurantId, set: { guestCalls: calls } });
-  return normalizeCalls(calls);
+  return normalizeCalls(calls, ctx.restaurant.kind);
 }

@@ -67,7 +67,9 @@ async function TableDetail({ params }: { params: Params }) {
       </Link>
       <div className="mt-2">
         <PageHeader
-          title={t("tableView.title", { label: view.table.label })}
+          title={t(view.table.kind === "room" ? "tableView.titleRoom" : "tableView.title", {
+            label: view.table.label,
+          })}
           description={
             view.session
               ? t("tableView.since", { time: format.relativeTime(view.session.openedAt) })

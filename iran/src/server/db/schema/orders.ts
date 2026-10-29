@@ -82,6 +82,8 @@ export const orders = pgTable(
     participantId: uuid().references(() => sessionParticipants.id, { onDelete: "set null" }),
     /** Snapshot of the table label at order time. */
     tableLabel: varchar({ length: 48 }),
+    /** "room" when ordered from a hotel room (room service); null = a table or no place. */
+    placeKind: varchar({ length: 8 }),
     status: orderStatus().notNull(),
     paymentStatus: orderPaymentStatus().notNull().default("unpaid"),
     currency: varchar({ length: 3 }).notNull(),

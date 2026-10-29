@@ -71,6 +71,7 @@ export function OrderAlerts({
   kitchen?: boolean;
 }) {
   const t = useTranslations("alerts");
+  const tCall = useTranslations("guest.waiter.kinds");
   const router = useRouter();
   const enabled = useSyncExternalStore(subscribePref, readPref, () => true);
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -106,6 +107,7 @@ export function OrderAlerts({
   useLiveEvent((type, data) => {
     if (type === "order.updated") return refreshSoon();
     let alert: Alert;
+    const room = data.place === "room";
     const target = data.sections;
     if (sections && Array.isArray(target) && !target.some((s) => sections.includes(String(s)))) {
       if (type === "order.created") refreshSoon();
@@ -122,12 +124,17 @@ export function OrderAlerts({
               ? "confirm"
               : "waiter";
       const table = String(data.tableLabel ?? "");
+      const roomCall = ["housekeeping", "towels", "reception"].includes(String(data.kind));
+      const label = typeof data.label === "string" && data.label ? data.label : null;
       alert = {
         id: `w-${data.tableLabel}-${Date.now()}`,
         title:
-          typeof data.label === "string" && data.label
-            ? t("waiter.custom", { table, label: data.label })
-            : t(`waiter.${kind}`, { table }),
+          label || roomCall
+            ? t(room ? "waiter.customRoom" : "waiter.custom", {
+                table,
+                label: label ?? tCall(String(data.kind) as "waiter"),
+              })
+            : t(`waiter.${kind}${room ? "Room" : ""}`, { table }),
         body: t("waiter.body"),
         href: `/dashboard/${restaurantId}/floor`,
         waiter: true,
@@ -138,7 +145,7 @@ export function OrderAlerts({
       alert = {
         id: `k-${String(data.orderId ?? Date.now())}`,
         title: t("kitchenTitle", { number: String(data.number ?? "") }),
-        body: t("body", { table: String(data.tableLabel ?? "") }),
+        body: t(room ? "bodyRoom" : "body", { table: String(data.tableLabel ?? "") }),
         href: `/dashboard/${restaurantId}/kitchen`,
       };
     } else {
@@ -148,7 +155,9 @@ export function OrderAlerts({
       alert = {
         id: String(data.orderId ?? Date.now()),
         title: t("title", { number: String(data.number ?? "") }),
-        body: t("body", { table: String(data.tableLabel ?? "") }),
+        body: room
+          ? `${t("roomOrder")} · ${t("bodyRoom", { table: String(data.tableLabel ?? "") })}`
+          : t("body", { table: String(data.tableLabel ?? "") }),
         href: `/dashboard/${restaurantId}/orders`,
       };
     }

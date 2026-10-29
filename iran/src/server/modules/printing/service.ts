@@ -36,12 +36,17 @@ const STALE_MINUTES = 30;
 export async function sendToKitchen(
   tx: DbOrTx,
   rid: string,
-  order: { id: string; number: string; tableLabel: string | null },
+  order: { id: string; number: string; tableLabel: string | null; placeKind?: string | null },
 ) {
   await emit(tx, {
     topic: topics.restaurant(rid),
     type: "order.accepted",
-    data: { orderId: order.id, number: order.number, tableLabel: order.tableLabel ?? "" },
+    data: {
+      orderId: order.id,
+      number: order.number,
+      tableLabel: order.tableLabel ?? "",
+      ...(order.placeKind === "room" ? { place: "room" } : {}),
+    },
   });
   const list = await tx
     .select()

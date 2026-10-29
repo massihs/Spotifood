@@ -65,7 +65,8 @@ export function NotificationBell({
   }, [open]);
 
   const label = (n: Item) => {
-    const key = `types.${n.type}`;
+    const base = `types.${n.type}`;
+    const key = n.payload.place === "room" && t.has(`${base}Room`) ? `${base}Room` : base;
     return t.has(key)
       ? t(key, {
           number: String(n.payload.number ?? ""),

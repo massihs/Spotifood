@@ -13,6 +13,8 @@ export type TableState = "free" | "in_progress" | "occupied";
 export type FloorTable = {
   id: string;
   label: string;
+  /** "table" or "room" (hotel room). */
+  kind: string;
   zone: string | null;
   capacity: number | null;
   state: TableState;
@@ -36,6 +38,7 @@ export async function getFloor(db: Database, ctx: RestaurantContext): Promise<Fl
     .select({
       id: diningTables.id,
       label: diningTables.label,
+      kind: diningTables.kind,
       zone: diningTables.zone,
       capacity: diningTables.capacity,
       sessionId: tableSessions.id,

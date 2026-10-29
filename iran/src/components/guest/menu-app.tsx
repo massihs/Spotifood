@@ -93,6 +93,7 @@ export function MenuApp({
   header,
   restaurantName,
   tableLabel,
+  room = false,
   theme,
   shortPrices,
 }: {
@@ -103,6 +104,8 @@ export function MenuApp({
   header: ReactNode;
   restaurantName: string;
   tableLabel: string;
+  /** Ordering from a hotel room (room service). */
+  room?: boolean;
   theme: MenuTheme;
   /** Menu prices in thousand tomans (the unit is shown once per section). */
   shortPrices: boolean;
@@ -262,7 +265,7 @@ export function MenuApp({
             {restaurantName}
           </p>
           <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-text">
-            {t("guest.tableBadge", { table: tableLabel })}
+            {t(room ? "guest.tableBadgeRoom" : "guest.tableBadge", { table: tableLabel })}
           </span>
         </div>
       </div>

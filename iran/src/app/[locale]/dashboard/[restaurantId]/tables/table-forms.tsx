@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/input";
 import {
+  SelectField,
   FormFeedback,
   SubmitButton,
   useCloseOnSuccess,
@@ -23,20 +24,41 @@ type TableRow = {
   number: number | null;
   capacity: number | null;
   zone: string | null;
+  kind?: string;
 };
+type PlaceKind = "table" | "room";
 
-function TableFields({ state, table }: { state: ActionState; table?: TableRow }) {
+function TableFields({
+  state,
+  table,
+  kind,
+  hotel = false,
+}: {
+  state: ActionState;
+  table?: TableRow;
+  kind: PlaceKind;
+  /** Hotels can switch a place between table and room. */
+  hotel?: boolean;
+}) {
   const t = useTranslations("tables");
   const err = useFieldError(state);
   return (
     <>
+      {hotel ? (
+        <SelectField label={t("kindLabel")} name="kind" defaultValue={kind}>
+          <option value="room">{t("kindRoom")}</option>
+          <option value="table">{t("kindTable")}</option>
+        </SelectField>
+      ) : (
+        <input type="hidden" name="kind" value={kind} />
+      )}
       <Field
         label={t("label")}
         name="label"
         required
         maxLength={48}
         defaultValue={table?.label}
-        hint={t("labelHint")}
+        hint={kind === "room" ? t("roomLabelHint") : t("labelHint")}
         error={err("label")}
         autoFocus
       />
@@ -75,7 +97,7 @@ function TableFields({ state, table }: { state: ActionState; table?: TableRow })
   );
 }
 
-function CreateTableForm({ restaurantId }: { restaurantId: string }) {
+function CreateTableForm({ restaurantId, kind }: { restaurantId: string; kind: PlaceKind }) {
   const t = useTranslations();
   const form = useActionForm(createTableAction.bind(null, restaurantId));
   const state = form.state;
@@ -83,7 +105,7 @@ function CreateTableForm({ restaurantId }: { restaurantId: string }) {
   return (
     <ActionForm form={form} className="space-y-4">
       <FormFeedback state={state} />
-      <TableFields state={state} />
+      <TableFields state={state} kind={kind} />
       <div className="flex justify-end">
         <SubmitButton>{t("common.add")}</SubmitButton>
       </div>
@@ -94,26 +116,37 @@ function CreateTableForm({ restaurantId }: { restaurantId: string }) {
 export function CreateTableDialog({
   restaurantId,
   variant = "primary",
+  kind = "table",
 }: {
   restaurantId: string;
   variant?: "primary" | "secondary";
+  kind?: PlaceKind;
 }) {
   const t = useTranslations("tables");
+  const title = kind === "room" ? t("addRoom") : t("add");
   return (
     <Dialog
-      title={t("add")}
+      title={title}
       trigger={(open) => (
         <Button variant={variant} onClick={open}>
-          + {t("add")}
+          + {title}
         </Button>
       )}
     >
-      <CreateTableForm restaurantId={restaurantId} />
+      <CreateTableForm restaurantId={restaurantId} kind={kind} />
     </Dialog>
   );
 }
 
-function EditTableForm({ restaurantId, table }: { restaurantId: string; table: TableRow }) {
+function EditTableForm({
+  restaurantId,
+  table,
+  hotel,
+}: {
+  restaurantId: string;
+  table: TableRow;
+  hotel?: boolean;
+}) {
   const t = useTranslations();
   const form = useActionForm(updateTableAction.bind(null, restaurantId, table.id));
   const state = form.state;
@@ -121,7 +154,12 @@ function EditTableForm({ restaurantId, table }: { restaurantId: string; table: T
   return (
     <ActionForm form={form} className="space-y-4">
       <FormFeedback state={state} />
-      <TableFields state={state} table={table} />
+      <TableFields
+        state={state}
+        table={table}
+        kind={table.kind === "room" ? "room" : "table"}
+        hotel={hotel || table.kind === "room"}
+      />
       <div className="flex justify-end">
         <SubmitButton>{t("common.save")}</SubmitButton>
       </div>
@@ -129,7 +167,15 @@ function EditTableForm({ restaurantId, table }: { restaurantId: string; table: T
   );
 }
 
-export function EditTableDialog({ restaurantId, table }: { restaurantId: string; table: TableRow }) {
+export function EditTableDialog({
+  restaurantId,
+  table,
+  hotel,
+}: {
+  restaurantId: string;
+  table: TableRow;
+  hotel?: boolean;
+}) {
   const t = useTranslations("tables");
   return (
     <Dialog
@@ -140,12 +186,20 @@ export function EditTableDialog({ restaurantId, table }: { restaurantId: string;
         </Button>
       )}
     >
-      <EditTableForm restaurantId={restaurantId} table={table} />
+      <EditTableForm restaurantId={restaurantId} table={table} hotel={hotel} />
     </Dialog>
   );
 }
 
-function BulkForm({ restaurantId, onDone }: { restaurantId: string; onDone: (msg: string) => void }) {
+function BulkForm({
+  restaurantId,
+  kind,
+  onDone,
+}: {
+  restaurantId: string;
+  kind: PlaceKind;
+  onDone: (msg: string) => void;
+}) {
   const t = useTranslations();
   const form = useActionForm(async (prev: unknown, fd: FormData) => {
     const res = await bulkCreateTablesAction(restaurantId, prev, fd);
@@ -158,6 +212,7 @@ function BulkForm({ restaurantId, onDone }: { restaurantId: string; onDone: (msg
   return (
     <ActionForm form={form} className="space-y-4">
       <FormFeedback state={state} />
+      <input type="hidden" name="kind" value={kind} />
       <div className="grid grid-cols-3 gap-3">
         <Field
           label={t("tables.from")}
@@ -165,7 +220,7 @@ function BulkForm({ restaurantId, onDone }: { restaurantId: string; onDone: (msg
           type="number"
           min={0}
           required
-          defaultValue={1}
+          defaultValue={kind === "room" ? 101 : 1}
           inputMode="numeric"
           error={err("from")}
         />
@@ -175,7 +230,7 @@ function BulkForm({ restaurantId, onDone }: { restaurantId: string; onDone: (msg
           type="number"
           min={0}
           required
-          defaultValue={20}
+          defaultValue={kind === "room" ? 120 : 20}
           inputMode="numeric"
           error={err("to")}
         />
@@ -200,27 +255,34 @@ function BulkForm({ restaurantId, onDone }: { restaurantId: string; onDone: (msg
         <Field label={t("tables.zone")} name="zone" maxLength={64} hint={t("tables.zoneHint")} />
       </div>
       <div className="flex justify-end">
-        <SubmitButton>{t("tables.bulk")}</SubmitButton>
+        <SubmitButton>{kind === "room" ? t("tables.bulkRooms") : t("tables.bulk")}</SubmitButton>
       </div>
     </ActionForm>
   );
 }
 
-export function BulkTablesDialog({ restaurantId }: { restaurantId: string }) {
+export function BulkTablesDialog({
+  restaurantId,
+  kind = "table",
+}: {
+  restaurantId: string;
+  kind?: PlaceKind;
+}) {
   const t = useTranslations("tables");
   const [message, setMessage] = useState<string | null>(null);
   const clear = useCallback(() => setMessage(null), []);
+  const title = kind === "room" ? t("bulkRooms") : t("bulk");
   return (
     <>
       <Dialog
-        title={t("bulk")}
+        title={title}
         trigger={(open) => (
           <Button variant="secondary" onClick={open}>
-            {t("bulk")}
+            {title}
           </Button>
         )}
       >
-        <BulkForm restaurantId={restaurantId} onDone={setMessage} />
+        <BulkForm restaurantId={restaurantId} kind={kind} onDone={setMessage} />
       </Dialog>
       <Toast message={message} onDone={clear} />
     </>

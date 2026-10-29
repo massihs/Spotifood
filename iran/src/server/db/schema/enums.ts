@@ -3,7 +3,7 @@ import { pgEnum } from "drizzle-orm/pg-core";
 export const userStatus = pgEnum("user_status", ["active", "disabled"]);
 export const restaurantStatus = pgEnum("restaurant_status", ["active", "suspended"]);
 /** Kind of venue: a food court notifies the guest by SMS when the dish is ready to pick up. */
-export const restaurantKind = pgEnum("restaurant_kind", ["restaurant", "cafe", "food_court"]);
+export const restaurantKind = pgEnum("restaurant_kind", ["restaurant", "cafe", "food_court", "hotel"]);
 export const memberRole = pgEnum("member_role", ["owner", "admin", "staff"]);
 export const memberStatus = pgEnum("member_status", ["active", "invited", "disabled"]);
 export const orgRole = pgEnum("org_role", ["owner", "billing", "member"]);

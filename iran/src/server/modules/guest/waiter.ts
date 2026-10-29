@@ -16,7 +16,9 @@ const COOLDOWN_MS = 45_000;
  */
 export async function callWaiter(db: Database, guest: GuestContext, raw: string, now = new Date()) {
   const rid = guest.restaurant.id;
-  const option = (await guestCallsOf(db, rid)).find((o) => o.key === raw);
+  const option = (await guestCallsOf(db, rid, { room: guest.table.kind === "room" })).find(
+    (o) => o.key === raw,
+  );
   if (!option) throw validation("invalid_call");
   const kind = option.key;
   return db.transaction(async (tx) => {
@@ -49,6 +51,7 @@ export async function callWaiter(db: Database, guest: GuestContext, raw: string,
         type: "waiter.call",
         payload: {
           tableLabel: guest.table.label,
+          ...(guest.table.kind === "room" ? { place: "room" } : {}),
           kind,
           ...(option.label ? { label: option.label } : {}),
           participantId: guest.participant.id,
@@ -62,6 +65,7 @@ export async function callWaiter(db: Database, guest: GuestContext, raw: string,
       data: {
         tableLabel: guest.table.label,
         tableId: guest.table.id,
+        ...(guest.table.kind === "room" ? { place: "room" } : {}),
         kind,
         ...(option.label ? { label: option.label } : {}),
         ...(sections ? { sections } : {}),

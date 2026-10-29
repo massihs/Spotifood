@@ -346,7 +346,8 @@
     "adminPlans": "Forfaits",
     "feedback": "Avis clients",
     "callcenter": "Centre d’appels",
-    "adminAudience": "Audience"
+    "adminAudience": "Audience",
+    "tablesHotel": "Chambres & QR"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -704,7 +705,25 @@
     "deleteConfirm": "Supprimer la table « {label} » ? Son QR code cessera de fonctionner.",
     "count": "{count, plural, =0 {Aucune table} one {# table} other {# tables}}",
     "openLink": "Ouvrir le lien client",
-    "edit": "Modifier la table"
+    "edit": "Modifier la table",
+    "kindLabel": "Type",
+    "kindTable": "Table",
+    "kindRoom": "Chambre",
+    "addRoom": "Ajouter une chambre",
+    "bulkRooms": "Générer des chambres",
+    "roomsTitle": "Chambres",
+    "tablesTitle": "Tables",
+    "roomLabelHint": "Ex. 101, 204, Suite 3",
+    "roomsCount": "{count, plural, =0 {Aucune chambre} one {# chambre} other {# chambres}}",
+    "deleteConfirmRoom": "Supprimer la chambre « {label} » ? Son QR code cessera de fonctionner.",
+    "titleHotel": "Chambres, tables & QR codes",
+    "subtitleHotel": "Chaque chambre et chaque table a son QR code. Les clients le scannent pour commander, même depuis leur chambre.",
+    "roomBadge": "Room service",
+    "printRoom": {
+      "room": "Chambre",
+      "scanRoom": "Scannez pour commander en chambre",
+      "roomService": "Room service 24 h/24"
+    }
   },
   "print": {
     "title": "Impression des QR codes",
@@ -833,7 +852,12 @@
       "shown": "Affichée",
       "remove": "Supprimer l’option",
       "add": "Ajouter une option",
-      "saved": "Enregistré."
+      "saved": "Enregistré.",
+      "builtin": {
+        "housekeeping": "Ménage",
+        "towels": "Serviettes",
+        "reception": "Réception"
+      }
     }
   },
   "permissions": {
@@ -1174,14 +1198,20 @@
       "kinds": {
         "waiter": "Serveur",
         "bill": "L’addition",
-        "water": "De l’eau"
+        "water": "De l’eau",
+        "housekeeping": "Ménage",
+        "towels": "Serviettes",
+        "reception": "Réception"
       },
       "sent": "Demande envoyée",
       "sentHint": {
         "waiter": "Un serveur arrive.",
         "bill": "Nous apportons l’addition.",
         "water": "Nous apportons de l’eau.",
-        "custom": "L’équipe arrive."
+        "custom": "L’équipe arrive.",
+        "housekeeping": "L’équipe arrive.",
+        "towels": "L’équipe arrive.",
+        "reception": "L’équipe arrive."
       },
       "tooSoon": "Votre demande est déjà partie, patientez un instant.",
       "failed": "Envoi impossible, réessayez.",
@@ -1231,7 +1261,12 @@
     "show": "Afficher",
     "priceUnit": "Prix en milliers de tomans",
     "couponHint": "Vous avez un code ?",
-    "waitingConfirm": "Un serveur va valider votre table. Vous pouvez déjà parcourir le menu."
+    "waitingConfirm": "Un serveur va valider votre table. Vous pouvez déjà parcourir le menu.",
+    "tableRoom": "Chambre {label}",
+    "seatOfRoom": "Chambre {table} · {who}",
+    "tableBadgeRoom": "Chambre {table}",
+    "roomService": "Room service",
+    "roomServiceHint": "Votre commande est livrée dans votre chambre."
   },
   "categoryTemplates": {
     "starters": "Entrées",
@@ -1516,7 +1551,8 @@
     "newWaiting": "{n} nouvelles commandes attendent",
     "block": "Bloquer ce client",
     "blockConfirm": "Bloquer l’appareil qui a passé la commande {number} ? Il ne pourra plus commander ni appeler, et ses commandes en attente seront annulées.",
-    "blockReason": "Raison (facultatif)"
+    "blockReason": "Raison (facultatif)",
+    "tableRoom": "Chambre {label}"
   },
   "tableView": {
     "title": "Table {label}",
@@ -1530,7 +1566,8 @@
     "view": "Voir la table",
     "back": "Retour aux tables",
     "clientTotal": "Total",
-    "noOrdersYet": "Pas encore de commande"
+    "noOrdersYet": "Pas encore de commande",
+    "titleRoom": "Chambre {label}"
   },
   "live": {
     "connecting": "Connexion…",
@@ -1586,7 +1623,8 @@
       "deliveryFee": "Frais de livraison",
       "total": "Total",
       "paid": "Payé",
-      "unpaid": "Non payé"
+      "unpaid": "Non payé",
+      "tableRoom": "Chambre {table}"
     },
     "tillPrintOn": "Impression auto du ticket caisse : activée",
     "tillPrintOff": "Impression auto du ticket caisse",
@@ -1623,7 +1661,12 @@
     "move": "Déplacer",
     "moveTo": "Déplacer vers…",
     "tableN": "Table {label}",
-    "waitingConfirm": "À valider"
+    "waitingConfirm": "À valider",
+    "closeConfirmRoom": "Libérer la chambre {label} ? Les clients devront rescanner le QR code.",
+    "closedRoom": "Chambre {label} libérée.",
+    "tableNRoom": "Chambre {label}",
+    "tables": "Tables",
+    "rooms": "Chambres"
   },
   "notifications": {
     "title": "Notifications",
@@ -1633,18 +1676,24 @@
     "types": {
       "order": {
         "created": "Nouvelle commande {number} · Table {table}",
-        "ready": "Commande {number} prête · Table {table}"
+        "ready": "Commande {number} prête · Table {table}",
+        "createdRoom": "Nouvelle commande {number} · Chambre {table}",
+        "readyRoom": "Commande {number} prête · Chambre {table}"
       },
       "payment": {
         "received": "Paiement reçu {amount} · Table {table}",
         "requested": "Table {table} · Client {client} veut payer {amount} ({method, select, cash {espèces} card {carte} other {à table}})",
-        "needs_review": "Paiement à vérifier · Table {table}"
+        "needs_review": "Paiement à vérifier · Table {table}",
+        "receivedRoom": "Paiement reçu {amount} · Chambre {table}",
+        "requestedRoom": "Chambre {table} · Client {client} veut payer {amount} ({method, select, cash {espèces} card {carte} other {à table}})",
+        "needs_reviewRoom": "Paiement à vérifier · Chambre {table}"
       },
       "stock": {
         "low": "{name} est presque épuisé ({quantity} {unit})"
       },
       "waiter": {
-        "call": "Table {table} : {kind, select, bill {addition} water {eau} waiter {serveur} other {{label}}}"
+        "call": "Table {table} : {kind, select, bill {addition} water {eau} waiter {serveur} housekeeping {ménage} towels {serviettes} reception {réception} other {{label}}}",
+        "callRoom": "Chambre {table} : {kind, select, bill {addition} water {eau} waiter {serveur} housekeeping {ménage} towels {serviettes} reception {réception} other {{label}}}"
       },
       "reservation": {
         "created": "Nouvelle réservation : {name} · {partySize} pers.",
@@ -1762,7 +1811,9 @@
       "refunded": "Remboursé",
       "partially_refunded": "Remboursé en partie"
     },
-    "collectOrder": "Encaisser la commande {number}"
+    "collectOrder": "Encaisser la commande {number}",
+    "collectTableRoom": "Encaisser toute la chambre {label}",
+    "tableLabelRoom": "Chambre {label}"
   },
   "invoice": {
     "title": "Facture de vente",
@@ -1816,7 +1867,9 @@
     "restaurant": "Restaurant",
     "cafe": "Café",
     "food_court": "Food court",
-    "foodCourtHint": "En food court, le client reçoit un SMS quand sa commande est prête."
+    "foodCourtHint": "En food court, le client reçoit un SMS quand sa commande est prête.",
+    "hotel": "Hôtel",
+    "hotelHint": "Pour un hôtel, chaque chambre a son QR code : les clients commandent depuis leur chambre (room service)."
   },
   "sms": {
     "orderReady": "Votre commande {number} chez {restaurant} est prête. Venez la récupérer.",
@@ -1843,9 +1896,16 @@
       "water": "Table {table} demande de l’eau",
       "body": "Merci de passer à la table.",
       "confirm": "Table {table} : nouveau client à valider",
-      "custom": "Table {table} : {label}"
+      "custom": "Table {table} : {label}",
+      "waiterRoom": "Chambre {table} appelle un serveur",
+      "billRoom": "Chambre {table} demande l’addition",
+      "waterRoom": "Chambre {table} demande de l’eau",
+      "confirmRoom": "Chambre {table} : nouveau client à valider",
+      "customRoom": "Chambre {table} : {label}"
     },
-    "kitchenTitle": "Commande {number} à préparer"
+    "kitchenTitle": "Commande {number} à préparer",
+    "bodyRoom": "Chambre {table}",
+    "roomOrder": "Room service"
   },
   "music": {
     "title": "Musique",
@@ -2113,7 +2173,8 @@
     "deliveryFee": "Frais de livraison",
     "accountInfo": "Dû : {balance} · crédit restant : {available}",
     "densityPhotos": "Avec photos",
-    "densityCompact": "Compact"
+    "densityCompact": "Compact",
+    "tableNRoom": "Chambre {label}"
   },
   "inventory": {
     "title": "Stocks",
@@ -2874,7 +2935,8 @@
     "decrease": "Diminuer",
     "increase": "Augmenter",
     "viewTicket": "Voir la commande",
-    "close": "Fermer"
+    "close": "Fermer",
+    "tableRoom": "Chambre {label}"
   },
   "routing": {
     "title": "Envoi cuisine / bar",
@@ -3485,6 +3547,7 @@
     "onGuest": "Me prévenir quand c’est prêt",
     "off": "Notifications activées (désactiver)",
     "denied": "Notifications bloquées dans le navigateur",
-    "unavailable": "Notifications indisponibles sur ce navigateur"
+    "unavailable": "Notifications indisponibles sur ce navigateur",
+    "newOrderTableRoom": "Chambre {table}"
   }
 }

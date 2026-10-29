@@ -12,12 +12,14 @@ export function CloseTableButton({
   label,
   canForce,
   size = "sm",
+  room = false,
 }: {
   restaurantId: string;
   tableId: string;
   label: string;
   canForce: boolean;
   size?: "sm" | "md";
+  room?: boolean;
 }) {
   const t = useTranslations();
   const [pending, startTransition] = useTransition();
@@ -48,7 +50,8 @@ export function CloseTableButton({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          if (window.confirm(t("floor.closeConfirm", { label }))) run(false);
+          if (window.confirm(t(room ? "floor.closeConfirmRoom" : "floor.closeConfirm", { label })))
+            run(false);
         }}
       >
         {t("floor.close")}

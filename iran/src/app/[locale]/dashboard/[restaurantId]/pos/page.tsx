@@ -75,7 +75,7 @@ async function Pos({ params, searchParams }: Pick<Props, "params" | "searchParam
         currency={ctx.restaurant.currency}
         tables={tables
           .filter((tb) => tb.qrEnabled !== undefined)
-          .map((tb) => ({ id: tb.id, label: tb.label }))}
+          .map((tb) => ({ id: tb.id, label: tb.label, kind: tb.kind }))}
         methods={config.offline}
         canPay={can(ctx, "payments.record")}
         zones={zones

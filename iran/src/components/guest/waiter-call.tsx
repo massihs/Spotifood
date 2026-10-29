@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { CALL_ICON, CALL_TONES } from "./call-icons";
 
 export type CallOption = { key: string; label: string | null; icon: string };
-const BUILTIN = ["waiter", "bill", "water"];
+const BUILTIN = ["waiter", "bill", "water", "housekeeping", "towels", "reception"];
 
 /** "Call the waiter" bell on the identity card, with the options the restaurant chose. */
 export function WaiterCall({ options, className }: { options: CallOption[]; className?: string }) {

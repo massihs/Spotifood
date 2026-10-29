@@ -171,6 +171,7 @@ export async function placeOrder(
         tableSessionId: guest.session.id,
         participantId: guest.participant.id,
         tableLabel: guest.table.label,
+        placeKind: guest.table.kind === "room" ? "room" : null,
         status,
         paymentStatus: "unpaid",
         currency: guest.restaurant.currency,
@@ -241,6 +242,7 @@ export async function placeOrder(
           orderId: created!.id,
           number,
           tableLabel: guest.table.label,
+          ...(guest.table.kind === "room" ? { place: "room" } : {}),
           totalCents,
           seq: guest.participant.seq,
         },
@@ -255,12 +257,18 @@ export async function placeOrder(
         number,
         tableId: guest.table.id,
         tableLabel: guest.table.label,
+        ...(guest.table.kind === "room" ? { place: "room" } : {}),
         ...(sections ? { sections } : {}),
       },
     });
     // Without acceptance at the till, a guest order goes straight to the kitchen.
     if (status === "received" && settings && !settings.cashierAcceptance)
-      await sendToKitchen(tx, rid, { id: created!.id, number, tableLabel: guest.table.label });
+      await sendToKitchen(tx, rid, {
+        id: created!.id,
+        number,
+        tableLabel: guest.table.label,
+        placeKind: guest.table.kind,
+      });
     await emit(tx, {
       topic: topics.participant(guest.participant.id),
       type: "order.updated",
@@ -276,7 +284,12 @@ export async function placeOrder(
     });
     return created!;
   });
-  notifyNewOrder(db, guest.restaurant, { id: order.id, number: order.number, tableLabel: order.tableLabel });
+  notifyNewOrder(db, guest.restaurant, {
+    id: order.id,
+    number: order.number,
+    tableLabel: order.tableLabel,
+    room: order.placeKind === "room",
+  });
   return order;
 }
 
@@ -325,6 +338,7 @@ export async function listActiveOrders(
       status: orders.status,
       paymentStatus: orders.paymentStatus,
       tableLabel: orders.tableLabel,
+      placeKind: orders.placeKind,
       tableId: orders.tableId,
       totalCents: orders.totalCents,
       currency: orders.currency,
@@ -458,7 +472,12 @@ export async function updateOrderStatus(
         {
           restaurantId: ctx.restaurant.id,
           type: "order.ready",
-          payload: { orderId, number: current.number, tableLabel: current.tableLabel },
+          payload: {
+            orderId,
+            number: current.number,
+            tableLabel: current.tableLabel,
+            ...(current.placeKind === "room" ? { place: "room" } : {}),
+          },
         },
         { orderId },
       );

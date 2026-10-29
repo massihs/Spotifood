@@ -198,7 +198,7 @@ async function RestaurantShell({
       {
         show: can(ctx, "tables.view"),
         href: `${base}/tables`,
-        label: t("nav.tables"),
+        label: ctx.restaurant.kind === "hotel" ? t("nav.tablesHotel") : t("nav.tables"),
         icon: <QrCode />,
         groupKey: "catalog",
         group: g.catalog,

@@ -401,7 +401,7 @@ async function importOne(
       : []);
     const table = await (input.channel === "dine_in" && input.tableId
       ? tx
-          .select({ id: diningTables.id, label: diningTables.label })
+          .select({ id: diningTables.id, label: diningTables.label, kind: diningTables.kind })
           .from(diningTables)
           .where(and(eq(diningTables.id, input.tableId), eq(diningTables.restaurantId, rid)))
           .then((r) => r[0] ?? null)
@@ -461,6 +461,7 @@ async function importOne(
         tableId: table?.id ?? null,
         tableSessionId: sessionId,
         tableLabel: table?.label ?? null,
+        placeKind: table?.kind === "room" ? "room" : null,
         status: input.status,
         paymentStatus: "unpaid",
         currency: settings?.currency ?? "IRR",
