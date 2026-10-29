@@ -24,6 +24,11 @@ export const diningTables = pgTable(
     sortOrder: integer().notNull().default(0),
     /** "table" (dining room, terrace…) or "room" (a hotel room: guests order room service). */
     kind: varchar({ length: 8 }).notNull().default("table"),
+    /** Floor plan: position in grid cells within its zone (null = laid out automatically). */
+    posX: integer(),
+    posY: integer(),
+    /** square | round | rect (long table) */
+    shape: varchar({ length: 8 }).notNull().default("square"),
     ...timestamps,
     ...softDelete,
   },

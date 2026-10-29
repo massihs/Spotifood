@@ -14,6 +14,8 @@ import {
   updateReservationSettings,
 } from "@/server/modules/reservations/service";
 import { wallTime } from "@/lib/period";
+import { getTranslations } from "next-intl/server";
+import { saveFloorPlan, seatWalkIn } from "@/server/modules/reservations/floor";
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const TIME = /^\d{2}:\d{2}$/;
@@ -139,6 +141,41 @@ export async function updateReservationSettingsAction(
   return runAction(async () => {
     const ctx = await actionContext(rid, "restaurant.manage");
     await updateReservationSettings(db, ctx, input);
+    refresh();
+  });
+}
+
+export async function saveFloorPlanAction(rid: string, items: unknown) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "tables.manage");
+    await saveFloorPlan(db, ctx, items);
+    refresh();
+  });
+}
+
+export async function walkInAction(rid: string, input: { tableId: string; partySize: number; name: string }) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "orders.update_status");
+    const t = await getTranslations("reservations.host");
+    await seatWalkIn(db, ctx, input, t("walkInName"));
+    refresh();
+  });
+}
+
+/** Seats a booking, at the table the host tapped (or the one it already has). */
+export async function seatAction(rid: string, id: string, tableId: string | null) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "orders.update_status");
+    await setReservationStatus(db, ctx, id, "seated", tableId);
+    refresh();
+  });
+}
+
+/** Gives a booking a table (or takes it back with null), under the double-booking rules. */
+export async function assignTableAction(rid: string, id: string, tableId: string | null) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "orders.create");
+    await updateBooking(db, ctx, id, { tableId });
     refresh();
   });
 }

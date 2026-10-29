@@ -36,6 +36,8 @@ export const reservations = pgTable(
     /** online | phone | walk_in */
     source: varchar({ length: 12 }).notNull().default("phone"),
     note: text(),
+    /** birthday | anniversary | date | business | family (shown to the host). */
+    occasion: varchar({ length: 16 }),
     customerId: uuid().references(() => customers.id, { onDelete: "set null" }),
     reminderSentAt: tstz(),
     notifiedAt: tstz(),
