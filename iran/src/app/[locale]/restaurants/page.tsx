@@ -44,13 +44,15 @@ export default async function RestaurantsPage({ params, searchParams }: Props) {
             aria-hidden="true"
             className="pointer-events-none absolute -end-40 -top-40 size-[30rem] rounded-full bg-accent/15 blur-3xl"
           />
-          <div className="relative mx-auto max-w-6xl px-4 pt-10 pb-6 sm:px-6 sm:pt-14">
-            <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg-muted ring-1 ring-border">
+          <div className="relative mx-auto max-w-6xl px-4 pt-5 pb-1 sm:px-6 sm:pt-14 sm:pb-6">
+            <span className="hidden items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg-muted ring-1 ring-border sm:inline-flex">
               <span className="size-1.5 rounded-full bg-accent" />
               {t("eyebrow")}
             </span>
-            <h1 className="mt-4 text-3xl font-bold tracking-tight text-balance sm:text-5xl">{t("title")}</h1>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-pretty text-fg-muted sm:text-lg">
+            <h1 className="text-2xl font-bold tracking-tight text-balance sm:mt-4 sm:text-5xl">
+              {t("title")}
+            </h1>
+            <p className="mt-3 hidden max-w-2xl text-base leading-7 text-pretty text-fg-muted sm:block sm:text-lg">
               {t("subtitle")}
             </p>
           </div>
@@ -186,14 +188,14 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
   return (
     <>
       <section className="border-b border-border/60 bg-bg/90 backdrop-blur-xl lg:sticky lg:top-16 lg:z-30">
-        <div className="mx-auto max-w-6xl space-y-3 px-4 py-3 sm:px-6">
+        <div className="mx-auto max-w-6xl space-y-2 px-4 py-3 sm:space-y-3 sm:px-6">
           <DirectoryFilters current={current} cities={cityOptions} booking={booking} />
           <ThemeChips current={current} themes={themes} />
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
+      <section className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-8">
+        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2 sm:mb-5">
           <h2 className="text-xl font-bold">
             {t("results", { count: results.length })}{" "}
             {results.length ? (

@@ -2728,7 +2728,9 @@
         "date": "موعد",
         "business": "عمل",
         "family": "عائلي"
-      }
+      },
+      "zoomIn": "تكبير",
+      "zoomFit": "عرض كامل"
     }
   },
   "booking": {

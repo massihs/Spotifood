@@ -1,4 +1,5 @@
 import { logoUrl } from "@/server/modules/restaurants/settings";
+import { PlaceInitials } from "@/components/ui/place-initials";
 
 /** Brand header of the public booking / queue pages. */
 export function PlaceHeader({
@@ -25,7 +26,7 @@ export function PlaceHeader({
           {logo ? (
             <img src={logo} alt="" className="size-full object-contain p-1" />
           ) : (
-            <span className="text-2xl font-bold text-accent">{[...name][0]}</span>
+            <PlaceInitials name={name} className="text-2xl" />
           )}
         </span>
         <div>

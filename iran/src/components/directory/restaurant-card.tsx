@@ -1,9 +1,10 @@
-import { CalendarCheck, MapPin, Star } from "lucide-react";
+import { CalendarCheck, MapPin, Star, UtensilsCrossed } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/config";
 import type { DirectoryResult } from "@/server/modules/directory/service";
 import { CUISINE_ICONS } from "./cuisine-icons";
+import { PlaceInitials } from "@/components/ui/place-initials";
 
 export function cityLabel(city: { fa: string; en: string }, locale: string) {
   return locale === "fa" || locale === "ar" ? city.fa : city.en;
@@ -39,7 +40,12 @@ export async function RestaurantCard({
             loading="lazy"
             className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-        ) : null}
+        ) : (
+          <UtensilsCrossed
+            aria-hidden="true"
+            className="absolute inset-0 m-auto size-20 -rotate-12 text-white/25"
+          />
+        )}
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent" />
         <OpenPill r={r} t={t} />
         {r.distanceKm != null ? (
@@ -51,7 +57,7 @@ export async function RestaurantCard({
           {r.logo ? (
             <img src={r.logo} alt="" className="size-full object-contain p-0.5" />
           ) : (
-            <span className="text-lg font-bold text-neutral-800">{[...r.name][0]}</span>
+            <PlaceInitials name={r.name} className="text-lg" />
           )}
         </span>
       </div>

@@ -42,6 +42,7 @@ import { buttonClasses } from "@/components/ui/button";
 import { getPathname, Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { getDirectory } from "@/server/modules/directory/cache";
+import { PlaceInitials } from "@/components/ui/place-initials";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -433,7 +434,7 @@ async function RestaurantsStrip({ locale }: { locale: string }) {
                   {r.logo ? (
                     <img src={r.logo} alt="" loading="lazy" className="size-full object-contain p-0.5" />
                   ) : (
-                    <span className="font-bold text-neutral-800">{[...r.name][0]}</span>
+                    <PlaceInitials name={r.name} />
                   )}
                 </span>
                 <span dir="auto" className="text-sm font-semibold whitespace-nowrap">

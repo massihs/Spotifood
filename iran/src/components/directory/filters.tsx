@@ -86,13 +86,13 @@ export function DirectoryFilters({
     <div className={cn("space-y-3 transition-opacity", pending && "opacity-70")}>
       <form
         role="search"
-        className="flex flex-col gap-2 rounded-3xl bg-surface p-2 shadow-[var(--shadow-float)] ring-1 ring-border sm:flex-row"
+        className="flex gap-2 rounded-3xl bg-surface p-1.5 shadow-[var(--shadow-float)] ring-1 ring-border max-sm:flex-wrap sm:p-2"
         onSubmit={(e) => {
           e.preventDefault();
           go({ q: String(new FormData(e.currentTarget).get("q") ?? "").trim() || undefined });
         }}
       >
-        <label className="flex min-w-0 flex-1 items-center gap-2 rounded-2xl px-3">
+        <label className="flex min-w-0 flex-1 basis-full items-center gap-2 rounded-2xl px-3 sm:basis-auto">
           <Search className="size-5 shrink-0 text-fg-subtle" aria-hidden="true" />
           <input
             name="q"
@@ -103,7 +103,7 @@ export function DirectoryFilters({
             className="h-12 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-fg-subtle"
           />
         </label>
-        <div className="flex gap-2">
+        <div className="flex w-full gap-2 sm:w-auto">
           <label className="relative flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl bg-surface-2 ps-3 pe-2 sm:w-48 sm:flex-none">
             <MapPin className="size-4 shrink-0 text-fg-muted" aria-hidden="true" />
             <select
@@ -133,7 +133,7 @@ export function DirectoryFilters({
             )}
           >
             <LocateFixed className={cn("size-4", locating && "animate-pulse")} aria-hidden="true" />
-            {locating ? t("locating") : t("nearMe")}
+            <span className="sr-only sm:not-sr-only">{locating ? t("locating") : t("nearMe")}</span>
           </button>
         </div>
       </form>

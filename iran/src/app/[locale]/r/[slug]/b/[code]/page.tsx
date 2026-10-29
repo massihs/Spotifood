@@ -26,6 +26,7 @@ import { cn } from "@/lib/cn";
 import { db } from "@/server/db/client";
 import { getDirectory } from "@/server/modules/directory/cache";
 import { getByCode } from "@/server/modules/reservations/service";
+import { PlaceInitials } from "@/components/ui/place-initials";
 
 type Props = PageProps<"/[locale]/r/[slug]/b/[code]">;
 
@@ -131,7 +132,7 @@ async function Status({ params }: Pick<Props, "params">) {
               {listing?.logo ? (
                 <img src={listing.logo} alt="" className="size-full object-contain p-1" />
               ) : (
-                <span className="text-lg font-bold text-neutral-800">{[...place.name][0]}</span>
+                <PlaceInitials name={place.name} className="text-lg" />
               )}
             </span>
             <div className="min-w-0">
@@ -158,7 +159,7 @@ async function Status({ params }: Pick<Props, "params">) {
               {t("guests", { count: r.partySize })}
             </Cell>
             <Cell icon={<Hash className="size-4" />} label={t("reference")}>
-              <span dir="ltr" className="font-mono text-sm tracking-wider uppercase">
+              <span dir="ltr" className="latin-digits text-sm tracking-wider uppercase">
                 {r.code.slice(0, 6)}
               </span>
             </Cell>

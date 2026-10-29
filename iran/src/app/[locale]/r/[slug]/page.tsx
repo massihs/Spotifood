@@ -28,6 +28,7 @@ import { getOnlineStore } from "@/server/modules/online/service";
 import { defaultWishTime, slotsNear } from "@/server/modules/reservations/service";
 import { localDay } from "@/lib/period";
 import { db } from "@/server/db/client";
+import { PlaceInitials } from "@/components/ui/place-initials";
 
 type Props = PageProps<"/[locale]/r/[slug]">;
 
@@ -226,7 +227,7 @@ async function Place({ params }: Pick<Props, "params">) {
                 {place.logo ? (
                   <img src={place.logo} alt="" className="size-full object-contain p-1" />
                 ) : (
-                  <span className="text-3xl font-bold text-neutral-800">{[...place.name][0]}</span>
+                  <PlaceInitials name={place.name} className="text-3xl" />
                 )}
               </span>
               <div className="min-w-0">

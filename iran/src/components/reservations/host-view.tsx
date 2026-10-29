@@ -20,6 +20,8 @@ import {
   Users,
   UserPlus,
   Wand2,
+  ZoomIn,
+  ZoomOut,
   X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -182,6 +184,8 @@ export function HostView({
   const [panel, setPanel] = useState<string | null>(null);
   const [sheet, setSheet] = useState<{ booking?: HostBooking; tableId?: string | null } | null>(null);
   const [editing, setEditing] = useState(false);
+  // Phones see the whole room by default; zoom gives the full-size plan with a side scroll.
+  const [zoom, setZoom] = useState(false);
   const [layout, setLayout] = useState<Record<string, { x: number; y: number; shape: string }>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const canvas = useRef<HTMLDivElement>(null);
@@ -427,13 +431,32 @@ export function HostView({
         ) : null}
 
         {/* The plan */}
-        <div className="overflow-x-auto rounded-3xl bg-surface p-3 ring-1 ring-border">
+        <div className="relative overflow-x-auto rounded-3xl bg-surface p-3 ring-1 ring-border">
+          {editing ? null : (
+            <button
+              type="button"
+              onClick={() => setZoom(!zoom)}
+              aria-pressed={zoom}
+              aria-label={zoom ? th("zoomFit") : th("zoomIn")}
+              className="sticky start-0 z-10 mb-2 inline-flex h-8 items-center gap-1.5 rounded-full bg-surface px-3 text-xs font-bold ring-1 ring-border sm:hidden"
+            >
+              {zoom ? (
+                <ZoomOut className="size-4" aria-hidden="true" />
+              ) : (
+                <ZoomIn className="size-4" aria-hidden="true" />
+              )}
+              {zoom ? th("zoomFit") : th("zoomIn")}
+            </button>
+          )}
           <div
             ref={canvas}
             dir="ltr"
             onPointerMove={pointerMove}
             onPointerUp={pointerUp}
-            className="relative min-w-[640px] touch-none rounded-2xl bg-surface-2/60"
+            className={cn(
+              "@container relative touch-none rounded-2xl bg-surface-2/60",
+              (editing || zoom) && "min-w-[640px]",
+            )}
             style={{
               aspectRatio: `${cols} / ${viewRows}`,
               backgroundImage: "radial-gradient(var(--border-strong) 1px, transparent 1px)",
@@ -477,24 +500,34 @@ export function HostView({
                         editing && selected === tb.id && "ring-4 ring-fg",
                       )}
                     >
-                      <span className={cn("leading-none font-black", small ? "text-sm" : "text-base")}>
+                      <span
+                        className={cn(
+                          "leading-none font-black @max-xl:text-xs",
+                          small ? "text-sm" : "text-base",
+                        )}
+                      >
                         {tb.label}
                       </span>
                       {b ? (
                         <>
-                          <span className="text-[11px] leading-tight font-bold tabular-nums" dir="ltr">
+                          <span
+                            className="text-[11px] leading-tight font-bold tabular-nums @max-xl:text-[9px]"
+                            dir="ltr"
+                          >
                             {clock(b.startsAt, timeZone)}
                           </span>
                           {small ? null : (
-                            <span className="w-full truncate text-[10px] leading-tight font-semibold opacity-90">
+                            <span className="w-full truncate text-[10px] leading-tight font-semibold opacity-90 @max-xl:hidden">
                               {b.name}
                             </span>
                           )}
                         </>
                       ) : small ? null : s.kind === "occupied" ? (
-                        <span className="text-[10px] leading-tight font-semibold">{th("qrGuests")}</span>
+                        <span className="text-[10px] leading-tight font-semibold @max-xl:hidden">
+                          {th("qrGuests")}
+                        </span>
                       ) : (
-                        <span className="text-[10px] leading-tight opacity-60">
+                        <span className="text-[10px] leading-tight opacity-60 @max-xl:hidden">
                           {th("seats", { count: tb.capacity ?? 0 })}
                         </span>
                       )}

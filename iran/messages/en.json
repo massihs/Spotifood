@@ -2728,7 +2728,9 @@
         "date": "Date night",
         "business": "Business",
         "family": "Family"
-      }
+      },
+      "zoomIn": "Zoom in",
+      "zoomFit": "Fit to screen"
     }
   },
   "booking": {

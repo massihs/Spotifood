@@ -21,6 +21,7 @@ import { usePref, writePref } from "@/components/ui/use-pref";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { bookAction, slotsAction } from "@/app/[locale]/r/actions";
+import { PlaceInitials } from "@/components/ui/place-initials";
 
 const field =
   "h-12 w-full rounded-xl border border-border-strong bg-surface px-3.5 text-[16px] focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-[var(--ring)] focus-visible:outline-none";
@@ -426,7 +427,7 @@ export function BookFlow({
                 {place.logo ? (
                   <img src={place.logo} alt="" className="size-full object-contain p-1" />
                 ) : (
-                  <span className="text-lg font-bold text-accent-text">{[...place.name][0]}</span>
+                  <PlaceInitials name={place.name} className="text-lg" />
                 )}
               </span>
               <div className="min-w-0">

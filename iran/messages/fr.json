@@ -2736,7 +2736,9 @@
         "date": "Rendez-vous",
         "business": "Affaires",
         "family": "En famille"
-      }
+      },
+      "zoomIn": "Agrandir",
+      "zoomFit": "Tout voir"
     }
   },
   "booking": {

@@ -11,6 +11,7 @@ import { db } from "@/server/db/client";
 import { getDirectory } from "@/server/modules/directory/cache";
 import { logoUrl } from "@/server/modules/restaurants/settings";
 import { bookingAreas, placeBySlug } from "@/server/modules/reservations/service";
+import { PlaceInitials } from "@/components/ui/place-initials";
 
 type Props = PageProps<"/[locale]/r/[slug]/book">;
 
@@ -92,7 +93,7 @@ async function Book({ params, searchParams }: Pick<Props, "params" | "searchPara
               {logo ? (
                 <img src={logo} alt="" className="size-full object-contain p-1" />
               ) : (
-                <span className="text-2xl font-bold text-neutral-800">{[...place.name][0]}</span>
+                <PlaceInitials name={place.name} className="text-2xl" />
               )}
             </span>
             <div className="min-w-0">
