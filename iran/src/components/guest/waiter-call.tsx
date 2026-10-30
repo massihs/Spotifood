@@ -8,20 +8,54 @@ import { cn } from "@/lib/cn";
 import { CALL_ICON, CALL_TONES } from "./call-icons";
 
 export type CallOption = { key: string; label: string | null; icon: string };
-const BUILTIN = ["waiter", "bill", "water", "housekeeping", "towels", "reception"];
+const BUILTIN = [
+  "waiter",
+  "bill",
+  "water",
+  "housekeeping",
+  "towels",
+  "reception",
+  "laundry",
+  "wakeup",
+  "minibar",
+  "maintenance",
+  "luggage",
+  "taxi",
+];
 
-/** "Call the waiter" bell on the identity card, with the options the restaurant chose. */
-export function WaiterCall({ options, className }: { options: CallOption[]; className?: string }) {
+/**
+ * "Call the waiter" bell on the identity card, with the options the restaurant chose. In a hotel
+ * room a tap opens a short note first ("2 shirts", "wake me at 7"), then the request is sent.
+ */
+export function WaiterCall({
+  options,
+  room = false,
+  className,
+}: {
+  options: CallOption[];
+  room?: boolean;
+  className?: string;
+}) {
   const t = useTranslations("guest.waiter");
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState<string | null>(null);
+  const [picked, setPicked] = useState<CallOption | null>(null);
+  const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const send = (key: string, text: string | null) =>
+    start(async () => {
+      setError(null);
+      const res = await callWaiterAction(key, text);
+      if (res?.ok) setSent(key);
+      else setError(res?.error === "too_soon" ? t("tooSoon") : t("failed"));
+    });
+  const name = (o: CallOption) => o.label ?? t(`kinds.${o.key as "waiter"}`);
   return (
     <>
       <button
         type="button"
-        onClick={() => (setOpen(true), setSent(null), setError(null))}
+        onClick={() => (setOpen(true), setSent(null), setError(null), setPicked(null), setNote(""))}
         className={cn(
           "inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-accent ps-3.5 pe-4 text-sm font-semibold text-accent-fg shadow-accent",
           "atelier:bg-transparent atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-border-strong nuit:shadow-none",
@@ -67,6 +101,37 @@ export function WaiterCall({ options, className }: { options: CallOption[]; clas
                   {BUILTIN.includes(sent) ? t(`sentHint.${sent as "waiter"}`) : t("sentHint.custom")}
                 </p>
               </div>
+            ) : picked ? (
+              <div className="space-y-3">
+                <p className="font-semibold">{name(picked)}</p>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder={t("notePlaceholder")}
+                  aria-label={t("note")}
+                  maxLength={280}
+                  rows={2}
+                  autoFocus
+                  className="w-full resize-none rounded-xl border border-border-strong bg-surface px-3.5 py-3 text-[16px] focus-visible:border-accent focus-visible:outline-none"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPicked(null)}
+                    className="h-12 rounded-2xl px-4 font-semibold ring-1 ring-border"
+                  >
+                    {t("back")}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => send(picked.key, note.trim() || null)}
+                    className="h-12 flex-1 rounded-2xl bg-accent font-bold text-accent-fg disabled:opacity-50"
+                  >
+                    {t("send")}
+                  </button>
+                </div>
+              </div>
             ) : (
               <div className="grid grid-cols-3 gap-3">
                 {options.map(({ key, label, icon }, i) => {
@@ -78,19 +143,14 @@ export function WaiterCall({ options, className }: { options: CallOption[]; clas
                       type="button"
                       disabled={pending}
                       onClick={() =>
-                        start(async () => {
-                          setError(null);
-                          const res = await callWaiterAction(key);
-                          if (res?.ok) setSent(key);
-                          else setError(res?.error === "too_soon" ? t("tooSoon") : t("failed"));
-                        })
+                        room ? (setPicked({ key, label, icon }), setNote("")) : send(key, null)
                       }
                       className="flex flex-col items-center gap-2 rounded-2xl border border-border p-4 text-sm font-semibold active:scale-95 disabled:opacity-50"
                     >
                       <span className={cn("grid size-12 place-items-center rounded-2xl", tone)}>
                         <Icon className="size-6" />
                       </span>
-                      {label ?? t(`kinds.${key as "waiter"}`)}
+                      {name({ key, label, icon })}
                     </button>
                   );
                 })}

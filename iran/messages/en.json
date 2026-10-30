@@ -339,7 +339,9 @@
       "catalog": "Menu & stock",
       "guests": "Guests & experience",
       "finance": "Finance & reports",
-      "manage": "Management"
+      "manage": "Management",
+      "hotel": "Hotel",
+      "hotelRestaurant": "Hotel restaurant"
     },
     "delivery": "Delivery",
     "reservations": "Bookings & queue",
@@ -355,7 +357,9 @@
     "feedback": "Guest feedback",
     "callcenter": "Call centre",
     "adminAudience": "Audience",
-    "tablesHotel": "Rooms & QR"
+    "tablesHotel": "Rooms & QR",
+    "requests": "Requests",
+    "roomService": "Room service"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -421,6 +425,16 @@
       "newOrders": "{n, plural, one {# order to accept} other {# orders to accept}}",
       "pendingBookings": "{n, plural, one {# booking to confirm} other {# bookings to confirm}}",
       "unpaid": "{amount} to collect"
+    },
+    "hotel": {
+      "alertOpen": "{n, plural, one {# room request waiting} other {# room requests waiting}}",
+      "requests": "Requests",
+      "services": "Services",
+      "open": "Requests waiting",
+      "inProgress": "{n} in progress",
+      "occupied": "Rooms in use",
+      "roomOrders": "Room service today",
+      "doneToday": "Requests done"
     }
   },
   "roles": {
@@ -678,7 +692,8 @@
     "channel_disabled": "This ordering mode is not available.",
     "too_many_sections": "30 sections at most.",
     "label_required": "Give every bell option a name.",
-    "invalid_call": "This option is no longer offered."
+    "invalid_call": "This option is no longer offered.",
+    "job_in_use": "Members hold this job."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -798,7 +813,23 @@
       "kitchen": {
         "name": "Kitchen",
         "desc": "Sees only the accepted orders of their station, with sound and ticket."
-      }
+      },
+      "hotel": {
+        "reception": "Front desk",
+        "housekeeping": "Housekeeping",
+        "roomService": "Room service"
+      },
+      "title": "Jobs",
+      "hint": "Name your jobs the way your place does (Cashier, Hookah, Front desk…) and pick their icon.",
+      "new": "New job",
+      "worksAs": "Works as: {job}",
+      "name": "Job name",
+      "namePlaceholder": "E.g. Hookah, Dishwashing, Front desk",
+      "icon": "Icon",
+      "base": "Works as",
+      "baseHint": "What the job sees and can do.",
+      "baseLocked": "Members hold this job: move them before changing how it works.",
+      "deleteConfirm": "Delete the job “{name}”? Its members keep their access."
     },
     "sections": {
       "title": "Sections",
@@ -854,7 +885,15 @@
         "coffee": "Coffee",
         "baby": "High chair",
         "sparkles": "Cleaning",
-        "bell": "Bell"
+        "bell": "Bell",
+        "shirt": "Laundry",
+        "alarm": "Alarm",
+        "wine": "Minibar",
+        "wrench": "Repair",
+        "luggage": "Luggage",
+        "car": "Taxi",
+        "bed": "Bed",
+        "spray": "Cleaning"
       },
       "routeTo": "Send to",
       "routeDefault": "“Guest calls” sections (or the whole team)",
@@ -865,8 +904,17 @@
       "builtin": {
         "housekeeping": "Housekeeping",
         "towels": "Towels",
-        "reception": "Reception"
-      }
+        "reception": "Reception",
+        "laundry": "Laundry",
+        "wakeup": "Wake-up call",
+        "minibar": "Minibar",
+        "maintenance": "Repair",
+        "luggage": "Luggage",
+        "taxi": "Taxi"
+      },
+      "hotelTitle": "Room services",
+      "hotelHint": "What guests can ask for from their room (housekeeping, laundry, wake-up…). Switch them on, add your own and pick the section that gets them.",
+      "roomOnly": "Rooms only"
     }
   },
   "permissions": {
@@ -1234,7 +1282,13 @@
         "water": "Water",
         "housekeeping": "Housekeeping",
         "towels": "Towels",
-        "reception": "Reception"
+        "reception": "Reception",
+        "laundry": "Laundry",
+        "wakeup": "Wake-up call",
+        "minibar": "Minibar",
+        "maintenance": "Repair",
+        "luggage": "Luggage",
+        "taxi": "Taxi"
       },
       "sent": "Request sent",
       "sentHint": {
@@ -1244,11 +1298,21 @@
         "custom": "The team is on its way.",
         "housekeeping": "The team is on its way.",
         "towels": "The team is on its way.",
-        "reception": "The team is on its way."
+        "reception": "The team is on its way.",
+        "laundry": "The front desk has your request.",
+        "wakeup": "The front desk has your request.",
+        "minibar": "The front desk has your request.",
+        "maintenance": "The front desk has your request.",
+        "luggage": "The front desk has your request.",
+        "taxi": "The front desk has your request."
       },
       "tooSoon": "Your request is on its way — please wait a moment.",
       "failed": "Could not send, try again.",
-      "short": "Waiter"
+      "short": "Waiter",
+      "note": "Details",
+      "notePlaceholder": "Optional: e.g. 2 shirts, wake me at 7, taxi to the airport",
+      "back": "Back",
+      "send": "Send request"
     },
     "popular": "Popular",
     "inCart": "{n} in your cart",
@@ -3685,5 +3749,28 @@
     "denied": "Notifications blocked in the browser",
     "unavailable": "Notifications unavailable in this browser",
     "newOrderTableRoom": "Room {table}"
+  },
+  "hotel": {
+    "title": "Room requests",
+    "subtitle": "What guests ask for from their room, from the front desk to done.",
+    "tabs": {
+      "board": "Requests",
+      "services": "Services offered"
+    },
+    "status": {
+      "open": "New",
+      "in_progress": "In progress",
+      "done": "Done"
+    },
+    "empty": {
+      "open": "No request waiting.",
+      "in_progress": "Nobody is on a request.",
+      "done": "Nothing done today yet."
+    },
+    "ago": "{min} min ago",
+    "doneAt": "done at",
+    "take": "I’m on it",
+    "release": "Put back",
+    "done": "Done"
   }
 }

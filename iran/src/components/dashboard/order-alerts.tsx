@@ -124,7 +124,17 @@ export function OrderAlerts({
               ? "confirm"
               : "waiter";
       const table = String(data.tableLabel ?? "");
-      const roomCall = ["housekeeping", "towels", "reception"].includes(String(data.kind));
+      const roomCall = [
+        "housekeeping",
+        "towels",
+        "reception",
+        "laundry",
+        "wakeup",
+        "minibar",
+        "maintenance",
+        "luggage",
+        "taxi",
+      ].includes(String(data.kind));
       const label = typeof data.label === "string" && data.label ? data.label : null;
       alert = {
         id: `w-${data.tableLabel}-${Date.now()}`,
@@ -135,8 +145,8 @@ export function OrderAlerts({
                 label: label ?? tCall(String(data.kind) as "waiter"),
               })
             : t(`waiter.${kind}${room ? "Room" : ""}`, { table }),
-        body: t("waiter.body"),
-        href: `/dashboard/${restaurantId}/floor`,
+        body: typeof data.note === "string" && data.note ? data.note : t("waiter.body"),
+        href: `/dashboard/${restaurantId}/${room ? "requests" : "floor"}`,
         waiter: true,
       };
     } else if (kitchen) {

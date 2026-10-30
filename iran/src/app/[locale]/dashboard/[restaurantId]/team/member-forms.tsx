@@ -16,7 +16,8 @@ import {
   useActionForm,
 } from "@/components/ui/form";
 import { addMemberAction, removeMemberAction, updateMemberAction } from "./actions";
-import { JOBS, STATION_JOBS, type Job } from "@/lib/jobs";
+import { STATION_JOBS, type Job } from "@/lib/jobs";
+import type { TeamJobView } from "./job-meta";
 
 export type MemberView = {
   id: string;
@@ -33,17 +34,23 @@ function AddMemberForm({
   restaurantId,
   roles,
   stations,
+  jobs,
 }: {
   restaurantId: string;
   roles: ("admin" | "staff")[];
   stations: { id: string; name: string }[];
+  jobs: TeamJobView[];
 }) {
   const t = useTranslations();
   const form = useActionForm(addMemberAction.bind(null, restaurantId));
   const state = form.state;
   useCloseOnSuccess(state);
   const err = useFieldError(state);
-  const [job, setJob] = useState<string>("waiter");
+  const usable = jobs.filter((j) => roles.includes("admin") || j.baseJob !== "manager");
+  const [jobId, setJobId] = useState<string>(
+    (usable.find((j) => j.baseJob === "waiter") ?? usable[0])?.id ?? "",
+  );
+  const job = usable.find((j) => j.id === jobId)?.baseJob ?? "waiter";
   return (
     <ActionForm form={form} className="space-y-4">
       <FormFeedback state={state} />
@@ -58,16 +65,17 @@ function AddMemberForm({
       />
       <Field label={t("team.fullName")} name="fullName" autoComplete="off" error={err("fullName")} />
       <input type="hidden" name="role" value="staff" />
+      <input type="hidden" name="job" value={job} />
       <SelectField
         label={t("team.jobs.label")}
-        name="job"
-        value={job}
-        onChange={(e) => setJob(e.target.value)}
+        name="teamJobId"
+        value={jobId}
+        onChange={(e) => setJobId(e.target.value)}
         hint={t(`team.jobs.${job as "waiter"}.desc`)}
       >
-        {JOBS.filter((j) => roles.includes("admin") || j !== "manager").map((j) => (
-          <option key={j} value={j}>
-            {t(`team.jobs.${j}.name`)}
+        {usable.map((j) => (
+          <option key={j.id} value={j.id}>
+            {j.name}
           </option>
         ))}
       </SelectField>
@@ -101,15 +109,17 @@ export function AddMemberDialog({
   restaurantId,
   roles,
   stations,
+  jobs,
 }: {
   restaurantId: string;
   roles: ("admin" | "staff")[];
   stations: { id: string; name: string }[];
+  jobs: TeamJobView[];
 }) {
   const t = useTranslations("team");
   return (
     <Dialog title={t("add")} trigger={(open) => <Button onClick={open}>+ {t("add")}</Button>}>
-      <AddMemberForm restaurantId={restaurantId} roles={roles} stations={stations} />
+      <AddMemberForm restaurantId={restaurantId} roles={roles} stations={stations} jobs={jobs} />
     </Dialog>
   );
 }

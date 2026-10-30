@@ -18,7 +18,8 @@ import { JobPicker } from "./job-picker";
 import { JobGuide } from "./job-guide";
 import { cn } from "@/lib/cn";
 import { isJob } from "@/lib/jobs";
-import { JOB_TONES } from "./job-meta";
+import { JOB_TONES, jobOf } from "./job-meta";
+import { listTeamJobs } from "@/server/modules/team/jobs";
 import { listStations } from "@/server/modules/kitchen/stations";
 import { CALL_ICONS, listGuestCalls, listSections, NOTIFY_KEYS } from "@/server/modules/team/sections";
 import { MemberSections, SectionsPanel } from "./sections";
@@ -37,14 +38,20 @@ export default function TeamPage({ params }: { params: Params }) {
 async function Team({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "members.manage");
-  const [t, format, members, { stations }, sections, calls] = await Promise.all([
+  const [t, format, members, { stations }, sections, calls, jobs] = await Promise.all([
     getTranslations(),
     getFormatter(),
     listMembers(db, ctx),
     listStations(db, ctx),
     listSections(db, ctx),
     listGuestCalls(db, ctx),
+    listTeamJobs(db, ctx),
   ]);
+  const jobCounts: Record<string, number> = {};
+  for (const m of members) {
+    const j = jobOf(jobs, m.teamJobId, m.job);
+    if (j) jobCounts[j.id] = (jobCounts[j.id] ?? 0) + 1;
+  }
   const sectionList = sections.map((s) => ({ id: s.id, name: s.name, color: s.color }));
   const presets = Object.fromEntries(
     (["waiter", "cashier", "bar", "kitchen"] as const).map((j) => [
@@ -62,14 +69,19 @@ async function Team({ params }: { params: Params }) {
         title={t("team.title")}
         description={t("team.subtitle")}
         actions={
-          <AddMemberDialog restaurantId={ctx.restaurant.id} roles={[...roles]} stations={stationList} />
+          <AddMemberDialog
+            restaurantId={ctx.restaurant.id}
+            roles={[...roles]}
+            stations={stationList}
+            jobs={jobs}
+          />
         }
       />
       <JobGuide
-        counts={members.reduce<Record<string, number>>((acc, m) => {
-          if (m.job) acc[m.job] = (acc[m.job] ?? 0) + 1;
-          return acc;
-        }, {})}
+        restaurantId={ctx.restaurant.id}
+        jobs={jobs}
+        counts={jobCounts}
+        allowManager={roles.includes("admin")}
       />
       <SectionsPanel
         restaurantId={ctx.restaurant.id}
@@ -146,6 +158,8 @@ async function Team({ params }: { params: Params }) {
                         restaurantId={ctx.restaurant.id}
                         memberId={m.id}
                         job={m.job}
+                        teamJobId={m.teamJobId}
+                        jobs={jobs}
                         stationId={m.stationId}
                         stations={stationList}
                         allowManager={roles.includes("admin")}
@@ -201,12 +215,15 @@ async function Team({ params }: { params: Params }) {
           </tbody>
         </table>
       </Card>
-      <GuestCallsPanel
-        restaurantId={ctx.restaurant.id}
-        calls={calls}
-        sections={sectionList}
-        icons={[...CALL_ICONS]}
-      />
+      {/* A hotel manages its bell with its room services, on the Requests page. */}
+      {ctx.restaurant.kind === "hotel" ? null : (
+        <GuestCallsPanel
+          restaurantId={ctx.restaurant.id}
+          calls={calls}
+          sections={sectionList}
+          icons={[...CALL_ICONS]}
+        />
+      )}
     </>
   );
 }

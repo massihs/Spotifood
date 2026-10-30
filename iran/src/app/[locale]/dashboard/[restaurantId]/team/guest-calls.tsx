@@ -15,6 +15,7 @@ export type CallView = {
   icon?: string;
   sectionId?: string | null;
   enabled: boolean;
+  roomOnly?: boolean;
 };
 
 /**
@@ -26,11 +27,14 @@ export function GuestCallsPanel({
   calls,
   sections,
   icons,
+  hotel = false,
 }: {
   restaurantId: string;
   calls: CallView[];
   sections: { id: string; name: string }[];
   icons: string[];
+  /** The hotel's services page: room services first, custom ones can be for rooms only. */
+  hotel?: boolean;
 }) {
   const t = useTranslations("team.calls");
   const tc = useTranslations("common");
@@ -45,7 +49,10 @@ export function GuestCallsPanel({
   const add = () => {
     setSaved(false);
     const key = `c-${Math.random().toString(36).slice(2, 8)}`;
-    setList((x) => [...x, { key, label: "", icon: "flame", sectionId: null, enabled: true }]);
+    setList((x) => [
+      ...x,
+      { key, label: "", icon: hotel ? "bell" : "flame", sectionId: null, enabled: true, roomOnly: hotel },
+    ]);
   };
   const custom = (c: CallView) => c.key.startsWith("c-");
 
@@ -53,9 +60,9 @@ export function GuestCallsPanel({
     <Card className="mb-4 p-4 sm:p-5">
       <h2 className="flex items-center gap-2 font-bold">
         <BellRing className="size-4 text-accent-text" aria-hidden="true" />
-        {t("title")}
+        {hotel ? t("hotelTitle") : t("title")}
       </h2>
-      <p className="mt-0.5 mb-3 text-sm text-fg-muted">{t("hint")}</p>
+      <p className="mt-0.5 mb-3 text-sm text-fg-muted">{hotel ? t("hotelHint") : t("hint")}</p>
       <div className="space-y-2">
         {list.map((c, i) => {
           const Icon = CALL_ICON[c.icon ?? "bell"] ?? BellRing;
@@ -123,6 +130,17 @@ export function GuestCallsPanel({
                 />
                 {t("shown")}
               </label>
+              {hotel && custom(c) ? (
+                <label className="flex items-center gap-1.5 text-sm">
+                  <input
+                    type="checkbox"
+                    className="size-4 accent-[var(--accent)]"
+                    checked={c.roomOnly ?? false}
+                    onChange={(e) => patch(c.key, { roomOnly: e.target.checked })}
+                  />
+                  {t("roomOnly")}
+                </label>
+              ) : null}
               {custom(c) ? (
                 <button
                   type="button"
@@ -142,7 +160,7 @@ export function GuestCallsPanel({
         <button
           type="button"
           onClick={add}
-          disabled={list.length >= 16}
+          disabled={list.length >= 28}
           className="inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold ring-1 ring-border hover:bg-surface-2"
         >
           <Plus className="size-4" aria-hidden="true" />

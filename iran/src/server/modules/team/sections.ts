@@ -274,8 +274,22 @@ export async function setMemberSections(
 // ---------------------------------------------------------------------------------------------
 // Guest call bell (options shown on the menu)
 
-/** Hotel rooms also get housekeeping, towels and the front desk (only offered in a room). */
-export const ROOM_CALLS = ["housekeeping", "towels", "reception"] as const;
+/**
+ * Hotel room services (only offered in a room): the first four are on by default, the others
+ * wait for the hotel to switch them on.
+ */
+export const ROOM_CALLS = [
+  "housekeeping",
+  "towels",
+  "reception",
+  "laundry",
+  "wakeup",
+  "minibar",
+  "maintenance",
+  "luggage",
+  "taxi",
+] as const;
+const ROOM_CALLS_ON = new Set(["housekeeping", "towels", "reception", "laundry"]);
 export const BUILTIN_CALLS = ["waiter", "bill", "water", ...ROOM_CALLS] as const;
 const isRoomCall = (key: string) => (ROOM_CALLS as readonly string[]).includes(key);
 export const CALL_ICONS = [
@@ -289,6 +303,14 @@ export const CALL_ICONS = [
   "baby",
   "sparkles",
   "bell",
+  "shirt",
+  "alarm",
+  "wine",
+  "wrench",
+  "luggage",
+  "car",
+  "bed",
+  "spray",
 ] as const;
 const BUILTIN_ICON: Record<string, (typeof CALL_ICONS)[number]> = {
   waiter: "hand",
@@ -297,6 +319,12 @@ const BUILTIN_ICON: Record<string, (typeof CALL_ICONS)[number]> = {
   housekeeping: "sparkles",
   towels: "droplets",
   reception: "bell",
+  laundry: "shirt",
+  wakeup: "alarm",
+  minibar: "wine",
+  maintenance: "wrench",
+  luggage: "luggage",
+  taxi: "car",
 };
 
 export type GuestCall = { key: string; label: string | null; icon: string; sectionId: string | null };
@@ -312,7 +340,12 @@ export function normalizeCalls(
   const list = saved?.length ? saved : [];
   const hotel = kind === "hotel";
   const out = BUILTIN_CALLS.filter((key) => hotel || !isRoomCall(key)).map(
-    (key) => list.find((o) => o.key === key) ?? { key, enabled: true, sectionId: null },
+    (key) =>
+      list.find((o) => o.key === key) ?? {
+        key,
+        enabled: !isRoomCall(key) || ROOM_CALLS_ON.has(key),
+        sectionId: null,
+      },
   ) as GuestCallOption[];
   const ordered = list.length ? list.filter((o) => o.key.startsWith("c-")) : [];
   return [...out, ...ordered].map((o) => ({
@@ -334,7 +367,7 @@ export async function guestCallsOf(
     .leftJoin(restaurantSettings, eq(restaurantSettings.restaurantId, restaurants.id))
     .where(eq(restaurants.id, restaurantId));
   return normalizeCalls(s?.calls, s?.kind)
-    .filter((o) => o.enabled && (place.room || !isRoomCall(o.key)))
+    .filter((o) => o.enabled && (place.room || (!isRoomCall(o.key) && !o.roomOnly)))
     .map((o) => ({
       key: o.key,
       label: o.key.startsWith("c-") ? (o.label ?? "") : null,
@@ -358,8 +391,9 @@ const callSchema = z.object({
   icon: z.enum(CALL_ICONS).optional(),
   sectionId: z.uuid().nullable().optional(),
   enabled: z.boolean(),
+  roomOnly: z.boolean().optional(),
 });
-export const guestCallsSchema = z.array(callSchema).max(16);
+export const guestCallsSchema = z.array(callSchema).max(28);
 
 export async function saveGuestCalls(db: Database, ctx: RestaurantContext, raw: unknown) {
   assertCan(ctx, "members.manage");
@@ -383,6 +417,7 @@ export async function saveGuestCalls(db: Database, ctx: RestaurantContext, raw: 
       icon: c.icon,
       sectionId: c.sectionId && sectionIds.includes(c.sectionId) ? c.sectionId : null,
       enabled: c.enabled,
+      ...(custom && c.roomOnly && ctx.restaurant.kind === "hotel" ? { roomOnly: true } : {}),
     });
   }
   await db

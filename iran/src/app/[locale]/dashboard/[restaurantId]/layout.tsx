@@ -10,6 +10,7 @@ import {
   CalendarClock,
   Network,
   Calculator,
+  ConciergeBell,
   CreditCard,
   Headset,
   ChefHat,
@@ -48,6 +49,37 @@ import { checkKpiAlerts } from "@/server/modules/kpi/service";
 import { vapidPublicKey } from "@/server/modules/push/service";
 import { after } from "next/server";
 import { SubscriptionBanner } from "@/components/dashboard/subscription-banner";
+import { countOpenRequests } from "@/server/modules/hotel/requests";
+
+/**
+ * A hotel's menu: requests, rooms and room service on top; what only its restaurant uses (the
+ * floor, table bookings, delivery…) in its own group further down.
+ */
+function arrangeForHotel(
+  nav: NavItem[],
+  base: string,
+  g: Record<"hotel" | "restaurant", string>,
+  roomService: string,
+) {
+  const restaurantOnly = ["floor", "waiter", "reservations", "callcenter", "delivery", "kitchen", "pos"].map(
+    (p) => `${base}/${p}`,
+  );
+  for (const item of nav) {
+    if (item.href === `${base}/orders`)
+      Object.assign(item, { label: roomService, groupKey: "hotel", group: g.hotel });
+    else if (item.href === `${base}/tables`) Object.assign(item, { groupKey: "hotel", group: g.hotel });
+    else if (restaurantOnly.includes(item.href))
+      Object.assign(item, {
+        groupKey: "restaurant",
+        group: g.restaurant,
+        primary: item.href === `${base}/kitchen`,
+      });
+  }
+  const rank = (i: NavItem) =>
+    !i.groupKey ? 0 : i.groupKey === "hotel" ? 1 : i.groupKey === "restaurant" ? 3 : 2;
+  const sorted = [...nav].sort((a, b) => rank(a) - rank(b));
+  nav.splice(0, nav.length, ...sorted);
+}
 
 export default function RestaurantLayout({
   children,
@@ -72,14 +104,17 @@ async function RestaurantShell({
   const t = await getTranslations();
   const base = `/dashboard/${ctx.restaurant.id}`;
 
-  const [{ unread }, newOrders, lowStock, undeliveredCount, disabled, notice] = await Promise.all([
-    listNotifications(db, ctx, 1),
-    countNewOrders(db, ctx),
-    countLowStock(db, ctx),
-    countToDispatch(db, ctx),
-    getDisabledModules(db, ctx),
-    can(ctx, "restaurant.manage") ? getSubscriptionNotice(db, ctx.restaurant.id) : null,
-  ]);
+  const hotel = ctx.restaurant.kind === "hotel";
+  const [{ unread }, newOrders, lowStock, undeliveredCount, disabled, notice, openRequests] =
+    await Promise.all([
+      listNotifications(db, ctx, 1),
+      countNewOrders(db, ctx),
+      countLowStock(db, ctx),
+      countToDispatch(db, ctx),
+      getDisabledModules(db, ctx),
+      can(ctx, "restaurant.manage") ? getSubscriptionNotice(db, ctx.restaurant.id) : null,
+      hotel && can(ctx, "orders.view") ? countOpenRequests(db, ctx.restaurant.id) : 0,
+    ]);
   // Satisfaction texts that are due go out after this page is sent (no cron needed).
   after(() => sendDueFeedback(db, ctx.restaurant.id).catch(() => 0));
   // Missed targets (kitchen time, rating, takings) become notifications.
@@ -92,6 +127,8 @@ async function RestaurantShell({
     guests: t("nav.groups.guests"),
     finance: t("nav.groups.finance"),
     manage: t("nav.groups.manage"),
+    hotel: t("nav.groups.hotel"),
+    restaurant: t("nav.groups.hotelRestaurant"),
   };
   type Item = NavItem & { show: boolean };
   const nav: NavItem[] = (
@@ -103,6 +140,17 @@ async function RestaurantShell({
         icon: <LayoutDashboard />,
         exact: true,
         primary: true,
+      },
+      // Hotels: the guests' requests from their rooms come first.
+      {
+        show: hotel && can(ctx, "orders.view"),
+        href: `${base}/requests`,
+        label: t("nav.requests"),
+        icon: <ConciergeBell />,
+        primary: true,
+        badge: openRequests,
+        groupKey: "hotel",
+        group: g.hotel,
       },
       // Sales & service: everything that happens during a shift.
       {
@@ -290,6 +338,7 @@ async function RestaurantShell({
   )
     .filter((i) => i.show)
     .map(({ show: _show, ...i }) => i);
+  if (hotel) arrangeForHotel(nav, base, g, t("nav.roomService"));
 
   // Go-anywhere search also reaches the tabs inside pages and the settings sections.
   const visible = new Set(nav.map((n) => n.href));

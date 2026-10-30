@@ -46,7 +46,7 @@ export async function GuestHeader({
       icon,
     }),
   );
-  const bell = calls.length ? <WaiterCall options={calls} /> : null;
+  const bell = calls.length ? <WaiterCall options={calls} room={guest.table.kind === "room"} /> : null;
 
   const actions = (
     <div className="flex items-center justify-end gap-2">

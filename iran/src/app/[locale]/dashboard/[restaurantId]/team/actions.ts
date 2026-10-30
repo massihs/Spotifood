@@ -6,6 +6,8 @@ import { actionContext, runAction } from "@/server/actions";
 import { isPermission, ROLE_PERMISSIONS, type Permission } from "@/server/auth/permissions";
 import { addMember, removeMember, setMemberJob, updateMember } from "@/server/modules/members/service";
 import { isJob } from "@/lib/jobs";
+import type { z } from "zod";
+import { deleteTeamJob, saveTeamJob, type teamJobSchema } from "@/server/modules/team/jobs";
 import {
   deleteSection,
   saveGuestCalls,
@@ -23,6 +25,7 @@ export async function addMemberAction(restaurantId: string, _prev: unknown, fd: 
       fullName: String(fd.get("fullName") ?? ""),
       role: String(fd.get("role") ?? "staff") as "staff",
       job: isJob(fd.get("job")) ? (fd.get("job") as never) : undefined,
+      teamJobId: String(fd.get("teamJobId") ?? "") || null,
       stationId: String(fd.get("stationId") ?? "") || null,
       password: password === "" ? undefined : password,
     });
@@ -67,10 +70,31 @@ export async function setMemberJobAction(
   memberId: string,
   job: string | null,
   stationId: string | null,
+  teamJobId: string | null = null,
 ) {
   return runAction(async () => {
     const ctx = await actionContext(restaurantId, "members.manage");
-    await setMemberJob(db, ctx, memberId, { job: isJob(job) ? job : null, stationId: stationId || null });
+    await setMemberJob(db, ctx, memberId, {
+      job: isJob(job) ? job : null,
+      stationId: stationId || null,
+      teamJobId: teamJobId || null,
+    });
+    refresh();
+  });
+}
+
+export async function saveTeamJobAction(restaurantId: string, input: z.input<typeof teamJobSchema>) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "members.manage");
+    await saveTeamJob(db, ctx, input);
+    refresh();
+  });
+}
+
+export async function deleteTeamJobAction(restaurantId: string, id: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "members.manage");
+    await deleteTeamJob(db, ctx, id);
     refresh();
   });
 }

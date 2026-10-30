@@ -159,9 +159,9 @@ export async function nowPlayingAction() {
 }
 
 /** Calls a waiter / asks for the bill / water from the table. */
-export async function callWaiterAction(kind: string) {
+export async function callWaiterAction(kind: string, note: string | null = null) {
   return runAction(async () => {
     const g = await guest();
-    await callWaiter(db, g, kind);
+    await callWaiter(db, g, kind, new Date(), typeof note === "string" ? note : null);
   });
 }

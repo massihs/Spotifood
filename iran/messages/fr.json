@@ -336,7 +336,9 @@
       "catalog": "Carte & stock",
       "guests": "Clients & expérience",
       "finance": "Finances & rapports",
-      "manage": "Gestion"
+      "manage": "Gestion",
+      "hotel": "Hôtel",
+      "hotelRestaurant": "Restaurant de l’hôtel"
     },
     "delivery": "Livraison",
     "reservations": "Réservations",
@@ -355,7 +357,9 @@
     "feedback": "Avis clients",
     "callcenter": "Centre d’appels",
     "adminAudience": "Audience",
-    "tablesHotel": "Chambres & QR"
+    "tablesHotel": "Chambres & QR",
+    "requests": "Demandes",
+    "roomService": "Room service"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -421,6 +425,16 @@
       "newOrders": "{n, plural, one {# commande à accepter} other {# commandes à accepter}}",
       "pendingBookings": "{n, plural, one {# réservation à confirmer} other {# réservations à confirmer}}",
       "unpaid": "{amount} à encaisser"
+    },
+    "hotel": {
+      "alertOpen": "{n, plural, one {# demande de chambre en attente} other {# demandes de chambre en attente}}",
+      "requests": "Demandes",
+      "services": "Services",
+      "open": "Demandes en attente",
+      "inProgress": "{n} en cours",
+      "occupied": "Chambres occupées",
+      "roomOrders": "Room service aujourd’hui",
+      "doneToday": "Demandes terminées"
     }
   },
   "roles": {
@@ -678,7 +692,8 @@
     "channel_disabled": "Ce mode de commande n’est pas disponible.",
     "too_many_sections": "30 sections au maximum.",
     "label_required": "Donnez un nom à chaque option de la cloche.",
-    "invalid_call": "Cette option n’est plus proposée."
+    "invalid_call": "Cette option n’est plus proposée.",
+    "job_in_use": "Des membres occupent ce poste."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -798,7 +813,23 @@
       "kitchen": {
         "name": "Cuisine",
         "desc": "Ne voit que les commandes acceptées de son poste, avec son et ticket."
-      }
+      },
+      "hotel": {
+        "reception": "Réception",
+        "housekeeping": "Ménage",
+        "roomService": "Room service"
+      },
+      "title": "Postes",
+      "hint": "Nommez vos postes comme dans votre établissement (Caisse, Chicha, Réception…) et choisissez leur icône.",
+      "new": "Nouveau poste",
+      "worksAs": "Fonctionne comme : {job}",
+      "name": "Nom du poste",
+      "namePlaceholder": "Ex. Chicha, Plonge, Réception",
+      "icon": "Icône",
+      "base": "Fonctionne comme",
+      "baseHint": "Ce que le poste voit et peut faire.",
+      "baseLocked": "Des membres occupent ce poste : retirez-les avant de changer son fonctionnement.",
+      "deleteConfirm": "Supprimer le poste « {name} » ? Ses membres gardent leurs accès."
     },
     "sections": {
       "title": "Sections",
@@ -854,7 +885,15 @@
         "coffee": "Café",
         "baby": "Chaise bébé",
         "sparkles": "Nettoyage",
-        "bell": "Cloche"
+        "bell": "Cloche",
+        "shirt": "Pressing",
+        "alarm": "Réveil",
+        "wine": "Minibar",
+        "wrench": "Réparation",
+        "luggage": "Bagages",
+        "car": "Taxi",
+        "bed": "Lit",
+        "spray": "Ménage"
       },
       "routeTo": "Envoyer à",
       "routeDefault": "Sections « Appels des clients » (ou toute l’équipe)",
@@ -865,8 +904,17 @@
       "builtin": {
         "housekeeping": "Ménage",
         "towels": "Serviettes",
-        "reception": "Réception"
-      }
+        "reception": "Réception",
+        "laundry": "Pressing",
+        "wakeup": "Réveil",
+        "minibar": "Minibar",
+        "maintenance": "Réparation",
+        "luggage": "Bagages",
+        "taxi": "Taxi"
+      },
+      "hotelTitle": "Services des chambres",
+      "hotelHint": "Ce que le client peut demander depuis sa chambre (ménage, pressing, réveil…). Activez, ajoutez les vôtres et choisissez la section qui les reçoit.",
+      "roomOnly": "Chambres seulement"
     }
   },
   "permissions": {
@@ -1210,7 +1258,13 @@
         "water": "De l’eau",
         "housekeeping": "Ménage",
         "towels": "Serviettes",
-        "reception": "Réception"
+        "reception": "Réception",
+        "laundry": "Pressing",
+        "wakeup": "Réveil",
+        "minibar": "Minibar",
+        "maintenance": "Réparation",
+        "luggage": "Bagages",
+        "taxi": "Taxi"
       },
       "sent": "Demande envoyée",
       "sentHint": {
@@ -1220,11 +1274,21 @@
         "custom": "L’équipe arrive.",
         "housekeeping": "L’équipe arrive.",
         "towels": "L’équipe arrive.",
-        "reception": "L’équipe arrive."
+        "reception": "L’équipe arrive.",
+        "laundry": "La réception a bien reçu votre demande.",
+        "wakeup": "La réception a bien reçu votre demande.",
+        "minibar": "La réception a bien reçu votre demande.",
+        "maintenance": "La réception a bien reçu votre demande.",
+        "luggage": "La réception a bien reçu votre demande.",
+        "taxi": "La réception a bien reçu votre demande."
       },
       "tooSoon": "Votre demande est déjà partie, patientez un instant.",
       "failed": "Envoi impossible, réessayez.",
-      "short": "Serveur"
+      "short": "Serveur",
+      "note": "Précisions",
+      "notePlaceholder": "Facultatif : ex. 2 chemises, réveil à 7 h, taxi pour l’aéroport",
+      "back": "Retour",
+      "send": "Envoyer la demande"
     },
     "tableBadge": "Table {table}",
     "quickAdd": "Ajouter {name} au panier",
@@ -3693,5 +3757,28 @@
     "denied": "Notifications bloquées dans le navigateur",
     "unavailable": "Notifications indisponibles sur ce navigateur",
     "newOrderTableRoom": "Chambre {table}"
+  },
+  "hotel": {
+    "title": "Demandes des chambres",
+    "subtitle": "Ce que les clients demandent depuis leur chambre, de la réception à « terminé ».",
+    "tabs": {
+      "board": "Demandes",
+      "services": "Services proposés"
+    },
+    "status": {
+      "open": "Nouvelles",
+      "in_progress": "En cours",
+      "done": "Terminées"
+    },
+    "empty": {
+      "open": "Aucune demande en attente.",
+      "in_progress": "Personne n’est sur une demande.",
+      "done": "Rien de terminé aujourd’hui."
+    },
+    "ago": "il y a {min} min",
+    "doneAt": "terminée à",
+    "take": "Je m’en occupe",
+    "release": "Remettre en attente",
+    "done": "Terminé"
   }
 }

@@ -1,5 +1,13 @@
 import {
+  AlarmClock,
   Baby,
+  BedDouble,
+  Car,
+  Luggage,
+  Shirt,
+  SprayCan,
+  Wine,
+  Wrench,
   BellRing,
   Coffee,
   Droplets,
@@ -24,6 +32,14 @@ export const CALL_ICON: Record<string, LucideIcon> = {
   baby: Baby,
   sparkles: Sparkles,
   bell: BellRing,
+  shirt: Shirt,
+  alarm: AlarmClock,
+  wine: Wine,
+  wrench: Wrench,
+  luggage: Luggage,
+  car: Car,
+  bed: BedDouble,
+  spray: SprayCan,
 };
 export const CALL_TONES = [
   "bg-tone-orange/12 text-tone-orange",

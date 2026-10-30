@@ -1,4 +1,8 @@
 import {
+  BedDouble,
+  CheckCircle2,
+  ConciergeBell,
+  Shirt,
   AlertTriangle,
   ArrowRight,
   Blocks,
@@ -21,6 +25,7 @@ import {
 import { Suspense, type ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
+import { hotelToday } from "@/server/modules/hotel/requests";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { buttonClasses } from "@/components/ui/button";
 import { Card, CardHeader, StatCard, TONE_TILE, type Tone } from "@/components/ui/card";
@@ -79,7 +84,12 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const ctx = await requireRestaurant(restaurantId);
   // Each job lands on its own screen: the kitchen and bar on their tickets, the till on the
   // orders to accept, waiters on the floor.
-  const home = { kitchen: "kitchen", bar: "kitchen", cashier: "orders", waiter: "waiter" }[ctx.job ?? ""];
+  // In a hotel the front desk and housekeeping start on the rooms' requests.
+  const home = (
+    ctx.restaurant.kind === "hotel"
+      ? { kitchen: "kitchen", bar: "kitchen", cashier: "requests", waiter: "requests" }
+      : { kitchen: "kitchen", bar: "kitchen", cashier: "orders", waiter: "waiter" }
+  )[ctx.job ?? ""];
   if (home) redirect({ href: `/dashboard/${ctx.restaurant.id}/${home}`, locale: await getLocale() });
   const [t, tStatus, tRes, locale, overview, today, live, lowStock, newOrders, disabled] = await Promise.all([
     getTranslations("dashboard"),
@@ -93,6 +103,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
     countNewOrders(db, ctx),
     getDisabledModules(db, ctx),
   ]);
+  const hotel = ctx.restaurant.kind === "hotel" && can(ctx, "orders.view") ? await hotelToday(db, ctx) : null;
   const tz = ctx.restaurant.timezone;
   const money = (c: number) => formatMoney(c, ctx.restaurant.currency, locale);
   const base = `/dashboard/${ctx.restaurant.id}`;
@@ -144,6 +155,13 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
 
   const showReservations = on("reservations") && can(ctx, "orders.view");
   const alerts = [
+    hotel &&
+      hotel.open > 0 && {
+        href: `${base}/requests`,
+        label: t("hotel.alertOpen", { n: hotel.open }),
+        Icon: ConciergeBell,
+        className: "bg-danger text-white",
+      },
     newOrders > 0 && {
       href: `${base}/orders`,
       label: t("alerts.newOrders", { n: newOrders }),
@@ -173,6 +191,19 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   ].filter((x) => !!x);
 
   const quick = [
+    hotel && {
+      href: `${base}/requests`,
+      label: t("hotel.requests"),
+      Icon: ConciergeBell,
+      tone: "orange" as Tone,
+    },
+    hotel &&
+      can(ctx, "members.manage") && {
+        href: `${base}/requests?tab=services`,
+        label: t("hotel.services"),
+        Icon: Shirt,
+        tone: "violet" as Tone,
+      },
     on("pos") &&
       can(ctx, "orders.create") && {
         href: `${base}/pos`,
@@ -242,7 +273,12 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
         title={t("welcome", { name: ctx.user.fullName.split(" ")[0] ?? "" })}
         description={<span className="first-letter:uppercase">{dateLabel}</span>}
         actions={
-          on("pos") && can(ctx, "orders.create") ? (
+          hotel ? (
+            <Link href={`${base}/requests`} className={buttonClasses("primary")}>
+              <ConciergeBell className="size-4" aria-hidden="true" />
+              {t("hotel.requests")}
+            </Link>
+          ) : on("pos") && can(ctx, "orders.create") ? (
             <Link href={`${base}/pos`} className={buttonClasses("primary")}>
               <Calculator className="size-4" aria-hidden="true" />
               {t("quickActions.pos")}
@@ -337,45 +373,93 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
             </div>
           </div>
         </Card>
-        <div className="grid grid-cols-2 gap-4">
-          <KpiLink href={can(ctx, "orders.view") ? `${base}/orders` : null}>
-            <StatCard label={t("ordersToday")} value={today.ordersToday} icon={<ReceiptText />} tone="sky" />
-          </KpiLink>
-          <KpiLink href={on("kitchen") && can(ctx, "orders.view") ? `${base}/kitchen` : null}>
-            <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} tone="orange" />
-          </KpiLink>
-          <KpiLink href={on("floor") && can(ctx, "tables.view") ? `${base}/floor` : null}>
-            <StatCard
-              label={t("openTables")}
-              value={
-                <>
-                  {today.openTables}
-                  <span className="text-base font-medium text-fg-subtle"> / {overview.tables}</span>
-                </>
-              }
-              icon={<LayoutGrid />}
-              tone="teal"
-            />
-          </KpiLink>
-          {showReservations ? (
-            <KpiLink href={`${base}/reservations`}>
+        {hotel ? (
+          <div className="grid grid-cols-2 gap-4">
+            <KpiLink href={`${base}/requests`}>
               <StatCard
-                label={t("reservationsToday")}
-                value={live.bookingsToday}
-                hint={t("coversN", { n: live.coversToday })}
-                icon={<CalendarClock />}
-                tone="fuchsia"
+                label={t("hotel.open")}
+                value={hotel.open}
+                hint={t("hotel.inProgress", { n: hotel.inProgress })}
+                icon={<ConciergeBell />}
+                tone="orange"
               />
             </KpiLink>
-          ) : (
-            <StatCard
-              label={t("stats.products")}
-              value={overview.products}
-              icon={<UtensilsCrossed />}
-              tone="rose"
-            />
-          )}
-        </div>
+            <KpiLink href={`${base}/tables`}>
+              <StatCard
+                label={t("hotel.occupied")}
+                value={
+                  <>
+                    {hotel.occupied}
+                    <span className="text-base font-medium text-fg-subtle"> / {hotel.rooms}</span>
+                  </>
+                }
+                icon={<BedDouble />}
+                tone="teal"
+              />
+            </KpiLink>
+            <KpiLink href={`${base}/orders`}>
+              <StatCard
+                label={t("hotel.roomOrders")}
+                value={hotel.roomOrders}
+                icon={<ReceiptText />}
+                tone="sky"
+              />
+            </KpiLink>
+            <KpiLink href={`${base}/requests`}>
+              <StatCard
+                label={t("hotel.doneToday")}
+                value={hotel.doneToday}
+                icon={<CheckCircle2 />}
+                tone="emerald"
+              />
+            </KpiLink>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <KpiLink href={can(ctx, "orders.view") ? `${base}/orders` : null}>
+              <StatCard
+                label={t("ordersToday")}
+                value={today.ordersToday}
+                icon={<ReceiptText />}
+                tone="sky"
+              />
+            </KpiLink>
+            <KpiLink href={on("kitchen") && can(ctx, "orders.view") ? `${base}/kitchen` : null}>
+              <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} tone="orange" />
+            </KpiLink>
+            <KpiLink href={on("floor") && can(ctx, "tables.view") ? `${base}/floor` : null}>
+              <StatCard
+                label={t("openTables")}
+                value={
+                  <>
+                    {today.openTables}
+                    <span className="text-base font-medium text-fg-subtle"> / {overview.tables}</span>
+                  </>
+                }
+                icon={<LayoutGrid />}
+                tone="teal"
+              />
+            </KpiLink>
+            {showReservations ? (
+              <KpiLink href={`${base}/reservations`}>
+                <StatCard
+                  label={t("reservationsToday")}
+                  value={live.bookingsToday}
+                  hint={t("coversN", { n: live.coversToday })}
+                  icon={<CalendarClock />}
+                  tone="fuchsia"
+                />
+              </KpiLink>
+            ) : (
+              <StatCard
+                label={t("stats.products")}
+                value={overview.products}
+                icon={<UtensilsCrossed />}
+                tone="rose"
+              />
+            )}
+          </div>
+        )}
       </section>
 
       {/* Quick access: an app-launcher row */}

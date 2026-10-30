@@ -36,6 +36,8 @@ export type GuestCallOption = {
   icon?: string;
   sectionId?: string | null;
   enabled: boolean;
+  /** Custom options offered only in hotel rooms (pressing, wake-up call…). */
+  roomOnly?: boolean;
 };
 
 export type WheelPrize = {
@@ -205,6 +207,8 @@ export const restaurantMembers = pgTable(
     job: varchar({ length: 16 }),
     /** Kitchen station a bar / kitchen member works at (their screen shows only its items). */
     stationId: uuid(),
+    /** The restaurant's own name and icon for the job ("Chicha", "Réception"…); `job` stays its base. */
+    teamJobId: uuid(),
     /** Team sections the member belongs to (access level and which notifications they get). */
     sectionIds: uuid()
       .array()
@@ -245,6 +249,51 @@ export const teamSections = pgTable(
     ...timestamps,
   },
   (t) => [index("team_sections_restaurant_idx").on(t.restaurantId)],
+);
+
+/**
+ * A job as the restaurant names it: its own label and icon on top of one of the base jobs
+ * (manager, cashier, waiter, bar, kitchen), which sets the permissions and the home screen.
+ */
+export const teamJobs = pgTable(
+  "team_jobs",
+  {
+    id: pk(),
+    restaurantId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    name: varchar({ length: 48 }).notNull(),
+    icon: varchar({ length: 24 }).notNull(),
+    baseJob: varchar({ length: 16 }).notNull(),
+    position: integer().notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index("team_jobs_restaurant_idx").on(t.restaurantId)],
+);
+
+/**
+ * What a hotel guest asked for from the room (housekeeping, pressing, a taxi…): the front desk
+ * takes it and marks it done, so nothing is forgotten after the ring.
+ */
+export const serviceRequests = pgTable(
+  "service_requests",
+  {
+    id: pk(),
+    restaurantId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    tableId: uuid(),
+    placeLabel: varchar({ length: 48 }).notNull(),
+    kind: varchar({ length: 24 }).notNull(),
+    label: varchar({ length: 48 }),
+    note: varchar({ length: 280 }),
+    status: varchar({ length: 16 }).notNull().default("open"),
+    takenByUserId: uuid(),
+    takenAt: timestamp({ withTimezone: true }),
+    doneAt: timestamp({ withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index("service_requests_restaurant_status_idx").on(t.restaurantId, t.status, t.createdAt)],
 );
 
 export const taxRates = pgTable(

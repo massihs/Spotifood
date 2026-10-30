@@ -23,6 +23,7 @@ import {
   type MemberJobInput,
   type UpdateMemberInput,
 } from "./schemas";
+import { teamJobById } from "@/server/modules/team/jobs";
 
 export async function listMembers(db: Database, ctx: RestaurantContext) {
   assertCan(ctx, "members.manage");
@@ -37,6 +38,7 @@ export async function listMembers(db: Database, ctx: RestaurantContext) {
       grantedPermissions: restaurantMembers.grantedPermissions,
       revokedPermissions: restaurantMembers.revokedPermissions,
       job: restaurantMembers.job,
+      teamJobId: restaurantMembers.teamJobId,
       stationId: restaurantMembers.stationId,
       sectionIds: restaurantMembers.sectionIds,
       lastLoginAt: users.lastLoginAt,
@@ -76,7 +78,9 @@ export async function listMembers(db: Database, ctx: RestaurantContext) {
  */
 export async function addMember(db: Database, ctx: RestaurantContext, raw: AddMemberInput) {
   assertCan(ctx, "members.manage");
-  const input = addMemberSchema.parse(raw);
+  const parsed = addMemberSchema.parse(raw);
+  const teamJob = parsed.teamJobId ? await teamJobById(db, ctx.restaurant.id, parsed.teamJobId) : null;
+  const input = teamJob ? { ...parsed, job: teamJob.baseJob } : parsed;
   const preset = input.job ? jobValues(ctx, input.job) : null;
   const role = preset?.role ?? input.role;
   if (!canAssignRole(ctx.role, role)) throw forbidden("role_not_assignable");
@@ -121,6 +125,7 @@ export async function addMember(db: Database, ctx: RestaurantContext, raw: AddMe
           ? {
               ...preset,
               job: input.job,
+              teamJobId: teamJob?.id ?? null,
               stationId: await stationOf(tx, ctx, input.job, input.stationId ?? null),
             }
           : {}),
@@ -257,7 +262,9 @@ export async function setMemberJob(
   raw: MemberJobInput,
 ) {
   assertCan(ctx, "members.manage");
-  const input = memberJobSchema.parse(raw);
+  const parsed = memberJobSchema.parse(raw);
+  const teamJob = parsed.teamJobId ? await teamJobById(db, ctx.restaurant.id, parsed.teamJobId) : null;
+  const input = teamJob ? { ...parsed, job: teamJob.baseJob } : parsed;
   const current = await loadManageableMember(db, ctx, memberId);
   const preset = input.job ? jobValues(ctx, input.job) : null;
   if (preset && !canAssignRole(ctx.role, preset.role)) throw forbidden("role_not_assignable");
@@ -265,7 +272,7 @@ export async function setMemberJob(
     const stationId = await stationOf(tx, ctx, input.job, input.stationId);
     const [updated] = await tx
       .update(restaurantMembers)
-      .set({ ...(preset ?? {}), job: input.job, stationId })
+      .set({ ...(preset ?? {}), job: input.job, teamJobId: teamJob?.id ?? null, stationId })
       .where(eq(restaurantMembers.id, memberId))
       .returning();
     await recordAudit(tx, {

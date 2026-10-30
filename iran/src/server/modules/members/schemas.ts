@@ -18,6 +18,8 @@ export const addMemberSchema = z.object({
   /** Job preset (sets the role and permissions); the role field is ignored when set. */
   job: z.enum(JOBS).optional(),
   stationId: z.uuid().nullable().optional(),
+  /** The restaurant's own job (its base job wins over `job`). */
+  teamJobId: z.uuid().nullable().optional(),
   /** Initial password, only used when the account does not exist yet. */
   password: passwordSchema.optional(),
 });
@@ -36,5 +38,7 @@ export type UpdateMemberInput = z.infer<typeof updateMemberSchema>;
 export const memberJobSchema = z.object({
   job: z.enum(JOBS).nullable(),
   stationId: z.uuid().nullable(),
+  /** The restaurant's own job; its base job wins over `job`. */
+  teamJobId: z.uuid().nullable().optional(),
 });
 export type MemberJobInput = z.infer<typeof memberJobSchema>;
