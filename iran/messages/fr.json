@@ -359,7 +359,9 @@
     "adminAudience": "Audience",
     "tablesHotel": "Chambres & QR",
     "requests": "Demandes",
-    "roomService": "Room service"
+    "roomService": "Room service",
+    "rooms": "Chambres",
+    "roomsQr": "QR des chambres"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -434,7 +436,23 @@
       "inProgress": "{n} en cours",
       "occupied": "Chambres occupées",
       "roomOrders": "Room service aujourd’hui",
-      "doneToday": "Demandes terminées"
+      "doneToday": "Demandes terminées",
+      "occupancy": "Taux d’occupation",
+      "occupiedOf": "{n} chambres occupées sur {total}",
+      "roomServiceRevenue": "Room service",
+      "avgResponse": "Réponse moyenne",
+      "minutes": "{n} min",
+      "outOfOrder": "Hors service",
+      "toClean": "À nettoyer",
+      "cleaningN": "{n} en cours",
+      "floors": "Étages",
+      "allRooms": "Toutes les chambres",
+      "other": "Autres",
+      "ground": "RDC",
+      "floorN": "Étage {n}",
+      "noRooms": "Ajoutez vos chambres pour les voir ici.",
+      "waitingTitle": "Demandes en attente",
+      "noWaiting": "Aucune demande en attente."
     }
   },
   "roles": {
@@ -3779,6 +3797,54 @@
     "doneAt": "terminée à",
     "take": "Je m’en occupe",
     "release": "Remettre en attente",
-    "done": "Terminé"
+    "done": "Terminé",
+    "rooms": {
+      "title": "Chambres",
+      "subtitle": "Chaque chambre par étage : occupation, ménage, demandes et room service en cours.",
+      "emptyTitle": "Aucune chambre",
+      "emptyBody": "Ajoutez vos chambres (ex. 101 à 120) pour leur créer un QR code.",
+      "addRooms": "Ajouter des chambres",
+      "occupancy": "Occupation",
+      "occupiedOf": "{n} / {total} chambres occupées",
+      "toClean": "À nettoyer",
+      "cleaningN": "{n} en cours de ménage",
+      "withRequests": "Avec une demande",
+      "outOfOrder": "Hors service",
+      "filters": {
+        "all": "Toutes",
+        "occupied": "Occupées",
+        "free": "Libres",
+        "dirty": "Ménage",
+        "requests": "Demandes"
+      },
+      "hk": {
+        "clean": "Propre",
+        "dirty": "À nettoyer",
+        "cleaning": "Ménage en cours",
+        "inspected": "Contrôlée",
+        "out_of_order": "Hors service"
+      },
+      "otherRooms": "Autres chambres",
+      "groundFloor": "Rez-de-chaussée",
+      "floorN": "Étage {n}",
+      "occupied": "Occupée",
+      "free": "Libre",
+      "guestsN": "{n, plural, =0 {Occupée} one {# client} other {# clients}}",
+      "roomN": "Chambre {label}",
+      "since": "depuis",
+      "roomServiceToday": "Room service aujourd’hui :",
+      "housekeeping": "Ménage",
+      "updatedAt": "Mis à jour à",
+      "requests": "Demandes en cours",
+      "noRequests": "Aucune demande en cours.",
+      "roomService": "Room service en cours",
+      "noOrders": "Aucune commande en cours.",
+      "qr": "QR de la chambre",
+      "checkOut": "Départ du client",
+      "checkOutConfirm": "Départ de la chambre {label} ? Elle passe « À nettoyer »."
+    },
+    "allServices": "Tous les services",
+    "takenBy": "Pris par {name}",
+    "respondedIn": "réponse en {min} min"
   }
 }

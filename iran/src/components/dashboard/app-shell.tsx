@@ -18,6 +18,7 @@ export async function AppShell({
   user,
   headerExtra,
   brand,
+  kind,
   search,
   children,
 }: {
@@ -25,6 +26,8 @@ export async function AppShell({
   search?: SearchEntry[];
   /** Restaurant brand color key: scopes the accent (data-brand). */
   brand?: string;
+  /** Establishment kind: hotels get their own, quieter navy theme (data-kind). */
+  kind?: string;
   title: string;
   subtitle?: string;
   /** Restaurant logo URL, shown in the sidebar identity card. */
@@ -122,6 +125,7 @@ export async function AppShell({
   return (
     <div
       data-brand={brand}
+      data-kind={kind}
       className="min-h-dvh bg-bg lg:grid lg:grid-cols-[272px_1fr] print:block print:bg-white"
     >
       <a
@@ -135,7 +139,7 @@ export async function AppShell({
       <div className="on-dark relative hidden overflow-hidden bg-sidebar lg:block print:hidden">
         {/* Brand glow behind the logo. */}
         <div
-          className="pointer-events-none absolute -start-20 -top-24 size-72 rounded-full opacity-35 blur-3xl"
+          className="brand-glow pointer-events-none absolute -start-20 -top-24 size-72 rounded-full opacity-35 blur-3xl"
           style={{ background: "var(--brand-gradient)" }}
           aria-hidden="true"
         />
@@ -166,7 +170,7 @@ export async function AppShell({
       <div className="relative min-w-0">
         {/* Soft brand wash at the top of every page. */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-accent-soft/80 to-transparent print:hidden"
+          className="brand-wash pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-accent-soft/80 to-transparent print:hidden"
           aria-hidden="true"
         />
         {/* Top bar */}

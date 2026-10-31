@@ -160,6 +160,81 @@
   color: var(--fg);
 }
 
+/*
+ * Hotels: a quieter, cooler palette — slate neutrals and a deep navy sidebar — so the panel
+ * reads like front-desk software rather than a café menu. The brand accent stays the hotel's.
+ */
+[data-kind="hotel"] {
+  --bg: oklch(0.972 0.0045 255);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.962 0.0065 255);
+  --surface-3: oklch(0.928 0.0095 255);
+  --border: oklch(0.915 0.009 255);
+  --border-strong: oklch(0.86 0.013 255);
+  --fg: oklch(0.22 0.03 262);
+  --fg-muted: oklch(0.5 0.023 258);
+  --fg-subtle: oklch(0.64 0.017 258);
+  --ink: oklch(0.25 0.05 264);
+  --ink-hover: oklch(0.33 0.055 264);
+  --ink-fg: oklch(1 0 0);
+  --sidebar: oklch(0.2 0.045 264);
+  --sidebar-2: oklch(0.255 0.05 264);
+  --sidebar-fg: oklch(0.965 0.008 255);
+  --sidebar-muted: oklch(0.74 0.03 258);
+  --sidebar-border: oklch(0.31 0.05 264);
+  --shadow-color: 224 45% 14%;
+}
+[data-kind="hotel"] .on-dark {
+  --surface-2: oklch(0.31 0.05 264);
+  --surface-3: oklch(0.36 0.055 264);
+  --fg-subtle: oklch(0.62 0.03 258);
+  --border-strong: oklch(0.4 0.055 264);
+}
+[data-kind="hotel"] .brand-wash {
+  opacity: 0.35;
+}
+[data-kind="hotel"] .brand-glow {
+  opacity: 0.18;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-kind="hotel"] {
+    --bg: oklch(0.155 0.018 262);
+    --surface: oklch(0.2 0.022 262);
+    --surface-2: oklch(0.24 0.025 262);
+    --surface-3: oklch(0.29 0.028 262);
+    --border: oklch(0.28 0.025 262);
+    --border-strong: oklch(0.36 0.03 262);
+    --fg: oklch(0.97 0.005 255);
+    --fg-muted: oklch(0.75 0.018 258);
+    --fg-subtle: oklch(0.6 0.018 258);
+    --ink: oklch(0.97 0.005 255);
+    --ink-hover: oklch(0.87 0.01 255);
+    --ink-fg: oklch(0.155 0.018 262);
+    --sidebar: oklch(0.13 0.025 264);
+    --sidebar-2: oklch(0.2 0.032 264);
+    --sidebar-border: oklch(0.25 0.032 264);
+    --shadow-color: 0 0% 0%;
+  }
+}
+:root[data-theme="dark"] [data-kind="hotel"] {
+  --bg: oklch(0.155 0.018 262);
+  --surface: oklch(0.2 0.022 262);
+  --surface-2: oklch(0.24 0.025 262);
+  --surface-3: oklch(0.29 0.028 262);
+  --border: oklch(0.28 0.025 262);
+  --border-strong: oklch(0.36 0.03 262);
+  --fg: oklch(0.97 0.005 255);
+  --fg-muted: oklch(0.75 0.018 258);
+  --fg-subtle: oklch(0.6 0.018 258);
+  --ink: oklch(0.97 0.005 255);
+  --ink-hover: oklch(0.87 0.01 255);
+  --ink-fg: oklch(0.155 0.018 262);
+  --sidebar: oklch(0.13 0.025 264);
+  --sidebar-2: oklch(0.2 0.032 264);
+  --sidebar-border: oklch(0.25 0.032 264);
+  --shadow-color: 0 0% 0%;
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);

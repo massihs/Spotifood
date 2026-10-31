@@ -359,7 +359,9 @@
     "adminAudience": "Audience",
     "tablesHotel": "Rooms & QR",
     "requests": "Requests",
-    "roomService": "Room service"
+    "roomService": "Room service",
+    "rooms": "Rooms",
+    "roomsQr": "Room QR codes"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -434,7 +436,23 @@
       "inProgress": "{n} in progress",
       "occupied": "Rooms in use",
       "roomOrders": "Room service today",
-      "doneToday": "Requests done"
+      "doneToday": "Requests done",
+      "occupancy": "Occupancy rate",
+      "occupiedOf": "{n} of {total} rooms occupied",
+      "roomServiceRevenue": "Room service",
+      "avgResponse": "Average response",
+      "minutes": "{n} min",
+      "outOfOrder": "Out of order",
+      "toClean": "To clean",
+      "cleaningN": "{n} in progress",
+      "floors": "Floors",
+      "allRooms": "All rooms",
+      "other": "Other",
+      "ground": "Ground",
+      "floorN": "Floor {n}",
+      "noRooms": "Add your rooms to see them here.",
+      "waitingTitle": "Waiting requests",
+      "noWaiting": "No request waiting."
     }
   },
   "roles": {
@@ -3771,6 +3789,54 @@
     "doneAt": "done at",
     "take": "I’m on it",
     "release": "Put back",
-    "done": "Done"
+    "done": "Done",
+    "rooms": {
+      "title": "Rooms",
+      "subtitle": "Every room by floor: occupancy, housekeeping, requests and room service in progress.",
+      "emptyTitle": "No rooms yet",
+      "emptyBody": "Add your rooms (e.g. 101 to 120) to create their QR codes.",
+      "addRooms": "Add rooms",
+      "occupancy": "Occupancy",
+      "occupiedOf": "{n} / {total} rooms occupied",
+      "toClean": "To clean",
+      "cleaningN": "{n} being cleaned",
+      "withRequests": "With a request",
+      "outOfOrder": "Out of order",
+      "filters": {
+        "all": "All",
+        "occupied": "Occupied",
+        "free": "Free",
+        "dirty": "Housekeeping",
+        "requests": "Requests"
+      },
+      "hk": {
+        "clean": "Clean",
+        "dirty": "To clean",
+        "cleaning": "Being cleaned",
+        "inspected": "Inspected",
+        "out_of_order": "Out of order"
+      },
+      "otherRooms": "Other rooms",
+      "groundFloor": "Ground floor",
+      "floorN": "Floor {n}",
+      "occupied": "Occupied",
+      "free": "Free",
+      "guestsN": "{n, plural, =0 {Occupied} one {# guest} other {# guests}}",
+      "roomN": "Room {label}",
+      "since": "since",
+      "roomServiceToday": "Room service today:",
+      "housekeeping": "Housekeeping",
+      "updatedAt": "Updated at",
+      "requests": "Open requests",
+      "noRequests": "No open request.",
+      "roomService": "Room service in progress",
+      "noOrders": "No order in progress.",
+      "qr": "Room QR code",
+      "checkOut": "Check-out",
+      "checkOutConfirm": "Check out room {label}? It goes to “To clean”."
+    },
+    "allServices": "All services",
+    "takenBy": "Taken by {name}",
+    "respondedIn": "answered in {min} min"
   }
 }

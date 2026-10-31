@@ -9,6 +9,7 @@ import {
   Bike,
   CalendarClock,
   Network,
+  BedDouble,
   Calculator,
   ConciergeBell,
   CreditCard,
@@ -60,6 +61,7 @@ function arrangeForHotel(
   base: string,
   g: Record<"hotel" | "restaurant", string>,
   roomService: string,
+  roomsQr: string,
 ) {
   const restaurantOnly = ["floor", "waiter", "reservations", "callcenter", "delivery", "kitchen", "pos"].map(
     (p) => `${base}/${p}`,
@@ -67,7 +69,8 @@ function arrangeForHotel(
   for (const item of nav) {
     if (item.href === `${base}/orders`)
       Object.assign(item, { label: roomService, groupKey: "hotel", group: g.hotel });
-    else if (item.href === `${base}/tables`) Object.assign(item, { groupKey: "hotel", group: g.hotel });
+    else if (item.href === `${base}/tables`)
+      Object.assign(item, { label: roomsQr, groupKey: "hotel", group: g.hotel, primary: false });
     else if (restaurantOnly.includes(item.href))
       Object.assign(item, {
         groupKey: "restaurant",
@@ -149,6 +152,15 @@ async function RestaurantShell({
         icon: <ConciergeBell />,
         primary: true,
         badge: openRequests,
+        groupKey: "hotel",
+        group: g.hotel,
+      },
+      {
+        show: hotel && can(ctx, "tables.view"),
+        href: `${base}/rooms`,
+        label: t("nav.rooms"),
+        icon: <BedDouble />,
+        primary: true,
         groupKey: "hotel",
         group: g.hotel,
       },
@@ -338,7 +350,7 @@ async function RestaurantShell({
   )
     .filter((i) => i.show)
     .map(({ show: _show, ...i }) => i);
-  if (hotel) arrangeForHotel(nav, base, g, t("nav.roomService"));
+  if (hotel) arrangeForHotel(nav, base, g, t("nav.roomService"), t("nav.roomsQr"));
 
   // Go-anywhere search also reaches the tabs inside pages and the settings sections.
   const visible = new Set(nav.map((n) => n.href));
@@ -374,6 +386,7 @@ async function RestaurantShell({
         subtitle={t(`roles.${ctx.role}`)}
         avatar={logoUrl(ctx.restaurant.logoKey)}
         brand={ctx.restaurant.brandColor}
+        kind={ctx.restaurant.kind}
         nav={nav}
         search={search}
         user={ctx.user}

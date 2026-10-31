@@ -309,6 +309,13 @@
       "when": 1793318058120,
       "tag": "0043_hotel_team",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1793445328748,
+      "tag": "0044_room_housekeeping",
+      "breakpoints": true
     }
   ]
 }

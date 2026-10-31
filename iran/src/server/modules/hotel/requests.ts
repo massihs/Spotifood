@@ -73,7 +73,11 @@ export async function moveRequest(
   if (!isUuid(id)) throw notFound();
   return db.transaction(async (tx) => {
     const [r] = await tx
-      .select({ status: serviceRequests.status })
+      .select({
+        status: serviceRequests.status,
+        kind: serviceRequests.kind,
+        tableId: serviceRequests.tableId,
+      })
       .from(serviceRequests)
       .where(and(eq(serviceRequests.id, id), eq(serviceRequests.restaurantId, ctx.restaurant.id)))
       .for("update");
@@ -93,6 +97,12 @@ export async function moveRequest(
             : { status: to, takenByUserId: null, takenAt: null },
       )
       .where(eq(serviceRequests.id, id));
+    // A room the guest asked to have cleaned is clean once the request is done.
+    if (to === "done" && r.kind === "housekeeping" && r.tableId)
+      await tx
+        .update(diningTables)
+        .set({ housekeeping: "clean", housekeepingAt: now })
+        .where(and(eq(diningTables.id, r.tableId), eq(diningTables.restaurantId, ctx.restaurant.id)));
     await emit(tx, { topic: topics.restaurant(ctx.restaurant.id), type: "notification.created" });
   });
 }
@@ -116,14 +126,19 @@ export async function requestStats(db: DbOrTx, ctx: RestaurantContext, now = new
   return { open: of("open"), inProgress: of("in_progress"), doneToday: of("done") };
 }
 
-/** The hotel overview's numbers: rooms in use, requests, and room service orders today. */
+/** The hotel overview's numbers: rooms in use and to clean, requests, response time, room service. */
 export async function hotelToday(db: DbOrTx, ctx: RestaurantContext, now = new Date()) {
   assertCan(ctx, "orders.view");
   const since = dayStart(localDay(now, ctx.restaurant.timezone), ctx.restaurant.timezone);
   const rid = ctx.restaurant.id;
-  const [[rooms], [occupied], [roomOrders], stats] = await Promise.all([
+  const [[rooms], [occupied], [roomOrders], [response], stats] = await Promise.all([
     db
-      .select({ n: sql<number>`count(*)::int` })
+      .select({
+        n: sql<number>`count(*)::int`,
+        outOfOrder: sql<number>`count(*) filter (where ${diningTables.housekeeping} = 'out_of_order')::int`,
+        dirty: sql<number>`count(*) filter (where ${diningTables.housekeeping} = 'dirty')::int`,
+        cleaning: sql<number>`count(*) filter (where ${diningTables.housekeeping} = 'cleaning')::int`,
+      })
       .from(diningTables)
       .where(
         and(
@@ -144,7 +159,10 @@ export async function hotelToday(db: DbOrTx, ctx: RestaurantContext, now = new D
         ),
       ),
     db
-      .select({ n: sql<number>`count(*)::int` })
+      .select({
+        n: sql<number>`count(*)::int`,
+        cents: sql<number>`coalesce(sum(${orders.totalCents}), 0)`.mapWith(Number),
+      })
       .from(orders)
       .innerJoin(diningTables, eq(diningTables.id, orders.tableId))
       .where(
@@ -155,7 +173,33 @@ export async function hotelToday(db: DbOrTx, ctx: RestaurantContext, now = new D
           sql`${orders.status} <> 'cancelled'`,
         ),
       ),
+    db
+      .select({
+        min: sql<
+          number | null
+        >`avg(extract(epoch from (${serviceRequests.takenAt} - ${serviceRequests.createdAt})) / 60)`.mapWith(
+          (v) => (v == null ? null : Number(v)),
+        ),
+      })
+      .from(serviceRequests)
+      .where(
+        and(
+          eq(serviceRequests.restaurantId, rid),
+          gte(serviceRequests.createdAt, since),
+          sql`${serviceRequests.takenAt} is not null`,
+        ),
+      ),
     requestStats(db, ctx, now),
   ]);
-  return { rooms: rooms?.n ?? 0, occupied: occupied?.n ?? 0, roomOrders: roomOrders?.n ?? 0, ...stats };
+  return {
+    rooms: rooms?.n ?? 0,
+    outOfOrder: rooms?.outOfOrder ?? 0,
+    dirty: rooms?.dirty ?? 0,
+    cleaning: rooms?.cleaning ?? 0,
+    occupied: occupied?.n ?? 0,
+    roomOrders: roomOrders?.n ?? 0,
+    roomServiceCents: roomOrders?.cents ?? 0,
+    avgResponseMin: response?.min == null ? null : Math.round(response.min),
+    ...stats,
+  };
 }

@@ -359,7 +359,9 @@
     "adminAudience": "بازدید سایت",
     "tablesHotel": "اتاق‌ها و QR",
     "requests": "درخواست‌ها",
-    "roomService": "سرویس اتاق"
+    "roomService": "سرویس اتاق",
+    "rooms": "اتاق‌ها",
+    "roomsQr": "QR اتاق‌ها"
   },
   "dashboard": {
     "welcome": "سلام {name}",
@@ -434,7 +436,23 @@
       "inProgress": "{n} در حال انجام",
       "occupied": "اتاق‌های فعال",
       "roomOrders": "سرویس اتاق امروز",
-      "doneToday": "درخواست‌های انجام‌شده"
+      "doneToday": "درخواست‌های انجام‌شده",
+      "occupancy": "نرخ اشغال",
+      "occupiedOf": "{n} اتاق از {total} اشغال",
+      "roomServiceRevenue": "سرویس اتاق",
+      "avgResponse": "میانگین پاسخ",
+      "minutes": "{n} دقیقه",
+      "outOfOrder": "خارج از سرویس",
+      "toClean": "نیاز به نظافت",
+      "cleaningN": "{n} در حال انجام",
+      "floors": "طبقات",
+      "allRooms": "همهٔ اتاق‌ها",
+      "other": "سایر",
+      "ground": "همکف",
+      "floorN": "طبقهٔ {n}",
+      "noRooms": "اتاق‌هایتان را اضافه کنید تا اینجا ببینید.",
+      "waitingTitle": "درخواست‌های در انتظار",
+      "noWaiting": "درخواستی در انتظار نیست."
     }
   },
   "roles": {
@@ -3771,6 +3789,54 @@
     "doneAt": "انجام در",
     "take": "بر عهدهٔ من",
     "release": "برگرداندن به انتظار",
-    "done": "انجام شد"
+    "done": "انجام شد",
+    "rooms": {
+      "title": "اتاق‌ها",
+      "subtitle": "همهٔ اتاق‌ها به تفکیک طبقه: اشغال، نظافت، درخواست‌ها و سرویس اتاق در جریان.",
+      "emptyTitle": "هنوز اتاقی ندارید",
+      "emptyBody": "اتاق‌هایتان را اضافه کنید (مثلاً ۱۰۱ تا ۱۲۰) تا QR آن‌ها ساخته شود.",
+      "addRooms": "افزودن اتاق",
+      "occupancy": "اشغال",
+      "occupiedOf": "{n} از {total} اتاق اشغال",
+      "toClean": "نیاز به نظافت",
+      "cleaningN": "{n} در حال نظافت",
+      "withRequests": "دارای درخواست",
+      "outOfOrder": "خارج از سرویس",
+      "filters": {
+        "all": "همه",
+        "occupied": "اشغال",
+        "free": "خالی",
+        "dirty": "نظافت",
+        "requests": "درخواست‌ها"
+      },
+      "hk": {
+        "clean": "تمیز",
+        "dirty": "نیاز به نظافت",
+        "cleaning": "در حال نظافت",
+        "inspected": "بازبینی‌شده",
+        "out_of_order": "خارج از سرویس"
+      },
+      "otherRooms": "سایر اتاق‌ها",
+      "groundFloor": "همکف",
+      "floorN": "طبقهٔ {n}",
+      "occupied": "اشغال",
+      "free": "خالی",
+      "guestsN": "{n, plural, =0 {اشغال} other {# مهمان}}",
+      "roomN": "اتاق {label}",
+      "since": "از",
+      "roomServiceToday": "سرویس اتاق امروز:",
+      "housekeeping": "نظافت",
+      "updatedAt": "به‌روزرسانی",
+      "requests": "درخواست‌های باز",
+      "noRequests": "درخواست بازی نیست.",
+      "roomService": "سرویس اتاق در جریان",
+      "noOrders": "سفارشی در جریان نیست.",
+      "qr": "QR اتاق",
+      "checkOut": "تخلیهٔ اتاق",
+      "checkOutConfirm": "اتاق {label} تخلیه شود؟ وضعیتش «نیاز به نظافت» می‌شود."
+    },
+    "allServices": "همهٔ خدمات",
+    "takenBy": "بر عهدهٔ {name}",
+    "respondedIn": "پاسخ در {min} دقیقه"
   }
 }

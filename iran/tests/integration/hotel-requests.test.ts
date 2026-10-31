@@ -10,6 +10,7 @@ import { addMember, setMemberJob } from "@/server/modules/members/service";
 import { deleteTeamJob, listTeamJobs, saveTeamJob } from "@/server/modules/team/jobs";
 import { guestCallsOf, saveGuestCalls, listGuestCalls } from "@/server/modules/team/sections";
 import { hotelToday, listRequests, moveRequest } from "@/server/modules/hotel/requests";
+import { checkOutRoom, floorOf, roomsBoard, setHousekeeping } from "@/server/modules/hotel/rooms";
 import { createOwnerWithRestaurant, uniqueEmail } from "../helpers/factories";
 
 async function seat(qrToken: string) {
@@ -127,5 +128,57 @@ describe("hotel requests", () => {
     // Another hotel cannot touch it.
     const other = await hotelOwner("Other hotel");
     await expect(moveRequest(db, other, req!.id, "done")).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+});
+
+describe("hotel rooms", () => {
+  it("groups rooms by floor, tracks housekeeping and checks guests out", async () => {
+    expect(floorOf({ label: "204", zone: null, number: 204 })).toMatchObject({ key: "f:2", label: 2 });
+    expect(floorOf({ label: "12", zone: null, number: 12 })).toMatchObject({ key: "f:0", label: 0 });
+    expect(floorOf({ label: "Suite A", zone: " Villa ", number: null })).toMatchObject({
+      key: "z:villa",
+      label: "Villa",
+    });
+
+    const hotel = await hotelOwner("Rooms hotel");
+    await bulkCreateTables(db, hotel, { from: 101, to: 102, kind: "room" });
+    await bulkCreateTables(db, hotel, { from: 201, to: 203, kind: "room" });
+    const rooms = await listTables(db, hotel);
+    const r201 = rooms.find((r) => r.label === "201")!;
+    const r102 = rooms.find((r) => r.label === "102")!;
+
+    const guest = await seat(r201.qrToken);
+    await callWaiter(db, guest, "housekeeping", new Date());
+    let board = await roomsBoard(db, hotel);
+    expect(board.floors.map((f) => f.label)).toEqual([1, 2]);
+    const b201 = board.rooms.find((r) => r.id === r201.id)!;
+    expect(b201.session?.guests).toBe(1);
+    expect(b201.requests).toHaveLength(1);
+
+    // Housekeeping states; a room of another hotel is out of reach.
+    await setHousekeeping(db, hotel, r102.id, "out_of_order");
+    await expect(setHousekeeping(db, hotel, r102.id, "sparkling")).rejects.toThrow();
+    const other = await hotelOwner("Other rooms hotel");
+    await expect(setHousekeeping(db, other, r102.id, "clean")).rejects.toMatchObject({ code: "NOT_FOUND" });
+
+    // The guest asked for housekeeping: once done, the room is clean.
+    await setHousekeeping(db, hotel, r201.id, "dirty");
+    const req = b201.requests[0]!;
+    await moveRequest(db, hotel, req.id, "in_progress");
+    await moveRequest(db, hotel, req.id, "done");
+    board = await roomsBoard(db, hotel);
+    expect(board.rooms.find((r) => r.id === r201.id)?.housekeeping).toBe("clean");
+
+    const today = await hotelToday(db, hotel);
+    expect(today).toMatchObject({ rooms: 5, outOfOrder: 1, occupied: 1, doneToday: 1 });
+    expect(today.avgResponseMin).not.toBeNull();
+
+    // Check-out closes the visit and sends the room to housekeeping.
+    await checkOutRoom(db, hotel, r201.id);
+    board = await roomsBoard(db, hotel);
+    const after = board.rooms.find((r) => r.id === r201.id)!;
+    expect(after.session).toBeNull();
+    expect(after.housekeeping).toBe("dirty");
+    expect((await hotelToday(db, hotel)).dirty).toBe(1);
   });
 });

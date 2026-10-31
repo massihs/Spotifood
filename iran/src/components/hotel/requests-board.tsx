@@ -17,6 +17,7 @@ export type RequestView = {
   status: string;
   createdAt: string;
   takenAt: string | null;
+  takenBy: string | null;
   doneAt: string | null;
 };
 
@@ -58,12 +59,53 @@ export function RequestsBoard({
   const now = useNow();
   const { pending, error, run } = useRun();
   const [col, setCol] = useState<string>("open");
+  const [kind, setKind] = useState<string | null>(null);
+  const kinds = [...new Set(requests.map((r) => r.kind))];
+  const name = (r: RequestView) => r.label ?? (tk.has(r.kind as "waiter") ? tk(r.kind as "waiter") : r.kind);
+  const visible = kind ? requests.filter((r) => r.kind === kind) : requests;
   const clock = (iso: string) =>
     new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const ago = (iso: string) => Math.max(0, Math.floor((now - Date.parse(iso)) / 60_000));
 
   return (
     <div>
+      {kinds.length > 1 ? (
+        <div className="-mx-4 mb-3 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
+          <button
+            type="button"
+            onClick={() => setKind(null)}
+            aria-pressed={kind === null}
+            className={cn(
+              "h-9 shrink-0 rounded-full px-4 text-sm font-semibold",
+              kind === null ? "bg-ink text-ink-fg" : "bg-surface text-fg-muted ring-1 ring-border",
+            )}
+          >
+            {t("allServices")}
+          </button>
+          {kinds.map((k) => {
+            const KIcon = CALL_ICON[icons[k] ?? "bell"] ?? BellRing;
+            const sample = requests.find((r) => r.kind === k)!;
+            return (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setKind(kind === k ? null : k)}
+                aria-pressed={kind === k}
+                className={cn(
+                  "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold whitespace-nowrap",
+                  kind === k ? "bg-ink text-ink-fg" : "bg-surface text-fg-muted ring-1 ring-border",
+                )}
+              >
+                <KIcon className="size-4" aria-hidden="true" />
+                {name(sample)}
+                <span className="tabular-nums opacity-70">
+                  {requests.filter((r) => r.kind === k && r.status !== "done").length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
       {/* Phones: one column at a time. */}
       <div className="mb-3 grid grid-cols-3 gap-1 rounded-2xl bg-surface-2 p-1 md:hidden">
         {COLUMNS.map((c) => (
@@ -87,7 +129,7 @@ export function RequestsBoard({
       {error ? <p className="mb-3 rounded-xl bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p> : null}
       <div className="grid gap-4 md:grid-cols-3">
         {COLUMNS.map(({ status, tone, Icon }) => {
-          const list = requests.filter((r) => r.status === status);
+          const list = visible.filter((r) => r.status === status);
           return (
             <section key={status} className={cn("min-w-0", col !== status && "max-md:hidden")}>
               <h2 className="mb-2.5 hidden items-center gap-2 font-bold md:flex">
@@ -125,9 +167,7 @@ export function RequestsBoard({
                           <div className="min-w-0 flex-1">
                             <p className="flex items-center gap-1.5 font-bold">
                               <KindIcon className="size-4 shrink-0 text-accent-text" aria-hidden="true" />
-                              <span className="truncate">
-                                {r.label ?? (tk.has(r.kind as "waiter") ? tk(r.kind as "waiter") : r.kind)}
-                              </span>
+                              <span className="truncate">{name(r)}</span>
                             </p>
                             <p
                               className={cn(
@@ -149,6 +189,23 @@ export function RequestsBoard({
                         {r.note ? (
                           <p className="mt-2.5 rounded-xl bg-surface-2 px-3 py-2 text-sm leading-6">
                             {r.note}
+                          </p>
+                        ) : null}
+                        {r.takenBy && r.status !== "open" ? (
+                          <p className="mt-2 flex items-center gap-1.5 text-xs text-fg-muted">
+                            <Hand className="size-3.5" aria-hidden="true" />
+                            {t("takenBy", { name: r.takenBy })}
+                            {r.takenAt ? (
+                              <span>
+                                ·{" "}
+                                {t("respondedIn", {
+                                  min: Math.max(
+                                    0,
+                                    Math.round((Date.parse(r.takenAt) - Date.parse(r.createdAt)) / 60_000),
+                                  ),
+                                })}
+                              </span>
+                            ) : null}
                           </p>
                         ) : null}
                         {canAct && r.status !== "done" ? (

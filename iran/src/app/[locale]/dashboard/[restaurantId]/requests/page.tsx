@@ -10,6 +10,7 @@ import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { can } from "@/server/tenancy";
 import { listRequests } from "@/server/modules/hotel/requests";
+import { takersOf } from "@/server/modules/hotel/rooms";
 import { CALL_ICONS, guestCallsOf, listGuestCalls, listSections } from "@/server/modules/team/sections";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/requests">;
@@ -38,6 +39,10 @@ async function Requests({ params, searchParams }: Pick<Props, "params" | "search
     guestCallsOf(db, ctx.restaurant.id, { room: true }),
   ]);
   const icons = Object.fromEntries(options.map((o) => [o.key, o.icon]));
+  const takers = await takersOf(
+    db,
+    rows.map((r) => r.takenByUserId),
+  );
   return (
     <>
       <PageHeader title={t("title")} description={t("subtitle")} />
@@ -76,6 +81,7 @@ async function Requests({ params, searchParams }: Pick<Props, "params" | "search
               status: r.status,
               createdAt: r.createdAt.toISOString(),
               takenAt: r.takenAt?.toISOString() ?? null,
+              takenBy: r.takenByUserId ? (takers.get(r.takenByUserId) ?? null) : null,
               doneAt: r.doneAt?.toISOString() ?? null,
             }))}
           />

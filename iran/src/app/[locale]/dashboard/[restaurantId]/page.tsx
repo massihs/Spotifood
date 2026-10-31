@@ -1,6 +1,4 @@
 import {
-  BedDouble,
-  CheckCircle2,
   ConciergeBell,
   Shirt,
   AlertTriangle,
@@ -26,6 +24,7 @@ import { Suspense, type ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { hotelToday } from "@/server/modules/hotel/requests";
+import { HotelOverview } from "@/components/hotel/hotel-overview";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { buttonClasses } from "@/components/ui/button";
 import { Card, CardHeader, StatCard, TONE_TILE, type Tone } from "@/components/ui/card";
@@ -153,7 +152,8 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
     timeZone: tz,
   }).format(now);
 
-  const showReservations = on("reservations") && can(ctx, "orders.view");
+  // A hotel books rooms elsewhere: table bookings stay in its restaurant pages, off its home.
+  const showReservations = !hotel && on("reservations") && can(ctx, "orders.view");
   const alerts = [
     hotel &&
       hotel.open > 0 && {
@@ -218,7 +218,8 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
         Icon: ChefHat,
         tone: "orange" as Tone,
       },
-    on("floor") &&
+    !hotel &&
+      on("floor") &&
       can(ctx, "tables.view") && {
         href: `${base}/floor`,
         label: t("quickActions.floor"),
@@ -305,162 +306,127 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
         </div>
       ) : null}
 
-      {/* Today */}
-      <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <Card
-          className="overflow-hidden border-transparent p-6 text-white shadow-accent"
-          style={{ background: "var(--brand-gradient)" }}
-        >
-          <div
-            className="pointer-events-none absolute -end-16 -top-20 size-64 rounded-full bg-white/10"
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute start-1/3 -bottom-24 size-56 rounded-full bg-white/[0.06]"
-            aria-hidden="true"
-          />
-          <div className="relative flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-sm font-medium opacity-80">{t("revenueToday")}</p>
-              <p className="mt-1 text-3xl font-bold tracking-tight tabular-nums sm:text-4xl">
-                {money(today.revenueTodayCents)}
-              </p>
-              {delta !== null ? (
-                <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/18 px-2.5 py-1 text-xs font-semibold">
-                  {delta >= 0 ? (
-                    <TrendingUp className="size-3.5" aria-hidden="true" />
-                  ) : (
-                    <TrendingDown className="size-3.5" aria-hidden="true" />
-                  )}
-                  <bdi dir="ltr" className="tabular-nums">
-                    {delta > 0 ? "+" : ""}
-                    {delta}%
-                  </bdi>
-                  <span className="opacity-85">{t("vsLastWeek", { day: weekday })}</span>
-                </p>
-              ) : null}
-            </div>
-            <span
-              className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/18"
-              aria-hidden="true"
+      {hotel ? (
+        <HotelOverview ctx={ctx} today={hotel} money={money} asOf={now} />
+      ) : (
+        <>
+          {/* Today */}
+          <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+            <Card
+              className="overflow-hidden border-transparent p-6 text-white shadow-accent"
+              style={{ background: "var(--brand-gradient)" }}
             >
-              <Wallet className="size-5" />
-            </span>
-          </div>
-          <div className="relative mt-5 flex flex-wrap gap-x-6 gap-y-1 text-sm">
-            <p>
-              <span className="opacity-75">{t("averageTicket")} </span>
-              <span className="font-bold tabular-nums">{money(today.averageTicketCents)}</span>
-            </p>
-            <p className="font-semibold opacity-90">{t("ordersN", { n: today.ordersToday })}</p>
-          </div>
-          <div className="relative mt-5">
-            <p className="text-xs font-medium opacity-75">{t("last7")}</p>
-            <div className="mt-3 flex h-28 items-end gap-2">
-              {days.map((d, i) => (
-                <div key={d.key} className="group flex flex-1 flex-col items-center gap-1.5">
-                  <div
-                    className={cn(
-                      "w-full rounded-lg transition-colors",
-                      i === 6 ? "bg-white" : "bg-white/30 group-hover:bg-white/50",
-                    )}
-                    style={{ height: `${Math.max(6, (d.cents / max) * 88)}px` }}
-                    title={money(d.cents)}
-                  />
-                  <span className={cn("text-[10px]", i === 6 ? "font-bold" : "opacity-75")}>{d.label}</span>
+              <div
+                className="pointer-events-none absolute -end-16 -top-20 size-64 rounded-full bg-white/10"
+                aria-hidden="true"
+              />
+              <div
+                className="pointer-events-none absolute start-1/3 -bottom-24 size-56 rounded-full bg-white/[0.06]"
+                aria-hidden="true"
+              />
+              <div className="relative flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium opacity-80">{t("revenueToday")}</p>
+                  <p className="mt-1 text-3xl font-bold tracking-tight tabular-nums sm:text-4xl">
+                    {money(today.revenueTodayCents)}
+                  </p>
+                  {delta !== null ? (
+                    <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/18 px-2.5 py-1 text-xs font-semibold">
+                      {delta >= 0 ? (
+                        <TrendingUp className="size-3.5" aria-hidden="true" />
+                      ) : (
+                        <TrendingDown className="size-3.5" aria-hidden="true" />
+                      )}
+                      <bdi dir="ltr" className="tabular-nums">
+                        {delta > 0 ? "+" : ""}
+                        {delta}%
+                      </bdi>
+                      <span className="opacity-85">{t("vsLastWeek", { day: weekday })}</span>
+                    </p>
+                  ) : null}
                 </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-        {hotel ? (
-          <div className="grid grid-cols-2 gap-4">
-            <KpiLink href={`${base}/requests`}>
-              <StatCard
-                label={t("hotel.open")}
-                value={hotel.open}
-                hint={t("hotel.inProgress", { n: hotel.inProgress })}
-                icon={<ConciergeBell />}
-                tone="orange"
-              />
-            </KpiLink>
-            <KpiLink href={`${base}/tables`}>
-              <StatCard
-                label={t("hotel.occupied")}
-                value={
-                  <>
-                    {hotel.occupied}
-                    <span className="text-base font-medium text-fg-subtle"> / {hotel.rooms}</span>
-                  </>
-                }
-                icon={<BedDouble />}
-                tone="teal"
-              />
-            </KpiLink>
-            <KpiLink href={`${base}/orders`}>
-              <StatCard
-                label={t("hotel.roomOrders")}
-                value={hotel.roomOrders}
-                icon={<ReceiptText />}
-                tone="sky"
-              />
-            </KpiLink>
-            <KpiLink href={`${base}/requests`}>
-              <StatCard
-                label={t("hotel.doneToday")}
-                value={hotel.doneToday}
-                icon={<CheckCircle2 />}
-                tone="emerald"
-              />
-            </KpiLink>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            <KpiLink href={can(ctx, "orders.view") ? `${base}/orders` : null}>
-              <StatCard
-                label={t("ordersToday")}
-                value={today.ordersToday}
-                icon={<ReceiptText />}
-                tone="sky"
-              />
-            </KpiLink>
-            <KpiLink href={on("kitchen") && can(ctx, "orders.view") ? `${base}/kitchen` : null}>
-              <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} tone="orange" />
-            </KpiLink>
-            <KpiLink href={on("floor") && can(ctx, "tables.view") ? `${base}/floor` : null}>
-              <StatCard
-                label={t("openTables")}
-                value={
-                  <>
-                    {today.openTables}
-                    <span className="text-base font-medium text-fg-subtle"> / {overview.tables}</span>
-                  </>
-                }
-                icon={<LayoutGrid />}
-                tone="teal"
-              />
-            </KpiLink>
-            {showReservations ? (
-              <KpiLink href={`${base}/reservations`}>
+                <span
+                  className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/18"
+                  aria-hidden="true"
+                >
+                  <Wallet className="size-5" />
+                </span>
+              </div>
+              <div className="relative mt-5 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                <p>
+                  <span className="opacity-75">{t("averageTicket")} </span>
+                  <span className="font-bold tabular-nums">{money(today.averageTicketCents)}</span>
+                </p>
+                <p className="font-semibold opacity-90">{t("ordersN", { n: today.ordersToday })}</p>
+              </div>
+              <div className="relative mt-5">
+                <p className="text-xs font-medium opacity-75">{t("last7")}</p>
+                <div className="mt-3 flex h-28 items-end gap-2">
+                  {days.map((d, i) => (
+                    <div key={d.key} className="group flex flex-1 flex-col items-center gap-1.5">
+                      <div
+                        className={cn(
+                          "w-full rounded-lg transition-colors",
+                          i === 6 ? "bg-white" : "bg-white/30 group-hover:bg-white/50",
+                        )}
+                        style={{ height: `${Math.max(6, (d.cents / max) * 88)}px` }}
+                        title={money(d.cents)}
+                      />
+                      <span className={cn("text-[10px]", i === 6 ? "font-bold" : "opacity-75")}>
+                        {d.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+            <div className="grid grid-cols-2 gap-4">
+              <KpiLink href={can(ctx, "orders.view") ? `${base}/orders` : null}>
                 <StatCard
-                  label={t("reservationsToday")}
-                  value={live.bookingsToday}
-                  hint={t("coversN", { n: live.coversToday })}
-                  icon={<CalendarClock />}
-                  tone="fuchsia"
+                  label={t("ordersToday")}
+                  value={today.ordersToday}
+                  icon={<ReceiptText />}
+                  tone="sky"
                 />
               </KpiLink>
-            ) : (
-              <StatCard
-                label={t("stats.products")}
-                value={overview.products}
-                icon={<UtensilsCrossed />}
-                tone="rose"
-              />
-            )}
-          </div>
-        )}
-      </section>
+              <KpiLink href={on("kitchen") && can(ctx, "orders.view") ? `${base}/kitchen` : null}>
+                <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} tone="orange" />
+              </KpiLink>
+              <KpiLink href={on("floor") && can(ctx, "tables.view") ? `${base}/floor` : null}>
+                <StatCard
+                  label={t("openTables")}
+                  value={
+                    <>
+                      {today.openTables}
+                      <span className="text-base font-medium text-fg-subtle"> / {overview.tables}</span>
+                    </>
+                  }
+                  icon={<LayoutGrid />}
+                  tone="teal"
+                />
+              </KpiLink>
+              {showReservations ? (
+                <KpiLink href={`${base}/reservations`}>
+                  <StatCard
+                    label={t("reservationsToday")}
+                    value={live.bookingsToday}
+                    hint={t("coversN", { n: live.coversToday })}
+                    icon={<CalendarClock />}
+                    tone="fuchsia"
+                  />
+                </KpiLink>
+              ) : (
+                <StatCard
+                  label={t("stats.products")}
+                  value={overview.products}
+                  icon={<UtensilsCrossed />}
+                  tone="rose"
+                />
+              )}
+            </div>
+          </section>
+        </>
+      )}
 
       {/* Quick access: an app-launcher row */}
       <nav aria-label={t("quick")} className="mt-4 grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-8">

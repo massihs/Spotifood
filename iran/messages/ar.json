@@ -359,7 +359,9 @@
     "adminAudience": "زوار الموقع",
     "tablesHotel": "الغرف وQR",
     "requests": "الطلبات",
-    "roomService": "خدمة الغرف"
+    "roomService": "خدمة الغرف",
+    "rooms": "الغرف",
+    "roomsQr": "رموز QR للغرف"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -434,7 +436,23 @@
       "inProgress": "{n} قيد التنفيذ",
       "occupied": "الغرف المشغولة",
       "roomOrders": "خدمة الغرف اليوم",
-      "doneToday": "طلبات منجزة"
+      "doneToday": "طلبات منجزة",
+      "occupancy": "نسبة الإشغال",
+      "occupiedOf": "{n} من {total} غرف مشغولة",
+      "roomServiceRevenue": "خدمة الغرف",
+      "avgResponse": "متوسط الرد",
+      "minutes": "{n} د",
+      "outOfOrder": "خارج الخدمة",
+      "toClean": "بحاجة إلى تنظيف",
+      "cleaningN": "{n} قيد التنفيذ",
+      "floors": "الطوابق",
+      "allRooms": "كل الغرف",
+      "other": "أخرى",
+      "ground": "الأرضي",
+      "floorN": "الطابق {n}",
+      "noRooms": "أضف غرفك لتظهر هنا.",
+      "waitingTitle": "طلبات في الانتظار",
+      "noWaiting": "لا طلبات في الانتظار."
     }
   },
   "roles": {
@@ -3771,6 +3789,54 @@
     "doneAt": "أُنجز الساعة",
     "take": "سأتولاه",
     "release": "إعادة إلى الانتظار",
-    "done": "تم"
+    "done": "تم",
+    "rooms": {
+      "title": "الغرف",
+      "subtitle": "كل الغرف حسب الطابق: الإشغال، التنظيف، الطلبات وخدمة الغرف الجارية.",
+      "emptyTitle": "لا غرف بعد",
+      "emptyBody": "أضف غرفك (مثلاً 101 إلى 120) لإنشاء رموز QR الخاصة بها.",
+      "addRooms": "إضافة غرف",
+      "occupancy": "الإشغال",
+      "occupiedOf": "{n} / {total} غرف مشغولة",
+      "toClean": "بحاجة إلى تنظيف",
+      "cleaningN": "{n} قيد التنظيف",
+      "withRequests": "لديها طلب",
+      "outOfOrder": "خارج الخدمة",
+      "filters": {
+        "all": "الكل",
+        "occupied": "مشغولة",
+        "free": "شاغرة",
+        "dirty": "التنظيف",
+        "requests": "الطلبات"
+      },
+      "hk": {
+        "clean": "نظيفة",
+        "dirty": "بحاجة إلى تنظيف",
+        "cleaning": "قيد التنظيف",
+        "inspected": "تم الفحص",
+        "out_of_order": "خارج الخدمة"
+      },
+      "otherRooms": "غرف أخرى",
+      "groundFloor": "الطابق الأرضي",
+      "floorN": "الطابق {n}",
+      "occupied": "مشغولة",
+      "free": "شاغرة",
+      "guestsN": "{n, plural, =0 {مشغولة} one {ضيف واحد} two {ضيفان} few {# ضيوف} many {# ضيفًا} other {# ضيف}}",
+      "roomN": "الغرفة {label}",
+      "since": "منذ",
+      "roomServiceToday": "خدمة الغرف اليوم:",
+      "housekeeping": "التنظيف",
+      "updatedAt": "آخر تحديث",
+      "requests": "طلبات مفتوحة",
+      "noRequests": "لا طلبات مفتوحة.",
+      "roomService": "خدمة غرف جارية",
+      "noOrders": "لا طلبات جارية.",
+      "qr": "رمز QR للغرفة",
+      "checkOut": "مغادرة الضيف",
+      "checkOutConfirm": "تسجيل مغادرة الغرفة {label}؟ ستصبح «بحاجة إلى تنظيف»."
+    },
+    "allServices": "كل الخدمات",
+    "takenBy": "يتولاه {name}",
+    "respondedIn": "الرد خلال {min} دقيقة"
   }
 }

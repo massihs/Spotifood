@@ -29,6 +29,9 @@ export const diningTables = pgTable(
     posY: integer(),
     /** square | round | rect (long table) */
     shape: varchar({ length: 8 }).notNull().default("square"),
+    /** Hotel rooms: clean | dirty | cleaning | inspected | out_of_order. */
+    housekeeping: varchar({ length: 16 }).notNull().default("clean"),
+    housekeepingAt: tstz(),
     ...timestamps,
     ...softDelete,
   },
