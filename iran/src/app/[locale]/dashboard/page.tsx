@@ -1,3 +1,4 @@
+import { Shield } from "lucide-react";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -22,7 +23,9 @@ export default function DashboardIndex() {
 async function RestaurantPicker() {
   const user = await requireUser();
   const list = await listUserRestaurants(db, user.id);
-  if (list.length === 1) redirect(`/dashboard/${list[0]!.id}`);
+  // A super admin always gets the choice (the platform admin first) instead of landing in
+  // their one restaurant with the admin link far down the sidebar.
+  if (list.length === 1 && !user.isSuperAdmin) redirect(`/dashboard/${list[0]!.id}`);
   if (list.length === 0 && user.isSuperAdmin) redirect("/admin");
 
   const t = await getTranslations();
@@ -36,6 +39,15 @@ async function RestaurantPicker() {
   }
   return (
     <div className="mt-10">
+      {user.isSuperAdmin ? (
+        <Link
+          href="/admin"
+          className="mb-8 flex items-center gap-3 rounded-xl bg-ink px-4 py-3.5 font-semibold text-ink-fg hover:opacity-90"
+        >
+          <Shield className="size-5" aria-hidden="true" />
+          {t("nav.admin")}
+        </Link>
+      ) : null}
       <h1 className="text-xl font-semibold">{t("dashboard.pickRestaurant")}</h1>
       <ul className="mt-6 space-y-2">
         {list.map((r) => (

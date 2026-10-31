@@ -392,6 +392,17 @@ async function RestaurantShell({
         user={ctx.user}
         headerExtra={
           <>
+            {/* Super admins reach the platform admin from every page, not only the sidebar's end. */}
+            {ctx.user.isSuperAdmin ? (
+              <Link
+                href="/admin"
+                title={t("nav.admin")}
+                aria-label={t("nav.admin")}
+                className="grid size-10 place-items-center rounded-full bg-ink text-ink-fg hover:opacity-90"
+              >
+                <Shield className="size-4" aria-hidden="true" />
+              </Link>
+            ) : null}
             <OrderAlerts
               restaurantId={ctx.restaurant.id}
               newOrders={newOrders}

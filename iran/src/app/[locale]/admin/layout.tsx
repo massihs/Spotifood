@@ -3,7 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import { IconChart, IconStore, IconUsers } from "@/components/ui/icons";
 import { requireSuperAdmin } from "@/server/auth/current";
-import { Bug, CreditCard, Eye, Music } from "lucide-react";
+import { Bug, CreditCard, Eye, LayoutGrid, Music } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 
 export default function AdminLayout({ children }: LayoutProps<"/[locale]/admin">) {
   return (
@@ -31,6 +32,15 @@ async function AdminShell({ children }: { children: React.ReactNode }) {
         { href: "/admin/audience", label: t("adminAudience"), icon: <Eye />, primary: true },
         { href: "/admin/errors", label: t("adminErrors"), icon: <Bug />, primary: true },
       ]}
+      footer={
+        <Link
+          href="/dashboard"
+          className="flex h-10 items-center gap-3 rounded-lg px-3 text-sm text-fg-muted hover:bg-surface-2 hover:text-fg"
+        >
+          <LayoutGrid className="size-4" aria-hidden="true" />
+          {t("switchRestaurant")}
+        </Link>
+      }
     >
       {children}
     </AppShell>
