@@ -178,13 +178,13 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* ── Platform (bento) ────────────────────────────── */}
-        <section id="features" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6">
+        <section id="features" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6 sm:py-24">
           <SectionTitle
             eyebrow={t("platform.eyebrow")}
             title={t("platform.title")}
             subtitle={t("platform.subtitle")}
           />
-          <div className="mt-14 grid gap-4 lg:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:mt-14 lg:grid-cols-3">
             <BentoCard
               className="lg:col-span-2 lg:row-span-2"
               Icon={QrCode}
@@ -247,9 +247,9 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 
         {/* ── How it works ────────────────────────────────── */}
         <section id="how" className="scroll-mt-20 border-y border-border bg-surface">
-          <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-24">
             <SectionTitle eyebrow={t("howEyebrow")} title={t("howTitle")} subtitle={t("howSubtitle")} />
-            <ol className="relative mt-14 grid gap-6 md:grid-cols-3">
+            <ol className="relative mt-10 grid gap-6 sm:mt-14 md:grid-cols-3">
               <span
                 aria-hidden="true"
                 className="absolute inset-x-[16%] top-7 hidden border-t-2 border-dashed border-border-strong md:block"
@@ -271,13 +271,16 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* ── Made for Iran ───────────────────────────────── */}
-        <section className="px-4 py-24 sm:px-6">
-          <div className="landing-hero relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] px-6 py-14 text-white sm:px-12">
+        <section className="px-4 py-14 sm:px-6 sm:py-24">
+          <div className="landing-hero relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] px-5 py-10 text-white sm:px-12 sm:py-14">
             <div aria-hidden="true" className="landing-grid pointer-events-none absolute inset-0 -z-10" />
             <SectionTitle eyebrow={t("iran.eyebrow")} title={t("iran.title")} dark />
-            <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-8 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
               {MADE_FOR_IRAN.map(({ key, Icon }) => (
-                <li key={key} className="flex gap-4 rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/10">
+                <li
+                  key={key}
+                  className="flex gap-4 rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/10 sm:p-5"
+                >
                   <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent text-accent-fg">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
@@ -294,7 +297,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* ── Guests vs restaurants ───────────────────────── */}
-        <section className="mx-auto grid max-w-6xl gap-4 px-4 pb-24 sm:px-6 md:grid-cols-2">
+        <section className="mx-auto grid max-w-6xl gap-4 px-4 pb-14 sm:px-6 sm:pb-24 md:grid-cols-2">
           <BenefitCard
             title={t("split.guestTitle")}
             points={guestPoints}
@@ -310,7 +313,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* ── FAQ ─────────────────────────────────────────── */}
-        <section id="faq" className="mx-auto max-w-3xl scroll-mt-20 px-4 pb-24 sm:px-6">
+        <section id="faq" className="mx-auto max-w-3xl scroll-mt-20 px-4 pb-14 sm:px-6 sm:pb-24">
           <SectionTitle title={t("faqTitle")} />
           <div className="mt-10 space-y-3">
             {FAQ.map((k) => (
@@ -372,8 +375,8 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
         </section>
 
         {/* ── Final CTA ───────────────────────────────────── */}
-        <section className="px-4 pb-24 sm:px-6">
-          <div className="landing-hero relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] px-6 py-16 text-center text-white sm:px-12">
+        <section className="px-4 pb-14 sm:px-6 sm:pb-24">
+          <div className="landing-hero relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] px-6 py-12 text-center text-white sm:px-12 sm:py-16">
             <div aria-hidden="true" className="landing-grid pointer-events-none absolute inset-0 -z-10" />
             <h2 className="mx-auto max-w-2xl text-3xl font-black tracking-tight text-balance sm:text-4xl">
               {t("finalTitle")}

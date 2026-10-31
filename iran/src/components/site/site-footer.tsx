@@ -36,8 +36,8 @@ export async function SiteFooter() {
   ];
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
-        <div className="max-w-xs">
+      <div className="mx-auto grid max-w-6xl grid-cols-3 gap-x-6 gap-y-8 px-4 py-10 sm:px-6 sm:py-12 md:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))] md:gap-10">
+        <div className="col-span-3 max-w-xs md:col-span-1">
           <Logo />
           <p className="mt-4 text-sm leading-6 text-fg-muted">{t("footer.tagline")}</p>
         </div>

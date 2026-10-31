@@ -361,15 +361,18 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
               </div>
               <div className="relative mt-5">
                 <p className="text-xs font-medium opacity-75">{t("last7")}</p>
-                <div className="mt-3 flex h-28 items-end gap-2">
+                <div className="mt-3 flex h-16 items-end gap-2 sm:h-28">
                   {days.map((d, i) => (
-                    <div key={d.key} className="group flex flex-1 flex-col items-center gap-1.5">
+                    <div
+                      key={d.key}
+                      className="group flex h-full flex-1 flex-col items-center justify-end gap-1.5"
+                    >
                       <div
                         className={cn(
                           "w-full rounded-lg transition-colors",
                           i === 6 ? "bg-white" : "bg-white/30 group-hover:bg-white/50",
                         )}
-                        style={{ height: `${Math.max(6, (d.cents / max) * 88)}px` }}
+                        style={{ height: `${Math.max(8, (d.cents / max) * 75)}%` }}
                         title={money(d.cents)}
                       />
                       <span className={cn("text-[10px]", i === 6 ? "font-bold" : "opacity-75")}>
