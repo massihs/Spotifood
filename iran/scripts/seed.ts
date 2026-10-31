@@ -63,7 +63,19 @@ async function upsertUser(email: string, password: string, fullName: string, isS
     .select()
     .from(users)
     .where(sql`lower(${users.email}) = ${email.toLowerCase()}`);
-  if (existing) return existing;
+  if (existing) {
+    // The account named by SEED_SUPERADMIN_EMAIL is the platform admin even if it signed up
+    // as a restaurant owner first; its password is never touched.
+    if (isSuperAdmin && !existing.isSuperAdmin) {
+      const [promoted] = await db
+        .update(users)
+        .set({ isSuperAdmin: true })
+        .where(eq(users.id, existing.id))
+        .returning();
+      return promoted!;
+    }
+    return existing;
+  }
   const [created] = await db
     .insert(users)
     .values({
@@ -282,7 +294,7 @@ async function seedPlatform() {
     // Never create a production admin with a well-known password.
     console.warn("! SEED_SUPERADMIN_PASSWORD not set: super admin not created");
   } else {
-    // Only creates the account; an existing account (and its changed password) is left untouched.
+    // Creates the account, or makes an existing one super admin; its password is left untouched.
     await upsertUser(email, password ?? "ChangeMe!2026", "Platform Admin", true);
     console.log(`✓ super admin ${email}`);
   }
