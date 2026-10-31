@@ -104,12 +104,18 @@ async function Place({ params }: Pick<Props, "params">) {
     .filter((c) => c.items.length > 0);
 
   const bookQuery = `p=2&d=${localDay(new Date(), place.timezone)}`;
+  // Phones book and order from the bar at the bottom: the card keeps tonight's times and the
+  // place's details in one block, without repeating those buttons.
+  const bar = place.reservable || orderOnline;
   const bookCard = (
     <div className="rounded-3xl bg-surface p-5 ring-1 ring-border">
       {orderOnline ? (
         <Link
           href={`/r/${place.slug}/order`}
-          className="mb-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-fg text-base font-bold text-bg"
+          className={cn(
+            "mb-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-fg text-base font-bold text-bg",
+            bar && "max-lg:hidden",
+          )}
         >
           <ShoppingBag className="size-5" aria-hidden="true" />
           {t("orderOnline")}
@@ -145,7 +151,7 @@ async function Place({ params }: Pick<Props, "params">) {
           )}
           <Link
             href={`/r/${place.slug}/book?${bookQuery}`}
-            className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-accent text-base font-bold text-accent-fg hover:bg-accent-hover"
+            className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-accent text-base font-bold text-accent-fg hover:bg-accent-hover max-lg:hidden"
           >
             <CalendarCheck className="size-5" aria-hidden="true" />
             {t("book")}
@@ -161,6 +167,40 @@ async function Place({ params }: Pick<Props, "params">) {
       ) : (
         <p className="mt-1 text-sm leading-6 text-fg-muted">{t("profile.noBooking")}</p>
       )}
+      {/* The place's details live in the same card. */}
+      {place.address || mapsUrl || place.phone ? (
+        <div className="mt-5 space-y-3 border-t border-border pt-4">
+          {place.address ? (
+            <p className="flex gap-2.5 text-sm leading-6">
+              <MapPin className="mt-0.5 size-4 shrink-0 text-fg-muted" aria-hidden="true" />
+              <span>{place.address}</span>
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {mapsUrl ? (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-10 items-center gap-1.5 rounded-full bg-surface-2 px-4 text-sm font-bold hover:bg-surface-3"
+              >
+                <Navigation className="size-4" aria-hidden="true" />
+                {t("profile.directions")}
+              </a>
+            ) : null}
+            {place.phone ? (
+              <a
+                href={`tel:${place.phone.replace(/[^+0-9]/g, "")}`}
+                className="inline-flex h-10 items-center gap-1.5 rounded-full bg-surface-2 px-4 text-sm font-bold hover:bg-surface-3"
+                dir="ltr"
+              >
+                <Phone className="size-4" aria-hidden="true" />
+                {place.phone}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 
@@ -363,44 +403,11 @@ async function Place({ params }: Pick<Props, "params">) {
         <aside className="order-first space-y-4 lg:sticky lg:top-24 lg:order-none lg:self-start">
           {bookCard}
 
-          <div className="space-y-4 rounded-3xl bg-surface p-5 ring-1 ring-border">
-            <h2 className="text-lg font-bold">{t("profile.info")}</h2>
-            {place.address ? (
-              <p className="flex gap-2.5 text-sm leading-6">
-                <MapPin className="mt-0.5 size-4 shrink-0 text-fg-muted" aria-hidden="true" />
-                <span>{place.address}</span>
-              </p>
-            ) : null}
-            <div className="flex flex-wrap gap-2">
-              {mapsUrl ? (
-                <a
-                  href={mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-10 items-center gap-1.5 rounded-full bg-surface-2 px-4 text-sm font-bold hover:bg-surface-3"
-                >
-                  <Navigation className="size-4" aria-hidden="true" />
-                  {t("profile.directions")}
-                </a>
-              ) : null}
-              {place.phone ? (
-                <a
-                  href={`tel:${place.phone.replace(/[^+0-9]/g, "")}`}
-                  className="inline-flex h-10 items-center gap-1.5 rounded-full bg-surface-2 px-4 text-sm font-bold hover:bg-surface-3"
-                  dir="ltr"
-                >
-                  <Phone className="size-4" aria-hidden="true" />
-                  {place.phone}
-                </a>
-              ) : null}
-            </div>
-          </div>
-
           <div className="hidden lg:block">{hoursCard}</div>
         </aside>
       </div>
 
-      {place.reservable || orderOnline ? (
+      {bar ? (
         <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-bg/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
           {orderOnline ? (
             <Link

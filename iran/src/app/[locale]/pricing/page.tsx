@@ -78,7 +78,8 @@ async function Plans() {
           {t("trial", { days: TRIAL_DAYS })}
         </p>
       ) : null}
-      <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Phones: plans side by side to swipe, the recommended one first. */}
+      <ul className="mt-10 flex snap-x snap-mandatory [scrollbar-width:none] gap-4 overflow-x-auto py-3 max-sm:-mx-4 max-sm:px-4 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:py-0 lg:grid-cols-4">
         {plans.map((p) => {
           const hot = p.code === highlight;
           const custom = p.priceMonthlyCents === 0 && p.code !== "free";
@@ -86,7 +87,8 @@ async function Plans() {
             <li
               key={p.id}
               className={cn(
-                "relative flex flex-col rounded-3xl bg-surface p-6 shadow-[var(--shadow-soft)] ring-1 ring-border transition-transform hover:-translate-y-1",
+                "relative flex w-[82%] shrink-0 snap-center flex-col rounded-3xl bg-surface p-6 shadow-[var(--shadow-soft)] ring-1 ring-border transition-transform hover:-translate-y-1 sm:w-auto",
+                hot && "max-sm:order-first",
                 hot &&
                   "bg-[#1c1917] text-white shadow-[0_30px_70px_-30px_rgb(234_88_12/0.65)] ring-0 lg:-my-3 lg:py-9",
               )}

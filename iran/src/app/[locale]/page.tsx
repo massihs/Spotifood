@@ -227,11 +227,12 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
               <MiniChart label={t("platform.mockRevenue")} />
             </BentoCard>
           </div>
-          <ul className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          {/* Phones: a swipeable row instead of six rows of two. */}
+          <ul className="mt-4 flex snap-x snap-mandatory [scrollbar-width:none] gap-3 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
             {MODULES.map(({ key, Icon }) => (
               <li
                 key={key}
-                className="group rounded-3xl bg-surface p-4 ring-1 ring-border transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-float)] sm:p-5"
+                className="group w-48 shrink-0 snap-start rounded-3xl bg-surface p-4 ring-1 ring-border transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-float)] sm:w-auto sm:p-5"
               >
                 <span className="grid size-11 place-items-center rounded-2xl bg-accent-soft text-accent-text transition group-hover:bg-accent group-hover:text-accent-fg">
                   <Icon className="size-5" aria-hidden="true" />
