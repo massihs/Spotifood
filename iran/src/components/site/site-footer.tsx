@@ -2,6 +2,13 @@ import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logo } from "@/components/ui/logo";
 import { Link } from "@/i18n/navigation";
+import { edition } from "@/config/edition";
+
+/** Enamad trust seal (Iran's e-commerce licence): its own link and image, sent with our origin. */
+const ENAMAD = {
+  href: "https://trustseal.enamad.ir/?id=8455900&Code=qzv1asNZtiruHE5CKdRpaR3qUe6rAQ10",
+  src: "https://trustseal.enamad.ir/logo.aspx?id=8455900&Code=qzv1asNZtiruHE5CKdRpaR3qUe6rAQ10",
+};
 
 /** The public site's footer: the brand, three columns of links, then rights and language. */
 export async function SiteFooter() {
@@ -59,6 +66,21 @@ export async function SiteFooter() {
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-5 text-sm text-fg-muted sm:px-6">
           <p>{t("footer.rights")}</p>
+          {edition.edition === "iran" ? (
+            <a referrerPolicy="origin" target="_blank" href={ENAMAD.href} className="shrink-0">
+              <img
+                referrerPolicy="origin"
+                src={ENAMAD.src}
+                alt="Enamad"
+                width={64}
+                height={64}
+                loading="lazy"
+                className="size-16 cursor-pointer object-contain"
+                // Enamad reads this attribute to check the seal belongs to the page.
+                {...{ code: "qzv1asNZtiruHE5CKdRpaR3qUe6rAQ10" }}
+              />
+            </a>
+          ) : null}
           <LanguageSwitcher />
         </div>
       </div>
