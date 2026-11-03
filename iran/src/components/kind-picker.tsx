@@ -3,7 +3,7 @@
 import { BedDouble, Coffee, Store, UtensilsCrossed, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
-import { RESTAURANT_KINDS, type RestaurantKind } from "@/lib/restaurant-kind";
+import { OFFERED_KINDS, type RestaurantKind } from "@/lib/restaurant-kind";
 
 const ICONS: Record<RestaurantKind, LucideIcon> = {
   restaurant: UtensilsCrossed,
@@ -12,7 +12,7 @@ const ICONS: Record<RestaurantKind, LucideIcon> = {
   hotel: BedDouble,
 };
 
-/** Radio cards: restaurant, café, food court, hotel. */
+/** Radio cards: restaurant, café, food court (and hotel only for a venue that already is one). */
 export function KindPicker({
   name = "kind",
   defaultValue = "restaurant",
@@ -23,11 +23,12 @@ export function KindPicker({
   disabled?: boolean;
 }) {
   const t = useTranslations("kinds");
+  const kinds: RestaurantKind[] = defaultValue === "hotel" ? [...OFFERED_KINDS, "hotel"] : [...OFFERED_KINDS];
   return (
     <fieldset className="min-w-0" disabled={disabled}>
       <legend className="mb-1.5 text-sm font-medium">{t("label")}</legend>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {RESTAURANT_KINDS.map((k) => {
+      <div className={cn("grid grid-cols-2 gap-2", kinds.length > 3 ? "sm:grid-cols-4" : "sm:grid-cols-3")}>
+        {kinds.map((k) => {
           const Icon = ICONS[k];
           return (
             <label
@@ -52,7 +53,7 @@ export function KindPicker({
         })}
       </div>
       <p className="mt-1.5 text-xs text-fg-muted">{t("foodCourtHint")}</p>
-      <p className="mt-1 text-xs text-fg-muted">{t("hotelHint")}</p>
+      {defaultValue === "hotel" ? <p className="mt-1 text-xs text-fg-muted">{t("hotelHint")}</p> : null}
     </fieldset>
   );
 }

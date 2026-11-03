@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { RESTAURANT_KINDS } from "@/lib/restaurant-kind";
+import { OFFERED_KINDS } from "@/lib/restaurant-kind";
 import { PASSWORD_MIN_LENGTH } from "@/server/auth/password";
 
 export const emailSchema = z.string().trim().toLowerCase().pipe(z.email().max(320));
@@ -11,7 +11,7 @@ export const signupSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   restaurantName: z.string().trim().min(2).max(160),
-  kind: z.enum(RESTAURANT_KINDS).default("restaurant"),
+  kind: z.enum(OFFERED_KINDS).default("restaurant"),
 });
 export type SignupInput = z.input<typeof signupSchema>;
 

@@ -1,6 +1,5 @@
 import { COMPANY } from "@/lib/company";
 import {
-  BedDouble,
   ArrowLeft,
   BarChart3,
   Bike,
@@ -65,7 +64,6 @@ const MODULES = [
   { key: "club", Icon: Gift },
   { key: "inventory", Icon: Boxes },
   { key: "branches", Icon: Building2 },
-  { key: "hotel", Icon: BedDouble },
   { key: "offline", Icon: WifiOff },
   { key: "music", Icon: Music },
   { key: "games", Icon: Dices },

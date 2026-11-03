@@ -711,7 +711,8 @@
     "too_many_sections": "30 sections at most.",
     "label_required": "Give every bell option a name.",
     "invalid_call": "This option is no longer offered.",
-    "job_in_use": "Members hold this job."
+    "job_in_use": "Members hold this job.",
+    "kind_unavailable": "This venue type is no longer offered."
   },
   "tables": {
     "title": "Tables & QR codes",

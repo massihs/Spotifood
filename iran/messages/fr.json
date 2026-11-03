@@ -711,7 +711,8 @@
     "too_many_sections": "30 sections au maximum.",
     "label_required": "Donnez un nom à chaque option de la cloche.",
     "invalid_call": "Cette option n’est plus proposée.",
-    "job_in_use": "Des membres occupent ce poste."
+    "job_in_use": "Des membres occupent ce poste.",
+    "kind_unavailable": "Ce type d'établissement n'est plus proposé."
   },
   "tables": {
     "title": "Tables & QR codes",

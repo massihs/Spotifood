@@ -40,6 +40,9 @@ export async function updateProfile(db: Database, ctx: RestaurantContext, raw: P
   assertCan(ctx, "restaurant.manage");
   const input = profileSchema.parse(raw);
   const rid = ctx.restaurant.id;
+  // Hotels now live on Spotihotel: a venue can stay a hotel but not become one.
+  if (input.kind === "hotel" && ctx.restaurant.kind !== "hotel")
+    throw new AppError("VALIDATION", "kind_unavailable", { field: "kind" });
   return db.transaction(async (tx) => {
     if (input.currency !== ctx.restaurant.currency) {
       // Changing currency would corrupt historical amounts.
