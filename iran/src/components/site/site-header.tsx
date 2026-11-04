@@ -1,6 +1,7 @@
 import { CircleUser, Store } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonClasses } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import { Link } from "@/i18n/navigation";
@@ -64,13 +65,14 @@ export async function SiteHeader({
             <span className="max-[420px]:sr-only">{t("nav.restaurants")}</span>
           </Link>
           <LanguageSwitcher className="hidden sm:inline-flex" />
+          <ThemeToggle className="max-[380px]:hidden" />
           <Link
             href="/account"
             aria-label={t("nav.account")}
             className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium whitespace-nowrap text-fg-muted ring-1 ring-border hover:text-fg"
           >
             <CircleUser className="size-4" aria-hidden="true" />
-            <span className="hidden xl:inline">{t("nav.account")}</span>
+            <span className="hidden 2xl:inline">{t("nav.account")}</span>
           </Link>
           <Link
             href="/login"

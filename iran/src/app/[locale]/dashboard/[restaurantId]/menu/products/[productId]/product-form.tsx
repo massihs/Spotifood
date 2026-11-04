@@ -1,5 +1,6 @@
 "use client";
 
+import { IMAGE_ACCEPT, prepareImage, setInputFile } from "@/lib/prepare-image";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Link } from "@/i18n/navigation";
@@ -534,9 +535,16 @@ export function ProductPhotos({
                   <input
                     type="file"
                     name="photo"
-                    accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                    accept={IMAGE_ACCEPT}
                     className="sr-only"
-                    onChange={(e) => e.target.form?.requestSubmit()}
+                    onChange={async (e) => {
+                      const el = e.currentTarget;
+                      const raw = el.files?.[0];
+                      if (!raw) return;
+                      const f = await prepareImage(raw);
+                      if (f !== raw) setInputFile(el, f);
+                      el.form?.requestSubmit();
+                    }}
                   />
                 </label>
               </ActionForm>

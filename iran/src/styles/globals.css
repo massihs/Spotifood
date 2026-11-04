@@ -13,6 +13,8 @@
  * charts and statuses so screens are never single-colored. Dark mode swaps values.
  */
 :root {
+  /* Native controls (inputs, scrollbars, date pickers) follow the day / night mode. */
+  color-scheme: light dark;
   --brand-h: 47;
   --brand-c: 0.19;
   --brand-l: 0.66;
@@ -22,11 +24,12 @@
   --surface: oklch(1 0 0);
   --surface-2: oklch(0.962 0.0056 62);
   --surface-3: oklch(0.925 0.0077 62);
-  --border: oklch(0.915 0.007 62);
-  --border-strong: oklch(0.86 0.0098 62);
-  --fg: oklch(0.21 0.021 62);
-  --fg-muted: oklch(0.49 0.0175 62);
-  --fg-subtle: oklch(0.63 0.014 62);
+  /* Day mode tuned for bright rooms and sunlit screens: crisper borders, secondary text at AA contrast. */
+  --border: oklch(0.9 0.008 62);
+  --border-strong: oklch(0.83 0.011 62);
+  --fg: oklch(0.2 0.021 62);
+  --fg-muted: oklch(0.45 0.0175 62);
+  --fg-subtle: oklch(0.56 0.014 62);
   --ink: oklch(0.21 0.021 62);
   --ink-hover: oklch(0.3 0.0245 62);
   --ink-fg: oklch(1 0 0);
@@ -112,7 +115,11 @@
   }
 }
 
+:root[data-theme="light"] {
+  color-scheme: light;
+}
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --bg: oklch(0.15 0.0105 62);
   --surface: oklch(0.195 0.014 62);
   --surface-2: oklch(0.235 0.0154 62);
@@ -624,4 +631,20 @@ dialog[open]::backdrop {
   .landing-float-slow {
     animation: none;
   }
+}
+
+/* Checkerboard behind uploaded logos, so transparent areas read as transparent. */
+.checker {
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(45deg, var(--surface-2) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--surface-2) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--surface-2) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--surface-2) 75%);
+  background-size: 16px 16px;
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
 }

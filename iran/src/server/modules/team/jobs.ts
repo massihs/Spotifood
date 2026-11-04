@@ -1,8 +1,8 @@
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
-import { restaurantMembers, teamJobs } from "@/server/db/schema";
+import { restaurantMembers, restaurants, teamJobs } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import { conflict, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
@@ -146,4 +146,30 @@ export async function deleteTeamJob(db: Database, ctx: RestaurantContext, id: st
       entityId: id,
     });
   });
+}
+
+/**
+ * What a job's sign-in link shows before anyone is signed in: the venue and the job, nothing
+ * private. Null for an unknown id or a closed venue.
+ */
+export async function staffLinkInfo(db: DbOrTx, teamJobId: string) {
+  if (!isUuid(teamJobId)) return null;
+  const [row] = await db
+    .select({
+      jobId: teamJobs.id,
+      jobName: teamJobs.name,
+      icon: teamJobs.icon,
+      baseJob: teamJobs.baseJob,
+      restaurantId: restaurants.id,
+      restaurantName: restaurants.name,
+      kind: restaurants.kind,
+      logoKey: restaurants.logoKey,
+      brandColor: restaurants.brandColor,
+      status: restaurants.status,
+    })
+    .from(teamJobs)
+    .innerJoin(restaurants, eq(restaurants.id, teamJobs.restaurantId))
+    .where(and(eq(teamJobs.id, teamJobId), isNull(restaurants.deletedAt)));
+  if (!row || row.status === "suspended") return null;
+  return row;
 }

@@ -105,7 +105,7 @@ export async function updateLegal(db: Database, ctx: RestaurantContext, raw: Leg
 
 export async function uploadLogo(db: Database, ctx: RestaurantContext, file: Buffer) {
   assertCan(ctx, "restaurant.manage");
-  const image = await processImage(file, LOGO_VARIANTS);
+  const image = await processImage(file, LOGO_VARIANTS, { allowSvg: true });
   const base = newAssetBase(ctx.restaurant.id, "logo", randomToken(16));
   const store = storage();
   const keys = image.variants.map((v) => variantKey(base, v.suffix, v.contentType));

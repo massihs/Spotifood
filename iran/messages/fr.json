@@ -303,6 +303,11 @@
       "validation": "Merci de vérifier les champs du formulaire.",
       "password_too_short": "Le mot de passe doit contenir au moins 10 caractères.",
       "unknown": "Une erreur est survenue. Réessayez."
+    },
+    "staff": {
+      "subtitle": "Connectez-vous avec votre compte d'équipe : vous arrivez directement sur l'écran « {job} ».",
+      "otherAccount": "Vous êtes connecté avec {email}, qui n'a pas accès à cet établissement. Connectez-vous avec votre compte d'équipe.",
+      "bookmark": "Astuce : ajoutez cette page à l'écran d'accueil de la tablette ou du téléphone du poste."
     }
   },
   "nav": {
@@ -600,7 +605,7 @@
     "image_empty": "Fichier vide.",
     "image_too_large": "Image trop lourde (8 Mo maximum).",
     "image_invalid": "Ce fichier n'est pas une image valide.",
-    "image_format": "Formats acceptés : JPEG, PNG, WebP, HEIC.",
+    "image_format": "Formats acceptés : JPEG, PNG, WebP, AVIF, GIF, HEIC (iPhone) et SVG pour le logo.",
     "already_member": "Cette personne fait déjà partie de l'équipe.",
     "password_required": "Ce compte n'existe pas encore : choisissez un mot de passe initial.",
     "name_required": "Ce compte n'existe pas encore : indiquez son nom.",
@@ -848,7 +853,14 @@
       "base": "Fonctionne comme",
       "baseHint": "Ce que le poste voit et peut faire.",
       "baseLocked": "Des membres occupent ce poste : retirez-les avant de changer son fonctionnement.",
-      "deleteConfirm": "Supprimer le poste « {name} » ? Ses membres gardent leurs accès."
+      "deleteConfirm": "Supprimer le poste « {name} » ? Ses membres gardent leurs accès.",
+      "link": "Lien de connexion",
+      "linkTitle": "Lien de connexion — {job}",
+      "linkHint": "Envoyez ce lien à l'équipe « {job} » ou ouvrez-le sur la tablette du poste : après connexion, chacun arrive directement sur son écran.",
+      "copy": "Copier le lien",
+      "copied": "Lien copié",
+      "open": "Ouvrir",
+      "print": "Imprimer le QR code"
     },
     "sections": {
       "title": "Sections",
@@ -1013,7 +1025,7 @@
     "timezone": "Fuseau horaire",
     "defaultLocale": "Langue par défaut",
     "logo": "Logo",
-    "logoHint": "Carré de préférence, 512 px minimum. JPEG, PNG, WebP ou HEIC.",
+    "logoHint": "Carré de préférence, 1024 px idéalement, sur fond transparent. SVG, PNG, WebP, JPEG ou photo iPhone. Glissez-déposez le fichier sur l'aperçu.",
     "logoUpload": "Choisir une image",
     "logoRemove": "Retirer le logo",
     "logoUpdated": "Logo mis à jour.",
@@ -3847,5 +3859,11 @@
     "allServices": "Tous les services",
     "takenBy": "Pris par {name}",
     "respondedIn": "réponse en {min} min"
+  },
+  "theme": {
+    "auto": "Automatique",
+    "light": "Mode jour",
+    "dark": "Mode nuit",
+    "switchTo": "Thème : passer à « {mode} »"
   }
 }

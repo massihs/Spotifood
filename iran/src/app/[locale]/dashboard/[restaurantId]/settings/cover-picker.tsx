@@ -1,5 +1,6 @@
 "use client";
 
+import { IMAGE_ACCEPT, prepareImage, setInputFile } from "@/lib/prepare-image";
 import { Check, ImageUp, Images, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
@@ -62,13 +63,16 @@ export function CoverPicker({
                 <input
                   type="file"
                   name="cover"
-                  accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                  accept={IMAGE_ACCEPT}
                   className="sr-only"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (!f) return;
+                  onChange={async (e) => {
+                    const el = e.currentTarget;
+                    const raw = el.files?.[0];
+                    if (!raw) return;
+                    const f = await prepareImage(raw);
+                    if (f !== raw) setInputFile(el, f);
                     setPreview(URL.createObjectURL(f));
-                    e.target.form?.requestSubmit();
+                    el.form?.requestSubmit();
                   }}
                 />
               </label>

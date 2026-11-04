@@ -5,6 +5,7 @@ import { logoutAction } from "@/app/[locale]/(auth)/actions";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logo, LogoMark } from "@/components/ui/logo";
 import { Link } from "@/i18n/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { CommandPalette, type SearchEntry } from "./command-palette";
 import { MobileTabBar, NavTrail, SidebarNav, type NavItem } from "./sidebar-nav";
 
@@ -186,6 +187,7 @@ export async function AppShell({
             <NavTrail items={nav} />
             <div className="ms-auto flex items-center gap-1.5">
               <LanguageSwitcher className="hidden lg:inline-flex" />
+              <ThemeToggle />
               <CommandPalette
                 entries={[
                   ...nav.map((n) => ({ href: n.href, label: n.label, hint: n.group, icon: n.icon })),

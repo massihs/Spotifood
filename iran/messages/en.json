@@ -303,6 +303,11 @@
       "validation": "Please check the form fields.",
       "password_too_short": "Password must be at least 10 characters.",
       "unknown": "Something went wrong. Please try again."
+    },
+    "staff": {
+      "subtitle": "Sign in with your team account: you land straight on the “{job}” screen.",
+      "otherAccount": "You are signed in as {email}, who has no access to this venue. Sign in with your team account.",
+      "bookmark": "Tip: add this page to the home screen of the station's tablet or phone."
     }
   },
   "nav": {
@@ -600,7 +605,7 @@
     "image_empty": "Empty file.",
     "image_too_large": "Image too large (8 MB max).",
     "image_invalid": "This file is not a valid image.",
-    "image_format": "Accepted formats: JPEG, PNG, WebP, HEIC.",
+    "image_format": "Accepted formats: JPEG, PNG, WebP, AVIF, GIF, HEIC (iPhone) and SVG for the logo.",
     "already_member": "This person is already on the team.",
     "password_required": "This account doesn't exist yet: choose an initial password.",
     "name_required": "This account doesn't exist yet: enter their name.",
@@ -848,7 +853,14 @@
       "base": "Works as",
       "baseHint": "What the job sees and can do.",
       "baseLocked": "Members hold this job: move them before changing how it works.",
-      "deleteConfirm": "Delete the job “{name}”? Its members keep their access."
+      "deleteConfirm": "Delete the job “{name}”? Its members keep their access.",
+      "link": "Sign-in link",
+      "linkTitle": "Sign-in link — {job}",
+      "linkHint": "Send this link to the “{job}” team or open it on the station's tablet: after signing in, everyone lands straight on their screen.",
+      "copy": "Copy link",
+      "copied": "Link copied",
+      "open": "Open",
+      "print": "Print the QR code"
     },
     "sections": {
       "title": "Sections",
@@ -1013,7 +1025,7 @@
     "timezone": "Time zone",
     "defaultLocale": "Default language",
     "logo": "Logo",
-    "logoHint": "Preferably square, at least 512 px. JPEG, PNG, WebP or HEIC.",
+    "logoHint": "Preferably square, ideally 1024 px, on a transparent background. SVG, PNG, WebP, JPEG or an iPhone photo. Drag and drop the file onto the preview.",
     "logoUpload": "Choose an image",
     "logoRemove": "Remove logo",
     "logoUpdated": "Logo updated.",
@@ -3839,5 +3851,11 @@
     "allServices": "All services",
     "takenBy": "Taken by {name}",
     "respondedIn": "answered in {min} min"
+  },
+  "theme": {
+    "auto": "Automatic",
+    "light": "Day mode",
+    "dark": "Night mode",
+    "switchTo": "Theme: switch to “{mode}”"
   }
 }

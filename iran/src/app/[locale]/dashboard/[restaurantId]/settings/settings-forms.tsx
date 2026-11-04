@@ -5,7 +5,10 @@ import { BrandPicker } from "@/components/brand-picker";
 import { MenuThemePicker } from "@/components/menu-theme-picker";
 import type { RestaurantKind } from "@/lib/restaurant-kind";
 import { useFormatter, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { ImageUp } from "lucide-react";
+import { cn } from "@/lib/cn";
+import { IMAGE_ACCEPT, prepareImage, setInputFile } from "@/lib/prepare-image";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 import {
@@ -194,16 +197,52 @@ export function LogoForm({
   const t = useTranslations();
   const form = useActionForm(uploadLogoAction.bind(null, restaurantId));
   const state = form.state;
+  const input = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [busy, setBusy] = useState(false);
   const shown = preview ?? logoUrl;
+
+  async function send(raw: File | undefined) {
+    const el = input.current;
+    if (!raw || !el) return;
+    setBusy(true);
+    try {
+      // HEIC (iPhone) and huge photos are converted in the browser; SVG goes as is.
+      const file = await prepareImage(raw, { maxSide: 2048, keepAlpha: true });
+      if (el.files?.[0] !== file) setInputFile(el, file);
+      setPreview(URL.createObjectURL(file));
+      el.form?.requestSubmit();
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <div className="flex flex-wrap items-center gap-5">
-      <div className="grid size-24 shrink-0 place-items-center overflow-hidden rounded-2xl bg-surface-2 ring-1 ring-border">
+      <div
+        onDragOver={(e) => {
+          if (disabled) return;
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          if (disabled) return;
+          e.preventDefault();
+          setDragging(false);
+          void send(e.dataTransfer.files?.[0]);
+        }}
+        className={cn(
+          "checker grid size-28 shrink-0 place-items-center overflow-hidden rounded-2xl ring-1 ring-border transition",
+          dragging && "ring-2 ring-accent",
+          (busy || form.pending) && "animate-pulse",
+        )}
+      >
         {shown ? (
-          <img src={shown} alt={t("settings.logo")} className="size-full object-contain" />
+          <img src={shown} alt={t("settings.logo")} className="size-full object-contain p-2" />
         ) : (
-          <span className="text-2xl text-fg-subtle">—</span>
+          <ImageUp className="size-7 text-fg-subtle" aria-hidden="true" />
         )}
       </div>
       <div className="min-w-0 flex-1 space-y-2">
@@ -211,19 +250,16 @@ export function LogoForm({
         {!disabled ? (
           <div className="flex flex-wrap gap-2">
             <ActionForm form={form}>
-              <label className="inline-flex h-10 cursor-pointer items-center rounded-full border border-border bg-surface px-4 text-sm font-medium focus-within:ring-4 focus-within:ring-[var(--ring)] hover:bg-surface-2">
+              <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-4 text-sm font-medium focus-within:ring-4 focus-within:ring-[var(--ring)] hover:bg-surface-2">
+                <ImageUp className="size-4" aria-hidden="true" />
                 {t("settings.logoUpload")}
                 <input
+                  ref={input}
                   type="file"
                   name="logo"
-                  accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                  accept={`${IMAGE_ACCEPT},image/svg+xml,.svg`}
                   className="sr-only"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (!f) return;
-                    setPreview(URL.createObjectURL(f));
-                    e.target.form?.requestSubmit();
-                  }}
+                  onChange={(e) => void send(e.target.files?.[0])}
                 />
               </label>
             </ActionForm>

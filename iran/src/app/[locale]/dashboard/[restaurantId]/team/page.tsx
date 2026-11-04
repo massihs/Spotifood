@@ -17,7 +17,8 @@ import { AddMemberDialog, EditMemberDialog } from "./member-forms";
 import { JobPicker } from "./job-picker";
 import { JobGuide } from "./job-guide";
 import { cn } from "@/lib/cn";
-import { isJob } from "@/lib/jobs";
+import { isJob, staffLinkPath } from "@/lib/jobs";
+import { qrSvg } from "@/server/modules/tables/qr";
 import { JOB_TONES, jobOf } from "./job-meta";
 import { listTeamJobs } from "@/server/modules/team/jobs";
 import { listStations } from "@/server/modules/kitchen/stations";
@@ -47,6 +48,16 @@ async function Team({ params }: { params: Params }) {
     listGuestCalls(db, ctx),
     listTeamJobs(db, ctx),
   ]);
+  // Each job's sign-in link (no locale: staff get the page in their own language) and its QR code.
+  const appUrl = (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const links = Object.fromEntries(
+    await Promise.all(
+      jobs.map(async (j) => {
+        const url = `${appUrl}${staffLinkPath(j.id)}`;
+        return [j.id, { url, qr: await qrSvg(url) }] as const;
+      }),
+    ),
+  );
   const jobCounts: Record<string, number> = {};
   for (const m of members) {
     const j = jobOf(jobs, m.teamJobId, m.job);
@@ -81,6 +92,7 @@ async function Team({ params }: { params: Params }) {
         restaurantId={ctx.restaurant.id}
         jobs={jobs}
         counts={jobCounts}
+        links={links}
         allowManager={roles.includes("admin")}
       />
       <SectionsPanel

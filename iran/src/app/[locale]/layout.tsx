@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { isLocale, localeDirection, LOCALES } from "@/i18n/config";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import "@/styles/globals.css";
 
 // Fonts are self-hosted (no request to Google at build or run time: unreachable from Iran,
@@ -103,7 +104,12 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       dir={localeDirection(locale)}
       className={`${sans.variable} ${persian.variable} ${persianDigits.variable} ${menuSerif.variable} ${menuKufi.variable}`}
       data-scroll-behavior="smooth"
+      // The boot script may set data-theme before React hydrates.
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body className="min-h-dvh">
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}

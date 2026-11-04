@@ -20,15 +20,16 @@ function FormError({ code }: { code?: AuthFormState["error"] }) {
   );
 }
 
-export function LoginForm() {
+export function LoginForm({ next: fixedNext }: { next?: string } = {}) {
   const t = useTranslations("auth");
   const [state, action, pending] = useActionState(loginAction, {});
   // Post-login destination (?next=/…). Read on the client so the page stays fully static.
-  const next = useSyncExternalStore(
+  const queryNext = useSyncExternalStore(
     noopSubscribe,
     () => new URLSearchParams(window.location.search).get("next"),
     () => null,
   );
+  const next = fixedNext ?? queryNext;
   return (
     <form action={action} className="space-y-4" noValidate>
       <FormError code={state.error} />

@@ -28,7 +28,8 @@ function fieldErrors(error: z.ZodError): Record<string, string> {
 
 /** Only allow same-origin relative redirects. */
 function safeNext(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) return null;
+  // "/\\host" is read as "//host" by browsers: only plain same-site paths.
+  if (typeof value !== "string" || !/^\/(?![/\\])/.test(value)) return null;
   return value;
 }
 

@@ -3,7 +3,7 @@ import sharp from "sharp";
 import { db } from "@/server/db/client";
 import { orders, products, categories } from "@/server/db/schema";
 import { setStorageDriver, type StorageDriver } from "@/server/infra/storage";
-import { processImage, PRODUCT_VARIANTS } from "@/server/infra/images";
+import { LOGO_VARIANTS, processImage, PRODUCT_VARIANTS } from "@/server/infra/images";
 import { parsePercentToBps } from "@/server/modules/restaurants/schemas";
 import {
   createTaxRate,
@@ -201,6 +201,25 @@ describe("images & logo", () => {
     await expect(processImage(Buffer.alloc(0), PRODUCT_VARIANTS)).rejects.toMatchObject({
       message: "image_empty",
     });
+  });
+
+  it("accepts a clean SVG logo, renders it sharp, and refuses unsafe ones", async () => {
+    const clean = Buffer.from(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><defs><linearGradient id="g"><stop offset="0" stop-color="#f60"/></linearGradient></defs><circle cx="20" cy="20" r="18" fill="url(#g)"/></svg>',
+    );
+    const out = await processImage(clean, LOGO_VARIANTS, { allowSvg: true });
+    const screen = await sharp(out.variants[0]!.body).metadata();
+    expect(screen.width).toBe(512);
+    expect(screen.hasAlpha).toBe(true);
+    expect((await sharp(out.variants[1]!.body).metadata()).width).toBe(1024);
+    for (const bad of [
+      '<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9"><image href="https://evil.test/x.png"/></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" onload="x()"></svg>',
+      '<!DOCTYPE svg [<!ENTITY x SYSTEM "file:///etc/passwd">]><svg xmlns="http://www.w3.org/2000/svg">&x;</svg>',
+    ])
+      await expect(processImage(Buffer.from(bad), LOGO_VARIANTS, { allowSvg: true })).rejects.toMatchObject({
+        message: expect.stringMatching(/^image_(format|invalid)$/),
+      });
   });
 
   it("uploads, replaces and removes the logo, cleaning old files", async () => {

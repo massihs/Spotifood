@@ -29,6 +29,7 @@ import { KpiCard } from "@/components/dashboard/kpi-card";
 import { buttonClasses } from "@/components/ui/button";
 import { Card, CardHeader, StatCard, TONE_TILE, type Tone } from "@/components/ui/card";
 import { Link, redirect } from "@/i18n/navigation";
+import { jobHome } from "@/lib/jobs";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { requireRestaurant } from "@/server/auth/current";
@@ -83,12 +84,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const ctx = await requireRestaurant(restaurantId);
   // Each job lands on its own screen: the kitchen and bar on their tickets, the till on the
   // orders to accept, waiters on the floor.
-  // In a hotel the front desk and housekeeping start on the rooms' requests.
-  const home = (
-    ctx.restaurant.kind === "hotel"
-      ? { kitchen: "kitchen", bar: "kitchen", cashier: "requests", waiter: "requests" }
-      : { kitchen: "kitchen", bar: "kitchen", cashier: "orders", waiter: "waiter" }
-  )[ctx.job ?? ""];
+  const home = jobHome(ctx.restaurant.kind, ctx.job);
   if (home) redirect({ href: `/dashboard/${ctx.restaurant.id}/${home}`, locale: await getLocale() });
   const [t, tStatus, tRes, locale, overview, today, live, lowStock, newOrders, disabled] = await Promise.all([
     getTranslations("dashboard"),
