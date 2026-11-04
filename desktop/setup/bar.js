@@ -41,12 +41,18 @@ function render(s) {
   $("sync").textContent = t("syncNow");
   $("sync").classList.toggle("hidden", !s.linked || !s.status.pending);
   $("settings").setAttribute("aria-pressed", String(s.mode === "settings"));
+  // A new version: one tap installs it (Windows) or opens the download (macOS).
+  const u = s.update ?? {};
+  $("update").classList.toggle("hidden", !["ready", "available"].includes(u.status));
+  $("update").textContent = u.status === "ready" ? t("restartUpdate") : t("downloadUpdate");
+  $("update").title = u.version ?? "";
 }
 
 $("site").onclick = () => window.spotifood.action("site");
 $("local").onclick = () => window.spotifood.action("local");
 $("sync").onclick = () => window.spotifood.action("sync").then(render);
 $("settings").onclick = () => window.spotifood.action("settings");
+$("update").onclick = () => window.spotifood.action("applyUpdate");
 window.spotifood.onState(render);
 window.spotifood.state().then(render);
 setInterval(() => window.spotifood.state().then(render), 4000);

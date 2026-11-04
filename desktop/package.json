@@ -1,7 +1,7 @@
 {
   "name": "spotifood-desktop",
   "productName": "Spotifood",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Spotifood for Windows and macOS: the restaurant's till, with offline ordering and local printing.",
   "author": "Spotifood",
   "license": "UNLICENSED",
@@ -49,7 +49,8 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "shortcutName": "Spotifood",
-      "artifactName": "Spotifood-Setup.${ext}"
+      "artifactName": "Spotifood-Setup.${ext}",
+      "differentialPackage": false
     },
     "mac": {
       "target": [
@@ -69,6 +70,14 @@
     "dmg": {
       "artifactName": "Spotifood-mac.${ext}"
     },
-    "publish": null
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://github.com/massihs/Spotifood/releases/latest/download"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "6.8.11"
   }
 }

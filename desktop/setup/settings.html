@@ -17,6 +17,10 @@
   .printer { border: 1px solid var(--border); border-radius: 16px; padding: 14px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); align-items: end; }
   .printer label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; }
   .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .opts { display: grid; gap: 12px; }
+  .check { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; }
+  .check input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .zoom { font-variant-numeric: tabular-nums; min-width: 56px; text-align: center; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -32,6 +36,20 @@
   <section class="card">
     <h2 id="pcTitle"></h2>
     <div class="row"><input id="pcName" class="field" style="max-width: 320px" /><button class="btn dark" id="pcSave"></button></div>
+  </section>
+
+  <section class="card">
+    <h2 id="screenTitle"></h2>
+    <div class="opts">
+      <label class="row" style="gap: 12px"><span id="startLabel" style="font-weight: 600"></span>
+        <select id="startScreen" class="field" style="max-width: 260px"></select></label>
+      <label class="check"><input type="checkbox" id="fullscreen" /><span id="fullscreenLabel"></span></label>
+      <label class="check"><input type="checkbox" id="keepAwake" /><span id="keepAwakeLabel"></span></label>
+      <label class="check" id="autoStartRow"><input type="checkbox" id="autoStart" /><span id="autoStartLabel"></span></label>
+      <div class="row"><span id="textSizeLabel" style="font-weight: 600"></span>
+        <button class="btn" id="zoomOut" aria-label="−">−</button><span class="zoom" id="zoom"></span><button class="btn" id="zoomIn" aria-label="+">+</button><button class="btn" id="zoomReset">100%</button></div>
+      <p class="muted" id="shortcuts" style="margin: 0; font-size: 13px"></p>
+    </div>
   </section>
 
   <section class="card">
@@ -56,7 +74,18 @@
     <h2 id="syncTitle"></h2>
     <p class="muted" id="syncInfo"></p>
     <div class="row"><button class="btn dark" id="syncNow"></button><button class="btn danger" id="unlink"></button></div>
+  </section>
+
+  <section class="card">
+    <h2 id="updatesTitle"></h2>
+    <p class="muted" id="updateInfo"></p>
+    <div class="row"><button class="btn" id="checkUpdate"></button><button class="btn dark hidden" id="applyUpdate"></button></div>
     <p class="muted" id="version" style="margin-top: 12px; font-size: 12px"></p>
+  </section>
+
+  <section class="card">
+    <h2 id="logsTitle"></h2>
+    <div class="row"><button class="btn" id="openLogs"></button></div>
   </section>
 </main>
 <script type="module" src="./settings.js"></script>

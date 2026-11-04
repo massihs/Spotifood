@@ -27,12 +27,33 @@ le PC caisse devient le serveur du restaurant :
 
 Le PC apparaît dans **Réglages → Logiciel PC** ; *Retirer* le déconnecte immédiatement.
 
+## Au quotidien
+
+- **Toujours actif** : fermer la fenêtre la masque seulement ; l'impression des tickets et le mode
+  hors ligne continuent. L'icône près de l'horloge (barre des menus sur macOS) rouvre Spotifood ou
+  le quitte (avec un avertissement s'il reste des commandes hors ligne à envoyer).
+- **Mises à jour** : à partir de la 1.1.0, Windows télécharge la nouvelle version en arrière-plan et
+  l'installe au prochain redémarrage (ou tout de suite avec *Redémarrer et installer* dans la barre).
+  macOS signale la nouvelle version et ouvre son téléchargement (l'app n'est pas signée Apple).
+- **Réglages → Écran et affichage** : écran à l'ouverture (dernière page, caisse, commandes,
+  cuisine, prise de commande), plein écran à l'ouverture (télévision en cuisine), écran toujours
+  allumé, démarrage avec l'ordinateur, taille du texte.
+- **Raccourcis** : F11 plein écran · Ctrl/⌘ + / − / 0 taille du texte · F5 ou Ctrl/⌘ R recharger ·
+  Ctrl/⌘ , réglages.
+- **Fiabilité** : une page qui plante ou se fige se recharge seule ; la taille et la position de la
+  fenêtre sont gardées ; les notifications du site (nouvelle commande…) s'affichent sous Windows et
+  la sonnerie retentit même sans clic préalable.
+- **Journaux** : *Réglages → Journaux → Ouvrir le dossier* (`logs/spotifood.log`), à envoyer à
+  l'assistance en cas de problème.
+
 ## Fonctionnement
 
 | Pièce | Rôle |
 | --- | --- |
 | `src/main.js` | fenêtre (barre d'état + site ou écrans locaux), activation, bascule automatique hors ligne |
 | `src/hub.js` | serveur local `:7420` (réseau du restaurant) : commandes, appairage des appareils, flux temps réel |
+| `src/updates.js` | mises à jour (GitHub releases : `latest.yml`, installateur Windows) |
+| `src/logger.js` | journal sur disque (1 Mo, 3 anciens fichiers) |
 | `src/sync.js` | surveillance de la connexion, copie du menu (5 min), envoi des commandes hors ligne, file d'impression du site |
 | `src/printer.js`, `src/escpos.js`, `src/tickets.js` | tickets dessinés par Chromium (persan correct) puis envoyés en raster ESC/POS |
 | `offline/` | écrans hors ligne (prise de commande, commandes, cuisine), partagés PC / téléphones |
@@ -56,5 +77,6 @@ npm start           # SPOTIFOOD_URL=http://localhost:3000 npm start pour un site
 
 Les installateurs sont construits par `.github/workflows/desktop.yml` (Actions → *Desktop app* →
 *Run workflow*, ou un tag `desktop-v1.0.1`). Pour une nouvelle version, augmentez `version` dans
-`package.json`. Les installateurs ne sont pas signés ; la signature (Apple Developer ID,
+`package.json` : la release publie aussi `latest.yml`, que les PC installés lisent pour se mettre à jour.
+Les installateurs ne sont pas signés ; la signature (Apple Developer ID,
 certificat Windows) s'ajoute sans autre changement.

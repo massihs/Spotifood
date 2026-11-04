@@ -5,11 +5,16 @@ import {
   dialog,
   ipcMain,
   Menu,
+  nativeImage,
   net as enet,
+  Notification,
   powerSaveBlocker,
+  screen,
   session,
   shell,
+  Tray,
 } from "electron";
+import updaterPkg from "electron-updater";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,6 +23,9 @@ import { isVirtualPrinter } from "./escpos.js";
 import { deliver, systemPrinters } from "./printer.js";
 import { createStore } from "./store.js";
 import { createSync } from "./sync.js";
+import { createLogger } from "./logger.js";
+import { createUpdates } from "./updates.js";
+import { translator } from "../offline/i18n.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, "..");
@@ -28,9 +36,16 @@ const UUID = /\/dashboard\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9
 // A separate data folder (tests, or two restaurants on one PC).
 if (process.env.SPOTIFOOD_DATA) app.setPath("userData", process.env.SPOTIFOOD_DATA);
 if (!app.requestSingleInstanceLock()) app.quit();
+// Windows shows the website's notifications (new order, call…) only for an app with an id.
+if (process.platform === "win32") app.setAppUserModelId("ir.spotifood.desktop");
+// The new-order bell must ring even if nobody clicked the till since it opened.
+app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const store = createStore(path.join(app.getPath("userData"), "data"));
+/** How this PC shows Spotifood (kitchen TV in full screen, a till on the orders…). */
+const PC_DEFAULTS = { startScreen: "last", fullscreen: false, keepAwake: false, zoom: 1 };
 let config = { serverUrl: DEFAULT_SERVER, localPrinters: [], ...store.read("config", {}) };
+config.pc = { ...PC_DEFAULTS, ...config.pc };
 // Older versions could pick OneNote / "Print to PDF" as the ticket printer: drop them.
 config.localPrinters = (config.localPrinters ?? []).filter((p) => !isVirtualPrinter(p.system));
 store.write("config", config);
@@ -39,7 +54,10 @@ const saveConfig = (patch) => {
   store.write("config", config);
   pushState();
 };
-const log = (...a) => console.log(new Date().toISOString(), ...a);
+const { log, dir: logsDir } = createLogger(path.join(app.getPath("userData"), "logs"));
+process.on("uncaughtException", (e) => log("uncaught", e));
+process.on("unhandledRejection", (e) => log("unhandled", e));
+const tr = () => translator(hub.snapshot?.restaurant.defaultLocale ?? config.locale ?? "fa");
 
 let win = null;
 let bar = null;
@@ -48,6 +66,10 @@ let hubPort = HUB_PORT;
 /** "site" (the website) | "local" (offline screens) | "setup" | "settings" */
 let mode = "setup";
 let toast = null;
+let tray = null;
+/** Closing the window only hides it: the hub and the printing must keep running. */
+let quitting = false;
+let awakeId = null;
 
 const hub = createHub({
   store,
@@ -66,7 +88,7 @@ const sync = createSync({
   log,
   fetchImpl: (url, init) => enet.fetch(url, init),
   onChange(e) {
-    if (e.online === false && mode === "site") showLocal();
+    if (e.online === false && mode === "site") showLocal(localFor(content?.webContents.getURL()));
     if (e.synced) flash("synced", { n: e.synced });
     if (e.online === true) flash("online");
     if (e.revoked) {
@@ -74,6 +96,20 @@ const sync = createSync({
       flash("revoked");
     }
     pushState();
+  },
+});
+
+const updates = createUpdates({
+  current: app.getVersion(),
+  platform: process.platform,
+  packaged: app.isPackaged,
+  fetchImpl: (url, init) => enet.fetch(url, init),
+  autoUpdater: process.platform === "win32" ? updaterPkg.autoUpdater : null,
+  openExternal: (url) => shell.openExternal(url),
+  log,
+  onChange: () => {
+    pushState();
+    refreshTray();
   },
 });
 
@@ -90,10 +126,20 @@ function layout() {
   content.setBounds({ x: 0, y: BAR_H, width, height: Math.max(0, height - BAR_H) });
 }
 
-function showSite() {
+const START_PATHS = { home: "", pos: "/pos", orders: "/orders", kitchen: "/kitchen", waiter: "/waiter" };
+/** `start`: the app just opened, so the PC's chosen screen wins over the last page. */
+function showSite({ start = false } = {}) {
   mode = "site";
-  void content.webContents.loadURL(config.lastUrl?.startsWith(config.serverUrl) ? config.lastUrl : siteUrl());
+  const chosen = start ? START_PATHS[config.pc.startScreen] : undefined;
+  const last = config.lastUrl?.startsWith(config.serverUrl) ? config.lastUrl : null;
+  void content.webContents.loadURL(chosen !== undefined ? `${siteUrl()}${chosen}` : (last ?? siteUrl()));
   pushState();
+}
+/** The local screen closest to the website page in use (the kitchen stays the kitchen). */
+function localFor(url = "") {
+  if (/\/kitchen\b/.test(url) || config.pc.startScreen === "kitchen") return "#/kitchen";
+  if (/\/orders\b/.test(url)) return "#/orders";
+  return "";
 }
 function showLocal(screen = "") {
   mode = "local";
@@ -138,10 +184,22 @@ function state() {
     locale: hub.snapshot?.restaurant.defaultLocale ?? config.locale ?? "fa",
     version: app.getVersion(),
     toast,
+    pc: config.pc,
+    autoStart: autoStartOn(),
+    update: updates.state,
+    platform: process.platform,
   };
 }
+const autoStartOn = () => {
+  try {
+    return app.getLoginItemSettings().openAtLogin;
+  } catch {
+    return false;
+  }
+};
 function pushState() {
   for (const v of [bar, content]) if (v && !v.webContents.isDestroyed()) v.webContents.send("state", state());
+  refreshTray();
 }
 
 /** After the manager signs in on the website: link this PC to the restaurant. */
@@ -169,17 +227,91 @@ async function link(restaurantId) {
   flash("linked", { name: restaurant.name });
 }
 
+/** Last size and place of the window, if it still fits on a connected screen. */
+function savedBounds() {
+  const w = store.read("window", null);
+  if (!w?.width || !w?.height) return { width: 1360, height: 860 };
+  const area = screen.getDisplayMatching(w).workArea;
+  const visible = w.x < area.x + area.width - 80 && w.x + w.width > area.x + 80 && w.y >= area.y - 10 && w.y < area.y + area.height - 80;
+  return visible ? { x: w.x, y: w.y, width: w.width, height: w.height, maximized: w.maximized } : { width: w.width, height: w.height, maximized: w.maximized };
+}
+let saveTimer = null;
+function rememberWindow() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    if (!win || win.isDestroyed() || win.isFullScreen() || win.isMinimized()) return;
+    store.write("window", { ...win.getNormalBounds(), maximized: win.isMaximized() });
+  }, 500);
+}
+
+function applyZoom() {
+  for (const v of [content]) if (v && !v.webContents.isDestroyed()) v.webContents.setZoomFactor(config.pc.zoom);
+}
+function zoomBy(delta) {
+  const zoom = delta === 0 ? 1 : Math.round(Math.min(2, Math.max(0.6, config.pc.zoom + delta)) * 10) / 10;
+  saveConfig({ pc: { ...config.pc, zoom } });
+  applyZoom();
+}
+function setKeepAwake(on) {
+  if (on && awakeId === null) awakeId = powerSaveBlocker.start("prevent-display-sleep");
+  if (!on && awakeId !== null) {
+    powerSaveBlocker.stop(awakeId);
+    awakeId = null;
+  }
+}
+
+/** Shortcuts that work even without a menu bar (Windows). */
+function shortcuts(wc) {
+  wc.on("before-input-event", (event, input) => {
+    if (input.type !== "keyDown") return;
+    const mod = process.platform === "darwin" ? input.meta : input.control;
+    const key = input.key;
+    let done = true;
+    if (key === "F11" || (process.platform === "darwin" && input.meta && input.control && key.toLowerCase() === "f"))
+      win?.setFullScreen(!win.isFullScreen());
+    else if (mod && (key === "=" || key === "+")) zoomBy(0.1);
+    else if (mod && key === "-") zoomBy(-0.1);
+    else if (mod && key === "0") zoomBy(0);
+    else if (key === "F5" || (mod && key.toLowerCase() === "r")) content.webContents.reload();
+    else if (mod && key === ",") showSettings();
+    else done = false;
+    if (done) event.preventDefault();
+  });
+}
+
+/** A crashed or frozen page reloads by itself: nobody at the till should have to restart the app. */
+function selfHealing(view, name) {
+  const wc = view.webContents;
+  let frozen = null;
+  wc.on("render-process-gone", (_e, details) => {
+    log(`${name} page gone: ${details.reason}`);
+    if (details.reason !== "clean-exit") setTimeout(() => !wc.isDestroyed() && wc.reload(), 1000);
+  });
+  wc.on("unresponsive", () => {
+    log(`${name} page unresponsive`);
+    frozen = setTimeout(() => {
+      if (wc.isDestroyed()) return;
+      log(`${name} page still frozen: reloading`);
+      wc.forcefullyCrashRenderer();
+      wc.reload();
+    }, 15_000);
+  });
+  wc.on("responsive", () => clearTimeout(frozen));
+}
+
 function createWindow() {
+  const bounds = savedBounds();
   win = new BaseWindow({
-    width: 1360,
-    height: 860,
+    ...bounds,
     minWidth: 380,
     minHeight: 560,
     title: "Spotifood",
     backgroundColor: "#f6f7f9",
     icon: path.join(root, "build", "icon.png"),
     autoHideMenuBar: true,
+    fullscreen: config.pc.fullscreen,
   });
+  if (bounds.maximized && !config.pc.fullscreen) win.maximize();
   const prefs = {
     preload: path.join(here, "preload.cjs"),
     contextIsolation: true,
@@ -191,8 +323,35 @@ function createWindow() {
   win.contentView.addChildView(content);
   win.contentView.addChildView(bar);
   layout();
-  win.on("resize", layout);
+  win.on("resize", () => {
+    layout();
+    rememberWindow();
+  });
+  win.on("move", rememberWindow);
+  win.on("maximize", rememberWindow);
+  win.on("unmaximize", rememberWindow);
+  win.on("close", (e) => {
+    if (quitting) return;
+    // The till keeps printing and serving the phones: hide, do not quit.
+    e.preventDefault();
+    win.hide();
+    if (!config.toldBackground) {
+      saveConfig({ toldBackground: true });
+      if (Notification.isSupported()) new Notification({ title: tr()("bgTitle"), body: tr()("bgBody") }).show();
+    }
+  });
+  // Windows shutting down or the user signing out: let the window close.
+  win.on("query-session-end", () => (quitting = true));
+  win.on("session-end", () => (quitting = true));
   win.on("closed", () => (win = null));
+  for (const [v, n] of [
+    [bar, "bar"],
+    [content, "content"],
+  ]) {
+    shortcuts(v.webContents);
+    selfHealing(v, n);
+  }
+  content.webContents.on("did-finish-load", applyZoom);
   void bar.webContents.loadURL(`http://127.0.0.1:${hubPort}/_app/bar.html`);
 
   const wc = content.webContents;
@@ -209,12 +368,76 @@ function createWindow() {
     if (isMain && mode === "setup" && code !== -3 && url.startsWith(config.serverUrl)) return showServerSetup();
     if (isMain && mode === "site" && code !== -3 && url.startsWith(config.serverUrl)) {
       hub.setStatus({ online: false });
-      showLocal();
+      showLocal(localFor(url));
     }
   });
 
-  if (config.deviceToken) showSite();
+  if (config.deviceToken) showSite({ start: true });
   else showSetup();
+}
+
+function showWindow() {
+  if (!win) createWindow();
+  if (win.isMinimized()) win.restore();
+  win.show();
+  win.focus();
+}
+
+/** Asks before stopping the till (pending offline orders, printing). */
+async function confirmQuit() {
+  const t = tr();
+  const n = hub.pending().length;
+  if (config.deviceToken) {
+    showWindow();
+    const { response } = await dialog.showMessageBox(win, {
+      type: n ? "warning" : "question",
+      buttons: [t("quitOk"), t("quitCancel")],
+      defaultId: 1,
+      cancelId: 1,
+      message: "Spotifood",
+      detail: n ? t("quitPending", { n }) : t("quitConfirm"),
+    });
+    if (response !== 0) return;
+  }
+  quitting = true;
+  app.quit();
+}
+
+/** The icon next to the clock (Windows) / in the menu bar (macOS): the app lives there when hidden. */
+function createTray() {
+  // Sharp on every screen: a 1× and a 2× picture of the app icon.
+  const src = nativeImage.createFromPath(path.join(root, "build", "icon.png"));
+  const size = process.platform === "darwin" ? 18 : 16;
+  const icon = nativeImage.createEmpty();
+  for (const scale of [1, 2])
+    icon.addRepresentation({ scaleFactor: scale, buffer: src.resize({ width: size * scale, quality: "best" }).toPNG() });
+  tray = new Tray(icon);
+  tray.setToolTip("Spotifood");
+  tray.on("click", showWindow);
+  refreshTray();
+}
+function refreshTray() {
+  if (!tray) return;
+  const t = tr();
+  const u = updates.state;
+  const items = [
+    { label: t("trayOpen"), click: showWindow },
+    ...(config.deviceToken
+      ? [
+          { label: t("site"), click: () => (showWindow(), showSite()) },
+          { label: t("trayLocal"), click: () => (showWindow(), showLocal()) },
+        ]
+      : []),
+    { label: t("settings"), click: () => (showWindow(), showSettings()) },
+    { type: "separator" },
+    ...(u.status === "ready" ? [{ label: `${t("restartUpdate")} (${u.version})`, click: () => updates.apply() }] : []),
+    ...(u.status === "available" ? [{ label: `${t("downloadUpdate")} (${u.version})`, click: () => updates.apply() }] : []),
+    { label: t("version", { v: app.getVersion() }), enabled: false },
+    { label: t("trayQuit"), click: () => void confirmQuit() },
+  ];
+  tray.setContextMenu(Menu.buildFromTemplate(items));
+  const status = hub.status.online === false && config.deviceToken ? ` · ${t("offline")}` : "";
+  tray.setToolTip(`Spotifood${config.restaurantName ? ` · ${config.restaurantName}` : ""}${status}`);
 }
 
 let asked = false;
@@ -333,6 +556,33 @@ ipcMain.handle("action", async (e, name, arg) => {
       showSetup();
       return state();
     }
+    case "setPc": {
+      const a = arg ?? {};
+      const pc = {
+        ...config.pc,
+        ...(a.startScreen && ["last", ...Object.keys(START_PATHS)].includes(a.startScreen) ? { startScreen: a.startScreen } : {}),
+        ...(typeof a.fullscreen === "boolean" ? { fullscreen: a.fullscreen } : {}),
+        ...(typeof a.keepAwake === "boolean" ? { keepAwake: a.keepAwake } : {}),
+      };
+      if (typeof a.fullscreen === "boolean" && win) win.setFullScreen(a.fullscreen);
+      if (typeof a.keepAwake === "boolean") setKeepAwake(a.keepAwake);
+      if (typeof a.autoStart === "boolean") app.setLoginItemSettings({ openAtLogin: a.autoStart });
+      saveConfig({ pc });
+      return state();
+    }
+    case "zoom":
+      zoomBy(Number(arg) || 0);
+      return state();
+    case "reload":
+      content.webContents.reload();
+      return true;
+    case "openLogs":
+      return shell.openPath(logsDir);
+    case "checkUpdate":
+      await updates.check();
+      return state();
+    case "applyUpdate":
+      return updates.apply();
     default:
       throw new Error("unknown_action");
   }
@@ -340,19 +590,10 @@ ipcMain.handle("action", async (e, name, arg) => {
 
 // ─── App ─────────────────────────────────────────────────────────────────────
 
-app.on("second-instance", () => {
-  if (win) {
-    if (win.isMinimized()) win.restore();
-    win.focus();
-  }
-});
+app.on("second-instance", () => showWindow());
 
 app.whenReady().then(async () => {
-  Menu.setApplicationMenu(
-    process.platform === "darwin"
-      ? Menu.buildFromTemplate([{ role: "appMenu" }, { role: "editMenu" }, { role: "viewMenu" }, { role: "windowMenu" }])
-      : null,
-  );
+  Menu.setApplicationMenu(process.platform === "darwin" ? macMenu() : null);
   // The hub must survive the screen saver: tablets and the kitchen depend on it.
   powerSaveBlocker.start("prevent-app-suspension");
   for (let port = HUB_PORT; port < HUB_PORT + 10; port++) {
@@ -364,7 +605,11 @@ app.whenReady().then(async () => {
     }
   }
   createWindow();
+  createTray();
+  setKeepAwake(config.pc.keepAwake);
   if (config.deviceToken) sync.start();
+  updates.start();
+  log(`Spotifood ${app.getVersion()} started (${process.platform} ${process.arch})`);
   if (process.env.SPOTIFOOD_SMOKE) void smoke(process.env.SPOTIFOOD_SMOKE);
 });
 
@@ -380,6 +625,23 @@ async function smoke(dir) {
     log(`smoke ${name}: ${content.webContents.getURL()}`);
   };
   await shot(mode);
+  if (process.env.SPOTIFOOD_SMOKE_CHECKS) {
+    // Window behaviour: closing hides (the hub keeps serving), zoom and full screen apply.
+    win.close();
+    await wait(300);
+    log(`smoke close: window ${win && !win.isDestroyed() ? (win.isVisible() ? "visible" : "hidden") : "destroyed"}, hub ${hub.status ? "up" : "down"}`);
+    showWindow();
+    zoomBy(0.2);
+    await wait(300);
+    log(`smoke zoom: ${content.webContents.getZoomFactor().toFixed(1)} saved ${store.read("config", {}).pc?.zoom}`);
+    zoomBy(0);
+    win.setFullScreen(true);
+    await wait(800);
+    log(`smoke fullscreen: ${win.isFullScreen()}`);
+    win.setFullScreen(false);
+    await wait(800);
+    log(`smoke tray: ${tray ? "yes" : "no"}, update ${updates.state.status}`);
+  }
   if (process.env.SPOTIFOOD_SMOKE_ORDER && hub.snapshot) {
     // A real order through the hub: kitchen tickets and the paid receipt go to the printers.
     const dishes = hub.snapshot.products.filter((p) => p.isAvailable && !p.optionGroups.some((g) => g.minSelect > 0));
@@ -403,14 +665,50 @@ async function smoke(dir) {
   app.quit();
 }
 
+/** macOS menu bar: the usual menus, plus Settings (⌘,) and the update check. */
+function macMenu() {
+  const t = tr();
+  return Menu.buildFromTemplate([
+    {
+      label: "Spotifood",
+      submenu: [
+        { role: "about" },
+        { label: t("checkUpdates"), click: () => void updates.check().then(() => updates.apply()) },
+        { type: "separator" },
+        { label: `${t("settings")}…`, accelerator: "Cmd+,", click: () => (showWindow(), showSettings()) },
+        { type: "separator" },
+        { role: "hide" },
+        { role: "hideOthers" },
+        { role: "unhide" },
+        { type: "separator" },
+        { label: t("trayQuit"), accelerator: "Cmd+Q", click: () => void confirmQuit() },
+      ],
+    },
+    { role: "editMenu" },
+    {
+      label: "View",
+      submenu: [
+        { label: t("reload"), accelerator: "Cmd+R", click: () => content?.webContents.reload() },
+        { type: "separator" },
+        { label: "+", accelerator: "Cmd+=", click: () => zoomBy(0.1) },
+        { label: "−", accelerator: "Cmd+-", click: () => zoomBy(-0.1) },
+        { label: "100 %", accelerator: "Cmd+0", click: () => zoomBy(0) },
+        { type: "separator" },
+        { role: "togglefullscreen" },
+      ],
+    },
+    { role: "windowMenu" },
+  ]);
+}
+
 app.on("window-all-closed", () => {
-  // macOS keeps the app (and the hub) running in the dock.
-  if (process.platform !== "darwin") app.quit();
+  // The window only hides; if it is really gone, the hub and the tray keep running.
 });
-app.on("activate", () => {
-  if (!win) createWindow();
-});
+app.on("activate", () => app.isReady() && showWindow());
 app.on("before-quit", () => {
+  // Quitting from the dock, the system or an update install (not only from our menus).
+  quitting = true;
   sync.stop();
+  updates.stop();
   void hub.close();
 });

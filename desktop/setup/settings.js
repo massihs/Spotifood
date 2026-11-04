@@ -32,7 +32,52 @@ for (const [id, key] of Object.entries({
   syncTitle: "syncTitle",
   syncNow: "syncNow",
   unlink: "unlink",
+  screenTitle: "pcScreen",
+  startLabel: "startScreen",
+  fullscreenLabel: "fullscreenStart",
+  keepAwakeLabel: "keepAwake",
+  autoStartLabel: "autoStart",
+  textSizeLabel: "textSize",
+  shortcuts: "shortcuts",
+  updatesTitle: "updatesTitle",
+  checkUpdate: "checkUpdates",
+  logsTitle: "logsTitle",
+  openLogs: "openLogs",
 })) $(id).textContent = t(key);
+
+// How this PC shows Spotifood: the kitchen TV in full screen on the kitchen, the till on its orders…
+const START = { last: "startLast", home: "startHome", pos: "startPos", orders: "startOrders", kitchen: "startKitchen", waiter: "startWaiter" };
+$("startScreen").innerHTML = Object.entries(START)
+  .map(([v, k]) => `<option value="${v}">${t(k)}</option>`)
+  .join("");
+$("startScreen").onchange = (e) => api.action("setPc", { startScreen: e.target.value });
+$("fullscreen").onchange = (e) => api.action("setPc", { fullscreen: e.target.checked });
+$("keepAwake").onchange = (e) => api.action("setPc", { keepAwake: e.target.checked });
+$("autoStart").onchange = (e) => api.action("setPc", { autoStart: e.target.checked });
+$("zoomIn").onclick = () => api.action("zoom", 0.1);
+$("zoomOut").onclick = () => api.action("zoom", -0.1);
+$("zoomReset").onclick = () => api.action("zoom", 0);
+$("checkUpdate").onclick = async () => {
+  $("updateInfo").textContent = t("updateChecking");
+  s = await api.action("checkUpdate");
+  renderState();
+};
+$("applyUpdate").onclick = () => api.action("applyUpdate");
+$("openLogs").onclick = () => api.action("openLogs");
+
+function updateText(u) {
+  const v = { v: u.version ?? "", p: u.progress ?? 0 };
+  return (
+    {
+      checking: t("updateChecking"),
+      latest: t("updateLatest"),
+      downloading: t("updateDownloading", v),
+      ready: t("updateReady", v),
+      available: t("updateAvailable", v),
+      error: t("updateError"),
+    }[u.status] ?? ""
+  );
+}
 
 function renderState() {
   $("pcName").value ||= s.deviceName;
@@ -45,6 +90,16 @@ function renderState() {
     .filter(Boolean)
     .join(" · ");
   $("version").textContent = `${t("version", { v: s.version })} · ${s.serverUrl}`;
+  $("startScreen").value = s.pc.startScreen;
+  $("fullscreen").checked = s.pc.fullscreen;
+  $("keepAwake").checked = s.pc.keepAwake;
+  $("autoStart").checked = s.autoStart;
+  $("autoStartRow").classList.toggle("hidden", s.platform === "linux");
+  $("zoom").textContent = `${Math.round(s.pc.zoom * 100)}%`;
+  $("updateInfo").textContent = updateText(s.update);
+  const apply = $("applyUpdate");
+  apply.classList.toggle("hidden", !["ready", "available"].includes(s.update.status));
+  apply.textContent = t(s.update.status === "ready" ? "restartUpdate" : "downloadUpdate");
 }
 
 const esc = (v) => String(v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);

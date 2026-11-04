@@ -65,10 +65,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: installer-${{ matrix.os }}
+          # latest.yml: what the installed apps read to update themselves (Windows) or to say a new
+          # version exists (macOS).
           path: |
             desktop/dist/Spotifood-Setup.exe
             desktop/dist/Spotifood-mac.dmg
-          if-no-files-found: error
+            desktop/dist/latest.yml
+          if-no-files-found: warn
 
   release:
     needs: build
@@ -87,10 +90,16 @@ jobs:
           version=$(node -p "require('./desktop/package.json').version")
           tag="desktop-v${version}"
           ls -la out
+          for f in Spotifood-Setup.exe Spotifood-mac.dmg latest.yml; do
+            test -f "out/$f" || { echo "missing $f"; exit 1; }
+          done
+          # The update file must describe this very installer, or every PC would refuse the download.
+          grep -q "^version: ${version}$" out/latest.yml || { echo "latest.yml is not ${version}"; cat out/latest.yml; exit 1; }
+          files="out/Spotifood-Setup.exe out/Spotifood-mac.dmg out/latest.yml"
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" out/Spotifood-Setup.exe out/Spotifood-mac.dmg --clobber
+            gh release upload "$tag" $files --clobber
           else
-            gh release create "$tag" out/Spotifood-Setup.exe out/Spotifood-mac.dmg \
+            gh release create "$tag" $files \
               --title "Spotifood Desktop ${version}" --latest \
-              --notes "Windows: Spotifood-Setup.exe · macOS (Intel + Apple Silicon): Spotifood-mac.dmg"
+              --notes "Windows: Spotifood-Setup.exe · macOS (Intel + Apple Silicon): Spotifood-mac.dmg. Les PC en 1.1.0 ou plus se mettent à jour d'eux-mêmes."
           fi
