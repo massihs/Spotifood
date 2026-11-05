@@ -5,6 +5,17 @@
 @custom-variant atelier (&:where([data-menu-theme="atelier"] *));
 @custom-variant nuit (&:where([data-menu-theme="nuit"] *));
 @custom-variant doux (&:where([data-menu-theme="doux"] *));
+/* `dark:` follows the day / night choice: forced by the toggle, else the device's setting. */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+  &:where([data-theme="dark"] *) {
+    @slot;
+  }
+}
 
 /*
  * Spotifood design tokens: "palette".
@@ -20,25 +31,29 @@
   --brand-l: 0.66;
   --brand-fg: oklch(1 0 0);
 
-  --bg: oklch(0.975 0.0042 62);
+  /*
+   * Day mode: a clean, almost white canvas (a hint of warmth, no beige), white cards that lift off
+   * it, a light sidebar, and secondary text at AA contrast for bright rooms and sunlit screens.
+   */
+  --bg: oklch(0.982 0.0028 75);
   --surface: oklch(1 0 0);
-  --surface-2: oklch(0.962 0.0056 62);
-  --surface-3: oklch(0.925 0.0077 62);
-  /* Day mode tuned for bright rooms and sunlit screens: crisper borders, secondary text at AA contrast. */
-  --border: oklch(0.9 0.008 62);
-  --border-strong: oklch(0.83 0.011 62);
-  --fg: oklch(0.2 0.021 62);
-  --fg-muted: oklch(0.45 0.0175 62);
-  --fg-subtle: oklch(0.56 0.014 62);
-  --ink: oklch(0.21 0.021 62);
-  --ink-hover: oklch(0.3 0.0245 62);
+  --surface-2: oklch(0.966 0.0035 75);
+  --surface-3: oklch(0.93 0.005 75);
+  --border: oklch(0.913 0.0045 75);
+  --border-strong: oklch(0.85 0.0065 75);
+  --fg: oklch(0.2 0.012 60);
+  --fg-muted: oklch(0.45 0.011 60);
+  --fg-subtle: oklch(0.57 0.009 60);
+  --ink: oklch(0.21 0.012 60);
+  --ink-hover: oklch(0.3 0.014 60);
   --ink-fg: oklch(1 0 0);
 
-  --sidebar: oklch(0.205 0.0245 62);
-  --sidebar-2: oklch(0.255 0.028 62);
-  --sidebar-fg: oklch(0.96 0.007 62);
-  --sidebar-muted: oklch(0.72 0.021 62);
-  --sidebar-border: oklch(0.3 0.028 62);
+  --sidebar: oklch(0.993 0.0018 75);
+  --sidebar-2: oklch(0.958 0.0045 75);
+  --sidebar-3: oklch(0.925 0.006 75);
+  --sidebar-fg: oklch(0.22 0.012 60);
+  --sidebar-muted: oklch(0.47 0.01 60);
+  --sidebar-border: oklch(0.915 0.0045 75);
 
   --success: oklch(0.6 0.15 155);
   --success-soft: oklch(0.96 0.035 155);
@@ -82,21 +97,25 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: oklch(0.15 0.0105 62);
-    --surface: oklch(0.195 0.014 62);
-    --surface-2: oklch(0.235 0.0154 62);
-    --surface-3: oklch(0.285 0.0175 62);
-    --border: oklch(0.27 0.0154 62);
-    --border-strong: oklch(0.35 0.0175 62);
-    --fg: oklch(0.97 0.0035 62);
-    --fg-muted: oklch(0.74 0.014 62);
-    --fg-subtle: oklch(0.6 0.014 62);
-    --ink: oklch(0.97 0.0035 62);
-    --ink-hover: oklch(0.87 0.007 62);
-    --ink-fg: oklch(0.15 0.0105 62);
-    --sidebar: oklch(0.13 0.014 62);
-    --sidebar-2: oklch(0.2 0.021 62);
-    --sidebar-border: oklch(0.24 0.021 62);
+    /* Night: soft charcoal (not brown), each layer a step lighter, so cards read without glare. */
+    --bg: oklch(0.155 0.0035 65);
+    --surface: oklch(0.197 0.0042 65);
+    --surface-2: oklch(0.237 0.005 65);
+    --surface-3: oklch(0.285 0.006 65);
+    --border: oklch(0.265 0.005 65);
+    --border-strong: oklch(0.345 0.0065 65);
+    --fg: oklch(0.965 0.0025 65);
+    --fg-muted: oklch(0.76 0.006 65);
+    --fg-subtle: oklch(0.61 0.006 65);
+    --ink: oklch(0.965 0.0025 65);
+    --ink-hover: oklch(0.87 0.004 65);
+    --ink-fg: oklch(0.155 0.0035 65);
+    --sidebar: oklch(0.135 0.0035 65);
+    --sidebar-2: oklch(0.205 0.0045 65);
+    --sidebar-3: oklch(0.25 0.0055 65);
+    --sidebar-fg: oklch(0.955 0.003 65);
+    --sidebar-muted: oklch(0.72 0.006 65);
+    --sidebar-border: oklch(0.23 0.005 65);
     --success: oklch(0.75 0.16 155);
     --success-soft: oklch(0.29 0.06 155);
     --warning-soft: oklch(0.32 0.06 75);
@@ -120,21 +139,25 @@
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: oklch(0.15 0.0105 62);
-  --surface: oklch(0.195 0.014 62);
-  --surface-2: oklch(0.235 0.0154 62);
-  --surface-3: oklch(0.285 0.0175 62);
-  --border: oklch(0.27 0.0154 62);
-  --border-strong: oklch(0.35 0.0175 62);
-  --fg: oklch(0.97 0.0035 62);
-  --fg-muted: oklch(0.74 0.014 62);
-  --fg-subtle: oklch(0.6 0.014 62);
-  --ink: oklch(0.97 0.0035 62);
-  --ink-hover: oklch(0.87 0.007 62);
-  --ink-fg: oklch(0.15 0.0105 62);
-  --sidebar: oklch(0.13 0.014 62);
-  --sidebar-2: oklch(0.2 0.021 62);
-  --sidebar-border: oklch(0.24 0.021 62);
+  /* Night: soft charcoal (not brown), each layer a step lighter, so cards read without glare. */
+  --bg: oklch(0.155 0.0035 65);
+  --surface: oklch(0.197 0.0042 65);
+  --surface-2: oklch(0.237 0.005 65);
+  --surface-3: oklch(0.285 0.006 65);
+  --border: oklch(0.265 0.005 65);
+  --border-strong: oklch(0.345 0.0065 65);
+  --fg: oklch(0.965 0.0025 65);
+  --fg-muted: oklch(0.76 0.006 65);
+  --fg-subtle: oklch(0.61 0.006 65);
+  --ink: oklch(0.965 0.0025 65);
+  --ink-hover: oklch(0.87 0.004 65);
+  --ink-fg: oklch(0.155 0.0035 65);
+  --sidebar: oklch(0.135 0.0035 65);
+  --sidebar-2: oklch(0.205 0.0045 65);
+  --sidebar-3: oklch(0.25 0.0055 65);
+  --sidebar-fg: oklch(0.955 0.003 65);
+  --sidebar-muted: oklch(0.72 0.006 65);
+  --sidebar-border: oklch(0.23 0.005 65);
   --success: oklch(0.75 0.16 155);
   --success-soft: oklch(0.29 0.06 155);
   --warning-soft: oklch(0.32 0.06 75);
@@ -155,13 +178,13 @@
 /* Dark sidebar: every token-based component inside (links, switchers, cards) adapts. */
 .on-dark {
   --surface: var(--sidebar-2);
-  --surface-2: oklch(0.3 0.028 62);
-  --surface-3: oklch(0.35 0.0315 62);
+  --surface-2: var(--sidebar-2);
+  --surface-3: var(--sidebar-3);
   --fg: var(--sidebar-fg);
   --fg-muted: var(--sidebar-muted);
-  --fg-subtle: oklch(0.6 0.021 62);
+  --fg-subtle: color-mix(in oklch, var(--sidebar-muted) 75%, var(--sidebar));
   --border: var(--sidebar-border);
-  --border-strong: oklch(0.38 0.0315 62);
+  --border-strong: var(--sidebar-3);
   --ink: var(--sidebar-fg);
   --ink-fg: var(--sidebar);
   color: var(--fg);
@@ -289,6 +312,7 @@
   --radius-card: 1.25rem;
   --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 6px 18px -10px hsl(var(--shadow-color) / 0.12);
   --shadow-float: 0 22px 50px -14px hsl(var(--shadow-color) / 0.3);
+  --shadow-float-sm: 0 10px 28px -12px hsl(var(--shadow-color) / 0.22);
   --shadow-accent: 0 10px 24px -10px oklch(var(--brand-l) var(--brand-c) var(--brand-h) / 0.65);
   --shadow-accent-sm: 0 1px 2px oklch(var(--brand-l) var(--brand-c) var(--brand-h) / 0.3);
 }
@@ -382,6 +406,57 @@ html {
 }
 dialog[open]::backdrop {
   animation: fade-in 0.2s ease-out;
+}
+
+/*
+ * Page changes in the dashboard and the guest menu: the new page fades in instead of popping, so
+ * moving around feels continuous. Opacity only: a transform would detach the page's fixed bars
+ * (cart, till) from the screen while it runs.
+ */
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+}
+.page-enter {
+  animation: page-in 0.22s ease-out;
+}
+
+/* Brand glow and wash: soft on the light canvas, dimmer at night so they never look muddy. */
+.brand-glow {
+  opacity: 0.14;
+}
+.brand-wash {
+  opacity: 0.7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brand-glow {
+    opacity: 0.28;
+  }
+  :root:not([data-theme="light"]) .brand-wash {
+    opacity: 0.35;
+  }
+}
+:root[data-theme="dark"] .brand-glow {
+  opacity: 0.28;
+}
+:root[data-theme="dark"] .brand-wash {
+  opacity: 0.35;
+}
+
+/* Switching day / night: colors cross-fade instead of flashing (only during the switch). */
+:root.theme-switching,
+:root.theme-switching * {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    fill 0.25s ease !important;
 }
 
 /* Music equalizer bars */
@@ -647,4 +722,14 @@ dialog[open]::backdrop {
     0 8px,
     8px -8px,
     -8px 0;
+}
+
+/* Dish photos are shot on white: at night they are toned down a little so they do not glare. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .dish-photo {
+    filter: brightness(0.9) saturate(1.05);
+  }
+}
+:root[data-theme="dark"] .dish-photo {
+  filter: brightness(0.9) saturate(1.05);
 }

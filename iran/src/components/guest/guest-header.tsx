@@ -80,7 +80,7 @@ export async function GuestHeader({
   );
   const guestLine = (
     <>
-      <span className="inline-flex items-center rounded-full bg-accent-soft px-2.5 py-0.5 font-semibold text-accent-text">
+      <span className="inline-flex items-center rounded-full bg-accent-soft px-2.5 py-0.5 font-semibold whitespace-nowrap text-accent-text">
         {t(guest.table.kind === "room" ? "tableBadgeRoom" : "tableBadge", { table: guest.table.label })}
       </span>
       <span className="inline-flex min-w-0 items-center gap-1 text-fg-muted">
@@ -200,8 +200,8 @@ function OpenBadge({
   if (!store || store.open.status === "unknown") return null;
   if (store.open.status === "open")
     return (
-      <span className="inline-flex items-center gap-1.5 text-fg-muted">
-        <span className="relative flex size-2">
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-fg-muted">
+        <span className="relative flex size-2 shrink-0">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
           <span className="relative inline-flex size-2 rounded-full bg-success" />
         </span>
@@ -210,8 +210,8 @@ function OpenBadge({
       </span>
     );
   return (
-    <span className="inline-flex items-center gap-1.5 text-fg-muted">
-      <Clock className="size-3.5" aria-hidden="true" />
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-fg-muted">
+      <Clock className="size-3.5 shrink-0" aria-hidden="true" />
       <span className="font-semibold text-danger">{t("closedNow")}</span>
       {store.open.from ? <span>{t("opensAt", { time: store.open.from })}</span> : null}
     </span>

@@ -245,7 +245,9 @@
           "title": "Hotels & room service",
           "body": "A QR code in every room: guests order, call housekeeping or the front desk, and the right team is notified."
         }
-      }
+      },
+      "moreTitle": "And everything else",
+      "moreBody": "Invoices, accounting, kiosk, call centre, targets… Try it all on the demo restaurant."
     },
     "iran": {
       "eyebrow": "Made for Iran",

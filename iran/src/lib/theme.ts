@@ -13,6 +13,9 @@ export const THEME_BOOT_SCRIPT = `(function(){try{var t=localStorage.getItem(${J
 
 export function applyTheme(choice: ThemeChoice) {
   const root = document.documentElement;
+  // A short cross-fade of the colors while the theme changes (see .theme-switching).
+  root.classList.add("theme-switching");
+  window.setTimeout(() => root.classList.remove("theme-switching"), 320);
   const dark =
     choice === "dark" || (choice === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   if (choice === "auto") delete root.dataset.theme;

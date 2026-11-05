@@ -1,6 +1,7 @@
 import { COMPANY } from "@/lib/company";
 import {
   ArrowLeft,
+  Sparkles,
   BarChart3,
   Bike,
   Boxes,
@@ -241,6 +242,31 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                 </p>
               </li>
             ))}
+            {/* The 12th tile: rounds the grid off and invites to try it all on the demo. */}
+            <li className="w-48 shrink-0 snap-start sm:w-auto">
+              <a
+                href={getPathname({ href: "/demo", locale })}
+                className="group flex h-full flex-col justify-between rounded-3xl p-4 text-white shadow-accent transition hover:-translate-y-0.5 sm:p-5"
+                style={{ background: "var(--brand-gradient)" }}
+              >
+                <span>
+                  <span className="grid size-11 place-items-center rounded-2xl bg-white/18">
+                    <Sparkles className="size-5" aria-hidden="true" />
+                  </span>
+                  <span className="mt-4 block font-bold">{t("platform.moreTitle")}</span>
+                  <span className="mt-1.5 block text-xs leading-5 text-white/80 sm:text-sm sm:leading-6">
+                    {t("platform.moreBody")}
+                  </span>
+                </span>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold">
+                  {t("ctaDemo")}
+                  <ArrowLeft
+                    className="size-4 transition-transform group-hover:-translate-x-0.5 ltr:rotate-180 ltr:group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </span>
+              </a>
+            </li>
           </ul>
         </section>
 

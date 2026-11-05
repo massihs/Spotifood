@@ -171,7 +171,7 @@ export function ProductImage({
       alt=""
       loading={eager ? "eager" : "lazy"}
       decoding="async"
-      className={cn("bg-surface-2 bg-cover object-cover", className)}
+      className={cn("dish-photo bg-surface-2 bg-cover object-cover", className)}
       style={img.placeholder ? { backgroundImage: `url(${img.placeholder})` } : undefined}
     />
   );

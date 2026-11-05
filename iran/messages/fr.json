@@ -245,7 +245,9 @@
           "title": "Hôtels & room service",
           "body": "Un QR code dans chaque chambre : le client commande, appelle le ménage ou la réception, et l'équipe concernée est prévenue."
         }
-      }
+      },
+      "moreTitle": "Et tout le reste",
+      "moreBody": "Factures, comptabilité, kiosque, centre d'appels, objectifs… Essayez tout sur le restaurant de démo."
     },
     "iran": {
       "eyebrow": "Conçu pour l'Iran",

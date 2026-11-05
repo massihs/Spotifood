@@ -312,12 +312,13 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
               className="overflow-hidden border-transparent p-6 text-white shadow-accent"
               style={{ background: "var(--brand-gradient)" }}
             >
+              {/* A soft light from the top corner and a fine grain, instead of flat color blobs. */}
               <div
-                className="pointer-events-none absolute -end-16 -top-20 size-64 rounded-full bg-white/10"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgb(255_255_255/0.22),transparent_55%)] rtl:bg-[radial-gradient(120%_80%_at_0%_0%,rgb(255_255_255/0.22),transparent_55%)]"
                 aria-hidden="true"
               />
               <div
-                className="pointer-events-none absolute start-1/3 -bottom-24 size-56 rounded-full bg-white/[0.06]"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/10 to-transparent"
                 aria-hidden="true"
               />
               <div className="relative flex items-start justify-between gap-3">
@@ -365,10 +366,15 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
                     >
                       <div
                         className={cn(
-                          "w-full rounded-lg transition-colors",
-                          i === 6 ? "bg-white" : "bg-white/30 group-hover:bg-white/50",
+                          "w-full origin-bottom animate-[bar-grow_0.6s_cubic-bezier(0.2,0.7,0.2,1)_both] rounded-md transition-colors",
+                          i === 6
+                            ? "bg-white shadow-[0_4px_14px_rgb(0_0_0/0.15)]"
+                            : "bg-white/28 group-hover:bg-white/45",
                         )}
-                        style={{ height: `${Math.max(8, (d.cents / max) * 75)}%` }}
+                        style={{
+                          height: `${Math.max(6, (d.cents / max) * 80)}%`,
+                          animationDelay: `${i * 40}ms`,
+                        }}
                         title={money(d.cents)}
                       />
                       <span className={cn("text-[10px]", i === 6 ? "font-bold" : "opacity-75")}>
@@ -433,7 +439,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
           <Link
             key={href}
             href={href}
-            className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-surface px-1.5 py-3 text-center shadow-[var(--shadow-soft)] transition-colors hover:border-accent/40 hover:bg-accent-soft/40"
+            className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-surface px-1.5 py-3 text-center shadow-[var(--shadow-soft)] transition-[background-color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:bg-accent-soft/40 active:scale-[0.97]"
           >
             <span
               className={cn(
@@ -641,7 +647,7 @@ function KpiLink({ href, children }: { href: string | null; children: ReactNode 
   return (
     <Link
       href={href}
-      className="block rounded-2xl transition-transform hover:-translate-y-0.5 focus-visible:ring-4 focus-visible:ring-[var(--ring)] [&>*]:h-full"
+      className="block rounded-2xl transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-float-sm)] focus-visible:ring-4 focus-visible:ring-[var(--ring)] active:translate-y-0 [&>*]:h-full"
     >
       {children}
     </Link>

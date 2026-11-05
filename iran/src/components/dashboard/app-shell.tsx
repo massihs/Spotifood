@@ -83,6 +83,7 @@ export async function AppShell({
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <LanguageSwitcher />
+        <ThemeToggle />
         <form action={logoutAction}>
           <button
             type="submit"
@@ -137,10 +138,10 @@ export async function AppShell({
       </a>
 
       {/* Desktop sidebar */}
-      <div className="on-dark relative hidden overflow-hidden bg-sidebar lg:block print:hidden">
+      <div className="on-dark relative hidden overflow-hidden border-e border-sidebar-border bg-sidebar lg:block print:hidden">
         {/* Brand glow behind the logo. */}
         <div
-          className="brand-glow pointer-events-none absolute -start-20 -top-24 size-72 rounded-full opacity-35 blur-3xl"
+          className="brand-glow pointer-events-none absolute -start-20 -top-24 size-72 rounded-full blur-3xl"
           style={{ background: "var(--brand-gradient)" }}
           aria-hidden="true"
         />
@@ -187,7 +188,7 @@ export async function AppShell({
             <NavTrail items={nav} />
             <div className="ms-auto flex items-center gap-1.5">
               <LanguageSwitcher className="hidden lg:inline-flex" />
-              <ThemeToggle />
+              <ThemeToggle className="max-lg:hidden" />
               <CommandPalette
                 entries={[
                   ...nav.map((n) => ({ href: n.href, label: n.label, hint: n.group, icon: n.icon })),

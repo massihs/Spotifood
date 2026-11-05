@@ -86,9 +86,10 @@ export function StatCard({
       style={tone === "gradient" ? { background: "var(--brand-gradient)" } : undefined}
     >
       {colored ? (
+        // A thin tone line on top: the card keeps its color cue without a blob in the corner.
         <span
           className={cn(
-            "pointer-events-none absolute -end-8 -top-8 size-24 rounded-full opacity-[0.08]",
+            "pointer-events-none absolute inset-x-5 top-0 h-0.5 rounded-b-full opacity-70",
             TONE_GLOW[colored],
           )}
           aria-hidden="true"

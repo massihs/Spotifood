@@ -695,7 +695,8 @@ function ListCard({
         ) : null}
         <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
           <Price product={p} money={money} />
-          {p.isAvailable ? (
+          {/* Without a photo the "+" stays on the price line; with one it sits on the photo. */}
+          {p.isAvailable && !photo ? (
             <AddButton
               label={t("guest.quickAdd", { name: p.name })}
               busy={adding === p.id}
@@ -705,18 +706,26 @@ function ListCard({
         </div>
       </div>
       {photo ? (
-        <div className="relative shrink-0 self-start">
+        <div className="relative shrink-0 self-start pb-1">
           {p.images[0] ? (
             <ProductImage
               product={p}
               size="sm"
-              className={cn("size-24 rounded-2xl atelier:rounded-xl", !p.isAvailable && "grayscale")}
+              className={cn("size-[6.75rem] rounded-2xl atelier:rounded-xl", !p.isAvailable && "grayscale")}
               eager={eager}
             />
           ) : (
-            <DishPlaceholder icon={categoryIcon.get(p.id) ?? ""} className="size-24 rounded-2xl" />
+            <DishPlaceholder icon={categoryIcon.get(p.id) ?? ""} className="size-[6.75rem] rounded-2xl" />
           )}
           <InCartBadge n={cart.byProduct[p.id] ?? 0} className="absolute -end-1.5 -top-1.5" />
+          {p.isAvailable ? (
+            <AddButton
+              label={t("guest.quickAdd", { name: p.name })}
+              busy={adding === p.id}
+              onClick={() => quickAdd(p)}
+              className="absolute -end-1.5 bottom-0.5 size-10 ring-[3px] ring-surface atelier:bg-surface nuit:ring-[var(--bg)]"
+            />
+          ) : null}
         </div>
       ) : (
         <InCartBadge n={cart.byProduct[p.id] ?? 0} className="self-start" />
