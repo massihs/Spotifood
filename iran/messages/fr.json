@@ -1315,6 +1315,8 @@
     },
     "tagLabel": "Étiquettes",
     "categoriesNav": "Catégories du menu",
+    "allCategories": "Toutes les catégories",
+    "removeOne": "Un de moins : {name}",
     "placeOrder": "Commander · {price}",
     "orderNote": "Une remarque pour la cuisine ?",
     "orderNotePlaceholder": "Ex. allergie, servir les plats ensemble…",

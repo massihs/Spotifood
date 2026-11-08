@@ -1315,6 +1315,8 @@
     },
     "tagLabel": "الوسوم",
     "categoriesNav": "فئات القائمة",
+    "allCategories": "كل الأقسام",
+    "removeOne": "واحد أقل: {name}",
     "placeOrder": "اطلب · {price}",
     "orderNote": "ملاحظة للمطبخ؟",
     "orderNotePlaceholder": "مثل حساسية، تقديم الأطباق معًا…",

@@ -16,10 +16,16 @@ test("a guest scans the QR, adds a dish and places the order", async ({ page }) 
   // The welcome splash fades after ~3 s; the menu is behind it.
   const add = page.locator('button[aria-label^="افزودن"], button[aria-label^="Add"]').first();
   await expect(add).toBeVisible({ timeout: 15_000 });
+  // The card shows the new count at once; the server action confirms it (wait for it).
+  const saved = page.waitForResponse((r) => Boolean(r.request().headers()["next-action"]), {
+    timeout: 15_000,
+  });
   await add.click();
   // Dishes with required choices open a sheet: confirm it if so.
   const sheetAdd = page.getByRole("dialog").getByRole("button", { name: /افزودن|Add/ });
   if (await sheetAdd.isVisible().catch(() => false)) await sheetAdd.click();
+  await saved;
+  await expect(page.getByRole("group").first()).toBeVisible();
   await page.goto("/table/cart");
   await page.getByRole("button", { name: /ثبت سفارش|Place order/ }).click();
   await expect(page).toHaveURL(/\/table\/orders/, { timeout: 15_000 });

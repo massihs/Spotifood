@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import { cartItems, carts } from "@/server/db/schema";
@@ -116,6 +116,19 @@ export async function setCartItemNote(db: Database, ctx: GuestContext, itemId: s
 
 export async function removeCartItem(db: Database, ctx: GuestContext, itemId: string) {
   await setCartItemQuantity(db, ctx, itemId, 0);
+}
+
+/** The menu's "−" on a dish: one unit less, taken from its most recent cart line. */
+export async function removeOneOfProduct(db: Database, ctx: GuestContext, productId: string) {
+  if (!isUuid(productId)) throw notFound();
+  const [item] = await db
+    .select({ id: cartItems.id, quantity: cartItems.quantity })
+    .from(cartItems)
+    .innerJoin(carts, eq(carts.id, cartItems.cartId))
+    .where(and(eq(carts.participantId, ctx.participant.id), eq(cartItems.productId, productId)))
+    .orderBy(desc(cartItems.createdAt))
+    .limit(1);
+  if (item) await setCartItemQuantity(db, ctx, item.id, item.quantity - 1);
 }
 
 export type CartLineView = {

@@ -5,7 +5,8 @@ import { getTranslations } from "next-intl/server";
 import { PlaceHeader } from "@/components/reservations/place-header";
 import { getCurrentDiner } from "@/server/auth/diner";
 import { db } from "@/server/db/client";
-import { getPublicMenu } from "@/server/modules/menu/public-cache";
+import { menuThemeOf } from "@/lib/menu-themes";
+import { getPopularProductIds, getPublicMenu } from "@/server/modules/menu/public-cache";
 import { getOnlineStore } from "@/server/modules/online/service";
 import { OrderApp } from "./order-app";
 
@@ -30,13 +31,15 @@ async function Online({ params }: Pick<Props, "params">) {
   const { slug } = await params;
   const store = await getOnlineStore(db, slug);
   if (!store) notFound();
-  const [menu, diner, t] = await Promise.all([
+  const [menu, diner, t, popularIds] = await Promise.all([
     getPublicMenu(store.id),
     getCurrentDiner(),
     getTranslations("online"),
+    getPopularProductIds(store.id),
   ]);
+  const theme = menuThemeOf(store.menuTheme);
   return (
-    <div data-brand={store.brandColor}>
+    <div data-brand={store.brandColor} data-menu-theme={theme}>
       <PlaceHeader name={store.name} logoKey={store.logoKey} title={t("title")} />
       <main className="relative mx-auto -mt-8 max-w-3xl rounded-t-3xl bg-bg pt-2">
         <OrderApp
@@ -51,6 +54,9 @@ async function Online({ params }: Pick<Props, "params">) {
           defaultName={diner?.name ?? ""}
           paymentProvider={store.payment.provider}
           payOnSite={store.payment.onSite}
+          popularIds={popularIds}
+          theme={theme}
+          shortPrices={store.shortPrices}
         />
       </main>
     </div>

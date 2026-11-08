@@ -2,16 +2,21 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
-import { Bike, Minus, Plus, ShoppingBag, Store, UtensilsCrossed } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { Bike, Minus, Plus, Store, UtensilsCrossed } from "lucide-react";
 import { DinerLogin } from "@/components/account/diner-login";
-import { ProductImage } from "@/components/guest/parts";
+import { CartBar } from "@/components/guest/cart-bar";
+import { MenuBrowser } from "@/components/guest/menu-browser";
+import { canQuickAdd, initialSelection } from "@/components/guest/parts";
 import { ProductSheet } from "@/components/guest/product-sheet";
+import { Toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { useMoney } from "@/components/ui/use-money";
 import { getPathname } from "@/i18n/navigation";
 import { forChannel } from "@/lib/channel-price";
 import { cn } from "@/lib/cn";
+import type { MenuTheme } from "@/lib/menu-themes";
+import { formatThousandTomans, isToman } from "@/lib/money";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
 import { priceLine } from "@/server/modules/pricing";
 import { payOnlineOrderAction, placeKioskOrderAction, placeOnlineOrderAction } from "./actions";
@@ -21,6 +26,7 @@ type Line = { key: string; productId: string; optionValueIds: string[]; quantity
 type Zone = { id: string; name: string; feeCents: number; minOrderCents: number };
 
 const storageKey = (slug: string) => `spotifood:online-cart:${slug}`;
+const sameIds = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
 
 /** The online ordering site: menu, browser-side cart, checkout with a verified mobile. */
 export function OrderApp({
@@ -36,7 +42,16 @@ export function OrderApp({
   kioskToken,
   paymentProvider = null,
   payOnSite = true,
+  popularIds = [],
+  theme = "doux",
+  shortPrices = false,
 }: {
+  /** Best sellers (badge and filter). */
+  popularIds?: string[];
+  /** The restaurant's menu look (same as on its tables). */
+  theme?: MenuTheme;
+  /** Menu prices in thousand tomans (the unit is shown once per section). */
+  shortPrices?: boolean;
   /** Online PSP the restaurant takes (null: pay at pickup / on delivery only). */
   paymentProvider?: string | null;
   /** Paying at pickup / on delivery is allowed. */
@@ -74,7 +89,13 @@ export function OrderApp({
   const [coupon, setCoupon] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const [cat, setCat] = useState(menu.categories[0]?.id ?? "");
+  const [toast, setToast] = useState<string | null>(null);
+  const clearToast = useCallback(() => setToast(null), []);
+  const short = shortPrices && isToman(currency);
+  const listMoney = useCallback(
+    (c: number) => (short ? formatThousandTomans(c, locale) : money(c)),
+    [short, locale, money],
+  );
 
   // The cart survives a reload and the SMS sign-in round trip.
   useEffect(() => {
@@ -109,6 +130,25 @@ export function OrderApp({
     const p = menu.products[id];
     return p ? forChannel(p, channel) : undefined;
   };
+  // Prices of the chosen channel (takeaway / delivery / eat in), as the lists show them.
+  const channelMenu = useMemo(
+    () => ({
+      ...menu,
+      products: Object.fromEntries(
+        Object.entries(menu.products).map(([id, p]) => [id, forChannel(p, channel)]),
+      ),
+    }),
+    [menu, channel],
+  );
+  const popular = useMemo(
+    () => new Set(popularIds.filter((id) => menu.products[id]?.isAvailable)),
+    [popularIds, menu],
+  );
+  const counts = useMemo(() => {
+    const byProduct: Record<string, number> = {};
+    for (const l of lines) byProduct[l.productId] = (byProduct[l.productId] ?? 0) + l.quantity;
+    return byProduct;
+  }, [lines]);
   const priced = useMemo(
     () =>
       lines.map((l) => {
@@ -133,6 +173,35 @@ export function OrderApp({
     setLines((ls) =>
       q <= 0 ? ls.filter((l) => l.key !== key) : ls.map((l) => (l.key === key ? { ...l, quantity: q } : l)),
     );
+  /** A line into the cart; the same dish with the same choices and note adds up on one line. */
+  const addLine = (productId: string, l: { optionValueIds: string[]; quantity: number; note: string }) => {
+    const next = [...lines];
+    const same = next.findIndex(
+      (x) => x.productId === productId && x.note === l.note && sameIds(x.optionValueIds, l.optionValueIds),
+    );
+    if (same >= 0) next[same] = { ...next[same]!, quantity: next[same]!.quantity + l.quantity };
+    else next.push({ ...l, productId, key: `${productId}:${Date.now()}` });
+    setLines(next);
+    return next;
+  };
+  /** "+" on a card: dishes whose defaults are enough go straight to the cart, the others open. */
+  const quickAdd = (p: PublicProduct) => {
+    if (!canQuickAdd(p)) return setOpen(p.id);
+    const first = !counts[p.id];
+    addLine(p.id, {
+      optionValueIds: [...initialSelection(p.optionGroups).values()].flatMap((x) => [...x]),
+      quantity: 1,
+      note: "",
+    });
+    navigator.vibrate?.(20);
+    if (first) setToast(te("guest.added"));
+  };
+  /** "−" on a card: one unit less, from the dish's most recent line. */
+  const removeOne = (p: PublicProduct) => {
+    const last = [...lines].reverse().find((l) => l.productId === p.id);
+    if (last) setQty(last.key, last.quantity - 1);
+    navigator.vibrate?.(10);
+  };
 
   const place = () =>
     startTransition(async () => {
@@ -236,98 +305,50 @@ export function OrderApp({
         </p>
       )}
 
-      <nav className="sticky top-0 z-20 mt-3 flex [scrollbar-width:none] gap-2 overflow-x-auto bg-bg/90 px-4 py-2 backdrop-blur">
-        {menu.categories.map((c) => (
-          <a
-            key={c.id}
-            href={`#c-${c.id}`}
-            onClick={() => setCat(c.id)}
-            className={cn(
-              "shrink-0 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap",
-              cat === c.id ? "bg-fg text-bg" : "bg-surface text-fg-muted ring-1 ring-border",
-            )}
-          >
-            {c.name}
-          </a>
-        ))}
-      </nav>
-
-      <div className="space-y-8 px-4 pt-2">
-        {menu.categories.map((c) => (
-          <section key={c.id} id={`c-${c.id}`} className="scroll-mt-16">
-            <h2 className="mb-3 text-lg font-bold">{c.name}</h2>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {c.productIds.map((id) => {
-                const p = productFor(id);
-                if (!p) return null;
-                const inCart = lines.filter((l) => l.productId === id).reduce((s, l) => s + l.quantity, 0);
-                return (
-                  <li key={id}>
-                    <button
-                      type="button"
-                      disabled={!p.isAvailable}
-                      onClick={() => setOpen(id)}
-                      className="flex w-full items-center gap-3 rounded-2xl bg-surface p-3 text-start shadow-[var(--shadow-soft)] ring-1 ring-border disabled:opacity-50"
-                    >
-                      <ProductImage product={p} size="sm" className="size-20 shrink-0 rounded-xl" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-semibold">{p.name}</span>
-                        {p.description ? (
-                          <span className="mt-0.5 line-clamp-2 block text-xs text-fg-muted">
-                            {p.description}
-                          </span>
-                        ) : null}
-                        <span className="mt-1.5 block text-sm font-bold tabular-nums">
-                          {p.isAvailable ? money(p.priceCents) : te("guest.soldOut")}
-                        </span>
-                      </span>
-                      <span
-                        className={cn(
-                          "grid size-9 shrink-0 place-items-center rounded-full text-sm font-bold",
-                          inCart ? "bg-accent text-accent-fg" : "bg-surface-2",
-                        )}
-                        aria-hidden="true"
-                      >
-                        {inCart || <Plus className="size-4" />}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ))}
-      </div>
+      <MenuBrowser
+        menu={channelMenu}
+        money={listMoney}
+        shortPrices={short}
+        popular={popular}
+        counts={counts}
+        theme={theme}
+        defaultView={kiosk ? "grid" : "list"}
+        onOpen={setOpen}
+        onAdd={quickAdd}
+        onRemove={removeOne}
+      />
 
       {opened ? (
         <ProductSheet
+          key={opened.id}
           product={opened}
           currency={currency}
+          popular={popular.has(opened.id)}
+          inCart={counts[opened.id] ?? 0}
           onClose={() => setOpen(null)}
-          onAdded={() => setOpen(null)}
-          addLocal={(l) => {
-            const next = [...lines, { ...l, productId: opened.id, key: `${opened.id}:${Date.now()}` }];
-            setLines(next);
-            return summary(next);
+          onAdded={() => {
+            setOpen(null);
+            navigator.vibrate?.(20);
+            setToast(te("guest.added"));
           }}
+          addLocal={(l) => summary(addLine(opened.id, l))}
         />
       ) : null}
 
       {count > 0 && !checkout ? (
-        <div className="fixed inset-x-0 bottom-0 z-30 p-4">
-          <Button
-            size="lg"
-            className="mx-auto flex w-full max-w-xl justify-between"
-            onClick={() => setCheckout(true)}
-          >
-            <span className="flex items-center gap-2">
-              <ShoppingBag className="size-5" aria-hidden="true" />
-              {t("viewCart", { count })}
-            </span>
-            <span className="tabular-nums">{money(subtotal)}</span>
-          </Button>
-        </div>
+        <CartBar
+          count={count}
+          total={money(subtotal)}
+          label={te("guest.viewCart")}
+          onClick={() => setCheckout(true)}
+        />
       ) : null}
+      <Toast
+        message={toast}
+        onDone={clearToast}
+        duration={2200}
+        className="bottom-[calc(5.5rem+env(safe-area-inset-bottom))]"
+      />
 
       {checkout ? (
         <div

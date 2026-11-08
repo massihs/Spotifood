@@ -25,6 +25,7 @@ import {
   addToCart,
   getCartView,
   removeCartItem,
+  removeOneOfProduct,
   setCartItemNote,
   setCartItemQuantity,
   type AddItemInput,
@@ -50,6 +51,20 @@ export async function addToCartAction(input: AddItemInput) {
     await addToCart(db, g, input);
     return cartSummary(await getCartView(db, g));
   });
+}
+
+/** "−" on a menu card: one unit less of that dish. */
+export async function removeOneAction(productId: string) {
+  return runAction(async () => {
+    const g = await guest();
+    await removeOneOfProduct(db, g, productId);
+    return cartSummary(await getCartView(db, g));
+  });
+}
+
+/** The cart as the menu shows it, after a change that could not be confirmed. */
+export async function cartSummaryAction() {
+  return runAction(async () => cartSummary(await getCartView(db, await requireGuest())));
 }
 
 export async function setQuantityAction(itemId: string, quantity: number) {

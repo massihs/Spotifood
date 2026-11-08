@@ -1315,6 +1315,8 @@
     },
     "tagLabel": "Labels",
     "categoriesNav": "Menu categories",
+    "allCategories": "All categories",
+    "removeOne": "One less {name}",
     "placeOrder": "Order · {price}",
     "orderNote": "A note for the kitchen?",
     "orderNotePlaceholder": "E.g. allergy, serve dishes together…",

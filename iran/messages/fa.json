@@ -1315,6 +1315,8 @@
     },
     "tagLabel": "برچسب‌ها",
     "categoriesNav": "دسته‌های منو",
+    "allCategories": "همه دسته‌ها",
+    "removeOne": "یکی کمتر: {name}",
     "placeOrder": "سفارش، {price}",
     "orderNote": "توضیحی برای آشپزخانه؟",
     "orderNotePlaceholder": "مثلاً حساسیت غذایی، سرو هم‌زمان…",

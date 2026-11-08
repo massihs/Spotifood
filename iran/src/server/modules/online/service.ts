@@ -70,6 +70,8 @@ async function storeBySlug(db: DbOrTx, slug: string) {
       orderPrefix: restaurantSettings.orderPrefix,
       pricesIncludeTax: restaurantSettings.pricesIncludeTax,
       defaultLocale: restaurants.defaultLocale,
+      menuTheme: restaurants.menuTheme,
+      menuShortPrices: restaurants.menuShortPrices,
     })
     .from(restaurants)
     .innerJoin(restaurantSettings, eq(restaurantSettings.restaurantId, restaurants.id))
@@ -112,6 +114,8 @@ export async function getOnlineStore(db: Database, slug: string) {
     delivery: s.delivery && zones.length > 0,
     zones,
     payment: { provider: pay.provider, onSite: pay.onSite || !pay.provider },
+    menuTheme: s.menuTheme,
+    shortPrices: s.menuShortPrices,
   };
 }
 
@@ -542,6 +546,8 @@ export async function getKioskStore(db: Database, token: string) {
     currency: s.currency,
     logoKey: s.logoKey,
     brandColor: s.brandColor,
+    menuTheme: s.menuTheme,
+    shortPrices: s.menuShortPrices,
   };
 }
 

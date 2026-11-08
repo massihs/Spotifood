@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Check,
   ChefHat,
   ChevronDown,
   ChevronLeft,
@@ -221,7 +222,7 @@ function Steps() {
             )}
             aria-current={i === 1 ? "step" : undefined}
           >
-            {i + 1}
+            {i < 1 ? <Check className="size-3.5" strokeWidth={3} aria-hidden="true" /> : i + 1}
           </span>
           <span className={cn("truncate", i <= 1 ? "text-fg" : "text-fg-subtle")}>{t(s)}</span>
           {i < steps.length - 1 ? (

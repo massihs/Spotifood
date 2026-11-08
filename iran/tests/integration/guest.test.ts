@@ -15,7 +15,13 @@ import {
   renameParticipant,
   type GuestContext,
 } from "@/server/modules/guest/sessions";
-import { addToCart, getCartView, removeCartItem, setCartItemQuantity } from "@/server/modules/cart/service";
+import {
+  addToCart,
+  getCartView,
+  removeCartItem,
+  removeOneOfProduct,
+  setCartItemQuantity,
+} from "@/server/modules/cart/service";
 import { setRestaurantStatus } from "@/server/modules/restaurants/service";
 import { createOwnerWithRestaurant } from "../helpers/factories";
 
@@ -300,5 +306,23 @@ describe("cart", () => {
     expect((await getCartView(db, alice)).itemCount).toBe(1);
     await removeCartItem(db, alice, aliceLine.id);
     expect((await getCartView(db, alice)).lines).toHaveLength(0);
+  });
+
+  it("the menu's − takes one unit off the dish's latest line, in your own cart only", async () => {
+    const { table, coca } = await setup();
+    const alice = await guestAt(table.qrToken);
+    const bob = await guestAt(table.qrToken);
+    await addToCart(db, alice, { productId: coca.id, quantity: 2 });
+    await addToCart(db, alice, { productId: coca.id, quantity: 1, note: "sans glace" });
+    await addToCart(db, bob, { productId: coca.id, quantity: 1 });
+
+    await removeOneOfProduct(db, alice, coca.id);
+    let lines = (await getCartView(db, alice)).lines;
+    expect(lines.map((l) => [l.note, l.quantity])).toEqual([[null, 2]]);
+    await removeOneOfProduct(db, alice, coca.id);
+    lines = (await getCartView(db, alice)).lines;
+    expect(lines.map((l) => l.quantity)).toEqual([1]);
+    expect((await getCartView(db, bob)).itemCount).toBe(1);
+    await expect(removeOneOfProduct(db, alice, "not-a-uuid")).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 });
