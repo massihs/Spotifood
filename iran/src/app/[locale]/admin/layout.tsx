@@ -5,12 +5,15 @@ import { IconChart, IconStore, IconUsers } from "@/components/ui/icons";
 import { requireSuperAdmin } from "@/server/auth/current";
 import { Bug, CreditCard, Eye, LayoutGrid, Music } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { AreaMessages } from "@/i18n/area-messages";
 
 export default function AdminLayout({ children }: LayoutProps<"/[locale]/admin">) {
   return (
-    <Suspense fallback={<ShellSkeleton />}>
-      <AdminShell>{children}</AdminShell>
-    </Suspense>
+    <AreaMessages area="admin">
+      <Suspense fallback={<ShellSkeleton />}>
+        <AdminShell>{children}</AdminShell>
+      </Suspense>
+    </AreaMessages>
   );
 }
 

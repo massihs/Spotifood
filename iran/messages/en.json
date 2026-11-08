@@ -1861,7 +1861,8 @@
       "pay_later": "Pay at the table",
       "mock_online": "Online (simulated)",
       "stripe": "Online (Stripe)",
-      "zarinpal": "Online (Zarinpal)"
+      "zarinpal": "Online (Zarinpal)",
+      "account": "Customer account (credit)"
     },
     "tendered": "Amount given",
     "tenderedHint": "Optional, to compute the change.",

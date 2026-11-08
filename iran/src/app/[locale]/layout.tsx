@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { isLocale, localeDirection, LOCALES } from "@/i18n/config";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
+import { pickMessages } from "@/i18n/area-messages";
 import "@/styles/globals.css";
 
 // Fonts are self-hosted (no request to Google at build or run time: unreachable from Iran,
@@ -111,7 +112,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body className="min-h-dvh">
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        {/* The public site's messages; the restaurant panel, admin and guest pages bring their own. */}
+        <NextIntlClientProvider locale={locale} messages={pickMessages(messages, "site")}>
           {children}
         </NextIntlClientProvider>
       </body>

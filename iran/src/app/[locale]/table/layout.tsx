@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense, type ReactNode } from "react";
 import { GuestSkeleton } from "@/components/guest/states";
+import { AreaMessages } from "@/i18n/area-messages";
 
 // Guest pages are private to the table: never indexed, never leaking the URL in referrers.
 export const metadata: Metadata = {
@@ -18,8 +19,10 @@ export const viewport: Viewport = {
 
 export default function GuestLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-dvh bg-bg">
-      <Suspense fallback={<GuestSkeleton />}>{children}</Suspense>
-    </div>
+    <AreaMessages area="table">
+      <div className="min-h-dvh bg-bg">
+        <Suspense fallback={<GuestSkeleton />}>{children}</Suspense>
+      </div>
+    </AreaMessages>
   );
 }
