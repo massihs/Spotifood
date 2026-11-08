@@ -3,7 +3,7 @@ import { z } from "zod";
 import { MAX_AMOUNT_CENTS } from "@/lib/money";
 import { adjustedPrice } from "@/lib/price-adjust";
 import type { Database, DbOrTx } from "@/server/db/client";
-import { productOptionGroups, products, taxRates } from "@/server/db/schema";
+import { categories, productOptionGroups, products, taxRates } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import { AppError, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
@@ -47,6 +47,29 @@ export async function listProducts(db: Database, ctx: RestaurantContext, categor
     .where(and(...filters))
     .orderBy(asc(products.sortOrder), asc(products.createdAt));
   return rows.map((r) => ({ ...r, image: r.imageKey ? productImageUrls(r.imageKey) : null }));
+}
+
+/**
+ * Every dish on the menu with its availability, in menu order: the quick "sold out" sheet used
+ * during service (by the menu managers and by the staff who take orders).
+ */
+export async function listAvailability(db: DbOrTx, ctx: RestaurantContext) {
+  if (!ctx.permissions.has("menu.manage")) assertCan(ctx, "orders.update_status");
+  const rows = await db
+    .select({
+      id: products.id,
+      name: products.name,
+      category: categories.name,
+      isAvailable: products.isAvailable,
+      imageKey: sql<
+        string | null
+      >`(select pi.storage_key from product_images pi where pi.product_id = "products"."id" order by pi.sort_order limit 1)`,
+    })
+    .from(products)
+    .innerJoin(categories, eq(categories.id, products.categoryId))
+    .where(and(live(ctx.restaurant.id), eq(products.isActive, true), isNull(categories.deletedAt)))
+    .orderBy(asc(categories.sortOrder), asc(products.sortOrder), asc(products.createdAt));
+  return rows.map(({ imageKey, ...r }) => ({ ...r, image: imageKey ? productImageUrls(imageKey).sm : null }));
 }
 
 async function loadProduct(tx: DbOrTx, ctx: RestaurantContext, id: string) {

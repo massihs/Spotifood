@@ -461,6 +461,52 @@
       "noRooms": "Add your rooms to see them here.",
       "waitingTitle": "Waiting requests",
       "noWaiting": "No request waiting."
+    },
+    "vsSameTime": "vs last {day} at this time",
+    "chart": {
+      "today": "Today",
+      "lastWeek": "Last {day}",
+      "summary": "Sales hour by hour today compared with last {day}",
+      "empty": "No sales yet: the chart fills up as the service goes."
+    },
+    "attention": {
+      "title": "Needs attention",
+      "newOrdersHint": "Accept them so the kitchen can start",
+      "ready": "{n, plural, one {# order} other {# orders}} ready to serve",
+      "readyHint": "Bring them to the table or hand them over",
+      "dispatch": "{n, plural, one {# delivery} other {# deliveries}} to send out",
+      "dispatchHint": "Assign a courier",
+      "bookingsHint": "Confirm or decline",
+      "lowStockHint": "Reorder before it runs out",
+      "unpaidHint": "Today's orders not settled yet",
+      "setup": "{n, plural, one {# step} other {# steps}} left to finish setup",
+      "setupHint": "Finish your menu, tables and payments",
+      "requestsHint": "Room requests are waiting",
+      "clear": "All clear",
+      "clearHint": "New orders and tasks will show up here"
+    },
+    "channels": {
+      "title": "Today's sales by channel",
+      "dine_in": "Dine-in",
+      "takeaway": "Takeaway",
+      "delivery": "Delivery",
+      "empty": "No sales today yet."
+    },
+    "pipeline": {
+      "title": "Kitchen right now",
+      "received": "New",
+      "preparing": "Preparing",
+      "ready": "Ready"
+    },
+    "online": {
+      "open": "Online orders: open",
+      "pausedUntil": "Online orders paused until {time}",
+      "resume": "Resume",
+      "pauseTitle": "Pause online orders",
+      "pauseHint": "During a rush, stop new online orders: the menu stays visible, tables, counter and kiosk keep going.",
+      "minutes": "{n} min",
+      "hours": "{n, plural, one {# hour} other {# hours}}",
+      "error": "That didn't work, try again."
     }
   },
   "roles": {
@@ -769,7 +815,9 @@
     "platform_payments_unavailable": "Payment through Spotifood is not available yet: use your own Zarinpal account.",
     "payout_exceeds_due": "The amount is more than this restaurant is owed.",
     "online_payment_required": "This restaurant asks for online payment.",
-    "order_not_awaiting_payment": "This order is no longer waiting for payment."
+    "order_not_awaiting_payment": "This order is no longer waiting for payment.",
+    "online_paused": "The restaurant has paused online orders for a few minutes. Try again shortly.",
+    "invalid_pause": "Invalid pause length."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1597,7 +1645,20 @@
       "done": "{count, plural, =0 {No price changed} one {# price updated} other {# prices updated}}."
     },
     "nutritionLink": "Nutrition database",
-    "importLink": "Import (Excel/CSV)"
+    "importLink": "Import (Excel/CSV)",
+    "availability": {
+      "open": "Sold out",
+      "title": "Quick availability",
+      "hint": "During service, mark a dish sold out in one tap: guests can no longer order it.",
+      "search": "Search a dish…",
+      "available": "Available",
+      "soldOut": "Sold out",
+      "soldOutCount": "{n, plural, one {# dish} other {# dishes}} sold out",
+      "allAvailable": "Every dish is available",
+      "toggle": "Change availability of {name}",
+      "none": "No dish found",
+      "error": "Could not load, try again."
+    }
   },
   "product": {
     "new": "New product",
@@ -1747,7 +1808,13 @@
     "block": "Block this guest",
     "blockConfirm": "Block the device that placed order {number}? It will no longer be able to order or call, and its waiting orders will be cancelled.",
     "blockReason": "Reason (optional)",
-    "tableRoom": "Room {label}"
+    "tableRoom": "Room {label}",
+    "layout": {
+      "label": "Orders layout",
+      "cards": "Cards",
+      "board": "Columns",
+      "emptyColumn": "No orders"
+    }
   },
   "tableView": {
     "title": "Table {label}",
@@ -3850,7 +3917,9 @@
       "cancelConfirm": "Cancel this order?",
       "paid": "Payment received, thank you! The restaurant is preparing your order.",
       "paidShort": "Paid online"
-    }
+    },
+    "pausedBanner": "This restaurant is not taking online orders right now. Back at {time}.",
+    "pausedButton": "Ordering paused"
   },
   "kpi": {
     "title": "Today’s targets",

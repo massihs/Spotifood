@@ -1,9 +1,9 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
-import { Bike, Minus, Plus, Store, UtensilsCrossed } from "lucide-react";
+import { Bike, Minus, Pause, Plus, Store, UtensilsCrossed } from "lucide-react";
 import { DinerLogin } from "@/components/account/diner-login";
 import { CartBar } from "@/components/guest/cart-bar";
 import { MenuBrowser } from "@/components/guest/menu-browser";
@@ -45,7 +45,12 @@ export function OrderApp({
   popularIds = [],
   theme = "doux",
   shortPrices = false,
+  pausedUntil = null,
+  timeZone,
 }: {
+  /** Busy mode: the restaurant takes no online order until then (the menu stays browsable). */
+  pausedUntil?: string | null;
+  timeZone?: string;
   /** Best sellers (badge and filter). */
   popularIds?: string[];
   /** The restaurant's menu look (same as on its tables). */
@@ -90,6 +95,14 @@ export function OrderApp({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [toast, setToast] = useState<string | null>(null);
+  const [paused, setPaused] = useState(pausedUntil);
+  const format = useFormatter();
+  // The pause ends by itself: ordering opens again without a reload.
+  useEffect(() => {
+    if (!paused) return;
+    const id = setTimeout(() => setPaused(null), Math.max(0, new Date(paused).getTime() - Date.now()));
+    return () => clearTimeout(id);
+  }, [paused]);
   const clearToast = useCallback(() => setToast(null), []);
   const short = shortPrices && isToman(currency);
   const listMoney = useCallback(
@@ -271,6 +284,17 @@ export function OrderApp({
 
   return (
     <div className="pb-28">
+      {paused && !kiosk ? (
+        <p
+          role="status"
+          className="mx-4 mt-4 flex items-start gap-2.5 rounded-2xl bg-warning-soft px-4 py-3 text-sm font-semibold text-warning"
+        >
+          <Pause className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          {t("pausedBanner", {
+            time: format.dateTime(new Date(paused), { hour: "2-digit", minute: "2-digit", timeZone }),
+          })}
+        </p>
+      ) : null}
       {kiosk || (takeaway && delivery) ? (
         <div className="mx-4 mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-surface-2 p-1" role="tablist">
           {(kiosk
@@ -546,6 +570,7 @@ export function OrderApp({
                   className="w-full"
                   disabled={
                     pending ||
+                    (Boolean(paused) && !kiosk) ||
                     count === 0 ||
                     !name.trim() ||
                     belowMin ||
@@ -553,9 +578,11 @@ export function OrderApp({
                   }
                   onClick={place}
                 >
-                  {canPayOnline && payment === "online"
-                    ? t("payment.payNow", { total: money(subtotal + fee) })
-                    : t("place", { total: money(subtotal + fee) })}
+                  {paused && !kiosk
+                    ? t("pausedButton")
+                    : canPayOnline && payment === "online"
+                      ? t("payment.payNow", { total: money(subtotal + fee) })
+                      : t("place", { total: money(subtotal + fee) })}
                 </Button>
               </div>
             )}

@@ -1,0 +1,1 @@
+ALTER TABLE "restaurant_settings" ADD COLUMN "online_paused_until" timestamp with time zone;

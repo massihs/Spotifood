@@ -1,9 +1,13 @@
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { getLocale, getTranslations } from "next-intl/server";
 import { BellRing, ReceiptText, Search, Timer, Wallet } from "lucide-react";
 import { formatMoney, normalizeDigits } from "@/lib/money";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { AcceptAllButton } from "@/components/dashboard/accept-all-button";
+import { OnlinePause } from "@/components/dashboard/online-pause";
+import { OrdersLayoutToggle } from "@/components/dashboard/orders-layout-toggle";
+import { ORDERS_LAYOUT_COOKIE } from "@/lib/orders-layout";
 import { OrderCard } from "@/components/dashboard/order-card";
 import { LiveRefresh } from "@/components/realtime/live";
 import { TillAutoPrint } from "@/components/kitchen/till-auto-print";
@@ -14,6 +18,7 @@ import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { can } from "@/server/tenancy";
 import { listActiveOrders } from "@/server/modules/orders/service";
+import { onlineServiceStatus } from "@/server/modules/online/service";
 import { getPaymentMethods } from "@/server/modules/payments/service";
 import { ACTIVE_STATUSES } from "@/server/modules/orders/status";
 
@@ -34,11 +39,20 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
   const VIEWS = ["active", "new", "progress", "ready", "done"] as const;
   type View = (typeof VIEWS)[number];
   const view: View = (VIEWS as readonly string[]).includes(String(sp.view)) ? (sp.view as View) : "active";
-  const [t, all, methods] = await Promise.all([
+  const [t, all, methods, online, jar] = await Promise.all([
     getTranslations("orders"),
     listActiveOrders(db, ctx),
     can(ctx, "payments.record") ? getPaymentMethods(db, ctx.restaurant.id) : null,
+    onlineServiceStatus(db, ctx),
+    cookies(),
   ]);
+  // Cards filtered by step, or every step side by side; the choice stays on this device.
+  const layout: "cards" | "board" =
+    sp.layout === "board" || sp.layout === "cards"
+      ? sp.layout
+      : jar.get(ORDERS_LAYOUT_COOKIE)?.value === "board"
+        ? "board"
+        : "cards";
   const groups: Record<View, typeof all> = {
     active: all.filter((o) => ACTIVE_STATUSES.includes(o.status)),
     new: all.filter((o) => o.status === "received" || o.status === "pending_payment"),
@@ -49,15 +63,20 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
   const CHANNELS = ["dine_in", "takeaway", "delivery"] as const;
   const channel = (CHANNELS as readonly string[]).includes(String(sp.channel)) ? String(sp.channel) : null;
   const q = typeof sp.q === "string" ? normalizeDigits(sp.q).trim().toLowerCase().replace(/^#/, "") : "";
-  const shown = groups[view].filter(
-    (o) =>
-      (!channel || o.channel === channel) &&
-      (!q || o.number.toLowerCase().includes(q) || (o.tableLabel ?? "").toLowerCase() === q),
-  );
+  const matches = (o: (typeof all)[number]) =>
+    (!channel || o.channel === channel) &&
+    (!q || o.number.toLowerCase().includes(q) || (o.tableLabel ?? "").toLowerCase() === q);
+  const shown = groups[view].filter(matches);
   const base = `/dashboard/${ctx.restaurant.id}/orders`;
   const href = (patch: Record<string, string | null>) => {
     const params = new URLSearchParams();
-    const next = { view: view === "active" ? null : view, channel, q: q || null, ...patch };
+    const next = {
+      view: view === "active" ? null : view,
+      channel,
+      q: q || null,
+      layout: sp.layout === "board" || sp.layout === "cards" ? sp.layout : null,
+      ...patch,
+    };
     for (const [k, v] of Object.entries(next)) if (v) params.set(k, v);
     const qs = params.toString();
     return qs ? `${base}?${qs}` : base;
@@ -74,7 +93,20 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
       <PageHeader
         title={t("title")}
         description={t("subtitle")}
-        actions={can(ctx, "orders.update_status") ? <TillAutoPrint restaurantId={ctx.restaurant.id} /> : null}
+        actions={
+          <>
+            {online.enabled ? (
+              <OnlinePause
+                key={online.pausedUntil?.toISOString() ?? "open"}
+                restaurantId={ctx.restaurant.id}
+                pausedUntil={online.pausedUntil?.toISOString() ?? null}
+                canPause={can(ctx, "orders.update_status")}
+                timeZone={ctx.restaurant.timezone}
+              />
+            ) : null}
+            {can(ctx, "orders.update_status") ? <TillAutoPrint restaurantId={ctx.restaurant.id} /> : null}
+          </>
+        }
       />
       <div className="-mx-4 mb-5 flex [scrollbar-width:none] gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:px-0">
         {[
@@ -152,6 +184,11 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
             </Link>
           ))}
         </div>
+        <OrdersLayoutToggle
+          layout={layout}
+          cardsHref={href({ layout: "cards" })}
+          boardHref={href({ layout: "board", view: null })}
+        />
         {q || channel ? (
           <Link
             href={href({ q: null, channel: null })}
@@ -161,40 +198,71 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
           </Link>
         ) : null}
       </div>
-      <nav
-        className="-mx-4 mb-5 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
-        aria-label={t("title")}
-      >
-        {VIEWS.map((key) => {
-          const n = groups[key].length;
-          return (
-            <Link
-              key={key}
-              href={href({ view: key === "active" ? null : key })}
-              aria-current={view === key ? "page" : undefined}
-              className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
-                view === key ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
-              )}
-            >
-              {t(`views.${key}`)}
-              <span
+      {layout === "board" ? (
+        <OrdersBoard
+          columns={(
+            [
+              ["new", groups.new.filter(matches), "bg-danger text-white"],
+              ["progress", groups.progress.filter(matches), "bg-warning text-white"],
+              ["ready", groups.ready.filter(matches), "bg-success text-white"],
+            ] as const
+          ).map(([key, orders, tone]) => ({ key, title: t(`views.${key}`), orders, tone }))}
+          empty={t("layout.emptyColumn")}
+          acceptAll={
+            can(ctx, "orders.update_status")
+              ? (ids: string[]) => (
+                  <AcceptAllButton restaurantId={ctx.restaurant.id} orderIds={ids} size="md" />
+                )
+              : null
+          }
+          card={(o) => (
+            <OrderCard
+              restaurantId={ctx.restaurant.id}
+              order={o}
+              canUpdate={can(ctx, "orders.update_status")}
+              canCancel={can(ctx, "orders.cancel")}
+              timeZone={ctx.restaurant.timezone}
+              collectMethods={methods?.offline}
+            />
+          )}
+        />
+      ) : null}
+      {layout === "cards" ? (
+        <nav
+          className="-mx-4 mb-5 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
+          aria-label={t("title")}
+        >
+          {VIEWS.map((key) => {
+            const n = groups[key].length;
+            return (
+              <Link
+                key={key}
+                href={href({ view: key === "active" ? null : key })}
+                aria-current={view === key ? "page" : undefined}
                 className={cn(
-                  "grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold tabular-nums",
-                  view === key
-                    ? "bg-white/25"
-                    : key === "new" && n > 0
-                      ? "bg-danger text-white"
-                      : "bg-surface-2",
+                  "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+                  view === key ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
                 )}
               >
-                {n}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
-      {can(ctx, "orders.update_status") && (view === "active" || view === "new")
+                {t(`views.${key}`)}
+                <span
+                  className={cn(
+                    "grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold tabular-nums",
+                    view === key
+                      ? "bg-white/25"
+                      : key === "new" && n > 0
+                        ? "bg-danger text-white"
+                        : "bg-surface-2",
+                  )}
+                >
+                  {n}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+      ) : null}
+      {layout === "cards" && can(ctx, "orders.update_status") && (view === "active" || view === "new")
         ? (() => {
             const fresh = shown.filter((o) => o.status === "received");
             return fresh.length > 1 ? (
@@ -209,7 +277,7 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
             ) : null;
           })()
         : null}
-      {shown.length === 0 ? (
+      {layout === "board" ? null : shown.length === 0 ? (
         <Card className="px-6 py-14 text-center">
           <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-surface-2 text-fg-subtle">
             <ReceiptText className="size-7" aria-hidden="true" />
@@ -234,6 +302,65 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
         </ul>
       )}
     </>
+  );
+}
+
+type ActiveOrder = Awaited<ReturnType<typeof listActiveOrders>>[number];
+
+/**
+ * Every step side by side (new → in the works → ready): the till sees the whole service at a
+ * glance. Columns scroll sideways on a phone.
+ */
+function OrdersBoard({
+  columns,
+  empty,
+  acceptAll,
+  card,
+}: {
+  columns: { key: string; title: string; orders: ActiveOrder[]; tone: string }[];
+  empty: string;
+  acceptAll: ((ids: string[]) => React.ReactNode) | null;
+  card: (o: ActiveOrder) => React.ReactNode;
+}) {
+  return (
+    <div className="-mx-4 flex snap-x snap-mandatory [scrollbar-width:none] items-start gap-4 overflow-x-auto px-4 pb-2 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0">
+      {columns.map((c) => {
+        const fresh = c.key === "new" ? c.orders.filter((o) => o.status === "received") : [];
+        return (
+          <section
+            key={c.key}
+            aria-label={c.title}
+            className="w-[86vw] max-w-md shrink-0 snap-start rounded-3xl bg-surface-2/70 p-2 ring-1 ring-border sm:w-[26rem] lg:w-auto lg:max-w-none"
+          >
+            <header className="flex items-center gap-2 px-2.5 pt-1.5 pb-3">
+              <h2 className="min-w-0 flex-1 truncate font-bold">{c.title}</h2>
+              <span
+                className={cn(
+                  "grid h-6 min-w-6 place-items-center rounded-full px-2 text-xs font-black tabular-nums",
+                  c.orders.length ? c.tone : "bg-surface text-fg-muted",
+                )}
+              >
+                {c.orders.length}
+              </span>
+            </header>
+            {acceptAll && fresh.length > 1 ? (
+              <div className="mb-2 px-1">{acceptAll(fresh.map((o) => o.id))}</div>
+            ) : null}
+            {c.orders.length ? (
+              <ul className="space-y-2">
+                {c.orders.map((o) => (
+                  <li key={o.id}>{card(o)}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="rounded-2xl border border-dashed border-border-strong px-4 py-10 text-center text-sm text-fg-muted">
+                {empty}
+              </p>
+            )}
+          </section>
+        );
+      })}
+    </div>
   );
 }
 

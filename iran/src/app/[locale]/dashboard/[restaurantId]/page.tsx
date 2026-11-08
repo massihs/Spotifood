@@ -3,18 +3,22 @@ import {
   Shirt,
   AlertTriangle,
   ArrowRight,
-  Blocks,
+  Bike,
   BellRing,
   Calculator,
   CalendarClock,
   ChartColumn,
   Check,
+  CheckCheck,
   ChefHat,
+  ChevronRight,
   Clock,
   Flame,
   LayoutGrid,
+  ListChecks,
   QrCode,
   ReceiptText,
+  Store,
   TrendingDown,
   TrendingUp,
   UtensilsCrossed,
@@ -25,17 +29,27 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { hotelToday } from "@/server/modules/hotel/requests";
 import { HotelOverview } from "@/components/hotel/hotel-overview";
+import { HourlyChart } from "@/components/dashboard/hourly-chart";
 import { KpiCard } from "@/components/dashboard/kpi-card";
+import { OnlinePause } from "@/components/dashboard/online-pause";
+import { QuickAvailability } from "@/components/dashboard/quick-availability";
 import { buttonClasses } from "@/components/ui/button";
-import { Card, CardHeader, StatCard, TONE_TILE, type Tone } from "@/components/ui/card";
+import { Card, CardHeader, TONE_TILE, type Tone } from "@/components/ui/card";
 import { Link, redirect } from "@/i18n/navigation";
 import { jobHome } from "@/lib/jobs";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
-import { getOverviewLive, getSetupOverview, getTodayStats } from "@/server/modules/dashboard/service";
+import {
+  getOverviewLive,
+  getSetupOverview,
+  getTodayPulse,
+  getTodayStats,
+} from "@/server/modules/dashboard/service";
+import { countToDispatch } from "@/server/modules/delivery/service";
 import { countLowStock } from "@/server/modules/inventory/service";
+import { onlineServiceStatus } from "@/server/modules/online/service";
 import { countNewOrders } from "@/server/modules/orders/service";
 import { can } from "@/server/tenancy";
 import { getDisabledModules } from "@/server/modules/restaurants/settings";
@@ -86,7 +100,21 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   // orders to accept, waiters on the floor.
   const home = jobHome(ctx.restaurant.kind, ctx.job);
   if (home) redirect({ href: `/dashboard/${ctx.restaurant.id}/${home}`, locale: await getLocale() });
-  const [t, tStatus, tRes, locale, overview, today, live, lowStock, newOrders, disabled] = await Promise.all([
+  const [
+    t,
+    tStatus,
+    tRes,
+    locale,
+    overview,
+    today,
+    live,
+    lowStock,
+    newOrders,
+    disabled,
+    pulse,
+    online,
+    toDispatch,
+  ] = await Promise.all([
     getTranslations("dashboard"),
     getTranslations("orderStatus"),
     getTranslations("reservations.status"),
@@ -97,6 +125,9 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
     countLowStock(db, ctx),
     countNewOrders(db, ctx),
     getDisabledModules(db, ctx),
+    getTodayPulse(db, ctx),
+    onlineServiceStatus(db, ctx),
+    countToDispatch(db, ctx),
   ]);
   const hotel = ctx.restaurant.kind === "hotel" && can(ctx, "orders.view") ? await hotelToday(db, ctx) : null;
   const tz = ctx.restaurant.timezone;
@@ -105,6 +136,9 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const on = (m: ModuleKey) => !disabled.includes(m);
   const now = today.asOf;
   const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: tz });
+  const currentHour = Number(
+    new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hourCycle: "h23", timeZone: tz }).format(now),
+  );
 
   const steps = [
     { key: "profile", done: overview.profileComplete, href: `${base}/settings#profile` },
@@ -121,7 +155,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   ] as const;
   const doneCount = steps.filter((s) => s.done).length;
 
-  // Last 7 days, oldest first, zero-filled; plus the same weekday last week for the trend chip.
+  // Last 7 days, oldest first, zero-filled.
   const dayKey = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(d);
   const centsOn = (key: string) => today.revenueByDay.find((r) => r.day === key)?.cents ?? 0;
   const days = Array.from({ length: 7 }, (_, i) => {
@@ -134,12 +168,12 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
     };
   });
   const max = Math.max(1, ...days.map((d) => d.cents));
-  const lastWeek = centsOn(dayKey(new Date(now.getTime() - 7 * 86_400_000)));
-  // No trend before the first sale of the day: "-100 %" at opening time says nothing.
-  const delta =
-    lastWeek > 0 && today.revenueTodayCents > 0
-      ? Math.round(((today.revenueTodayCents - lastWeek) / lastWeek) * 100)
-      : null;
+  const weekTotal = days.reduce((n, d) => n + d.cents, 0);
+  // Against the same weekday last week at the same time of day: never a morning against a whole day.
+  const pct = (now: number, then: number) =>
+    then > 0 && now > 0 ? Math.round(((now - then) / then) * 100) : null;
+  const revenueDelta = pct(today.revenueTodayCents, pulse.lastWeekSoFar.revenueCents);
+  const ordersDelta = pct(today.ordersToday, pulse.lastWeekSoFar.orders);
   const weekday = new Intl.DateTimeFormat(locale, { weekday: "long", timeZone: tz }).format(now);
   const dateLabel = new Intl.DateTimeFormat(locale, {
     weekday: "long",
@@ -150,40 +184,71 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
 
   // A hotel books rooms elsewhere: table bookings stay in its restaurant pages, off its home.
   const showReservations = !hotel && on("reservations") && can(ctx, "orders.view");
-  const alerts = [
+  const canOrders = can(ctx, "orders.view");
+  const todo = [
     hotel &&
       hotel.open > 0 && {
         href: `${base}/requests`,
         label: t("hotel.alertOpen", { n: hotel.open }),
+        hint: t("attention.requestsHint"),
         Icon: ConciergeBell,
-        className: "bg-danger text-white",
+        tone: "bg-danger text-white",
       },
-    newOrders > 0 && {
-      href: `${base}/orders`,
-      label: t("alerts.newOrders", { n: newOrders }),
-      Icon: BellRing,
-      className: "bg-danger text-white",
-    },
+    canOrders &&
+      newOrders > 0 && {
+        href: `${base}/orders?view=new`,
+        label: t("alerts.newOrders", { n: newOrders }),
+        hint: t("attention.newOrdersHint"),
+        Icon: BellRing,
+        tone: "bg-danger text-white",
+      },
+    canOrders &&
+      pulse.steps.ready > 0 && {
+        href: `${base}/orders?view=ready`,
+        label: t("attention.ready", { n: pulse.steps.ready }),
+        hint: t("attention.readyHint"),
+        Icon: CheckCheck,
+        tone: "bg-success-soft text-success",
+      },
+    on("delivery") &&
+      toDispatch > 0 && {
+        href: `${base}/delivery`,
+        label: t("attention.dispatch", { n: toDispatch }),
+        hint: t("attention.dispatchHint"),
+        Icon: Bike,
+        tone: TONE_TILE.sky,
+      },
     showReservations &&
       live.pendingBookings > 0 && {
         href: `${base}/reservations`,
         label: t("alerts.pendingBookings", { n: live.pendingBookings }),
+        hint: t("attention.bookingsHint"),
         Icon: CalendarClock,
-        className: "bg-tone-fuchsia/12 text-tone-fuchsia",
+        tone: TONE_TILE.fuchsia,
       },
     on("inventory") &&
       lowStock > 0 && {
         href: `${base}/inventory`,
         label: t("alerts.lowStock", { n: lowStock }),
+        hint: t("attention.lowStockHint"),
         Icon: AlertTriangle,
-        className: "bg-warning-soft text-warning",
+        tone: "bg-warning-soft text-warning",
       },
     live.unpaidCents > 0 && {
       href: `${base}/orders`,
       label: t("alerts.unpaid", { amount: money(live.unpaidCents) }),
+      hint: t("attention.unpaidHint"),
       Icon: Wallet,
-      className: "bg-surface-2 text-fg",
+      tone: "bg-surface-2 text-fg",
     },
+    doneCount < steps.length &&
+      can(ctx, "restaurant.manage") && {
+        href: "#setup",
+        label: t("attention.setup", { n: steps.length - doneCount }),
+        hint: t("attention.setupHint"),
+        Icon: ListChecks,
+        tone: "bg-accent-soft text-accent-text",
+      },
   ].filter((x) => !!x);
 
   const quick = [
@@ -208,7 +273,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
         tone: "emerald" as Tone,
       },
     on("kitchen") &&
-      can(ctx, "orders.view") && {
+      canOrders && {
         href: `${base}/kitchen`,
         label: t("quickActions.kitchen"),
         Icon: ChefHat,
@@ -246,12 +311,6 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
       Icon: ChartColumn,
       tone: "indigo" as Tone,
     },
-    can(ctx, "restaurant.manage") && {
-      href: `${base}/settings#modules`,
-      label: t("quickActions.modules"),
-      Icon: Blocks,
-      tone: "amber" as Tone,
-    },
   ].filter((x) => !!x);
 
   const seeAll = (href: string) => (
@@ -263,6 +322,12 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
       <ArrowRight className="size-3.5 rtl:rotate-180" aria-hidden="true" />
     </Link>
   );
+  const channelMeta = {
+    dine_in: { Icon: UtensilsCrossed, bar: "bg-accent", tile: "bg-accent-soft text-accent-text" },
+    takeaway: { Icon: Store, bar: "bg-tone-sky", tile: TONE_TILE.sky },
+    delivery: { Icon: Bike, bar: "bg-tone-violet", tile: TONE_TILE.violet },
+  } as const;
+  const channelTotal = pulse.channels.reduce((n, c) => n + c.cents, 0);
 
   return (
     <>
@@ -270,192 +335,257 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
         title={t("welcome", { name: ctx.user.fullName.split(" ")[0] ?? "" })}
         description={<span className="first-letter:uppercase">{dateLabel}</span>}
         actions={
-          hotel ? (
-            <Link href={`${base}/requests`} className={buttonClasses("primary")}>
-              <ConciergeBell className="size-4" aria-hidden="true" />
-              {t("hotel.requests")}
-            </Link>
-          ) : on("pos") && can(ctx, "orders.create") ? (
-            <Link href={`${base}/pos`} className={buttonClasses("primary")}>
-              <Calculator className="size-4" aria-hidden="true" />
-              {t("quickActions.pos")}
-            </Link>
-          ) : null
+          <>
+            {!hotel && online.enabled ? (
+              <OnlinePause
+                key={online.pausedUntil?.toISOString() ?? "open"}
+                restaurantId={ctx.restaurant.id}
+                pausedUntil={online.pausedUntil?.toISOString() ?? null}
+                canPause={can(ctx, "orders.update_status")}
+                timeZone={tz}
+              />
+            ) : null}
+            {hotel ? (
+              <Link href={`${base}/requests`} className={buttonClasses("primary")}>
+                <ConciergeBell className="size-4" aria-hidden="true" />
+                {t("hotel.requests")}
+              </Link>
+            ) : on("pos") && can(ctx, "orders.create") ? (
+              <Link href={`${base}/pos`} className={buttonClasses("primary")}>
+                <Calculator className="size-4" aria-hidden="true" />
+                {t("quickActions.pos")}
+              </Link>
+            ) : null}
+          </>
         }
       />
 
-      {alerts.length ? (
-        <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
-          {alerts.map(({ href, label, Icon, className }) => (
-            <Link
-              key={label}
-              href={href}
-              className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold whitespace-nowrap transition-opacity hover:opacity-85",
-                className,
-              )}
-            >
-              <Icon className="size-4" aria-hidden="true" />
-              {label}
-            </Link>
-          ))}
-        </div>
-      ) : null}
-
-      {hotel ? (
-        <HotelOverview ctx={ctx} today={hotel} money={money} asOf={now} />
-      ) : (
-        <>
-          {/* Today */}
-          <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-            <Card
-              className="overflow-hidden border-transparent p-6 text-white shadow-accent"
-              style={{ background: "var(--brand-gradient)" }}
-            >
-              {/* A soft light from the top corner and a fine grain, instead of flat color blobs. */}
-              <div
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_100%_0%,rgb(255_255_255/0.22),transparent_55%)] rtl:bg-[radial-gradient(120%_80%_at_0%_0%,rgb(255_255_255/0.22),transparent_55%)]"
-                aria-hidden="true"
-              />
-              <div
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/10 to-transparent"
-                aria-hidden="true"
-              />
-              <div className="relative flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium opacity-80">{t("revenueToday")}</p>
-                  <p className="mt-1 text-3xl font-bold tracking-tight tabular-nums sm:text-4xl">
-                    {money(today.revenueTodayCents)}
-                  </p>
-                  {delta !== null ? (
-                    <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/18 px-2.5 py-1 text-xs font-semibold">
-                      {delta >= 0 ? (
-                        <TrendingUp className="size-3.5" aria-hidden="true" />
-                      ) : (
-                        <TrendingDown className="size-3.5" aria-hidden="true" />
-                      )}
-                      <bdi dir="ltr" className="tabular-nums">
-                        {delta > 0 ? "+" : ""}
-                        {delta}%
-                      </bdi>
-                      <span className="opacity-85">{t("vsLastWeek", { day: weekday })}</span>
-                    </p>
-                  ) : null}
-                </div>
-                <span
-                  className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/18"
-                  aria-hidden="true"
-                >
-                  <Wallet className="size-5" />
-                </span>
-              </div>
-              <div className="relative mt-5 flex flex-wrap gap-x-6 gap-y-1 text-sm">
-                <p>
-                  <span className="opacity-75">{t("averageTicket")} </span>
-                  <span className="font-bold tabular-nums">{money(today.averageTicketCents)}</span>
-                </p>
-                <p className="font-semibold opacity-90">{t("ordersN", { n: today.ordersToday })}</p>
-              </div>
-              <div className="relative mt-5">
-                <p className="text-xs font-medium opacity-75">{t("last7")}</p>
-                <div className="mt-3 flex h-16 items-end gap-2 sm:h-28">
-                  {days.map((d, i) => (
-                    <div
-                      key={d.key}
-                      className="group flex h-full flex-1 flex-col items-center justify-end gap-1.5"
-                    >
-                      <div
-                        className={cn(
-                          "w-full origin-bottom animate-[bar-grow_0.6s_cubic-bezier(0.2,0.7,0.2,1)_both] rounded-md transition-colors",
-                          i === 6
-                            ? "bg-white shadow-[0_4px_14px_rgb(0_0_0/0.15)]"
-                            : "bg-white/28 group-hover:bg-white/45",
-                        )}
-                        style={{
-                          height: `${Math.max(6, (d.cents / max) * 80)}%`,
-                          animationDelay: `${i * 40}ms`,
-                        }}
-                        title={money(d.cents)}
-                      />
-                      <span className={cn("text-[10px]", i === 6 ? "font-bold" : "opacity-75")}>
-                        {d.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-            <div className="grid grid-cols-2 gap-4">
-              <KpiLink href={can(ctx, "orders.view") ? `${base}/orders` : null}>
-                <StatCard
-                  label={t("ordersToday")}
-                  value={today.ordersToday}
-                  icon={<ReceiptText />}
-                  tone="sky"
-                />
-              </KpiLink>
-              <KpiLink href={on("kitchen") && can(ctx, "orders.view") ? `${base}/kitchen` : null}>
-                <StatCard label={t("inKitchen")} value={today.inKitchen} icon={<ChefHat />} tone="orange" />
-              </KpiLink>
-              <KpiLink href={on("floor") && can(ctx, "tables.view") ? `${base}/floor` : null}>
-                <StatCard
-                  label={t("openTables")}
-                  value={
-                    <>
-                      {today.openTables}
-                      <span className="text-base font-medium text-fg-subtle"> / {overview.tables}</span>
-                    </>
-                  }
-                  icon={<LayoutGrid />}
-                  tone="teal"
-                />
-              </KpiLink>
-              {showReservations ? (
-                <KpiLink href={`${base}/reservations`}>
-                  <StatCard
-                    label={t("reservationsToday")}
-                    value={live.bookingsToday}
-                    hint={t("coversN", { n: live.coversToday })}
-                    icon={<CalendarClock />}
-                    tone="fuchsia"
-                  />
-                </KpiLink>
-              ) : (
-                <StatCard
-                  label={t("stats.products")}
-                  value={overview.products}
-                  icon={<UtensilsCrossed />}
-                  tone="rose"
-                />
-              )}
-            </div>
-          </section>
-        </>
-      )}
-
-      {/* Quick access: an app-launcher row */}
-      <nav aria-label={t("quick")} className="mt-4 grid grid-cols-4 gap-2 sm:gap-3 lg:grid-cols-8">
+      {/* Shortcuts: one row, scrolls on phones */}
+      <nav
+        aria-label={t("quick")}
+        className="-mx-4 mb-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
+      >
+        {!hotel && overview.products > 0 && (can(ctx, "menu.manage") || can(ctx, "orders.update_status")) ? (
+          <QuickAvailability restaurantId={ctx.restaurant.id} variant="chip" />
+        ) : null}
         {quick.map(({ href, label, Icon, tone }) => (
           <Link
             key={href}
             href={href}
-            className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-surface px-1.5 py-3 text-center shadow-[var(--shadow-soft)] transition-[background-color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:bg-accent-soft/40 active:scale-[0.97]"
+            className="group inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-border bg-surface ps-1.5 pe-3.5 text-sm font-semibold whitespace-nowrap shadow-[var(--shadow-soft)] transition-[border-color,background-color,transform] hover:border-accent/40 hover:bg-accent-soft/40 active:scale-[0.97]"
           >
-            <span
-              className={cn(
-                "grid size-11 place-items-center rounded-2xl transition-transform group-hover:scale-105",
-                TONE_TILE[tone],
-              )}
-            >
-              <Icon className="size-5" aria-hidden="true" />
+            <span className={cn("grid size-7 place-items-center rounded-full", TONE_TILE[tone])}>
+              <Icon className="size-4" aria-hidden="true" />
             </span>
-            <span className="line-clamp-2 text-xs leading-tight font-semibold sm:text-[13px]">{label}</span>
+            {label}
           </Link>
         ))}
       </nav>
 
+      <div className="grid gap-4 lg:grid-cols-3">
+        {hotel ? (
+          <div className="lg:col-span-2">
+            <HotelOverview ctx={ctx} today={hotel} money={money} asOf={now} />
+          </div>
+        ) : (
+          /* Today: revenue, its trend at this time of day, and the day's rhythm hour by hour */
+          <Card className="p-5 sm:p-6 lg:col-span-2">
+            <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
+              <div className="min-w-0">
+                <p className="flex items-center gap-2 text-sm font-medium text-fg-muted">
+                  <span
+                    className="grid size-7 place-items-center rounded-lg text-white"
+                    style={{ background: "var(--brand-gradient)" }}
+                    aria-hidden="true"
+                  >
+                    <Wallet className="size-4" />
+                  </span>
+                  {t("revenueToday")}
+                </p>
+                <p className="mt-2 text-3xl font-black tracking-tight tabular-nums sm:text-4xl">
+                  {money(today.revenueTodayCents)}
+                </p>
+                <Trend delta={revenueDelta} label={t("vsSameTime", { day: weekday })} />
+              </div>
+              <dl className="grid grid-cols-3 gap-x-5 gap-y-1 sm:gap-x-8">
+                <Mini label={t("ordersToday")} delta={ordersDelta}>
+                  {today.ordersToday}
+                </Mini>
+                <Mini label={t("averageTicket")}>{money(today.averageTicketCents)}</Mini>
+                <Mini label={t("openTables")}>
+                  {today.openTables}
+                  <span className="text-sm font-medium text-fg-subtle"> / {overview.tables}</span>
+                </Mini>
+              </dl>
+            </div>
+            <div className="mt-6">
+              <HourlyChart
+                today={pulse.hourly.today}
+                lastWeek={pulse.hourly.lastWeek}
+                currentHour={currentHour}
+                locale={locale}
+                money={money}
+                todayLabel={t("chart.today")}
+                lastWeekLabel={t("chart.lastWeek", { day: weekday })}
+                summary={t("chart.summary", { day: weekday })}
+                emptyLabel={t("chart.empty")}
+              />
+            </div>
+          </Card>
+        )}
+
+        {/* What needs someone now */}
+        <Card className="order-first flex flex-col lg:order-none">
+          <CardHeader title={t("attention.title")} />
+          {todo.length ? (
+            <ul className="divide-y divide-border">
+              {todo.map(({ href, label, hint, Icon, tone }) => (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    className="group flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-surface-2"
+                  >
+                    <span className={cn("grid size-10 shrink-0 place-items-center rounded-xl", tone)}>
+                      <Icon className="size-[18px]" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-bold">{label}</span>
+                      <span className="block truncate text-xs text-fg-muted">{hint}</span>
+                    </span>
+                    <ChevronRight
+                      className="size-4 shrink-0 text-fg-subtle transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5 py-10 text-center">
+              <span className="grid size-12 place-items-center rounded-2xl bg-success-soft text-success">
+                <Check className="size-6" strokeWidth={3} aria-hidden="true" />
+              </span>
+              <p className="font-bold">{t("attention.clear")}</p>
+              <p className="text-sm text-fg-muted">{t("attention.clearHint")}</p>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      {!hotel ? (
+        <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {/* Where today's sales come from */}
+          <Card className="flex flex-col">
+            <CardHeader title={t("channels.title")} />
+            {pulse.channels.length ? (
+              <div className="space-y-4 p-5">
+                <div className="flex h-2.5 overflow-hidden rounded-full bg-surface-2">
+                  {pulse.channels.map((c) => (
+                    <span
+                      key={c.channel}
+                      className={channelMeta[c.channel].bar}
+                      style={{ width: `${channelTotal ? (c.cents / channelTotal) * 100 : 0}%` }}
+                    />
+                  ))}
+                </div>
+                <ul className="space-y-3">
+                  {pulse.channels.map((c) => {
+                    const M = channelMeta[c.channel];
+                    return (
+                      <li key={c.channel} className="flex items-center gap-3">
+                        <span className={cn("grid size-9 shrink-0 place-items-center rounded-xl", M.tile)}>
+                          <M.Icon className="size-4" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-semibold">{t(`channels.${c.channel}`)}</span>
+                          <span className="block text-xs text-fg-muted">{t("ordersN", { n: c.orders })}</span>
+                        </span>
+                        <span className="text-end">
+                          <span className="block text-sm font-bold tabular-nums">{money(c.cents)}</span>
+                          <span className="block text-xs text-fg-subtle tabular-nums">
+                            {new Intl.NumberFormat(locale, { style: "percent" }).format(
+                              channelTotal ? c.cents / channelTotal : 0,
+                            )}
+                          </span>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : (
+              <Empty icon={<Store />} text={t("channels.empty")} />
+            )}
+          </Card>
+
+          {/* The kitchen right now */}
+          {canOrders ? (
+            <Card className="flex flex-col">
+              <CardHeader
+                title={t("pipeline.title")}
+                action={on("kitchen") ? seeAll(`${base}/kitchen`) : undefined}
+              />
+              <div className="grid flex-1 grid-cols-3 gap-2 p-5">
+                {(
+                  [
+                    ["received", pulse.steps.received, "new", "bg-danger-soft text-danger"],
+                    ["preparing", pulse.steps.preparing, "progress", "bg-warning-soft text-warning"],
+                    ["ready", pulse.steps.ready, "ready", "bg-success-soft text-success"],
+                  ] as const
+                ).map(([key, n, view, tone]) => (
+                  <Link
+                    key={key}
+                    href={`${base}/orders?view=${view}`}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-4 text-center transition-transform hover:-translate-y-0.5",
+                      n ? tone : "bg-surface-2 text-fg-muted",
+                    )}
+                  >
+                    <span className="text-3xl font-black tabular-nums">{n}</span>
+                    <span className="text-xs font-semibold">{t(`pipeline.${key}`)}</span>
+                  </Link>
+                ))}
+              </div>
+            </Card>
+          ) : null}
+
+          {/* The week */}
+          <Card className="flex flex-col md:col-span-2 xl:col-span-1">
+            <CardHeader
+              title={t("last7")}
+              action={
+                <span className="text-sm font-bold text-fg-muted tabular-nums">{money(weekTotal)}</span>
+              }
+            />
+            <div className="flex flex-1 items-end gap-2 p-5">
+              {days.map((d, i) => (
+                <div
+                  key={d.key}
+                  className="group flex h-36 flex-1 flex-col items-center justify-end gap-1.5"
+                  title={money(d.cents)}
+                >
+                  <div
+                    className={cn(
+                      "w-full origin-bottom animate-[bar-grow_0.6s_cubic-bezier(0.2,0.7,0.2,1)_both] rounded-md",
+                      i === 6 ? "bg-accent" : "bg-accent/25 group-hover:bg-accent/45",
+                    )}
+                    style={{
+                      height: `${Math.max(4, (d.cents / max) * 100)}%`,
+                      animationDelay: `${i * 40}ms`,
+                    }}
+                  />
+                  <span className={cn("text-[11px]", i === 6 ? "font-bold" : "text-fg-muted")}>
+                    {d.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      ) : null}
+
       {doneCount < steps.length ? (
-        <Card className="mt-4">
+        <Card id="setup" className="mt-4 scroll-mt-24">
           <CardHeader
             title={t("setupTitle")}
             description={t("setupSubtitle")}
@@ -642,15 +772,48 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   );
 }
 
-function KpiLink({ href, children }: { href: string | null; children: ReactNode }) {
-  if (!href) return children;
+/** "+12 % vs Monday at this time": nothing before the first sale, nothing without a reference. */
+function Trend({ delta, label }: { delta: number | null; label: string }) {
+  if (delta === null) return null;
+  const up = delta >= 0;
   return (
-    <Link
-      href={href}
-      className="block rounded-2xl transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-float-sm)] focus-visible:ring-4 focus-visible:ring-[var(--ring)] active:translate-y-0 [&>*]:h-full"
+    <p
+      className={cn(
+        "mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
+        up ? "bg-success-soft text-success" : "bg-danger-soft text-danger",
+      )}
     >
-      {children}
-    </Link>
+      {up ? (
+        <TrendingUp className="size-3.5" aria-hidden="true" />
+      ) : (
+        <TrendingDown className="size-3.5" aria-hidden="true" />
+      )}
+      <bdi dir="ltr" className="tabular-nums">
+        {delta > 0 ? "+" : ""}
+        {delta}%
+      </bdi>
+      <span className="font-medium opacity-85">{label}</span>
+    </p>
+  );
+}
+
+function Mini({ label, delta, children }: { label: string; delta?: number | null; children: ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <dt className="truncate text-xs text-fg-muted">{label}</dt>
+      <dd className="mt-0.5 flex items-baseline gap-1.5">
+        <span className="truncate text-lg font-black tabular-nums sm:text-xl">{children}</span>
+        {delta != null ? (
+          <bdi
+            dir="ltr"
+            className={cn("text-xs font-bold tabular-nums", delta >= 0 ? "text-success" : "text-danger")}
+          >
+            {delta > 0 ? "+" : ""}
+            {delta}%
+          </bdi>
+        ) : null}
+      </dd>
+    </div>
   );
 }
 

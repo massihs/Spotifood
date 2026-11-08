@@ -16,6 +16,7 @@ import {
   createProduct,
   deleteProduct,
   getProduct,
+  listAvailability,
   listProducts,
   reorderProducts,
   setProductFlags,
@@ -231,6 +232,13 @@ describe("products", () => {
     });
     await expect(updateProduct(db, sctx, p.id, base(cat.id))).rejects.toMatchObject({ code: "FORBIDDEN" });
     expect((await listProducts(db, sctx, cat.id))[0]?.isAvailable).toBe(false);
+    // The quick "sold out" sheet: the staff sees every dish of the menu, hidden ones aside.
+    const hidden = await createProduct(db, ctx, { ...base(cat.id), name: "Plat caché" });
+    await setProductFlags(db, ctx, hidden.id, { isActive: false });
+    const sheet = await listAvailability(db, sctx);
+    expect(sheet.map((d) => [d.name, d.category, d.isAvailable])).toEqual([[p.name, "Plats", false]]);
+    const other = await createOwnerWithRestaurant();
+    expect(await listAvailability(db, other.ctx)).toEqual([]);
   });
 
   it("logs price changes in the audit trail", async () => {

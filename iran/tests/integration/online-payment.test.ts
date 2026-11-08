@@ -251,4 +251,21 @@ describe("online orders paid online", () => {
     const [b] = await db.select().from(orders).where(eq(orders.id, paying.id));
     expect(b).toMatchObject({ status: "pending_payment", paymentStatus: "pending" });
   });
+
+  it("busy mode: online orders wait while paused, then come back", async () => {
+    const o = await setup();
+    const d = await diner();
+    await expect(online.pauseOnlineOrders(db, o.ctx, 7)).rejects.toMatchObject({ message: "invalid_pause" });
+    const until = await online.pauseOnlineOrders(db, o.ctx, 15);
+    expect(until!.getTime()).toBeGreaterThan(Date.now() + 14 * 60_000);
+    expect((await online.getOnlineStore(db, o.slug))?.pausedUntil?.getTime()).toBe(until!.getTime());
+    expect(await online.onlineServiceStatus(db, o.ctx)).toMatchObject({ enabled: true });
+    await expect(online.placeOnlineOrder(db, d, o.slug, order(o.dish.id, "on_site"))).rejects.toMatchObject({
+      message: "online_paused",
+    });
+    await online.pauseOnlineOrders(db, o.ctx, 0);
+    expect((await online.getOnlineStore(db, o.slug))?.pausedUntil).toBeNull();
+    const placed = await online.placeOnlineOrder(db, d, o.slug, order(o.dish.id, "on_site"));
+    expect(placed.status).toBe("received");
+  });
 });

@@ -101,6 +101,14 @@ toujours utiliser son propre compte Zarinpal (**Paramètres → Paiements → Mo
   fois payée ; laissée impayée plus d'une heure, elle est annulée (stock rendu) par le passage
   périodique de `/api/v1/cron`.
 
+## Mode occupé (pause des commandes en ligne)
+
+Pendant un rush, l'équipe met les commandes en ligne en pause 15 min, 30 min, 1 h ou 2 h depuis
+l'accueil ou la page Commandes (pastille « Commandes en ligne : ouvertes »), et reprend d'un geste.
+Le menu en ligne reste visible avec un bandeau « retour à HH:MM » ; les commandes passées pendant
+la pause sont refusées côté serveur. Les tables, la caisse et la borne continuent normalement.
+Chaque pause et reprise est journalisée (migration `0046_online_pause`).
+
 ## Démo publique (/demo)
 
 Le bouton « Essayer la démo » de l'accueil place le visiteur à une table libre du restaurant de

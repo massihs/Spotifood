@@ -72,6 +72,7 @@ export const CLIENT_NAMESPACES = {
     "categoryTemplates",
     "common",
     "customers",
+    "dashboard",
     "delivery",
     "directory",
     "errorCodes",

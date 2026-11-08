@@ -24,6 +24,7 @@ import {
   deleteProduct,
   reorderProducts,
   adjustPrices,
+  listAvailability,
   setProductFlags,
   setProductPrice,
   updateProduct,
@@ -208,6 +209,14 @@ export async function setProductFlagAction(
     const ctx = await actionContext(restaurantId);
     await setProductFlags(db, ctx, productId, { [flag]: value });
     menuChanged(ctx);
+  });
+}
+
+/** The quick "sold out" sheet: every dish with its availability. */
+export async function listAvailabilityAction(restaurantId: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId);
+    return listAvailability(db, ctx);
   });
 }
 

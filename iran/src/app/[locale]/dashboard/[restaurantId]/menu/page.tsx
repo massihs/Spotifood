@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
+import { QuickAvailability } from "@/components/dashboard/quick-availability";
 import { buttonClasses } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { requireRestaurant } from "@/server/auth/current";
@@ -42,6 +43,9 @@ async function Menu({ params, searchParams }: Pick<Props, "params" | "searchPara
         description={t("subtitle")}
         actions={
           <>
+            {products.length && (can(ctx, "menu.manage") || can(ctx, "orders.update_status")) ? (
+              <QuickAvailability restaurantId={ctx.restaurant.id} />
+            ) : null}
             {can(ctx, "menu.manage") ? (
               <Link
                 href={`/dashboard/${ctx.restaurant.id}/menu/import`}

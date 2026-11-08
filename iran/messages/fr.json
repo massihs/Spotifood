@@ -461,6 +461,52 @@
       "noRooms": "Ajoutez vos chambres pour les voir ici.",
       "waitingTitle": "Demandes en attente",
       "noWaiting": "Aucune demande en attente."
+    },
+    "vsSameTime": "vs {day} dernier à la même heure",
+    "chart": {
+      "today": "Aujourd'hui",
+      "lastWeek": "{day} dernier",
+      "summary": "Ventes heure par heure aujourd'hui comparées à {day} dernier",
+      "empty": "Pas encore de vente : le graphique se remplit au fil du service."
+    },
+    "attention": {
+      "title": "À traiter",
+      "newOrdersHint": "Acceptez-les pour lancer la cuisine",
+      "ready": "{n, plural, one {# commande prête} other {# commandes prêtes}} à servir",
+      "readyHint": "À apporter en salle ou à remettre",
+      "dispatch": "{n, plural, one {# livraison} other {# livraisons}} à envoyer",
+      "dispatchHint": "Attribuez un livreur",
+      "bookingsHint": "À confirmer ou refuser",
+      "lowStockHint": "Recommandez avant la rupture",
+      "unpaidHint": "Commandes du jour pas encore réglées",
+      "setup": "Plus que {n, plural, one {# étape} other {# étapes}} pour finir la configuration",
+      "setupHint": "Menu, tables et paiements",
+      "requestsHint": "Des demandes des chambres attendent",
+      "clear": "Tout est en ordre",
+      "clearHint": "Les nouvelles commandes et tâches apparaîtront ici"
+    },
+    "channels": {
+      "title": "Ventes du jour par canal",
+      "dine_in": "Sur place",
+      "takeaway": "À emporter",
+      "delivery": "Livraison",
+      "empty": "Pas encore de vente aujourd’hui."
+    },
+    "pipeline": {
+      "title": "La cuisine en ce moment",
+      "received": "Nouvelles",
+      "preparing": "En préparation",
+      "ready": "Prêtes"
+    },
+    "online": {
+      "open": "Commandes en ligne : ouvertes",
+      "pausedUntil": "Commandes en ligne en pause jusqu'à {time}",
+      "resume": "Reprendre",
+      "pauseTitle": "Mettre en pause les commandes en ligne",
+      "pauseHint": "Pendant un rush, plus de nouvelles commandes en ligne : le menu reste visible, les tables, la caisse et la borne continuent.",
+      "minutes": "{n} min",
+      "hours": "{n} h",
+      "error": "Échec, réessayez."
     }
   },
   "roles": {
@@ -769,7 +815,9 @@
     "platform_payments_unavailable": "Le paiement via Spotifood n'est pas encore disponible : utilisez votre propre compte Zarinpal.",
     "payout_exceeds_due": "Le montant dépasse ce qui est dû à ce restaurant.",
     "online_payment_required": "Ce restaurant demande le paiement en ligne.",
-    "order_not_awaiting_payment": "Cette commande n'attend plus de paiement."
+    "order_not_awaiting_payment": "Cette commande n'attend plus de paiement.",
+    "online_paused": "Le restaurant a mis les commandes en ligne en pause quelques minutes. Réessayez bientôt.",
+    "invalid_pause": "Durée de pause invalide."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1597,7 +1645,20 @@
       "done": "{count, plural, =0 {Aucun prix modifié} one {# prix mis à jour} other {# prix mis à jour}}."
     },
     "nutritionLink": "Base nutritionnelle",
-    "importLink": "Importer (Excel/CSV)"
+    "importLink": "Importer (Excel/CSV)",
+    "availability": {
+      "open": "Ruptures",
+      "title": "Disponibilité rapide",
+      "hint": "Pendant le service, passez un plat en rupture d’un geste : les clients ne peuvent plus le commander.",
+      "search": "Rechercher un plat…",
+      "available": "Disponible",
+      "soldOut": "Épuisé",
+      "soldOutCount": "{n, plural, one {# plat épuisé} other {# plats épuisés}}",
+      "allAvailable": "Tous les plats sont disponibles",
+      "toggle": "Changer la disponibilité de {name}",
+      "none": "Aucun plat trouvé",
+      "error": "Chargement impossible, réessayez."
+    }
   },
   "product": {
     "new": "Nouveau produit",
@@ -1747,7 +1808,13 @@
     "block": "Bloquer ce client",
     "blockConfirm": "Bloquer l’appareil qui a passé la commande {number} ? Il ne pourra plus commander ni appeler, et ses commandes en attente seront annulées.",
     "blockReason": "Raison (facultatif)",
-    "tableRoom": "Chambre {label}"
+    "tableRoom": "Chambre {label}",
+    "layout": {
+      "label": "Affichage des commandes",
+      "cards": "Cartes",
+      "board": "Colonnes",
+      "emptyColumn": "Aucune commande"
+    }
   },
   "tableView": {
     "title": "Table {label}",
@@ -3858,7 +3925,9 @@
       "cancelConfirm": "Annuler cette commande ?",
       "paid": "Paiement reçu, merci ! Le restaurant prépare votre commande.",
       "paidShort": "Payée en ligne"
-    }
+    },
+    "pausedBanner": "Ce restaurant ne prend pas de commandes en ligne pour le moment. Retour à {time}.",
+    "pausedButton": "Commandes en pause"
   },
   "kpi": {
     "title": "Objectifs du jour",

@@ -57,6 +57,8 @@ async function Online({ params }: Pick<Props, "params">) {
           popularIds={popularIds}
           theme={theme}
           shortPrices={store.shortPrices}
+          pausedUntil={store.pausedUntil?.toISOString() ?? null}
+          timeZone={store.timezone}
         />
       </main>
     </div>

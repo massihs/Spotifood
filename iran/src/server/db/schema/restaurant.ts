@@ -133,6 +133,8 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   wheelPrizes: jsonb().$type<WheelPrize[]>().notNull().default([]),
   /** Online ordering site (/r/{slug}/order): takeaway and/or delivery, by signed-in guests. */
   onlineOrderingEnabled: boolean().notNull().default(false),
+  /** Busy mode: online orders are refused until then (a rush, a kitchen problem). */
+  onlinePausedUntil: timestamp({ withTimezone: true }),
   onlineTakeaway: boolean().notNull().default(true),
   onlineDelivery: boolean().notNull().default(false),
   /** Self-order kiosk (/kiosk/{token}): a tablet at the counter, eat in or take away. */

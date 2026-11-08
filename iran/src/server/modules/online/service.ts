@@ -72,6 +72,8 @@ async function storeBySlug(db: DbOrTx, slug: string) {
       defaultLocale: restaurants.defaultLocale,
       menuTheme: restaurants.menuTheme,
       menuShortPrices: restaurants.menuShortPrices,
+      pausedUntil: restaurantSettings.onlinePausedUntil,
+      timezone: restaurants.timezone,
     })
     .from(restaurants)
     .innerJoin(restaurantSettings, eq(restaurantSettings.restaurantId, restaurants.id))
@@ -116,7 +118,56 @@ export async function getOnlineStore(db: Database, slug: string) {
     payment: { provider: pay.provider, onSite: pay.onSite || !pay.provider },
     menuTheme: s.menuTheme,
     shortPrices: s.menuShortPrices,
+    /** Busy mode: the menu stays visible, ordering waits until then. */
+    pausedUntil: pausedUntil(s.pausedUntil),
+    timezone: s.timezone,
   };
+}
+
+const pausedUntil = (until: Date | null) => (until && until.getTime() > Date.now() ? until : null);
+
+/** Lengths offered for a pause, in minutes. */
+export const PAUSE_MINUTES = [15, 30, 60, 120] as const;
+
+/** Online ordering as the team sees it: open, paused (until when) or not offered. */
+export async function onlineServiceStatus(db: DbOrTx, ctx: RestaurantContext) {
+  const [s] = await db
+    .select({
+      on: restaurantSettings.onlineOrderingEnabled,
+      takeaway: restaurantSettings.onlineTakeaway,
+      delivery: restaurantSettings.onlineDelivery,
+      pausedUntil: restaurantSettings.onlinePausedUntil,
+    })
+    .from(restaurantSettings)
+    .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
+  return {
+    enabled: Boolean(s?.on && (s.takeaway || s.delivery)),
+    pausedUntil: pausedUntil(s?.pausedUntil ?? null),
+  };
+}
+
+/**
+ * Busy mode: online orders are refused for a while (a rush, the kitchen is behind). 0 resumes
+ * at once. The tables, the counter and the kiosk keep taking orders.
+ */
+export async function pauseOnlineOrders(db: Database, ctx: RestaurantContext, minutes: number) {
+  assertCan(ctx, "orders.update_status");
+  if (minutes !== 0 && !(PAUSE_MINUTES as readonly number[]).includes(minutes))
+    throw new AppError("VALIDATION", "invalid_pause");
+  const until = minutes ? new Date(Date.now() + minutes * 60_000) : null;
+  await db.transaction(async (tx) => {
+    await tx
+      .update(restaurantSettings)
+      .set({ onlinePausedUntil: until })
+      .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
+    await recordAudit(tx, {
+      action: until ? "online.paused" : "online.resumed",
+      actorUserId: ctx.user.id,
+      restaurantId: ctx.restaurant.id,
+      metadata: until ? { minutes, until: until.toISOString() } : {},
+    });
+  });
+  return until;
 }
 
 export const onlineOrderSchema = z.object({
@@ -146,6 +197,8 @@ export async function placeOnlineOrder(db: Database, diner: OnlineDiner, slug: s
   const input = onlineOrderSchema.parse(raw);
   const store = await storeBySlug(db, slug);
   if (!store || store.status !== "active" || !store.on) throw notFound();
+  const paused = pausedUntil(store.pausedUntil);
+  if (paused) throw conflict("online_paused", { until: paused.toISOString() });
   if (input.channel === "takeaway" && !store.takeaway) throw forbidden("channel_disabled");
   if (input.channel === "delivery") {
     if (!store.delivery) throw forbidden("channel_disabled");
