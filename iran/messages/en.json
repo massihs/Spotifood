@@ -368,7 +368,8 @@
     "requests": "Requests",
     "roomService": "Room service",
     "rooms": "Rooms",
-    "roomsQr": "Room QR codes"
+    "roomsQr": "Room QR codes",
+    "adminPayouts": "Payouts"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -570,6 +571,47 @@
       "referrersHint": "Sites visitors come from (Instagram, Google…).",
       "empty": "No visit recorded.",
       "noReferrer": "No known referrer yet."
+    },
+    "payouts": {
+      "title": "Payouts to restaurants",
+      "subtitle": "Online payments Spotifood collected for restaurants, and what is still to transfer.",
+      "statDue": "To pay out",
+      "statCollected": "Collected for restaurants",
+      "statFee": "Spotifood commission",
+      "statSplit": "Paid automatically (split)",
+      "restaurants": "Restaurants",
+      "restaurantsHint": "The amount due accounts for the commission and for what Zarinpal already paid automatically.",
+      "empty": "No payment collected for a restaurant yet.",
+      "counts": "{n, plural, =0 {no payment} one {# payment} other {# payments}}",
+      "collected": "collected",
+      "fee": "Commission",
+      "splitShort": "auto",
+      "paidOut": "paid out",
+      "due": "due",
+      "copy": "Copy",
+      "noAccount": "No bank details",
+      "recentChange": "Bank account changed {hours} h ago: check with the owner before transferring.",
+      "pay": "Record a payout",
+      "payTitle": "Payout to {name}",
+      "payDue": "Due: {amount}",
+      "amount": "Amount transferred",
+      "reference": "Transfer tracking number",
+      "referenceHint": "The tracking number (پیگیری) given by the bank.",
+      "note": "Note (optional)",
+      "confirm": "Record the payout",
+      "settings": "Settings",
+      "settingsHint": "Applies to new payments; older ones keep the commission of their day.",
+      "merchant": "Spotifood's Zarinpal account:",
+      "merchantOn": "configured",
+      "merchantOff": "not configured (ZARINPAL_MERCHANT_ID)",
+      "save": "Save",
+      "saved": "Settings saved.",
+      "recent": "Latest payouts",
+      "noPayouts": "No payout yet.",
+      "feeField": "Spotifood commission (%)",
+      "feeHint": "Taken on each payment collected for a restaurant. 0 = none.",
+      "split": "Zarinpal automatic split (تسهیم)",
+      "splitHint": "Tick only once Zarinpal has enabled split settlement on Spotifood's account: the restaurant's share then goes straight to its Sheba (99% at most)."
     }
   },
   "errors": {
@@ -677,7 +719,7 @@
     "duplicate_customer": "This number is already registered.",
     "duplicate_coupon": "This code already exists.",
     "no_recipients": "Nobody in this group.",
-    "owner_only": "Only the owner can open a branch.",
+    "owner_only": "Only the restaurant owner can do this.",
     "other_organization": "This restaurant is not in your organization.",
     "address_required": "Enter the delivery address.",
     "below_zone_minimum": "The order is below this zone’s minimum.",
@@ -719,7 +761,15 @@
     "label_required": "Give every bell option a name.",
     "invalid_call": "This option is no longer offered.",
     "job_in_use": "Members hold this job.",
-    "kind_unavailable": "This venue type is no longer offered."
+    "kind_unavailable": "This venue type is no longer offered.",
+    "invalid_iban": "Invalid Sheba number.",
+    "invalid_card": "Invalid card number.",
+    "payout_account_in_use": "Online payment through Spotifood is on: switch accounts or turn it off before removing these details.",
+    "payout_account_required": "Add your bank details to receive payments through Spotifood.",
+    "platform_payments_unavailable": "Payment through Spotifood is not available yet: use your own Zarinpal account.",
+    "payout_exceeds_due": "The amount is more than this restaurant is owed.",
+    "online_payment_required": "This restaurant asks for online payment.",
+    "order_not_awaiting_payment": "This order is no longer waiting for payment."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1167,7 +1217,44 @@
     "online": "Online ordering",
     "onlineHint": "Your ordering site: takeaway and delivery, a link for your Instagram bio.",
     "goals": "Targets",
-    "goalsHint": "Today’s takings, kitchen time and guest rating: tracked on the overview, alert when a target is missed."
+    "goalsHint": "Today’s takings, kitchen time and guest rating: tracked on the overview, alert when a target is missed.",
+    "bank": "Bank details",
+    "payout": {
+      "title": "Bank details",
+      "hint": "The account Spotifood pays your guests' online payments into.",
+      "privacy": "Encrypted and only visible to you and the Spotifood team, to pay you. Only the owner can change them.",
+      "holder": "Account holder",
+      "holderHint": "Exactly as at the bank (person or company).",
+      "iban": "Sheba number (IBAN)",
+      "ibanHint": "IR followed by 24 digits, in your banking app or on the back of the card.",
+      "ibanInvalid": "This Sheba number is not valid: check the digits.",
+      "ibanValid": "Valid Sheba number",
+      "card": "Card number (optional)",
+      "cardHint": "16 digits, handy for a card-to-card transfer.",
+      "cardInvalid": "This card number is not valid.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saved": "Bank details saved.",
+      "change": "Change",
+      "remove": "Remove",
+      "removeConfirm": "Remove these bank details?",
+      "updated": "Updated on {when}",
+      "bankUnknown": "Bank",
+      "ownerOnly": "Only the restaurant owner can change these details.",
+      "ownerOnlyEmpty": "No bank details yet. The restaurant owner can add them here."
+    },
+    "collect": {
+      "title": "How you get paid",
+      "platform": "Through Spotifood (recommended)",
+      "platformHint": "No Zarinpal account needed: Spotifood collects for you and pays the money into your bank account. Commission: {fee}.",
+      "platformSoon": "Coming soon: Spotifood's Zarinpal account is not active yet.",
+      "needBank": "Add your bank details first so you can be paid.",
+      "needBankLink": "Bank details",
+      "own": "My own Zarinpal account",
+      "ownHint": "The money goes straight to your Zarinpal account (you need a merchant id).",
+      "merchant": "Zarinpal merchant id",
+      "merchantHint": "In your Zarinpal panel: Payment gateway → merchant id (36 characters)."
+    }
   },
   "guest": {
     "table": "Table {label}",
@@ -1792,7 +1879,8 @@
         "needs_review": "Payment to review · Table {table}",
         "receivedRoom": "Payment received {amount} · Room {table}",
         "requestedRoom": "Room {table} · Guest {client} wants to pay {amount} ({method, select, cash {cash} card {card} other {at the table}})",
-        "needs_reviewRoom": "Payment to review · Room {table}"
+        "needs_reviewRoom": "Payment to review · Room {table}",
+        "receivedOnline": "Online payment received {amount} · order {number}"
       },
       "stock": {
         "low": "{name} is running low ({quantity} {unit})"
@@ -1812,6 +1900,12 @@
         "prep_slow": "Slow kitchen: {minutes} min on average over the last hour (target {goal} min)",
         "rating_low": "Guest rating dropping: {rating}/5 over 7 days (target {goal})",
         "revenue_missed": "Today’s takings target missed"
+      },
+      "payout_account": {
+        "updated": "Bank details changed (Sheba •••{ibanLast4}) by {by}"
+      },
+      "payout": {
+        "sent": "Spotifood paid you {amount}"
       }
     }
   },
@@ -3737,6 +3831,23 @@
       "regenerate": "New link",
       "regenerateConfirm": "Create a new link? Tablets using the old one will stop ordering.",
       "private": "This link orders without sign-in: open it only on your tablets."
+    },
+    "payment": {
+      "title": "Payment",
+      "online": "Pay online now (bank card)",
+      "onlineHint": "Secure payment by Zarinpal; your order goes to the kitchen as soon as it is confirmed.",
+      "payNow": "Pay {total}",
+      "waiting": "Payment pending",
+      "failed": "The payment did not go through",
+      "waitingHint": "Your order is sent to the restaurant as soon as it is paid.",
+      "retry": "Try paying again",
+      "payNowShort": "Pay now",
+      "switchDelivery": "Pay on delivery",
+      "switchPickup": "Pay at pickup",
+      "cancel": "Cancel the order",
+      "cancelConfirm": "Cancel this order?",
+      "paid": "Payment received, thank you! The restaurant is preparing your order.",
+      "paidShort": "Paid online"
     }
   },
   "kpi": {
@@ -3860,5 +3971,15 @@
     "light": "Day mode",
     "dark": "Night mode",
     "switchTo": "Theme: switch to “{mode}”"
+  },
+  "payouts": {
+    "title": "Spotifood payouts",
+    "hint": "Online payments Spotifood collects for you, then pays into your bank account.",
+    "due": "to receive",
+    "collected": "Collected",
+    "fee": "Commission",
+    "split": "Paid automatically",
+    "paidOut": "Already paid",
+    "noAccount": "Add your bank details to receive your payouts:"
   }
 }

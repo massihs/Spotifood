@@ -77,6 +77,30 @@ Quand Zarinpal confirme le compte marchand de Spotifood :
 L'admin peut aussi attribuer un forfait à la main (paiement par virement, geste commercial) :
 **Admin → Restaurants → Attribuer un forfait** (avec durée et montant, facture créée).
 
+## Paiements en ligne des clients « via Spotifood » et versements
+
+Par défaut, chaque restaurant encaisse **via Spotifood** : le client paie sur le compte Zarinpal de
+Spotifood (`ZARINPAL_MERCHANT_ID`, à défaut `BILLING_ZARINPAL_MERCHANT_ID`), puis Spotifood reverse
+au restaurant. Tant qu'aucun des deux n'est renseigné, ce choix est grisé ; un restaurant peut
+toujours utiliser son propre compte Zarinpal (**Paramètres → Paiements → Mon propre compte**).
+
+- **Coordonnées bancaires** (**Paramètres → Coordonnées bancaires**, propriétaire seul) : Sheba
+  vérifié (banque reconnue), titulaire, carte en option. Chiffrées avec `APP_SECRET` — ne jamais le
+  changer, sinon elles deviennent illisibles. En clair uniquement dans **Admin → Versements**.
+  Chaque changement est journalisé et signalé à l'équipe ; l'admin voit un avertissement pendant
+  72 h après un changement (appeler le propriétaire avant de virer).
+- **Admin → Versements** : commission Spotifood (0 % par défaut, s'applique aux nouveaux
+  paiements), solde dû par restaurant, Sheba et carte à copier, « Marquer versé » (montant,
+  référence du virement) ; le restaurateur voit son solde et l'historique dans **Paiements**.
+- **Partage automatique Zarinpal (تسهیم)** : à cocher seulement après activation par Zarinpal sur
+  le compte de Spotifood. Zarinpal verse alors directement la part du restaurant (montant moins
+  commission, 99 % au plus) sur son Sheba ; le reste dû apparaît dans les soldes. Si Zarinpal
+  refuse le partage pour un paiement, le paiement passe quand même, sans partage.
+- **Commandes en ligne** (livraison / à emporter) : le client choisit « paiement en ligne » ou
+  « au retrait / à la livraison ». Une commande à payer en ligne n'est transmise à l'équipe qu'une
+  fois payée ; laissée impayée plus d'une heure, elle est annulée (stock rendu) par le passage
+  périodique de `/api/v1/cron`.
+
 ## Démo publique (/demo)
 
 Le bouton « Essayer la démo » de l'accueil place le visiteur à une table libre du restaurant de

@@ -66,7 +66,9 @@ export function NotificationBell({
 
   const label = (n: Item) => {
     const base = `types.${n.type}`;
-    const key = n.payload.place === "room" && t.has(`${base}Room`) ? `${base}Room` : base;
+    // Rooms and online orders have their own wording ("Chambre 12", "commande en ligne").
+    const place = n.payload.place === "room" ? "Room" : n.payload.place === "online" ? "Online" : "";
+    const key = place && t.has(`${base}${place}`) ? `${base}${place}` : base;
     return t.has(key)
       ? t(key, {
           number: String(n.payload.number ?? ""),
@@ -79,6 +81,8 @@ export function NotificationBell({
           partySize: String(n.payload.partySize ?? ""),
           quantity: String(n.payload.quantity ?? ""),
           unit: String(n.payload.unit ?? ""),
+          ibanLast4: String(n.payload.ibanLast4 ?? ""),
+          by: String(n.payload.by ?? ""),
           amount:
             typeof n.payload.amountCents === "number" && typeof n.payload.currency === "string"
               ? formatMoney(n.payload.amountCents, n.payload.currency, locale)

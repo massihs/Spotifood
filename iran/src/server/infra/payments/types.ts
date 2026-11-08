@@ -34,11 +34,22 @@ export type CreatePaymentInput = {
    * Null while the platform has not onboarded the restaurant.
    */
   merchantAccount: string | null;
+  /**
+   * Split settlement (Zarinpal "wages", تسهیم): parts of the amount the PSP pays straight to
+   * other bank accounts (the restaurant's share when Spotifood collects for it).
+   */
+  wages?: { iban: string; amountCents: number; description: string }[];
 };
 
 export type CreatePaymentResult =
   | { status: "succeeded"; providerRef?: string }
-  | { status: "requires_action"; redirectUrl: string; providerRef: string };
+  | {
+      status: "requires_action";
+      redirectUrl: string;
+      providerRef: string;
+      /** False when the PSP refused the split and the payment was created without it. */
+      splitApplied?: boolean;
+    };
 
 /** Normalized webhook outcome. */
 export type PaymentWebhookEvent =

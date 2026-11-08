@@ -72,16 +72,25 @@ export function SubmitButton({
   children,
   variant = "primary",
   className,
+  disabled,
 }: {
   children: ReactNode;
   variant?: ButtonVariant;
   className?: string;
+  /** Not ready to submit yet (the form shows why). */
+  disabled?: boolean;
 }) {
   const status = useFormStatus();
   const ctxPending = use(PendingContext);
   const pending = ctxPending ?? status.pending;
   return (
-    <Button type="submit" variant={variant} disabled={pending} aria-busy={pending} className={className}>
+    <Button
+      type="submit"
+      variant={variant}
+      disabled={pending || disabled}
+      aria-busy={pending}
+      className={className}
+    >
       {pending ? (
         <span
           className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"

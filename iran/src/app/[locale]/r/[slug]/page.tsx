@@ -29,6 +29,9 @@ import { defaultWishTime, slotsNear } from "@/server/modules/reservations/servic
 import { localDay } from "@/lib/period";
 import { db } from "@/server/db/client";
 import { PlaceInitials } from "@/components/ui/place-initials";
+import { JsonLd } from "@/components/site/json-ld";
+import { absoluteUrl, pageUrl } from "@/lib/site-url";
+import { env } from "@/server/env";
 
 type Props = PageProps<"/[locale]/r/[slug]">;
 
@@ -234,8 +237,48 @@ async function Place({ params }: Pick<Props, "params">) {
     </div>
   ) : null;
 
+  const base = env().APP_URL;
+  const url = pageUrl(base, locale, `/r/${place.slug}`);
+  const image = place.cover ? place.cover.lg : place.logo;
   return (
     <div data-brand={place.brandColor}>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Restaurant",
+          name: place.name,
+          url,
+          ...(place.tagline ? { description: place.tagline } : {}),
+          ...(image ? { image: absoluteUrl(base, image) } : {}),
+          ...(place.phone ? { telephone: place.phone } : {}),
+          ...(place.address || where
+            ? {
+                address: {
+                  "@type": "PostalAddress",
+                  ...(place.address ? { streetAddress: place.address } : {}),
+                  ...(where ? { addressLocality: where } : {}),
+                  addressCountry: "IR",
+                },
+              }
+            : {}),
+          ...(pos && !pos.approximate
+            ? { geo: { "@type": "GeoCoordinates", latitude: pos.lat, longitude: pos.lng } }
+            : {}),
+          ...(place.priceLevel ? { priceRange: "$".repeat(place.priceLevel) } : {}),
+          ...(place.cuisines.length ? { servesCuisine: place.cuisines } : {}),
+          ...(place.rating && place.reviewCount > 0
+            ? {
+                aggregateRating: {
+                  "@type": "AggregateRating",
+                  ratingValue: place.rating,
+                  reviewCount: place.reviewCount,
+                },
+              }
+            : {}),
+          hasMenu: url,
+          acceptsReservations: place.reservable,
+        }}
+      />
       <SiteHeader active="restaurants" />
 
       <header className="relative">

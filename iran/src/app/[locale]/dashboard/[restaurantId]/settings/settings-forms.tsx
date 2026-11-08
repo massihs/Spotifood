@@ -5,7 +5,7 @@ import { BrandPicker } from "@/components/brand-picker";
 import { MenuThemePicker } from "@/components/menu-theme-picker";
 import type { RestaurantKind } from "@/lib/restaurant-kind";
 import { useFormatter, useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ImageUp } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { IMAGE_ACCEPT, prepareImage, setInputFile } from "@/lib/prepare-image";
@@ -578,6 +578,11 @@ export type PaymentValues = {
   zarinpalMerchantId: string | null;
   /** A platform-wide Zarinpal account exists (used when the restaurant has none). */
   platformZarinpal: boolean;
+  /** "platform": Spotifood collects and pays the restaurant; "own": its own Zarinpal account. */
+  onlinePaymentCollection: "platform" | "own";
+  platformReady: boolean;
+  platformFeeBps: number;
+  hasPayoutAccount: boolean;
 };
 
 export function PaymentSettingsForm({
@@ -639,25 +644,7 @@ export function PaymentSettingsForm({
                       label={t(`payments.provider.${c}`)}
                       description={t(`settings.providerHint.${c}`)}
                     />
-                    {c === "zarinpal" ? (
-                      <div className="ps-7">
-                        <Field
-                          label={t("settings.zarinpalMerchant")}
-                          name="zarinpalMerchantId"
-                          dir="ltr"
-                          autoComplete="off"
-                          spellCheck={false}
-                          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                          defaultValue={values.zarinpalMerchantId ?? ""}
-                          error={err("zarinpalMerchantId")}
-                          hint={
-                            values.platformZarinpal
-                              ? t("settings.zarinpalMerchantHintFallback")
-                              : t("settings.zarinpalMerchantHint")
-                          }
-                        />
-                      </div>
-                    ) : null}
+                    {c === "zarinpal" ? <ZarinpalCollection values={values} err={err} /> : null}
                   </div>
                 ))
               )}
@@ -685,5 +672,82 @@ export function PaymentSettingsForm({
         </div>
       ) : null}
     </ActionForm>
+  );
+}
+
+/** How the guests' Zarinpal payments reach the restaurant: through Spotifood, or its own account. */
+function ZarinpalCollection({
+  values,
+  err,
+}: {
+  values: PaymentValues;
+  err: (field: string) => string | undefined;
+}) {
+  const t = useTranslations("settings.collect");
+  const format = useFormatter();
+  const [mode, setMode] = useState<"platform" | "own">(
+    values.platformReady ? values.onlinePaymentCollection : "own",
+  );
+  const fee = format.number(values.platformFeeBps / 10_000, { style: "percent", maximumFractionDigits: 2 });
+  const option = (value: "platform" | "own", title: string, body: ReactNode, disabled = false) => (
+    <label
+      className={cn(
+        "flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 text-sm transition-colors",
+        mode === value ? "border-accent bg-accent-soft/50" : "border-border hover:bg-surface-2",
+        disabled && "cursor-not-allowed opacity-60",
+      )}
+    >
+      <input
+        type="radio"
+        name="onlinePaymentCollection"
+        value={value}
+        checked={mode === value}
+        disabled={disabled}
+        onChange={() => setMode(value)}
+        className="mt-0.5 size-4 shrink-0 accent-[var(--accent)]"
+      />
+      <span className="min-w-0">
+        <span className="font-semibold">{title}</span>
+        <span className="mt-0.5 block text-fg-muted">{body}</span>
+      </span>
+    </label>
+  );
+  return (
+    <div className="space-y-2.5 ps-7">
+      <p className="text-sm font-medium">{t("title")}</p>
+      {option(
+        "platform",
+        t("platform"),
+        values.platformReady ? t("platformHint", { fee }) : t("platformSoon"),
+        !values.platformReady,
+      )}
+      {mode === "platform" && values.platformReady && !values.hasPayoutAccount ? (
+        <p className="rounded-xl bg-warning-soft px-3 py-2 text-sm">
+          {t("needBank")}{" "}
+          <a href="#bank" className="font-semibold underline">
+            {t("needBankLink")}
+          </a>
+        </p>
+      ) : null}
+      {option("own", t("own"), t("ownHint"))}
+      {mode === "own" ? (
+        <Field
+          label={t("merchant")}
+          name="zarinpalMerchantId"
+          dir="ltr"
+          autoComplete="off"
+          spellCheck={false}
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          defaultValue={values.zarinpalMerchantId ?? ""}
+          error={err("zarinpalMerchantId")}
+          hint={t("merchantHint")}
+        />
+      ) : (
+        <input type="hidden" name="zarinpalMerchantId" value={values.zarinpalMerchantId ?? ""} />
+      )}
+      {err("onlinePaymentCollection") ? (
+        <p className="text-sm text-danger">{err("onlinePaymentCollection")}</p>
+      ) : null}
+    </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   payments,
   refunds,
   restaurantSettings,
+  restaurants,
   sessionParticipants,
   tableSessions,
 } from "@/server/db/schema";
@@ -29,6 +30,14 @@ import {
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { isUuid, randomToken } from "@/lib/ids";
 import type { GuestContext } from "@/server/modules/guest/sessions";
+import { announceOrder } from "@/server/modules/orders/announce";
+import { notifyNewOrder } from "@/server/modules/push/service";
+import {
+  getPlatformPayments,
+  payoutIban,
+  platformMerchantId,
+  shareOf,
+} from "@/server/modules/payouts/service";
 
 /** An online checkout left unfinished for longer than this is abandoned (orders become payable again). */
 export const PENDING_TTL_MINUTES = 35;
@@ -115,6 +124,23 @@ async function releasePayment(tx: Tx, paymentId: string, status: "failed" | "can
   return updated;
 }
 
+/**
+ * Checkouts still open on an order (tab closed at the bank, back button): released so the order
+ * can be paid again, paid on site or cancelled. A late return from the bank is then not verified,
+ * and the PSP gives the money back by itself.
+ */
+export async function releaseOpenCheckouts(tx: Tx, orderId: string, reason: string) {
+  const open = await tx
+    .select({ id: payments.id })
+    .from(paymentAllocations)
+    .innerJoin(payments, eq(payments.id, paymentAllocations.paymentId))
+    .where(
+      and(eq(paymentAllocations.orderId, orderId), inArray(payments.status, ["pending", "requires_action"])),
+    );
+  for (const p of open) await releasePayment(tx, p.id, "cancelled", reason);
+  return open.length;
+}
+
 export async function emitPaymentUpdate(tx: Tx, p: typeof payments.$inferSelect) {
   await emit(tx, {
     topic: topics.restaurant(p.restaurantId),
@@ -154,6 +180,9 @@ export async function settleAllocations(tx: Tx, p: typeof payments.$inferSelect,
       status: orders.status,
       participantId: orders.participantId,
       tableId: orders.tableId,
+      tableSessionId: orders.tableSessionId,
+      number: orders.number,
+      totalCents: orders.totalCents,
     });
 
   await onOrdersPaid(
@@ -174,6 +203,8 @@ export async function settleAllocations(tx: Tx, p: typeof payments.$inferSelect,
         toStatus: "received",
         actorUserId,
       });
+      // An online order paid on the spot: the team hears of it only now.
+      if (!o.tableSessionId) await announceOrder(tx, p.restaurantId, o, "online");
     }
     await emit(tx, {
       topic: topics.restaurant(p.restaurantId),
@@ -217,12 +248,23 @@ async function notifyPayment(
       amountCents: p.amountCents,
       currency: p.currency,
       ...(await placeOf(tx, p.tableSessionId)),
+      ...(typeof p.metadata.onlineOrderId === "string"
+        ? { place: "online", number: String(p.metadata.orderNumber ?? "") }
+        : {}),
       ...extra,
     },
   });
 }
 
 // ─── Guest side ──────────────────────────────────────────────────────────────
+
+/** Whether Zarinpal can collect for this restaurant, with its own account or with Spotifood's. */
+const zarinpalReadyFor = (s: { collection: string; merchantId: string | null; hasPayoutAccount: boolean }) =>
+  s.collection === "own" ? Boolean(s.merchantId) : Boolean(platformMerchantId()) && s.hasPayoutAccount;
+
+// Spelled out: inside a one-table select drizzle leaves column names unqualified, and a bare
+// "restaurant_id" here would bind to payout_accounts' own column.
+const hasPayoutAccountSql = sql<boolean>`exists (select 1 from payout_accounts pa where pa.restaurant_id = restaurant_settings.restaurant_id)`;
 
 export async function paymentConfig(db: DbOrTx, restaurantId: string) {
   const [settings] = await db
@@ -231,12 +273,21 @@ export async function paymentConfig(db: DbOrTx, restaurantId: string) {
       enabledPaymentProviders: restaurantSettings.enabledPaymentProviders,
       requirePaymentBeforeOrder: restaurantSettings.requirePaymentBeforeOrder,
       zarinpalMerchantId: restaurantSettings.zarinpalMerchantId,
+      collection: restaurantSettings.onlinePaymentCollection,
+      hasPayoutAccount: hasPayoutAccountSql,
     })
     .from(restaurantSettings)
     .where(eq(restaurantSettings.restaurantId, restaurantId));
   const entitlements = await getEntitlements(db, restaurantId);
   const enabled = settings?.enabledPaymentProviders ?? ["cash", "on_site_terminal"];
-  const deployment = availableOnlineProviders({ zarinpalMerchantId: settings?.zarinpalMerchantId });
+  const collection: "own" | "platform" = settings?.collection === "own" ? "own" : "platform";
+  const deployment = availableOnlineProviders({
+    zarinpalReady: zarinpalReadyFor({
+      collection,
+      merchantId: settings?.zarinpalMerchantId ?? null,
+      hasPayoutAccount: Boolean(settings?.hasPayoutAccount),
+    }),
+  });
   const onlineAllowed =
     Boolean(settings?.onlinePaymentEnabled) && hasFeature(entitlements, "online_payments");
   const online = onlineAllowed
@@ -247,10 +298,51 @@ export async function paymentConfig(db: DbOrTx, restaurantId: string) {
     offline: OFFLINE_CODES.filter((c) => enabled.includes(c)) as OfflineCode[],
     payLater: enabled.includes("pay_later"),
     requirePaymentBeforeOrder: settings?.requirePaymentBeforeOrder ?? false,
-    /** Restaurant accounts at each PSP (null = platform fallback). */
-    merchantAccounts: { zarinpal: settings?.zarinpalMerchantId ?? null } as Partial<
-      Record<OnlineCode, string | null>
-    >,
+    /** Who collects the online payments: the restaurant's own account, or Spotifood for it. */
+    collection,
+    /** Account at each PSP the money lands on. */
+    merchantAccounts: {
+      zarinpal: collection === "own" ? (settings?.zarinpalMerchantId ?? null) : platformMerchantId(),
+    } as Partial<Record<OnlineCode, string | null>>,
+  };
+}
+
+/** Zarinpal refuses a split part of more than 99 % of the payment, or a tiny one. */
+const MAX_WAGE_SHARE = 0.99;
+const MIN_WAGE_CENTS = 10_000 * 100; // 10,000 rials
+
+/**
+ * How a new online payment is collected, frozen in its metadata:
+ * - on the restaurant's own account: nothing else to do;
+ * - by Spotifood for the restaurant: the commission in force, and, when split settlement is on,
+ *   the share Zarinpal pays straight to the restaurant's Sheba (the rest is paid out by hand).
+ */
+export async function collectionTerms(
+  db: DbOrTx,
+  restaurantId: string,
+  config: Awaited<ReturnType<typeof paymentConfig>>,
+  provider: OnlineCode,
+  amountCents: number,
+  label: string,
+) {
+  const merchantAccount = config.merchantAccounts[provider] ?? null;
+  if (provider !== "zarinpal" || config.collection !== "platform")
+    return { metadata: { merchantAccount, collectedBy: "restaurant" }, wages: undefined };
+  const platform = await getPlatformPayments(db);
+  let wages: { iban: string; amountCents: number; description: string }[] | undefined;
+  let splitCents = 0;
+  if (platform.split) {
+    const iban = await payoutIban(db, restaurantId);
+    const share = Math.min(shareOf(amountCents, platform.feeBps), amountCents * MAX_WAGE_SHARE);
+    const wage = Math.floor(share / 100) * 100; // whole rials
+    if (iban && wage >= MIN_WAGE_CENTS) {
+      wages = [{ iban, amountCents: wage, description: `Spotifood · ${label}` }];
+      splitCents = wage;
+    }
+  }
+  return {
+    metadata: { merchantAccount, collectedBy: "platform", feeBps: platform.feeBps, splitCents },
+    wages,
   };
 }
 
@@ -440,6 +532,15 @@ export async function startOnlinePayment(
   returnUrl.searchParams.set("payment", payment.id);
   const callbackUrl = new URL(`/api/v1/payments/return/${input.provider}`, returnUrl.origin);
   callbackUrl.searchParams.set("payment", payment.id);
+  const terms = await collectionTerms(
+    db,
+    rid,
+    config,
+    input.provider,
+    payment.amountCents,
+    `${guest.restaurant.name} · ${payment.orderNumbers.join(", ")}`,
+  );
+  payment.metadata = { ...payment.metadata, ...terms.metadata };
   try {
     const result = await provider.createPayment({
       paymentId: payment.id,
@@ -451,8 +552,13 @@ export async function startOnlinePayment(
       callbackUrl: callbackUrl.toString(),
       idempotencyKey: `create_${payment.id}`,
       merchantAccount,
+      wages: terms.wages,
     });
+    // The PSP refused the split: everything lands on Spotifood's account, paid out by hand.
+    if (result.status === "requires_action" && result.splitApplied === false)
+      payment.metadata = { ...payment.metadata, splitCents: 0 };
     if (result.status === "succeeded") {
+      await db.update(payments).set({ metadata: payment.metadata }).where(eq(payments.id, payment.id));
       await confirmPayment(db, {
         paymentId: payment.id,
         provider: input.provider,
@@ -475,6 +581,148 @@ export async function startOnlinePayment(
       cause: err instanceof Error ? err.message : "unknown",
     });
   }
+}
+
+/**
+ * Pays an online order (takeaway / delivery) right after it was placed with "pay online", or
+ * again after a failed attempt. Same steps as at the table: lock, payment + allocation, PSP,
+ * then the PSP's return confirms it and the order goes to the team.
+ */
+export async function startOnlineOrderPayment(
+  db: Database,
+  diner: { id: string },
+  slug: string,
+  orderId: string,
+  raw: z.input<typeof startOnlinePaymentSchema>,
+  opts: { returnUrl: string },
+) {
+  const input = startOnlinePaymentSchema.parse(raw);
+  if (!isUuid(orderId)) throw notFound();
+  const [found] = await db
+    .select({ order: orders, restaurantName: restaurants.name })
+    .from(orders)
+    .innerJoin(restaurants, eq(restaurants.id, orders.restaurantId))
+    .where(and(eq(orders.id, orderId), eq(orders.dinerId, diner.id), eq(restaurants.slug, slug)));
+  if (!found) throw notFound();
+  const rid = found.order.restaurantId;
+  const config = await paymentConfig(db, rid);
+  if (!config.online.includes(input.provider)) throw forbidden("online_payment_unavailable");
+  const provider = getProvider(input.provider);
+  if (!provider || provider.kind !== "online") throw forbidden("online_payment_unavailable");
+  const merchantAccount = config.merchantAccounts[input.provider] ?? null;
+
+  const [existing] = await db
+    .select()
+    .from(payments)
+    .where(and(eq(payments.restaurantId, rid), eq(payments.idempotencyKey, input.idempotencyKey)));
+  if (existing) {
+    if (existing.metadata.onlineOrderId !== orderId) throw notFound();
+    const redirectUrl = existing.metadata.redirectUrl as string | undefined;
+    if (redirectUrl && (existing.status === "pending" || existing.status === "requires_action"))
+      return { paymentId: existing.id, redirectUrl };
+    throw conflict("payment_already_processed", { status: existing.status });
+  }
+
+  const payment = await db.transaction(async (tx) => {
+    const [o] = await tx.select().from(orders).where(eq(orders.id, orderId)).for("update");
+    if (!o || o.status === "cancelled") throw conflict("order_not_awaiting_payment");
+    // A checkout left unfinished (closed tab, back button) does not block a new attempt.
+    await releaseOpenCheckouts(tx, orderId, "replaced");
+    const [fresh] = await tx.select().from(orders).where(eq(orders.id, orderId));
+    if (fresh!.paymentStatus !== "unpaid") throw conflict("nothing_to_pay");
+    const [created] = await tx
+      .insert(payments)
+      .values({
+        restaurantId: rid,
+        provider: input.provider,
+        status: "pending",
+        amountCents: fresh!.totalCents,
+        currency: fresh!.currency,
+        idempotencyKey: input.idempotencyKey,
+        metadata: { merchantAccount, onlineOrderId: orderId, orderNumber: fresh!.number },
+      })
+      .returning();
+    await tx.insert(paymentAllocations).values({
+      restaurantId: rid,
+      paymentId: created!.id,
+      orderId,
+      amountCents: fresh!.totalCents,
+    });
+    await tx.update(orders).set({ paymentStatus: "pending" }).where(eq(orders.id, orderId));
+    await recordAudit(tx, {
+      action: "payment.started",
+      actorType: "guest",
+      restaurantId: rid,
+      entityType: "payment",
+      entityId: created!.id,
+      metadata: {
+        provider: input.provider,
+        amountCents: fresh!.totalCents,
+        orders: [fresh!.number],
+        online: true,
+      },
+    });
+    return created!;
+  });
+
+  const returnUrl = new URL(opts.returnUrl);
+  returnUrl.searchParams.set("payment", payment.id);
+  const callbackUrl = new URL(`/api/v1/payments/return/${input.provider}`, returnUrl.origin);
+  callbackUrl.searchParams.set("payment", payment.id);
+  const label = `${found.restaurantName} · ${found.order.number}`;
+  const terms = await collectionTerms(db, rid, config, input.provider, payment.amountCents, label);
+  payment.metadata = { ...payment.metadata, ...terms.metadata };
+  try {
+    const result = await provider.createPayment({
+      paymentId: payment.id,
+      amountCents: payment.amountCents,
+      currency: payment.currency,
+      description: label.slice(0, 250),
+      returnUrl: returnUrl.toString(),
+      callbackUrl: callbackUrl.toString(),
+      idempotencyKey: `create_${payment.id}`,
+      merchantAccount,
+      wages: terms.wages,
+    });
+    if (result.status === "requires_action" && result.splitApplied === false)
+      payment.metadata = { ...payment.metadata, splitCents: 0 };
+    if (result.status === "succeeded") {
+      await db.update(payments).set({ metadata: payment.metadata }).where(eq(payments.id, payment.id));
+      await confirmPayment(db, {
+        paymentId: payment.id,
+        provider: input.provider,
+        providerRef: result.providerRef ?? null,
+      });
+      return { paymentId: payment.id, redirectUrl: returnUrl.toString() };
+    }
+    await db
+      .update(payments)
+      .set({
+        status: "requires_action",
+        providerRef: result.providerRef,
+        metadata: { ...payment.metadata, redirectUrl: result.redirectUrl, returnUrl: returnUrl.toString() },
+      })
+      .where(and(eq(payments.id, payment.id), eq(payments.status, "pending")));
+    return { paymentId: payment.id, redirectUrl: result.redirectUrl };
+  } catch (err) {
+    await db.transaction((tx) => releasePayment(tx, payment.id, "failed", "provider_error"));
+    throw new AppError("CONFLICT", "payment_provider_error", {
+      cause: err instanceof Error ? err.message : "unknown",
+    });
+  }
+}
+
+/** The latest payment of an online order (tracking page after the PSP). */
+export async function onlineOrderPayment(db: DbOrTx, orderId: string) {
+  if (!isUuid(orderId)) return null;
+  const [p] = await db
+    .select({ id: payments.id, status: payments.status, provider: payments.provider })
+    .from(paymentAllocations)
+    .innerJoin(payments, eq(payments.id, paymentAllocations.paymentId))
+    .where(eq(paymentAllocations.orderId, orderId))
+    .orderBy(desc(payments.createdAt))
+    .limit(1);
+  return p ?? null;
 }
 
 /** The guest gives up on a checkout in progress: their orders become payable again. */
@@ -543,6 +791,34 @@ export async function confirmPayment(
   },
 ) {
   if (!isUuid(input.paymentId)) throw notFound();
+  const result = await applyPayment(db, input);
+  // Online order now paid: the phones of the team ring, as for any new order.
+  const m = result.payment.metadata;
+  if (result.applied && typeof m.onlineOrderId === "string") {
+    const [r] = await db
+      .select({ defaultLocale: restaurants.defaultLocale })
+      .from(restaurants)
+      .where(eq(restaurants.id, result.payment.restaurantId));
+    if (r)
+      notifyNewOrder(
+        db,
+        { id: result.payment.restaurantId, defaultLocale: r.defaultLocale },
+        { id: m.onlineOrderId, number: String(m.orderNumber ?? ""), tableLabel: null },
+      );
+  }
+  return result;
+}
+
+async function applyPayment(
+  db: Database,
+  input: {
+    paymentId: string;
+    provider: string;
+    providerRef: string | null;
+    amountCents?: number;
+    extra?: Record<string, string>;
+  },
+) {
   return db.transaction(async (tx) => {
     const [current] = await tx.select().from(payments).where(eq(payments.id, input.paymentId)).for("update");
     if (!current || current.provider !== input.provider) throw notFound();
@@ -1096,6 +1372,8 @@ export const paymentSettingsSchema = z.object({
   /** Providers the restaurant accepts. Unknown codes are rejected. */
   enabledPaymentProviders: z.array(z.enum(["cash", "on_site_terminal", "pay_later", ...ONLINE_CODES])).max(8),
   requirePaymentBeforeOrder: z.boolean(),
+  /** "platform": Spotifood collects and pays the restaurant; "own": its own Zarinpal account. */
+  onlinePaymentCollection: z.enum(["platform", "own"]).optional(),
   /** Zarinpal merchant ids are UUIDs (36 characters), shown in the Zarinpal panel. */
   zarinpalMerchantId: z
     .string()
@@ -1121,18 +1399,26 @@ export async function getPaymentSettingsView(db: Database, ctx: RestaurantContex
       enabledPaymentProviders: restaurantSettings.enabledPaymentProviders,
       requirePaymentBeforeOrder: restaurantSettings.requirePaymentBeforeOrder,
       zarinpalMerchantId: restaurantSettings.zarinpalMerchantId,
+      onlinePaymentCollection: restaurantSettings.onlinePaymentCollection,
+      hasPayoutAccount: hasPayoutAccountSql,
     })
     .from(restaurantSettings)
     .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
   const entitlements = await getEntitlements(db, ctx.restaurant.id);
+  const platform = await getPlatformPayments(db);
   return {
     ...settings!,
+    onlinePaymentCollection: (settings!.onlinePaymentCollection === "own" ? "own" : "platform") as
+      "own" | "platform",
+    /** Spotifood can collect for restaurants on this deployment (its merchant is configured). */
+    platformReady: Boolean(platformMerchantId()),
+    platformFeeBps: platform.feeBps,
     planAllowsOnline: hasFeature(entitlements, "online_payments"),
     // Zarinpal is listed even before a merchant id is entered: the form asks for it.
     availableOnline: offerableOnlineProviders().filter((c): c is OnlineCode =>
       (ONLINE_CODES as readonly string[]).includes(c),
     ),
-    platformZarinpal: Boolean(process.env.ZARINPAL_MERCHANT_ID),
+    platformZarinpal: Boolean(platformMerchantId()),
   };
 }
 
@@ -1144,13 +1430,35 @@ export async function updatePaymentSettings(
   assertCan(ctx, "restaurant.manage");
   const input = paymentSettingsSchema.parse(raw);
   const providers = [...new Set(input.enabledPaymentProviders)];
+  const [current] = await db
+    .select({
+      collection: restaurantSettings.onlinePaymentCollection,
+      merchantId: restaurantSettings.zarinpalMerchantId,
+      hasPayoutAccount: hasPayoutAccountSql,
+    })
+    .from(restaurantSettings)
+    .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
+  // What the form did not send (online payments switched off) keeps its saved value.
+  const merchantId =
+    input.zarinpalMerchantId !== undefined ? input.zarinpalMerchantId : (current?.merchantId ?? null);
+  const chosen = input.onlinePaymentCollection ?? (current?.collection === "own" ? "own" : "platform");
   if (input.onlinePaymentEnabled) {
     const entitlements = await getEntitlements(db, ctx.restaurant.id);
     if (!hasFeature(entitlements, "online_payments"))
       throw new AppError("PLAN_LIMIT", "plan_feature_online_payments");
-    const deployment = availableOnlineProviders({ zarinpalMerchantId: input.zarinpalMerchantId });
-    if (providers.includes("zarinpal") && !deployment.includes("zarinpal"))
-      throw validation("zarinpal_merchant_required", { field: "zarinpalMerchantId" });
+    const deployment = availableOnlineProviders({
+      zarinpalReady: zarinpalReadyFor({
+        collection: chosen,
+        merchantId,
+        hasPayoutAccount: Boolean(current?.hasPayoutAccount),
+      }),
+    });
+    if (providers.includes("zarinpal") && !deployment.includes("zarinpal")) {
+      if (chosen === "own") throw validation("zarinpal_merchant_required", { field: "zarinpalMerchantId" });
+      if (!platformMerchantId())
+        throw validation("platform_payments_unavailable", { field: "onlinePaymentCollection" });
+      throw validation("payout_account_required", { field: "onlinePaymentCollection" });
+    }
     if (
       !providers.some(
         (c) => (ONLINE_CODES as readonly string[]).includes(c) && deployment.includes(c as OnlineCode),
@@ -1161,17 +1469,19 @@ export async function updatePaymentSettings(
   const canBePaid =
     input.onlinePaymentEnabled || providers.some((c) => (OFFLINE_CODES as readonly string[]).includes(c));
   if (!canBePaid) throw validation("payment_method_required");
+  // "Own account" means nothing without a merchant id: Spotifood's account stays the default.
+  const collection = chosen === "own" && !merchantId ? "platform" : chosen;
   return db.transaction(async (tx) => {
     const [updated] = await tx
       .update(restaurantSettings)
-      .set({ ...input, enabledPaymentProviders: providers })
+      .set({ ...input, onlinePaymentCollection: collection, enabledPaymentProviders: providers })
       .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id))
       .returning();
     await recordAudit(tx, {
       action: "restaurant.payment_settings_updated",
       actorUserId: ctx.user.id,
       restaurantId: ctx.restaurant.id,
-      metadata: { ...input, enabledPaymentProviders: providers },
+      metadata: { ...input, onlinePaymentCollection: collection, enabledPaymentProviders: providers },
     });
     return updated!;
   });

@@ -119,7 +119,18 @@ export const CLIENT_NAMESPACES = {
     "theme",
     "waiter",
   ],
-  admin: ["common", "errorCodes", "errors", "music", "nav", "orders", "payments", "theme"],
+  admin: [
+    "admin",
+    "common",
+    "errorCodes",
+    "errors",
+    "feedback",
+    "music",
+    "nav",
+    "orders",
+    "payments",
+    "theme",
+  ],
 } as const satisfies Record<string, readonly string[]>;
 
 export type ClientArea = keyof typeof CLIENT_NAMESPACES;

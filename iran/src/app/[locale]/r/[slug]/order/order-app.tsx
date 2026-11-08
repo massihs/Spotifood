@@ -14,7 +14,7 @@ import { forChannel } from "@/lib/channel-price";
 import { cn } from "@/lib/cn";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
 import { priceLine } from "@/server/modules/pricing";
-import { placeKioskOrderAction, placeOnlineOrderAction } from "./actions";
+import { payOnlineOrderAction, placeKioskOrderAction, placeOnlineOrderAction } from "./actions";
 
 type Channel = "dine_in" | "takeaway" | "delivery";
 type Line = { key: string; productId: string; optionValueIds: string[]; quantity: number; note: string };
@@ -34,7 +34,13 @@ export function OrderApp({
   hasPhone,
   defaultName,
   kioskToken,
+  paymentProvider = null,
+  payOnSite = true,
 }: {
+  /** Online PSP the restaurant takes (null: pay at pickup / on delivery only). */
+  paymentProvider?: string | null;
+  /** Paying at pickup / on delivery is allowed. */
+  payOnSite?: boolean;
   /** Kiosk mode: eat in / take away, no sign-in, the order number shown big, then a new customer. */
   kioskToken?: string;
   slug: string;
@@ -54,6 +60,8 @@ export function OrderApp({
   const money = useMoney(currency);
   const kiosk = Boolean(kioskToken);
   const [channel, setChannel] = useState<Channel>(kiosk ? "dine_in" : takeaway ? "takeaway" : "delivery");
+  const canPayOnline = !kiosk && Boolean(paymentProvider);
+  const [payment, setPayment] = useState<"online" | "on_site">(canPayOnline ? "online" : "on_site");
   const [phone, setPhone] = useState("");
   const [placed, setPlaced] = useState<string | null>(null);
   const [lines, setLines] = useState<Line[]>([]);
@@ -165,10 +173,25 @@ export function OrderApp({
         deliveryZoneId: channel === "delivery" ? zoneId || null : null,
         note,
         couponCode: coupon,
+        payment: canPayOnline ? payment : "on_site",
       });
       if (res?.ok && res.data) {
         setLines([]);
-        router.push(getPathname({ href: `/r/${slug}/o/${res.data.orderId}`, locale }));
+        const track = getPathname({ href: `/r/${slug}/o/${res.data.orderId}`, locale });
+        if (canPayOnline && payment === "online") {
+          // Straight to the bank's page; if that fails, the order page offers to pay again.
+          const pay = await payOnlineOrderAction(
+            slug,
+            res.data.orderId,
+            paymentProvider!,
+            crypto.randomUUID(),
+          );
+          if (pay?.ok && pay.data?.redirectUrl) {
+            window.location.assign(pay.data.redirectUrl);
+            return;
+          }
+        }
+        router.push(track);
         return;
       }
       const code = res?.ok === false ? res.error : "internal";
@@ -441,14 +464,52 @@ export function OrderApp({
                     <dt>{t("total")}</dt>
                     <dd className="tabular-nums">{money(subtotal + fee)}</dd>
                   </div>
-                  <p className="pt-1 text-xs text-fg-muted">
-                    {kiosk
-                      ? t("payAtCounter")
-                      : channel === "delivery"
-                        ? t("payOnDelivery")
-                        : t("payAtPickup")}
-                  </p>
+                  {!canPayOnline ? (
+                    <p className="pt-1 text-xs text-fg-muted">
+                      {kiosk
+                        ? t("payAtCounter")
+                        : channel === "delivery"
+                          ? t("payOnDelivery")
+                          : t("payAtPickup")}
+                    </p>
+                  ) : null}
                 </dl>
+                {canPayOnline ? (
+                  <fieldset className="grid gap-2" aria-label={t("payment.title")}>
+                    <legend className="mb-1 text-sm font-semibold">{t("payment.title")}</legend>
+                    {(["online", "on_site"] as const)
+                      .filter((m) => m === "online" || payOnSite)
+                      .map((m) => (
+                        <label
+                          key={m}
+                          className={cn(
+                            "flex cursor-pointer items-center gap-3 rounded-2xl border p-3.5 text-sm transition-colors",
+                            payment === m ? "border-accent bg-accent-soft/50" : "border-border bg-surface",
+                          )}
+                        >
+                          <input
+                            type="radio"
+                            name="payment"
+                            checked={payment === m}
+                            onChange={() => setPayment(m)}
+                            className="size-4 accent-[var(--accent)]"
+                          />
+                          <span className="min-w-0">
+                            <span className="block font-semibold">
+                              {m === "online"
+                                ? t("payment.online")
+                                : channel === "delivery"
+                                  ? t("payment.switchDelivery")
+                                  : t("payment.switchPickup")}
+                            </span>
+                            {m === "online" ? (
+                              <span className="block text-xs text-fg-muted">{t("payment.onlineHint")}</span>
+                            ) : null}
+                          </span>
+                        </label>
+                      ))}
+                  </fieldset>
+                ) : null}
                 {belowMin ? (
                   <p className="text-sm text-danger">
                     {t("belowMin", { amount: money(zone!.minOrderCents) })}
@@ -471,7 +532,9 @@ export function OrderApp({
                   }
                   onClick={place}
                 >
-                  {t("place", { total: money(subtotal + fee) })}
+                  {canPayOnline && payment === "online"
+                    ? t("payment.payNow", { total: money(subtotal + fee) })
+                    : t("place", { total: money(subtotal + fee) })}
                 </Button>
               </div>
             )}

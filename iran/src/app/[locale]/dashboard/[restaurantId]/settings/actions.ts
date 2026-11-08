@@ -33,6 +33,7 @@ import {
 } from "@/server/modules/restaurants/settings";
 import type { AppLocale } from "@/i18n/config";
 import { updatePaymentSettings } from "@/server/modules/payments/service";
+import { removePayoutAccount, savePayoutAccount } from "@/server/modules/payouts/service";
 import {
   deletePrinter,
   newAgentToken,
@@ -156,8 +157,36 @@ export async function updatePaymentSettingsAction(restaurantId: string, _prev: u
       onlinePaymentEnabled: fd.get("onlinePaymentEnabled") === "on",
       enabledPaymentProviders: fd.getAll("providers").map(String) as "cash"[],
       requirePaymentBeforeOrder: fd.get("requirePaymentBeforeOrder") === "on",
+      // Absent while online payments are switched off: the saved choice is kept.
+      onlinePaymentCollection: fd.has("onlinePaymentCollection")
+        ? fd.get("onlinePaymentCollection") === "own"
+          ? "own"
+          : "platform"
+        : undefined,
       zarinpalMerchantId: fd.has("zarinpalMerchantId") ? String(fd.get("zarinpalMerchantId")) : undefined,
     });
+    refresh();
+  });
+}
+
+/** Bank account for Spotifood's payouts: the owner only (checked again in the service). */
+export async function savePayoutAccountAction(restaurantId: string, _prev: unknown, fd: FormData) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    await enforceRateLimit("payoutAccount", ctx.user.id);
+    await savePayoutAccount(db, ctx, {
+      holderName: str(fd, "holderName"),
+      iban: str(fd, "iban"),
+      card: str(fd, "card"),
+    });
+    refresh();
+  });
+}
+
+export async function removePayoutAccountAction(restaurantId: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(restaurantId, "restaurant.manage");
+    await removePayoutAccount(db, ctx);
     refresh();
   });
 }

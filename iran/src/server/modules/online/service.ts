@@ -1,5 +1,4 @@
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
-import { notifyTeam } from "@/server/modules/team/sections";
+import { and, asc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
 import {
@@ -10,7 +9,6 @@ import {
   restaurantSettings,
   restaurants,
 } from "@/server/db/schema";
-import { emit, topics } from "@/server/infra/realtime";
 import { AppError, conflict, forbidden, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { taxFromGross, taxFromNet } from "@/lib/money";
@@ -26,14 +24,32 @@ import { commitDiscounts, computeDiscounts, linkOrderCustomer } from "@/server/m
 import { getZone, rememberAddress } from "@/server/modules/delivery/service";
 import { recordAudit } from "@/server/audit";
 import { notifyNewOrder } from "@/server/modules/push/service";
+import { onOrderCancelled } from "@/server/modules/customers/service";
+import { paymentConfig, releaseOpenCheckouts } from "@/server/modules/payments/service";
+import { announceOrder } from "@/server/modules/orders/announce";
 
 /**
  * Online ordering (Z-6): /r/{slug}/order, a link for the Instagram bio. Takeaway or delivery,
- * paid at pickup or on delivery. The guest signs in with their mobile (SMS code) first: a
- * verified phone on every order, and the restaurant can call back. The order lands in
- * "received" like a QR order, for the team to accept.
+ * paid online (Zarinpal) or at pickup / on delivery. The guest signs in with their mobile (SMS
+ * code) first: a verified phone on every order, and the restaurant can call back.
+ * Paid on site: the order lands in "received" like a QR order, for the team to accept.
+ * Paid online: it waits in "pending_payment", unseen by the team, until the payment succeeds.
  */
 export const MAX_OPEN_ONLINE_ORDERS = 2;
+/** An order left unpaid online for longer than this is cancelled (the guest gave up). */
+export const UNPAID_ONLINE_TTL_MINUTES = 60;
+
+/** How the guests of this restaurant may pay their online orders. */
+export async function onlinePaymentChoices(db: DbOrTx, restaurantId: string) {
+  const config = await paymentConfig(db, restaurantId);
+  const provider = config.online[0] ?? null;
+  return {
+    /** The online PSP to use, if the restaurant takes online payments. */
+    provider,
+    /** Paying at pickup / on delivery stays possible. */
+    onSite: config.offline.length > 0 && !(config.requirePaymentBeforeOrder && provider),
+  };
+}
 
 export type OnlineDiner = { id: string; phone: string | null; name?: string | null };
 
@@ -83,6 +99,7 @@ export async function getOnlineStore(db: Database, slug: string) {
         )
         .orderBy(asc(deliveryZones.sortOrder), asc(deliveryZones.name))
     : [];
+  const pay = await onlinePaymentChoices(db, s.id);
   return {
     id: s.id,
     name: s.name,
@@ -94,6 +111,7 @@ export async function getOnlineStore(db: Database, slug: string) {
     takeaway: s.takeaway,
     delivery: s.delivery && zones.length > 0,
     zones,
+    payment: { provider: pay.provider, onSite: pay.onSite || !pay.provider },
   };
 }
 
@@ -115,6 +133,8 @@ export const onlineOrderSchema = z.object({
   deliveryZoneId: z.uuid().nullable().optional(),
   note: z.string().trim().max(500).default(""),
   couponCode: z.string().trim().max(32).default(""),
+  /** "online": paid by card right away (Zarinpal); "on_site": at pickup / on delivery. */
+  payment: z.enum(["online", "on_site"]).default("on_site"),
 });
 
 export async function placeOnlineOrder(db: Database, diner: OnlineDiner, slug: string, raw: unknown) {
@@ -129,7 +149,17 @@ export async function placeOnlineOrder(db: Database, diner: OnlineDiner, slug: s
       throw new AppError("VALIDATION", "address_required", { field: "address" });
     if (!input.deliveryZoneId) throw new AppError("VALIDATION", "zone_required", { field: "zone" });
   }
-  return insertGuestOrder(db, store, input, { dinerId: diner.id, phone: diner.phone, source: "online" });
+  const pay = await onlinePaymentChoices(db, store.id);
+  if (input.payment === "online" && !pay.provider) throw forbidden("online_payment_unavailable");
+  if (input.payment === "on_site" && pay.provider && !pay.onSite)
+    throw new AppError("VALIDATION", "online_payment_required", { field: "payment" });
+  await cancelAbandonedOnlineOrders(db, { restaurantId: store.id, dinerId: diner.id });
+  return insertGuestOrder(db, store, input, {
+    dinerId: diner.id,
+    phone: diner.phone,
+    source: "online",
+    awaitPayment: input.payment === "online",
+  });
 }
 
 type Store = NonNullable<Awaited<ReturnType<typeof storeBySlug>>>;
@@ -142,7 +172,13 @@ async function insertGuestOrder(
   db: Database,
   store: Store,
   input: GuestOrderInput,
-  who: { dinerId: string | null; phone: string | null; source: "online" | "kiosk" },
+  who: {
+    dinerId: string | null;
+    phone: string | null;
+    source: "online" | "kiosk";
+    /** Paid online: kept from the team until the payment succeeds. */
+    awaitPayment?: boolean;
+  },
 ) {
   const rid = store.id;
   const phone = who.phone;
@@ -221,7 +257,7 @@ async function insertGuestOrder(
         number,
         seq,
         channel: input.channel,
-        status: "received",
+        status: who.awaitPayment ? "pending_payment" : "received",
         paymentStatus: "unpaid",
         currency: store.currency,
         subtotalCents: totals.subtotalCents,
@@ -269,7 +305,7 @@ async function insertGuestOrder(
       restaurantId: rid,
       orderId: order!.id,
       fromStatus: null,
-      toStatus: "received",
+      toStatus: order!.status,
       actorUserId: null,
     });
     await applyOrderToStock(tx, rid, order!.id, -1);
@@ -284,35 +320,137 @@ async function insertGuestOrder(
       null,
     );
 
-    const sections = await notifyTeam(
-      tx,
-      {
-        restaurantId: rid,
-        type: "order.created",
-        payload: { orderId: order!.id, number, tableLabel: null, totalCents, source: who.source },
-      },
-      { orderId: order!.id },
-    );
-    await emit(tx, {
-      topic: topics.restaurant(rid),
-      type: "order.created",
-      data: {
-        orderId: order!.id,
-        number,
-        tableId: null,
-        tableLabel: "",
-        source: who.source,
-        ...(sections ? { sections } : {}),
-      },
-    });
+    if (!who.awaitPayment) await announceOrder(tx, rid, order!, who.source);
     return order!;
+  });
+  if (!who.awaitPayment)
+    notifyNewOrder(
+      db,
+      { id: store.id, defaultLocale: store.defaultLocale },
+      { id: placed.id, number: placed.number, tableLabel: null },
+    );
+  return placed;
+}
+
+/** The guest's own order still waiting for its online payment (locked for the change). */
+async function unpaidOrderOf(tx: DbOrTx, dinerId: string, slug: string, orderId: string) {
+  if (!isUuid(orderId)) throw notFound();
+  const [row] = await tx
+    .select({ order: orders, defaultLocale: restaurants.defaultLocale })
+    .from(orders)
+    .innerJoin(restaurants, eq(restaurants.id, orders.restaurantId))
+    .where(and(eq(orders.id, orderId), eq(orders.dinerId, dinerId), eq(restaurants.slug, slug)))
+    .for("update", { of: orders });
+  if (!row) throw notFound();
+  if (row.order.status !== "pending_payment" || !["unpaid", "pending"].includes(row.order.paymentStatus))
+    throw conflict("order_not_awaiting_payment");
+  // A checkout left open at the bank no longer holds the order.
+  if (row.order.paymentStatus === "pending") await releaseOpenCheckouts(tx, row.order.id, "replaced");
+  return row;
+}
+
+/** The guest pays at pickup / on delivery after all: the order goes to the team as usual. */
+export async function payOnlineOrderOnSite(db: Database, diner: OnlineDiner, slug: string, orderId: string) {
+  const placed = await db.transaction(async (tx) => {
+    const { order, defaultLocale } = await unpaidOrderOf(tx, diner.id, slug, orderId);
+    const pay = await onlinePaymentChoices(tx, order.restaurantId);
+    if (!pay.onSite) throw new AppError("VALIDATION", "online_payment_required", { field: "payment" });
+    await tx.update(orders).set({ status: "received" }).where(eq(orders.id, order.id));
+    await tx.insert(orderStatusEvents).values({
+      restaurantId: order.restaurantId,
+      orderId: order.id,
+      fromStatus: "pending_payment",
+      toStatus: "received",
+      actorUserId: null,
+    });
+    await announceOrder(tx, order.restaurantId, order, "online");
+    return { order, defaultLocale };
   });
   notifyNewOrder(
     db,
-    { id: store.id, defaultLocale: store.defaultLocale },
-    { id: placed.id, number: placed.number, tableLabel: null },
+    { id: placed.order.restaurantId, defaultLocale: placed.defaultLocale },
+    { id: placed.order.id, number: placed.order.number, tableLabel: null },
   );
-  return placed;
+}
+
+/** The guest gives up before paying: stock and coupon are given back. */
+export async function cancelUnpaidOnlineOrder(
+  db: Database,
+  diner: OnlineDiner,
+  slug: string,
+  orderId: string,
+) {
+  await db.transaction(async (tx) => {
+    const { order } = await unpaidOrderOf(tx, diner.id, slug, orderId);
+    await cancelUnpaid(tx, order.restaurantId, order.id, "guest_cancelled");
+  });
+}
+
+async function cancelUnpaid(tx: DbOrTx, restaurantId: string, orderId: string, reason: string) {
+  await tx.update(orders).set({ status: "cancelled" }).where(eq(orders.id, orderId));
+  await tx.insert(orderStatusEvents).values({
+    restaurantId,
+    orderId,
+    fromStatus: "pending_payment",
+    toStatus: "cancelled",
+    actorUserId: null,
+  });
+  await applyOrderToStock(tx, restaurantId, orderId, 1);
+  await onOrderCancelled(tx, restaurantId, orderId);
+  await recordAudit(tx, {
+    action: "order.cancelled",
+    actorType: "guest",
+    restaurantId,
+    entityType: "order",
+    entityId: orderId,
+    metadata: { from: "pending_payment", reason },
+  });
+}
+
+/**
+ * Online orders left unpaid for too long (no checkout started recently either) are cancelled and
+ * their stock given back: for one guest before they order again, and for everyone by the periodic
+ * sweep (/api/v1/cron), so a guest who never comes back does not hold stock forever.
+ */
+export async function cancelAbandonedOnlineOrders(
+  db: Database,
+  scope?: { restaurantId: string; dinerId: string },
+) {
+  const cutoff = new Date(Date.now() - UNPAID_ONLINE_TTL_MINUTES * 60_000);
+  const stale = await db
+    .select({ id: orders.id, restaurantId: orders.restaurantId })
+    .from(orders)
+    .where(
+      and(
+        scope ? eq(orders.restaurantId, scope.restaurantId) : undefined,
+        scope ? eq(orders.dinerId, scope.dinerId) : undefined,
+        eq(orders.status, "pending_payment"),
+        inArray(orders.paymentStatus, ["unpaid", "pending"]),
+        lt(orders.createdAt, cutoff),
+        // Raw names: the correlated subquery must point at this row of "orders".
+        sql`not exists (select 1 from payment_allocations pa join payments p on p.id = pa.payment_id
+          where pa.order_id = "orders"."id" and p.status in ('pending', 'requires_action')
+          and p.created_at > ${cutoff})`,
+      ),
+    )
+    .limit(200);
+  let cancelled = 0;
+  for (const o of stale) {
+    const done = await db.transaction(async (tx) => {
+      // Checked again under lock: the payment may have just been confirmed.
+      const [cur] = await tx
+        .select({ status: orders.status, paymentStatus: orders.paymentStatus })
+        .from(orders)
+        .where(eq(orders.id, o.id))
+        .for("update");
+      if (cur?.status !== "pending_payment" || cur.paymentStatus === "paid") return false;
+      await releaseOpenCheckouts(tx, o.id, "expired");
+      await cancelUnpaid(tx, o.restaurantId, o.id, "payment_abandoned");
+      return true;
+    });
+    if (done) cancelled++;
+  }
+  return cancelled;
 }
 
 /** The guest's own order, for the tracking page. */

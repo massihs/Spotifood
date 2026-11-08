@@ -49,6 +49,8 @@ async function Online({ params }: Pick<Props, "params">) {
           signedIn={Boolean(diner)}
           hasPhone={Boolean(diner?.phone)}
           defaultName={diner?.name ?? ""}
+          paymentProvider={store.payment.provider}
+          payOnSite={store.payment.onSite}
         />
       </main>
     </div>

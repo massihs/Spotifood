@@ -43,6 +43,9 @@ import { getPathname, Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { getDirectory } from "@/server/modules/directory/cache";
 import { PlaceInitials } from "@/components/ui/place-initials";
+import { JsonLd } from "@/components/site/json-ld";
+import { pageUrl } from "@/lib/site-url";
+import { env } from "@/server/env";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -100,6 +103,9 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
 
   return (
     <div className="min-h-dvh bg-bg">
+      <Suspense fallback={null}>
+        <SiteJsonLd locale={locale} description={t("metaDescription")} />
+      </Suspense>
       <SiteHeader home />
 
       <main>
@@ -737,5 +743,31 @@ function PhoneMock({
         </div>
       </div>
     </div>
+  );
+}
+
+/** Structured data with the real site address, read per request (never the build machine's). */
+async function SiteJsonLd({ locale, description }: { locale: string; description: string }) {
+  await connection();
+  const base = env().APP_URL.replace(/\/$/, "");
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "Spotifood",
+        url: pageUrl(base, locale),
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web, Windows, macOS, Android, iOS",
+        description,
+        inLanguage: locale,
+        publisher: {
+          "@type": "Organization",
+          name: "Spotifood",
+          url: base,
+          logo: `${base}/icons/icon-512.png`,
+        },
+      }}
+    />
   );
 }

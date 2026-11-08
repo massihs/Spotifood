@@ -19,6 +19,10 @@ const { placeOrder } = await import("@/server/modules/orders/service");
 const { getGuestPaymentState, handlePaymentReturn, newIdempotencyKey, startOnlinePayment } =
   await import("@/server/modules/payments/service");
 const { createOwnerWithRestaurant } = await import("../helpers/factories");
+const { savePayoutAccount } = await import("@/server/modules/payouts/service");
+
+/** A valid Sheba number (Bank Mellat), check digits computed for the test. */
+export const TEST_IBAN = "IR150120000000004567891234";
 
 const RETURN = "http://localhost:3000/table/orders";
 type Call = { url: string; body: Record<string, unknown> };
@@ -56,6 +60,8 @@ async function setup() {
     .update(restaurantSettings)
     .set({ onlinePaymentEnabled: true, enabledPaymentProviders: ["cash", "zarinpal"] })
     .where(eq(restaurantSettings.restaurantId, owner.restaurant.id));
+  // Collected by Spotifood (the default): the restaurant needs an account to be paid on.
+  await savePayoutAccount(db, owner.ctx, { holderName: "رستوران تست", iban: TEST_IBAN });
   const table = await createTable(db, owner.ctx, { label: "۷" });
   const cat = await createCategory(db, owner.ctx, { name: "غذای اصلی" });
   // 4,500,000 rials (450,000 toman): 450,000,000 minor units per dish.
@@ -175,7 +181,7 @@ describe("Zarinpal merchant per restaurant", () => {
     const { owner, guest, kabab } = await setup();
     await db
       .update(restaurantSettings)
-      .set({ zarinpalMerchantId: RESTO_MERCHANT })
+      .set({ zarinpalMerchantId: RESTO_MERCHANT, onlinePaymentCollection: "own" })
       .where(eq(restaurantSettings.restaurantId, owner.restaurant.id));
     await addToCart(db, guest, { productId: kabab.id, optionValueIds: [], quantity: 1 });
     await placeOrder(db, guest);
@@ -209,7 +215,13 @@ describe("Zarinpal merchant per restaurant", () => {
         onlinePaymentEnabled: true,
         enabledPaymentProviders: ["cash", "zarinpal"] as "cash"[],
         requirePaymentBeforeOrder: false,
+        onlinePaymentCollection: "own" as const,
       };
+      // Without Spotifood's account, collecting through it is impossible…
+      await expect(
+        updatePaymentSettings(db, owner.ctx, { ...base, onlinePaymentCollection: "platform" }),
+      ).rejects.toMatchObject({ message: "platform_payments_unavailable" });
+      // …and the restaurant's own account needs its merchant id.
       await expect(updatePaymentSettings(db, owner.ctx, base)).rejects.toMatchObject({
         message: "zarinpal_merchant_required",
       });
@@ -224,5 +236,31 @@ describe("Zarinpal merchant per restaurant", () => {
     } finally {
       process.env.ZARINPAL_MERCHANT_ID = saved;
     }
+  });
+
+  it("keeps the collection choice while online payments are off", async () => {
+    const { updatePaymentSettings } = await import("@/server/modules/payments/service");
+    const { owner } = await setup();
+    const base = {
+      enabledPaymentProviders: ["cash", "zarinpal"] as "cash"[],
+      requirePaymentBeforeOrder: false,
+    };
+    await updatePaymentSettings(db, owner.ctx, {
+      ...base,
+      onlinePaymentEnabled: true,
+      onlinePaymentCollection: "own",
+      zarinpalMerchantId: RESTO_MERCHANT,
+    });
+    // With the online toggle off the form sends neither field: both stay as saved.
+    const off = await updatePaymentSettings(db, owner.ctx, { ...base, onlinePaymentEnabled: false });
+    expect(off).toMatchObject({ onlinePaymentCollection: "own", zarinpalMerchantId: RESTO_MERCHANT });
+    // "Own account" without a merchant id falls back to Spotifood's account.
+    const cleared = await updatePaymentSettings(db, owner.ctx, {
+      ...base,
+      onlinePaymentEnabled: false,
+      onlinePaymentCollection: "own",
+      zarinpalMerchantId: "",
+    });
+    expect(cleared).toMatchObject({ onlinePaymentCollection: "platform", zarinpalMerchantId: null });
   });
 });

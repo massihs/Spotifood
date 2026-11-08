@@ -10,7 +10,9 @@ import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { getCurrentDiner } from "@/server/auth/diner";
 import { db } from "@/server/db/client";
-import { getOnlineOrder } from "@/server/modules/online/service";
+import { getOnlineOrder, onlinePaymentChoices } from "@/server/modules/online/service";
+import { onlineOrderPayment } from "@/server/modules/payments/service";
+import { UnpaidPanel } from "./pay-panel";
 import { PushButton } from "@/components/push/push-button";
 import { vapidPublicKey } from "@/server/modules/push/service";
 
@@ -34,8 +36,14 @@ async function Status({ params }: Pick<Props, "params">) {
   if (!diner) notFound();
   const found = await getOnlineOrder(db, diner.id, slug, orderId);
   if (!found) notFound();
-  const [t, locale] = await Promise.all([getTranslations("online"), getLocale()]);
   const o = found.order;
+  const [t, locale, latest, choices] = await Promise.all([
+    getTranslations("online"),
+    getLocale(),
+    onlineOrderPayment(db, o.id),
+    onlinePaymentChoices(db, o.restaurantId),
+  ]);
+  const awaitingPayment = o.status === "pending_payment" && o.paymentStatus !== "paid";
   const money = (c: number) => formatMoney(c, o.currency, locale);
   const done = o.status === "served" || o.status === "cancelled";
   const at = STEPS.indexOf(o.status as (typeof STEPS)[number]);
@@ -48,6 +56,22 @@ async function Status({ params }: Pick<Props, "params">) {
         title={t("statusTitle", { number: o.number })}
       />
       <main className="relative mx-auto -mt-8 max-w-md space-y-4 rounded-t-3xl bg-bg px-4 pt-6 pb-12">
+        {awaitingPayment ? (
+          <UnpaidPanel
+            slug={slug}
+            orderId={o.id}
+            provider={choices.provider}
+            onSite={choices.onSite || !choices.provider}
+            failed={latest?.status === "failed" || latest?.status === "cancelled"}
+            delivery={o.channel === "delivery"}
+          />
+        ) : null}
+        {o.paymentStatus === "paid" && latest?.status === "succeeded" ? (
+          <p className="flex items-center gap-2 rounded-2xl bg-success-soft p-4 font-semibold text-success">
+            <Check className="size-5" strokeWidth={3} aria-hidden="true" />
+            {t("payment.paid")}
+          </p>
+        ) : null}
         {o.status === "cancelled" ? (
           <p className="rounded-2xl bg-danger-soft p-4 text-center font-semibold text-danger">
             {t("cancelled")}
@@ -109,7 +133,13 @@ async function Status({ params }: Pick<Props, "params">) {
             <span className="tabular-nums">{money(o.totalCents)}</span>
           </p>
           <p className="mt-1 text-xs text-fg-muted">
-            {o.channel === "delivery" ? t("payOnDelivery") : t("payAtPickup")}
+            {o.paymentStatus === "paid"
+              ? t("payment.paidShort")
+              : awaitingPayment
+                ? t("payment.waiting")
+                : o.channel === "delivery"
+                  ? t("payOnDelivery")
+                  : t("payAtPickup")}
           </p>
           {o.deliveryAddress ? <p className="mt-3 text-fg-muted">{o.deliveryAddress}</p> : null}
         </div>

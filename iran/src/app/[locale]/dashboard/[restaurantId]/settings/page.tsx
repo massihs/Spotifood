@@ -1,6 +1,6 @@
 import { edition } from "@/config/edition";
 import { Suspense } from "react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import {
   Blocks,
@@ -9,6 +9,7 @@ import {
   Target,
   Clock,
   CreditCard,
+  Landmark,
   Laptop,
   Percent,
   Printer,
@@ -51,6 +52,8 @@ import { GoalsForm } from "./goals-form";
 import { getKpiGoals } from "@/server/modules/kpi/service";
 import { getKioskSettings, getOnlineSettings } from "@/server/modules/online/service";
 import { listZones } from "@/server/modules/delivery/service";
+import { getPayoutAccount } from "@/server/modules/payouts/service";
+import { BankPanel } from "./bank-panel";
 
 type Params = PageProps<"/[locale]/dashboard/[restaurantId]/settings">["params"];
 
@@ -69,22 +72,39 @@ export default function SettingsPage({ params }: { params: Params }) {
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view");
-  const [t, view, payment, printing, setup, listing, cover, devices, blocks, online, zones, kiosk, goals] =
-    await Promise.all([
-      getTranslations("settings"),
-      getRestaurantSettingsView(db, ctx),
-      getPaymentSettingsView(db, ctx),
-      listPrinters(db, ctx),
-      can(ctx, "orders.view") ? listStations(db, ctx) : { stations: [] },
-      getListing(db, ctx),
-      getCoverChoices(db, ctx),
-      listDevices(db, ctx),
-      listGuestBlocks(db, ctx),
-      getOnlineSettings(db, ctx),
-      can(ctx, "orders.view") ? listZones(db, ctx) : [],
-      getKioskSettings(db, ctx),
-      getKpiGoals(db, ctx.restaurant.id),
-    ]);
+  const [
+    t,
+    view,
+    payment,
+    printing,
+    setup,
+    listing,
+    cover,
+    devices,
+    blocks,
+    online,
+    zones,
+    kiosk,
+    goals,
+    payoutAccount,
+    locale,
+  ] = await Promise.all([
+    getTranslations("settings"),
+    getRestaurantSettingsView(db, ctx),
+    getPaymentSettingsView(db, ctx),
+    listPrinters(db, ctx),
+    can(ctx, "orders.view") ? listStations(db, ctx) : { stations: [] },
+    getListing(db, ctx),
+    getCoverChoices(db, ctx),
+    listDevices(db, ctx),
+    listGuestBlocks(db, ctx),
+    getOnlineSettings(db, ctx),
+    can(ctx, "orders.view") ? listZones(db, ctx) : [],
+    getKioskSettings(db, ctx),
+    getKpiGoals(db, ctx.restaurant.id),
+    getPayoutAccount(db, ctx),
+    getLocale(),
+  ]);
   const readOnly = !can(ctx, "restaurant.manage");
   const { restaurant: r, settings: s } = view;
   const rid = ctx.restaurant.id;
@@ -291,6 +311,24 @@ async function Settings({ params }: { params: Params }) {
               <PaymentSettingsForm restaurantId={rid} disabled={readOnly} values={payment} />
             </div>
           </Card>
+          <Card id="bank" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<Landmark />}>{t("payout.title")}</SectionTitle>}
+              description={t("payout.hint")}
+            />
+            <div className="p-5 sm:p-6">
+              <BankPanel
+                restaurantId={rid}
+                canEdit={ctx.role === "owner"}
+                locale={locale}
+                account={
+                  payoutAccount
+                    ? { ...payoutAccount, updatedAt: payoutAccount.updatedAt.toISOString() }
+                    : null
+                }
+              />
+            </div>
+          </Card>
           <Card id="taxes" className="scroll-mt-24">
             <CardHeader
               title={<SectionTitle icon={<Percent />}>{t("taxes")}</SectionTitle>}
@@ -346,6 +384,7 @@ const SECTIONS = [
   { key: "online", icon: <Globe aria-hidden="true" /> },
   { key: "security", icon: <ShieldCheck aria-hidden="true" /> },
   { key: "payments", icon: <CreditCard aria-hidden="true" /> },
+  { key: "bank", icon: <Landmark aria-hidden="true" /> },
   { key: "taxes", icon: <Percent aria-hidden="true" /> },
   { key: "legal", icon: <Scale aria-hidden="true" /> },
 ] as const;

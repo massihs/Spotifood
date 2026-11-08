@@ -30,16 +30,18 @@ export function offerableOnlineProviders(): ProviderCode[] {
   return out;
 }
 
-/** Online providers usable on this deployment (credentials present / dev mock allowed). */
-export function availableOnlineProviders(opts: { zarinpalMerchantId?: string | null } = {}): ProviderCode[] {
+/**
+ * Online providers usable for a restaurant (credentials present / dev mock allowed).
+ * `zarinpalReady`: the restaurant has a way to collect with Zarinpal (its own merchant id, or
+ * Spotifood's account plus a bank account to be paid on).
+ */
+export function availableOnlineProviders(opts: { zarinpalReady?: boolean } = {}): ProviderCode[] {
   const out: ProviderCode[] = [];
   // Each edition only offers the PSPs that work in its market (Stripe is unavailable in Iran).
   const offered = edition.onlineProviders as readonly string[];
   if (offered.includes("stripe") && process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET)
     out.push("stripe");
-  // Zarinpal: the restaurant's own merchant id, or the platform-wide fallback.
-  if (offered.includes("zarinpal") && (opts.zarinpalMerchantId || process.env.ZARINPAL_MERCHANT_ID))
-    out.push("zarinpal");
+  if (offered.includes("zarinpal") && opts.zarinpalReady) out.push("zarinpal");
   if (mockEnabled()) out.push("mock_online");
   return out;
 }

@@ -45,7 +45,14 @@ import {
   tagLabel,
   type CartSummary,
 } from "./parts";
-import { ProductSheet } from "./product-sheet";
+import dynamic from "next/dynamic";
+
+/**
+ * The dish sheet opens on a tap: its code is not part of the first load of the menu (lighter on
+ * mobile data). It is fetched quietly once the menu is shown, so opening a dish stays instant.
+ */
+const loadSheet = () => import("./product-sheet");
+const ProductSheet = dynamic(() => loadSheet().then((m) => m.ProductSheet), { ssr: false });
 
 export type { CartSummary };
 export { useMoney };
@@ -177,6 +184,11 @@ export function MenuApp({
   );
 
   // Compact bar once the header has scrolled away.
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1200));
+    idle(() => void loadSheet());
+  }, []);
+
   useEffect(() => {
     const el = sentinel.current;
     if (!el) return;

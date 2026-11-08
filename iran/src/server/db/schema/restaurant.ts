@@ -144,6 +144,11 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   kpiGoals: jsonb().$type<KpiGoals>().notNull().default({}),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */
   zarinpalMerchantId: varchar({ length: 64 }),
+  /**
+   * Who collects the guests' online payments: "platform" (Spotifood's Zarinpal account, then paid
+   * to the restaurant's bank account) or "own" (the restaurant's merchant id above).
+   */
+  onlinePaymentCollection: varchar({ length: 16 }).notNull().default("platform"),
   /** Auto-close idle table sessions after N minutes (null = manual only). */
   sessionAutoCloseMinutes: integer().default(180),
   /** Loyalty club: one point per `loyaltySpendPerPointCents` paid, worth `loyaltyPointValueCents`. */

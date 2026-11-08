@@ -368,7 +368,8 @@
     "requests": "Demandes",
     "roomService": "Room service",
     "rooms": "Chambres",
-    "roomsQr": "QR des chambres"
+    "roomsQr": "QR des chambres",
+    "adminPayouts": "Versements"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -570,6 +571,47 @@
       "referrersHint": "Sites d’où viennent les visiteurs (Instagram, Google…).",
       "empty": "Aucune visite enregistrée.",
       "noReferrer": "Pas encore de provenance connue."
+    },
+    "payouts": {
+      "title": "Versements aux restaurants",
+      "subtitle": "Les paiements en ligne encaissés par Spotifood pour les restaurants, et ce qu'il reste à leur virer.",
+      "statDue": "À verser",
+      "statCollected": "Encaissé pour les restaurants",
+      "statFee": "Commissions Spotifood",
+      "statSplit": "Versé automatiquement (تسهیم)",
+      "restaurants": "Restaurants",
+      "restaurantsHint": "Le montant dû tient compte de la commission et de ce que Zarinpal a déjà versé automatiquement.",
+      "empty": "Aucun paiement encaissé pour un restaurant pour l'instant.",
+      "counts": "{n, plural, =0 {aucun paiement} one {# paiement} other {# paiements}}",
+      "collected": "encaissé",
+      "fee": "Commission",
+      "splitShort": "auto",
+      "paidOut": "déjà versé",
+      "due": "dû",
+      "copy": "Copier",
+      "noAccount": "Pas de coordonnées bancaires",
+      "recentChange": "Compte bancaire modifié il y a {hours} h : vérifiez avec le propriétaire avant de virer.",
+      "pay": "Enregistrer un versement",
+      "payTitle": "Versement à {name}",
+      "payDue": "Dû : {amount}",
+      "amount": "Montant viré",
+      "reference": "N° de suivi du virement",
+      "referenceHint": "Le numéro de suivi (پیگیری) donné par la banque.",
+      "note": "Note (facultatif)",
+      "confirm": "Enregistrer le versement",
+      "settings": "Réglages",
+      "settingsHint": "S'applique aux nouveaux paiements ; les anciens gardent la commission de leur jour.",
+      "merchant": "Compte Zarinpal Spotifood :",
+      "merchantOn": "configuré",
+      "merchantOff": "non configuré (ZARINPAL_MERCHANT_ID)",
+      "save": "Enregistrer",
+      "saved": "Réglages enregistrés.",
+      "recent": "Derniers versements",
+      "noPayouts": "Aucun versement pour l'instant.",
+      "feeField": "Commission Spotifood (%)",
+      "feeHint": "Prélevée sur chaque paiement encaissé pour un restaurant. 0 = aucune.",
+      "split": "Partage automatique Zarinpal (تسهیم)",
+      "splitHint": "À cocher seulement une fois le partage activé par Zarinpal sur le compte Spotifood : la part du restaurant part alors directement sur son Sheba (99 % au plus)."
     }
   },
   "errors": {
@@ -677,7 +719,7 @@
     "duplicate_customer": "Ce numéro est déjà enregistré.",
     "duplicate_coupon": "Ce code existe déjà.",
     "no_recipients": "Personne dans ce groupe.",
-    "owner_only": "Seul le propriétaire peut créer une succursale.",
+    "owner_only": "Seul le propriétaire du restaurant peut faire cela.",
     "other_organization": "Cet établissement n'appartient pas à votre organisation.",
     "address_required": "Saisissez l’adresse de livraison.",
     "below_zone_minimum": "Commande inférieure au minimum de la zone.",
@@ -719,7 +761,15 @@
     "label_required": "Donnez un nom à chaque option de la cloche.",
     "invalid_call": "Cette option n’est plus proposée.",
     "job_in_use": "Des membres occupent ce poste.",
-    "kind_unavailable": "Ce type d'établissement n'est plus proposé."
+    "kind_unavailable": "Ce type d'établissement n'est plus proposé.",
+    "invalid_iban": "Numéro Sheba non valide.",
+    "invalid_card": "Numéro de carte non valide.",
+    "payout_account_in_use": "Le paiement en ligne via Spotifood est activé : changez de compte ou désactivez-le avant de supprimer ces coordonnées.",
+    "payout_account_required": "Ajoutez vos coordonnées bancaires pour recevoir les paiements via Spotifood.",
+    "platform_payments_unavailable": "Le paiement via Spotifood n'est pas encore disponible : utilisez votre propre compte Zarinpal.",
+    "payout_exceeds_due": "Le montant dépasse ce qui est dû à ce restaurant.",
+    "online_payment_required": "Ce restaurant demande le paiement en ligne.",
+    "order_not_awaiting_payment": "Cette commande n'attend plus de paiement."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1167,7 +1217,44 @@
     "online": "Commande en ligne",
     "onlineHint": "Votre site de commande : à emporter et livraison, un lien à mettre dans votre bio Instagram.",
     "goals": "Objectifs",
-    "goalsHint": "Chiffre d’affaires du jour, temps en cuisine et note des clients : suivis sur l’accueil, alerte si un objectif est manqué."
+    "goalsHint": "Chiffre d’affaires du jour, temps en cuisine et note des clients : suivis sur l’accueil, alerte si un objectif est manqué.",
+    "bank": "Coordonnées bancaires",
+    "payout": {
+      "title": "Coordonnées bancaires",
+      "hint": "Le compte sur lequel Spotifood vous verse les paiements en ligne de vos clients.",
+      "privacy": "Chiffrées et visibles seulement par vous et l'équipe Spotifood, pour vous verser vos paiements. Seul le propriétaire peut les modifier.",
+      "holder": "Titulaire du compte",
+      "holderHint": "Exactement comme à la banque (personne ou société).",
+      "iban": "Numéro Sheba (IBAN)",
+      "ibanHint": "IR suivi de 24 chiffres, sur votre application bancaire ou au dos de la carte.",
+      "ibanInvalid": "Ce numéro Sheba n'est pas valide : vérifiez les chiffres.",
+      "ibanValid": "Numéro Sheba valide",
+      "card": "Numéro de carte (facultatif)",
+      "cardHint": "16 chiffres, utile pour un virement carte à carte.",
+      "cardInvalid": "Ce numéro de carte n'est pas valide.",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "saved": "Coordonnées enregistrées.",
+      "change": "Modifier",
+      "remove": "Supprimer",
+      "removeConfirm": "Supprimer ces coordonnées bancaires ?",
+      "updated": "Mis à jour le {when}",
+      "bankUnknown": "Banque",
+      "ownerOnly": "Seul le propriétaire du restaurant peut modifier ces coordonnées.",
+      "ownerOnlyEmpty": "Aucune coordonnée bancaire. Le propriétaire du restaurant peut les ajouter ici."
+    },
+    "collect": {
+      "title": "Comment recevoir l'argent",
+      "platform": "Via Spotifood (recommandé)",
+      "platformHint": "Pas besoin de compte Zarinpal : Spotifood encaisse pour vous et vous verse l'argent sur votre compte bancaire. Commission : {fee}.",
+      "platformSoon": "Bientôt disponible : le compte Zarinpal de Spotifood n'est pas encore activé.",
+      "needBank": "Ajoutez d'abord vos coordonnées bancaires pour être payé.",
+      "needBankLink": "Coordonnées bancaires",
+      "own": "Mon propre compte Zarinpal",
+      "ownHint": "L'argent arrive directement sur votre compte Zarinpal (il vous faut un identifiant marchand).",
+      "merchant": "Identifiant marchand Zarinpal",
+      "merchantHint": "Dans votre panneau Zarinpal : Passerelle de paiement → identifiant marchand (36 caractères)."
+    }
   },
   "guest": {
     "table": "Table {label}",
@@ -1792,7 +1879,8 @@
         "needs_review": "Paiement à vérifier · Table {table}",
         "receivedRoom": "Paiement reçu {amount} · Chambre {table}",
         "requestedRoom": "Chambre {table} · Client {client} veut payer {amount} ({method, select, cash {espèces} card {carte} other {à table}})",
-        "needs_reviewRoom": "Paiement à vérifier · Chambre {table}"
+        "needs_reviewRoom": "Paiement à vérifier · Chambre {table}",
+        "receivedOnline": "Paiement en ligne reçu {amount} · commande {number}"
       },
       "stock": {
         "low": "{name} est presque épuisé ({quantity} {unit})"
@@ -1812,6 +1900,12 @@
         "prep_slow": "Cuisine lente : {minutes} min en moyenne sur la dernière heure (objectif {goal} min)",
         "rating_low": "Note des clients en baisse : {rating}/5 sur 7 jours (objectif {goal})",
         "revenue_missed": "Objectif du jour non atteint"
+      },
+      "payout_account": {
+        "updated": "Coordonnées bancaires modifiées (Sheba •••{ibanLast4}) par {by}"
+      },
+      "payout": {
+        "sent": "Spotifood vous a versé {amount}"
       }
     }
   },
@@ -3745,6 +3839,23 @@
       "regenerate": "Nouveau lien",
       "regenerateConfirm": "Créer un nouveau lien ? Les tablettes qui utilisent l’ancien ne pourront plus commander.",
       "private": "Ce lien donne accès à la commande sans connexion : ne l’ouvrez que sur vos tablettes."
+    },
+    "payment": {
+      "title": "Paiement",
+      "online": "Payer en ligne maintenant (carte bancaire)",
+      "onlineHint": "Paiement sécurisé par Zarinpal, votre commande part en cuisine dès qu'il est confirmé.",
+      "payNow": "Payer {total}",
+      "waiting": "Paiement en attente",
+      "failed": "Le paiement n'a pas abouti",
+      "waitingHint": "Votre commande sera envoyée au restaurant dès qu'elle sera payée.",
+      "retry": "Réessayer le paiement",
+      "payNowShort": "Payer maintenant",
+      "switchDelivery": "Payer à la livraison",
+      "switchPickup": "Payer au retrait",
+      "cancel": "Annuler la commande",
+      "cancelConfirm": "Annuler cette commande ?",
+      "paid": "Paiement reçu, merci ! Le restaurant prépare votre commande.",
+      "paidShort": "Payée en ligne"
     }
   },
   "kpi": {
@@ -3868,5 +3979,15 @@
     "light": "Mode jour",
     "dark": "Mode nuit",
     "switchTo": "Thème : passer à « {mode} »"
+  },
+  "payouts": {
+    "title": "Versements Spotifood",
+    "hint": "Les paiements en ligne que Spotifood encaisse pour vous, puis vous verse sur votre compte bancaire.",
+    "due": "à recevoir",
+    "collected": "Encaissé",
+    "fee": "Commission",
+    "split": "Versé automatiquement",
+    "paidOut": "Déjà versé",
+    "noAccount": "Ajoutez vos coordonnées bancaires pour recevoir vos versements :"
   }
 }

@@ -12,7 +12,9 @@ import { cn } from "@/lib/cn";
 import { requireRestaurant } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { can } from "@/server/tenancy";
-import { listPayments, type PAYMENT_STATUSES } from "@/server/modules/payments/service";
+import { listPayments, paymentConfig, type PAYMENT_STATUSES } from "@/server/modules/payments/service";
+import { getRestaurantPayouts } from "@/server/modules/payouts/service";
+import { Landmark } from "lucide-react";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/payments">;
 type Status = (typeof PAYMENT_STATUSES)[number];
@@ -48,10 +50,12 @@ async function Payments({ params, searchParams }: Pick<Props, "params" | "search
   const ctx = await requireRestaurant(restaurantId, "payments.view");
   const sp = await searchParams;
   const view = typeof sp.view === "string" && sp.view in VIEWS ? sp.view : "all";
-  const [t, format, list] = await Promise.all([
+  const [t, format, list, payouts, config] = await Promise.all([
     getTranslations(),
     getFormatter(),
     listPayments(db, ctx, { statuses: VIEWS[view], limit: 100 }),
+    getRestaurantPayouts(db, ctx),
+    paymentConfig(db, ctx.restaurant.id),
   ]);
   const locale = await getLocale();
   const canInvoice = can(ctx, "invoices.view");
@@ -73,6 +77,65 @@ async function Payments({ params, searchParams }: Pick<Props, "params" | "search
     <>
       <LiveRefresh types={["payment.updated"]} />
       <PageHeader title={t("payments.title")} description={t("payments.subtitle")} />
+      {payouts.balance || (config.collection === "platform" && config.online.length > 0) ? (
+        <Card className="mb-5 p-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex min-w-0 items-start gap-3">
+              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                <Landmark className="size-5" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <p className="font-semibold">{t("payouts.title")}</p>
+                <p className="mt-0.5 text-sm text-fg-muted">{t("payouts.hint")}</p>
+              </div>
+            </div>
+            <div className="text-end">
+              <p className="text-2xl font-bold tabular-nums">{money(payouts.balance?.dueCents ?? 0)}</p>
+              <p className="text-xs text-fg-muted">{t("payouts.due")}</p>
+            </div>
+          </div>
+          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-4">
+            {(
+              [
+                ["collected", payouts.balance?.collectedCents ?? 0],
+                ["fee", payouts.balance?.feeCents ?? 0],
+                ["split", payouts.balance?.splitCents ?? 0],
+                ["paidOut", payouts.balance?.paidOutCents ?? 0],
+              ] as const
+            ).map(([k, v]) => (
+              <div key={k} className="rounded-xl bg-surface-2 px-3 py-2.5">
+                <dt className="text-xs text-fg-muted">{t(`payouts.${k}`)}</dt>
+                <dd className="mt-0.5 font-semibold tabular-nums">{money(v)}</dd>
+              </div>
+            ))}
+          </dl>
+          {!payouts.account ? (
+            <p className="mt-4 rounded-xl bg-warning-soft px-3 py-2 text-sm">
+              {t("payouts.noAccount")}{" "}
+              <Link
+                href={`/dashboard/${ctx.restaurant.id}/settings#bank`}
+                className="font-semibold underline"
+              >
+                {t("settings.payout.title")}
+              </Link>
+            </p>
+          ) : null}
+          {payouts.history.length ? (
+            <ul className="mt-4 divide-y divide-border rounded-xl border border-border text-sm">
+              {payouts.history.map((h) => (
+                <li key={h.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                  <span className="text-fg-muted">
+                    {format.dateTime(h.paidAt, { dateStyle: "medium" })} ·{" "}
+                    <span dir="ltr">#{h.reference}</span>
+                    {h.ibanLast4 ? <span dir="ltr"> · •••{h.ibanLast4}</span> : null}
+                  </span>
+                  <span className="font-semibold tabular-nums">{money(h.amountCents)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </Card>
+      ) : null}
       <div className="mb-5 grid gap-4 sm:grid-cols-3">
         <StatCard label={t("payments.statNet")} value={money(net)} hint={t("payments.statHint")} />
         <StatCard label={t("payments.statRefunded")} value={money(refunded)} />
