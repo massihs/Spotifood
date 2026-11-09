@@ -75,7 +75,13 @@ export const metadata: Metadata = {
   title: { default: "Spotifood", template: "%s · Spotifood" },
   applicationName: "Spotifood",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
+  icons: {
+    icon: [
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/icons/apple-touch-icon.png",
+  },
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
 };
 
