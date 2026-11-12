@@ -221,6 +221,8 @@ export const restaurantMembers = pgTable(
       .array()
       .notNull()
       .default(sql`ARRAY[]::uuid[]`),
+    /** Dashboard screens this person sees (null: their job's screens). */
+    screens: text().array(),
     ...timestamps,
   },
   (t) => [
@@ -272,6 +274,8 @@ export const teamJobs = pgTable(
     name: varchar({ length: 48 }).notNull(),
     icon: varchar({ length: 24 }).notNull(),
     baseJob: varchar({ length: 16 }).notNull(),
+    /** Dashboard screens of the job (null: the base job's default screens). */
+    screens: text().array(),
     position: integer().notNull().default(0),
     ...timestamps,
   },

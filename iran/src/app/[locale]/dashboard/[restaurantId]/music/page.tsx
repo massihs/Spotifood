@@ -24,7 +24,7 @@ export default function MusicPage({ params }: { params: Params }) {
 
 async function MusicContent({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "restaurant.view");
+  const ctx = await requireRestaurant(restaurantId, "restaurant.view", "music");
   const [t, format, locale, state] = await Promise.all([
     getTranslations("music"),
     getFormatter(),

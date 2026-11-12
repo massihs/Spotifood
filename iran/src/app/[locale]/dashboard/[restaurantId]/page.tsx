@@ -36,7 +36,7 @@ import { QuickAvailability } from "@/components/dashboard/quick-availability";
 import { buttonClasses } from "@/components/ui/button";
 import { Card, CardHeader, TONE_TILE, type Tone } from "@/components/ui/card";
 import { Link, redirect } from "@/i18n/navigation";
-import { jobHome } from "@/lib/jobs";
+import { homeScreen, screenAllowed, screenPath } from "@/lib/screens";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { requireRestaurant } from "@/server/auth/current";
@@ -98,8 +98,14 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
   const ctx = await requireRestaurant(restaurantId);
   // Each job lands on its own screen: the kitchen and bar on their tickets, the till on the
   // orders to accept, waiters on the floor.
-  const home = jobHome(ctx.restaurant.kind, ctx.job);
-  if (home) redirect({ href: `/dashboard/${ctx.restaurant.id}/${home}`, locale: await getLocale() });
+  // (the screens the owner opened to them; the first one is their home).
+  if (!screenAllowed(ctx.screens, "overview")) {
+    const home = homeScreen(ctx.screens, ctx.restaurant.kind);
+    if (home)
+      redirect({ href: `/dashboard/${ctx.restaurant.id}${screenPath(home)}`, locale: await getLocale() });
+    const t = await getTranslations("team.screens");
+    return <p className="py-16 text-center text-fg-muted">{t("noScreen")}</p>;
+  }
   const [
     t,
     tStatus,

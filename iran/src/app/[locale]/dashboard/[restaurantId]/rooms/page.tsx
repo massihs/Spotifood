@@ -22,7 +22,7 @@ export default function RoomsPage({ params }: Props) {
 /** The front desk's view of the hotel: every room by floor, who is in, what it needs. */
 async function Rooms({ params }: Pick<Props, "params">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "tables.view");
+  const ctx = await requireRestaurant(restaurantId, "tables.view", "rooms");
   const [t, board, options] = await Promise.all([
     getTranslations("hotel.rooms"),
     roomsBoard(db, ctx),

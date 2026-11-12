@@ -25,7 +25,7 @@ export default function TablesPage({ params }: { params: Params }) {
 
 async function Tables({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "tables.view");
+  const ctx = await requireRestaurant(restaurantId, "tables.view", "tables");
   const [t, format, tables] = await Promise.all([getTranslations(), getFormatter(), listTables(db, ctx)]);
   const manage = can(ctx, "tables.manage");
   const rid = ctx.restaurant.id;

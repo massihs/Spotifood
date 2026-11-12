@@ -25,7 +25,7 @@ export default function ProductPage({ params, searchParams }: Props) {
 
 async function ProductEditor({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId, productId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "menu.manage");
+  const ctx = await requireRestaurant(restaurantId, "menu.manage", "menu");
   const sp = await searchParams;
   const isNew = productId === "new";
   const rid = ctx.restaurant.id;

@@ -25,7 +25,7 @@ export default function BillingPage(props: Props) {
 async function Billing({ params, searchParams }: Props) {
   const { restaurantId } = await params;
   const sp = await searchParams;
-  const ctx = await requireRestaurant(restaurantId, "restaurant.view");
+  const ctx = await requireRestaurant(restaurantId, "restaurant.view", "billing");
   const [t, format, view, locale] = await Promise.all([
     getTranslations("billing"),
     getFormatter(),

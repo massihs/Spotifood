@@ -42,7 +42,7 @@ const shift = (day: string, n: number) =>
 
 async function Reservations({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "orders.view");
+  const ctx = await requireRestaurant(restaurantId, "orders.view", "reservations");
   const sp = await searchParams;
   const tz = ctx.restaurant.timezone;
   const tab = (TABS as readonly string[]).includes(String(sp.tab))

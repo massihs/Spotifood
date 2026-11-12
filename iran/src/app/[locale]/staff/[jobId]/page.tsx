@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
-import { jobHome, type Job } from "@/lib/jobs";
+import type { Job } from "@/lib/jobs";
+import { homeScreen, resolveScreens, screenPath } from "@/lib/screens";
 import { getCurrentUser } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { logoUrl } from "@/server/modules/restaurants/settings";
@@ -45,8 +46,11 @@ async function StaffLink({ params }: { params: PageProps<"/[locale]/staff/[jobId
   setRequestLocale(locale);
   const info = await staffLinkInfo(db, jobId);
   if (!info) notFound();
-  const home = jobHome(info.kind, info.baseJob);
-  const target = `/dashboard/${info.restaurantId}${home ? `/${home}` : ""}`;
+  const home = homeScreen(
+    resolveScreens({ role: "staff", job: info.baseJob, jobScreens: info.screens }),
+    info.kind,
+  );
+  const target = `/dashboard/${info.restaurantId}${home ? screenPath(home) : ""}`;
 
   const user = await getCurrentUser();
   const isMember = user

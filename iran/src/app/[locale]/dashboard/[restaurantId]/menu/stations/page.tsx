@@ -21,7 +21,7 @@ export default function StationsRoutingPage({ params }: Props) {
 
 async function Routing({ params }: Pick<Props, "params">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "menu.view");
+  const ctx = await requireRestaurant(restaurantId, "menu.view", "menu");
   const [t, view] = await Promise.all([getTranslations("routing"), routingView(db, ctx)]);
   const base = `/dashboard/${ctx.restaurant.id}`;
   return (

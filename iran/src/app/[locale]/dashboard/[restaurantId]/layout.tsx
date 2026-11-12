@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { getDisabledModules, logoUrl } from "@/server/modules/restaurants/settings";
 import type { ModuleKey } from "@/lib/modules";
+import { isScreen, screenAllowed } from "@/lib/screens";
 import type { NavItem } from "@/components/dashboard/sidebar-nav";
 import type { SearchEntry } from "@/components/dashboard/command-palette";
 import { can } from "@/server/tenancy";
@@ -82,6 +83,12 @@ function arrangeForHotel(
     !i.groupKey ? 0 : i.groupKey === "hotel" ? 1 : i.groupKey === "restaurant" ? 3 : 2;
   const sorted = [...nav].sort((a, b) => rank(a) - rank(b));
   nav.splice(0, nav.length, ...sorted);
+}
+
+/** The screen a menu entry opens ("overview" for the dashboard's root). */
+function screenOfHref(href: string, base: string) {
+  const seg = href === base ? "overview" : href.slice(base.length + 1).split(/[/?#]/)[0];
+  return isScreen(seg) ? seg : "overview";
 }
 
 export default function RestaurantLayout({
@@ -348,7 +355,7 @@ async function RestaurantShell({
       },
     ] satisfies Item[]
   )
-    .filter((i) => i.show)
+    .filter((i) => i.show && screenAllowed(ctx.screens, screenOfHref(i.href, base)))
     .map(({ show: _show, ...i }) => i);
   if (hotel) arrangeForHotel(nav, base, g, t("nav.roomService"), t("nav.roomsQr"));
 

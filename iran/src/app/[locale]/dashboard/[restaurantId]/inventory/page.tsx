@@ -30,7 +30,7 @@ export default function InventoryPage({ params, searchParams }: Props) {
 
 async function Inventory({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "inventory.view");
+  const ctx = await requireRestaurant(restaurantId, "inventory.view", "inventory");
   const sp = await searchParams;
   const tab = (TABS as readonly string[]).includes(String(sp.tab))
     ? (sp.tab as (typeof TABS)[number])

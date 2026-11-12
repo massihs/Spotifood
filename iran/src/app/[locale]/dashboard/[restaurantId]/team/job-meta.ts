@@ -55,7 +55,13 @@ export const TEAM_ICONS: Record<TeamJobIcon, LucideIcon> = {
   shield: Shield,
 };
 
-export type TeamJobView = { id: string; name: string; icon: string; baseJob: string };
+export type TeamJobView = {
+  id: string;
+  name: string;
+  icon: string;
+  baseJob: string;
+  screens?: string[] | null;
+};
 /** A member's job as the restaurant names it: theirs, else the first one built on their base job. */
 export const jobOf = (jobs: TeamJobView[], teamJobId: string | null, job: string | null) =>
   jobs.find((j) => j.id === teamJobId) ?? (job ? jobs.find((j) => j.baseJob === job) : undefined);

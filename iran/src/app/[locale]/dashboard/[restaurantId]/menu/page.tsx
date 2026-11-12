@@ -24,7 +24,7 @@ export default function MenuPage({ params, searchParams }: Props) {
 
 async function Menu({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "menu.view");
+  const ctx = await requireRestaurant(restaurantId, "menu.view", "menu");
   const sp = await searchParams;
   const [t, tRouting, categories] = await Promise.all([
     getTranslations("menu"),

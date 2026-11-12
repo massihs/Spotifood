@@ -22,7 +22,7 @@ export default function FeedbackDashboardPage(props: Props) {
 
 async function FeedbackDashboard({ params }: Props) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "customers.view");
+  const ctx = await requireRestaurant(restaurantId, "customers.view", "feedback");
   const [t, format, overview, settings] = await Promise.all([
     getTranslations("feedback"),
     getFormatter(),

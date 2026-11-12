@@ -369,7 +369,9 @@
     "roomService": "Room service",
     "rooms": "Rooms",
     "roomsQr": "Room QR codes",
-    "adminPayouts": "Payouts"
+    "adminPayouts": "Payouts",
+    "accounting": "Accounting",
+    "b2b": "Trade sales (B2B)"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -960,7 +962,8 @@
       "copy": "Copy link",
       "copied": "Link copied",
       "open": "Open",
-      "print": "Print the QR code"
+      "print": "Print the QR code",
+      "screensTitle": "Screens of this job"
     },
     "sections": {
       "title": "Sections",
@@ -1046,6 +1049,15 @@
       "hotelTitle": "Room services",
       "hotelHint": "What guests can ask for from their room (housekeeping, laundry, wake-up…). Switch them on, add your own and pick the section that gets them.",
       "roomOnly": "Rooms only"
+    },
+    "screens": {
+      "title": "Visible screens",
+      "hint": "What this person sees in the dashboard. The first ticked screen is their home page.",
+      "all": "Select all",
+      "none": "Clear",
+      "followJob": "Same as their job ({job})",
+      "followRole": "From their role (every allowed screen)",
+      "noScreen": "No screen is open to you here. Ask your manager."
     }
   },
   "permissions": {

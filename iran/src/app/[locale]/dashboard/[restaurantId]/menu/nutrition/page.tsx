@@ -23,7 +23,7 @@ export default function NutritionDatabasePage({ params, searchParams }: Props) {
 
 async function NutritionDatabase({ params, searchParams }: Props) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "menu.view");
+  const ctx = await requireRestaurant(restaurantId, "menu.view", "menu");
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.slice(0, 80) : "";
   const [t, tn, format, coverage, results] = await Promise.all([

@@ -21,7 +21,7 @@ export default function BillingInvoicePage(props: Props) {
 
 async function Invoice({ params }: Props) {
   const { restaurantId, paymentId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "restaurant.view");
+  const ctx = await requireRestaurant(restaurantId, "restaurant.view", "billing");
   const [t, th, format, locale, inv] = await Promise.all([
     getTranslations("billing"),
     getTranslations("landing"),

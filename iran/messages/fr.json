@@ -369,7 +369,9 @@
     "roomService": "Room service",
     "rooms": "Chambres",
     "roomsQr": "QR des chambres",
-    "adminPayouts": "Versements"
+    "adminPayouts": "Versements",
+    "accounting": "Comptabilité",
+    "b2b": "Ventes pro (B2B)"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -960,7 +962,8 @@
       "copy": "Copier le lien",
       "copied": "Lien copié",
       "open": "Ouvrir",
-      "print": "Imprimer le QR code"
+      "print": "Imprimer le QR code",
+      "screensTitle": "Écrans de ce poste"
     },
     "sections": {
       "title": "Sections",
@@ -1046,6 +1049,15 @@
       "hotelTitle": "Services des chambres",
       "hotelHint": "Ce que le client peut demander depuis sa chambre (ménage, pressing, réveil…). Activez, ajoutez les vôtres et choisissez la section qui les reçoit.",
       "roomOnly": "Chambres seulement"
+    },
+    "screens": {
+      "title": "Écrans visibles",
+      "hint": "Ce que cette personne voit dans le tableau de bord. Le premier écran coché est sa page d'accueil.",
+      "all": "Tout cocher",
+      "none": "Tout décocher",
+      "followJob": "Comme son poste ({job})",
+      "followRole": "Selon son rôle (tous les écrans permis)",
+      "noScreen": "Aucun écran ne vous est ouvert ici. Demandez au responsable."
     }
   },
   "permissions": {

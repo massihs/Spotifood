@@ -24,7 +24,7 @@ export default function CustomerPage({ params }: Props) {
 
 async function CustomerFile({ params }: Pick<Props, "params">) {
   const { restaurantId, customerId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "customers.view");
+  const ctx = await requireRestaurant(restaurantId, "customers.view", "customers");
   const [t, tOrders, format, file, cfg, accountEntries] = await Promise.all([
     getTranslations("customers"),
     getTranslations("orderStatus"),

@@ -33,7 +33,7 @@ const iso = (d: Date | null) => (d ? d.toISOString() : null);
 
 async function Delivery({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "orders.view");
+  const ctx = await requireRestaurant(restaurantId, "orders.view", "delivery");
   const sp = await searchParams;
   const tab = (TABS as readonly string[]).includes(String(sp.tab))
     ? (sp.tab as (typeof TABS)[number])

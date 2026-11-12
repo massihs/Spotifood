@@ -10,6 +10,7 @@ import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { isUuid } from "@/lib/ids";
 import { JOBS, type Job } from "@/lib/jobs";
 import { TEAM_JOB_ICONS, type TeamJobIcon } from "@/lib/team-jobs";
+import { SCREENS } from "@/lib/screens";
 
 type Default = { base: Job; icon: TeamJobIcon; key: string };
 
@@ -65,7 +66,13 @@ export async function listTeamJobs(db: Database, ctx: RestaurantContext) {
 
 export function teamJobsOf(db: DbOrTx, restaurantId: string) {
   return db
-    .select({ id: teamJobs.id, name: teamJobs.name, icon: teamJobs.icon, baseJob: teamJobs.baseJob })
+    .select({
+      id: teamJobs.id,
+      name: teamJobs.name,
+      icon: teamJobs.icon,
+      baseJob: teamJobs.baseJob,
+      screens: teamJobs.screens,
+    })
     .from(teamJobs)
     .where(eq(teamJobs.restaurantId, restaurantId))
     .orderBy(asc(teamJobs.position), asc(teamJobs.createdAt));
@@ -87,6 +94,8 @@ export const teamJobSchema = z.object({
   name: z.string().trim().min(1).max(48),
   icon: z.enum(TEAM_JOB_ICONS),
   baseJob: z.enum(JOBS),
+  /** The job's screens (null: the base job's defaults; absent: unchanged). */
+  screens: z.array(z.enum(SCREENS)).min(1).max(SCREENS.length).nullable().optional(),
 });
 
 /** Creates or renames a job. Its base cannot change while members hold it (their access would). */
@@ -105,7 +114,12 @@ export async function saveTeamJob(db: Database, ctx: RestaurantContext, raw: z.i
       }
       await tx
         .update(teamJobs)
-        .set({ name: input.name, icon: input.icon, baseJob: input.baseJob })
+        .set({
+          name: input.name,
+          icon: input.icon,
+          baseJob: input.baseJob,
+          ...(input.screens !== undefined ? { screens: input.screens } : {}),
+        })
         .where(eq(teamJobs.id, input.id));
     } else {
       const [last] = await tx
@@ -117,6 +131,7 @@ export async function saveTeamJob(db: Database, ctx: RestaurantContext, raw: z.i
         name: input.name,
         icon: input.icon,
         baseJob: input.baseJob,
+        screens: input.screens ?? null,
         position: (last?.p ?? -1) + 1,
       });
     }
@@ -124,7 +139,7 @@ export async function saveTeamJob(db: Database, ctx: RestaurantContext, raw: z.i
       action: input.id ? "team_job.updated" : "team_job.created",
       actorUserId: ctx.user.id,
       restaurantId: ctx.restaurant.id,
-      metadata: { name: input.name, baseJob: input.baseJob },
+      metadata: { name: input.name, baseJob: input.baseJob, screens: input.screens },
     });
   });
 }
@@ -160,6 +175,7 @@ export async function staffLinkInfo(db: DbOrTx, teamJobId: string) {
       jobName: teamJobs.name,
       icon: teamJobs.icon,
       baseJob: teamJobs.baseJob,
+      screens: teamJobs.screens,
       restaurantId: restaurants.id,
       restaurantName: restaurants.name,
       kind: restaurants.kind,

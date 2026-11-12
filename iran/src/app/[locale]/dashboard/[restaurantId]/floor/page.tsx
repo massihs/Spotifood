@@ -33,7 +33,7 @@ export default function FloorPage({ params }: { params: Params }) {
 
 async function Floor({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "tables.view");
+  const ctx = await requireRestaurant(restaurantId, "tables.view", "floor");
   const [t, format, floor] = await Promise.all([getTranslations("floor"), getFormatter(), getFloor(db, ctx)]);
   const locale = await getLocale();
   const money = (c: number) => formatMoney(c, ctx.restaurant.currency, locale);

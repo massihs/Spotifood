@@ -22,7 +22,7 @@ export default function OptionsPage({ params }: { params: Params }) {
 
 async function Options({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "menu.view");
+  const ctx = await requireRestaurant(restaurantId, "menu.view", "menu");
   const [t, tp, groups] = await Promise.all([
     getTranslations("options"),
     getTranslations("product"),

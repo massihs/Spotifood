@@ -29,7 +29,7 @@ export default function RequestsPage({ params, searchParams }: Props) {
  */
 async function Requests({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const [{ restaurantId }, sp] = await Promise.all([params, searchParams]);
-  const ctx = await requireRestaurant(restaurantId, "orders.view");
+  const ctx = await requireRestaurant(restaurantId, "orders.view", "requests");
   const t = await getTranslations("hotel");
   const manage = can(ctx, "members.manage");
   const tab = sp.tab === "services" && manage ? "services" : "board";
@@ -94,7 +94,7 @@ async function Requests({ params, searchParams }: Pick<Props, "params" | "search
 }
 
 async function ServicesTab({ restaurantId }: { restaurantId: string }) {
-  const ctx = await requireRestaurant(restaurantId, "members.manage");
+  const ctx = await requireRestaurant(restaurantId, "members.manage", "requests");
   const [calls, sections] = await Promise.all([listGuestCalls(db, ctx), listSections(db, ctx)]);
   return (
     <GuestCallsPanel

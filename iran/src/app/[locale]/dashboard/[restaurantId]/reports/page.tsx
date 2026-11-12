@@ -26,7 +26,7 @@ export default function ReportsPage({ params, searchParams }: Props) {
 
 async function Reports({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "accounting.manage");
+  const ctx = await requireRestaurant(restaurantId, "accounting.manage", "reports");
   const sp = await searchParams;
   const tz = ctx.restaurant.timezone;
   const period = resolvePeriod(sp, tz, ctx.restaurant.currency === "IRR");

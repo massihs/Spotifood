@@ -47,7 +47,7 @@ export default function PaymentsPage({ params, searchParams }: Props) {
 
 async function Payments({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "payments.view");
+  const ctx = await requireRestaurant(restaurantId, "payments.view", "payments");
   const sp = await searchParams;
   const view = typeof sp.view === "string" && sp.view in VIEWS ? sp.view : "all";
   const [t, format, list, payouts, config] = await Promise.all([

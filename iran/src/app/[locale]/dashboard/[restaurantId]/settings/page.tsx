@@ -71,7 +71,7 @@ export default function SettingsPage({ params }: { params: Params }) {
 
 async function Settings({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "restaurant.view");
+  const ctx = await requireRestaurant(restaurantId, "restaurant.view", "settings");
   const [
     t,
     view,

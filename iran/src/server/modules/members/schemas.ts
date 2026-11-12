@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { JOBS } from "@/lib/jobs";
 import { PERMISSIONS } from "@/server/auth/permissions";
+import { SCREENS } from "@/lib/screens";
 import { emailSchema, passwordSchema } from "@/server/modules/auth/schemas";
 
 export const assignableRole = z.enum(["admin", "staff"]);
@@ -32,6 +33,8 @@ export const updateMemberSchema = z.object({
   status: z.enum(["active", "disabled"]),
   /** Keep the stored per-member permissions (their access comes from a section). */
   keepPermissions: z.boolean().optional(),
+  /** Screens this person sees: a list, null to follow their job, absent to keep them. */
+  screens: z.array(z.enum(SCREENS)).min(1).max(SCREENS.length).nullable().optional(),
 });
 export type UpdateMemberInput = z.infer<typeof updateMemberSchema>;
 

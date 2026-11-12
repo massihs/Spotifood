@@ -10,6 +10,8 @@ import { TEAM_JOB_ICONS } from "@/lib/team-jobs";
 import { deleteTeamJobAction, saveTeamJobAction } from "./actions";
 import { JOB_TONES, TEAM_ICONS, type TeamJobView } from "./job-meta";
 import { TeamIcon } from "./team-icon";
+import { ScreenPicker } from "./screen-picker";
+import { cleanScreens, JOB_SCREENS, SCREENS, type Screen } from "@/lib/screens";
 
 /**
  * The restaurant's jobs as it names them (Caisse, Chicha, Réception…), each with its icon and
@@ -21,12 +23,14 @@ export function JobGuide({
   counts,
   links,
   allowManager,
+  kind,
 }: {
   restaurantId: string;
   jobs: TeamJobView[];
   counts: Record<string, number>;
   links: Record<string, { url: string; qr: string }>;
   allowManager: boolean;
+  kind: string;
 }) {
   const t = useTranslations("team.jobs");
   const [edit, setEdit] = useState<TeamJobView | "new" | null>(null);
@@ -99,6 +103,7 @@ export function JobGuide({
           job={edit === "new" ? null : edit}
           held={edit === "new" ? 0 : (counts[edit.id] ?? 0)}
           allowManager={allowManager}
+          kind={kind}
           onClose={() => setEdit(null)}
         />
       ) : null}
@@ -111,12 +116,14 @@ function JobSheet({
   job,
   held,
   allowManager,
+  kind,
   onClose,
 }: {
   restaurantId: string;
   job: TeamJobView | null;
   held: number;
   allowManager: boolean;
+  kind: string;
   onClose: () => void;
 }) {
   const t = useTranslations("team.jobs");
@@ -126,6 +133,10 @@ function JobSheet({
   const [icon, setIcon] = useState(job?.icon ?? "users");
   const [base, setBase] = useState<Job>((job?.baseJob as Job) ?? "waiter");
   const bases = JOBS.filter((j) => allowManager || j !== "manager" || base === "manager");
+  // The job's screens: its own list, else its base job's default (managers: everything).
+  const defaultsOf = (b: Job): Screen[] => [...(JOB_SCREENS[b] ?? SCREENS)];
+  const [screens, setScreens] = useState<Screen[] | null>(job?.screens ? cleanScreens(job.screens) : null);
+  const shown = screens ?? defaultsOf(base);
   return (
     <Sheet title={job ? job.name : t("new")} onClose={onClose}>
       <div className="space-y-5">
@@ -206,6 +217,11 @@ function JobSheet({
           </div>
         </fieldset>
 
+        <fieldset>
+          <legend className="text-sm font-semibold">{t("screensTitle")}</legend>
+          <ScreenPicker value={shown} onChange={setScreens} kind={kind} />
+        </fieldset>
+
         {error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p> : null}
         <div className="flex items-center gap-2">
           {job ? (
@@ -233,6 +249,7 @@ function JobSheet({
                     name,
                     icon: icon as "users",
                     baseJob: base,
+                    screens,
                   }),
                 onClose,
               )

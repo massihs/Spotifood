@@ -21,7 +21,7 @@ export default function PrintPage({ params, searchParams }: Props) {
 
 async function Print({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "tables.view");
+  const ctx = await requireRestaurant(restaurantId, "tables.view", "tables");
   const sp = await searchParams;
   const preselected = typeof sp.ids === "string" ? sp.ids.split(",").filter(Boolean) : null;
 

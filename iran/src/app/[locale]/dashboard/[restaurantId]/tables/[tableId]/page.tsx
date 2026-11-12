@@ -29,7 +29,7 @@ export default function TableDetailPage({ params }: { params: Params }) {
 
 async function TableDetail({ params }: { params: Params }) {
   const { restaurantId, tableId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "tables.view");
+  const ctx = await requireRestaurant(restaurantId, "tables.view", "tables");
   let view: Awaited<ReturnType<typeof getTableOverview>>;
   try {
     view = await getTableOverview(db, ctx, tableId);

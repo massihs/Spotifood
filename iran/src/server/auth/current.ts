@@ -7,6 +7,7 @@ import { db } from "@/server/db/client";
 import { isAppError } from "@/server/errors";
 import { loadRestaurantContext, type RestaurantContext } from "@/server/tenancy";
 import type { Permission } from "./permissions";
+import { homeScreen, screenAllowed, screenPath, type Screen } from "@/lib/screens";
 import { SESSION_COOKIE, sessionCookieOptions } from "./cookies";
 import { createAuthSession, revokeAuthSession, validateAuthSession } from "./sessions";
 
@@ -36,13 +37,18 @@ export async function requireSuperAdmin() {
 
 /**
  * Loads the tenant context for a dashboard page. Unknown or foreign restaurants
- * render a 404 (never reveal that another tenant's id exists).
+ * render a 404 (never reveal that another tenant's id exists). A page of a screen the owner
+ * did not open to this member sends them to their own screen.
  */
 export const requireRestaurant = cache(
-  async (restaurantId: string, permission?: Permission): Promise<RestaurantContext> => {
+  async (restaurantId: string, permission?: Permission, screen?: Screen): Promise<RestaurantContext> => {
     const user = await requireUser();
     try {
       const ctx = await loadRestaurantContext(db, user, restaurantId);
+      if (screen && !screenAllowed(ctx.screens, screen)) {
+        const home = homeScreen(ctx.screens, ctx.restaurant.kind);
+        redirect(`/dashboard/${restaurantId}${home && home !== screen ? screenPath(home) : ""}`);
+      }
       if (permission && !ctx.permissions.has(permission)) redirect(`/dashboard/${restaurantId}`);
       return ctx;
     } catch (e) {

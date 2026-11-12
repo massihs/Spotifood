@@ -6,6 +6,7 @@ import { actionContext, runAction } from "@/server/actions";
 import { isPermission, ROLE_PERMISSIONS, type Permission } from "@/server/auth/permissions";
 import { addMember, removeMember, setMemberJob, updateMember } from "@/server/modules/members/service";
 import { isJob } from "@/lib/jobs";
+import { cleanScreens } from "@/lib/screens";
 import type { z } from "zod";
 import { deleteTeamJob, saveTeamJob, type teamJobSchema } from "@/server/modules/team/jobs";
 import {
@@ -52,6 +53,12 @@ export async function updateMemberAction(
       revokedPermissions: [...defaults].filter((p) => !desired.has(p)),
       status: fd.get("status") === "disabled" ? "disabled" : "active",
       keepPermissions: fd.get("keepPermissions") === "1",
+      screens:
+        fd.get("screensMode") === "custom"
+          ? cleanScreens(fd.getAll("screens").map(String))
+          : fd.get("screensMode") === "job"
+            ? null
+            : undefined,
     });
     refresh();
   });

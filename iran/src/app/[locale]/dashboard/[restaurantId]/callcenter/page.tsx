@@ -25,7 +25,7 @@ export default function CallCenterPage(props: Props) {
 async function CallCenter({ params, searchParams }: Props) {
   const { restaurantId } = await params;
   const sp = await searchParams;
-  const ctx = await requireRestaurant(restaurantId, "orders.create");
+  const ctx = await requireRestaurant(restaurantId, "orders.create", "callcenter");
   const q = typeof sp.phone === "string" ? sp.phone.slice(0, 20) : "";
   const [t, ts, format, locale, branches] = await Promise.all([
     getTranslations("callcenter"),

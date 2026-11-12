@@ -1,10 +1,11 @@
 import { and, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 import type { DbOrTx } from "@/server/db/client";
-import { restaurantMembers, restaurants, teamSections } from "@/server/db/schema";
+import { restaurantMembers, restaurants, teamJobs, teamSections } from "@/server/db/schema";
 import { resolvePermissions, type MemberRole, type Permission } from "@/server/auth/permissions";
 import type { SessionUser } from "@/server/auth/sessions";
 import { AppError, forbidden, notFound } from "@/server/errors";
 import { isUuid } from "@/lib/ids";
+import { resolveScreens, type Screen } from "@/lib/screens";
 
 export type RestaurantSummary = {
   id: string;
@@ -36,6 +37,8 @@ export type RestaurantContext = {
   stationId?: string | null;
   /** Team sections the member belongs to (their access and which notifications they get). */
   sectionIds?: string[];
+  /** Dashboard screens the owner opened to this member (null or absent: every screen). */
+  screens?: Screen[] | null;
 };
 
 const restaurantColumns = {
@@ -71,13 +74,16 @@ export async function loadRestaurantContext(
         job: restaurantMembers.job,
         stationId: restaurantMembers.stationId,
         sectionIds: restaurantMembers.sectionIds,
+        screens: restaurantMembers.screens,
       },
+      jobScreens: teamJobs.screens,
     })
     .from(restaurants)
     .leftJoin(
       restaurantMembers,
       and(eq(restaurantMembers.restaurantId, restaurants.id), eq(restaurantMembers.userId, user.id)),
     )
+    .leftJoin(teamJobs, eq(teamJobs.id, restaurantMembers.teamJobId))
     .where(and(eq(restaurants.id, restaurantId), isNull(restaurants.deletedAt)))
     .limit(1);
 
@@ -111,6 +117,12 @@ export async function loadRestaurantContext(
     job: activeMember.job,
     stationId: activeMember.stationId,
     sectionIds: activeMember.sectionIds,
+    screens: resolveScreens({
+      role: activeMember.role,
+      job: activeMember.job,
+      memberScreens: activeMember.screens,
+      jobScreens: row.jobScreens,
+    }),
   };
 }
 

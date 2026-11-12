@@ -34,7 +34,7 @@ export default function OrdersPage({ params, searchParams }: Props) {
 
 async function Orders({ params, searchParams }: Pick<Props, "params" | "searchParams">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "orders.view");
+  const ctx = await requireRestaurant(restaurantId, "orders.view", "orders");
   const sp = await searchParams;
   const VIEWS = ["active", "new", "progress", "ready", "done"] as const;
   type View = (typeof VIEWS)[number];

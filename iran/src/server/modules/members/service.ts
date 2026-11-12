@@ -41,6 +41,7 @@ export async function listMembers(db: Database, ctx: RestaurantContext) {
       teamJobId: restaurantMembers.teamJobId,
       stationId: restaurantMembers.stationId,
       sectionIds: restaurantMembers.sectionIds,
+      screens: restaurantMembers.screens,
       lastLoginAt: users.lastLoginAt,
       createdAt: restaurantMembers.createdAt,
     })
@@ -187,6 +188,7 @@ export async function updateMember(
         grantedPermissions: granted,
         revokedPermissions: revoked,
         status: input.status,
+        ...(input.screens !== undefined ? { screens: input.screens } : {}),
       })
       .where(eq(restaurantMembers.id, memberId))
       .returning();
@@ -201,6 +203,7 @@ export async function updateMember(
         to: { role: input.role, status: input.status },
         granted,
         revoked,
+        ...(input.screens !== undefined ? { screens: input.screens } : {}),
       },
     });
     return updated!;

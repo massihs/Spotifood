@@ -18,6 +18,8 @@ import {
 import { addMemberAction, removeMemberAction, updateMemberAction } from "./actions";
 import { STATION_JOBS, type Job } from "@/lib/jobs";
 import type { TeamJobView } from "./job-meta";
+import { ScreenPicker } from "./screen-picker";
+import { cleanScreens, SCREENS, type Screen } from "@/lib/screens";
 
 export type MemberView = {
   id: string;
@@ -28,6 +30,11 @@ export type MemberView = {
   effectivePermissions: string[];
   /** Access set by the member's section: the permissions below are read-only. */
   accessFromSection?: boolean;
+  /** The person's own screens (null: their job's). */
+  screens?: string[] | null;
+  /** Their job's screens and its name (null: every screen). */
+  jobScreens?: string[] | null;
+  jobName?: string | null;
 };
 
 function AddMemberForm({
@@ -131,6 +138,7 @@ function EditMemberForm({
   allPermissions,
   roleDefaults,
   assignable,
+  kind,
 }: {
   restaurantId: string;
   member: MemberView;
@@ -139,6 +147,7 @@ function EditMemberForm({
   roleDefaults: Record<"admin" | "staff", string[]>;
   /** Permissions the current user holds and may therefore grant. */
   assignable: string[];
+  kind: string;
 }) {
   const t = useTranslations();
   const form = useActionForm(updateMemberAction.bind(null, restaurantId, member.id));
@@ -146,6 +155,10 @@ function EditMemberForm({
   const [role, setRole] = useState<"admin" | "staff">(member.role === "admin" ? "admin" : "staff");
   const [perms, setPerms] = useState(() => new Set(member.effectivePermissions));
   const [removeError, setRemoveError] = useState<string | null>(null);
+  const jobScreens = member.jobScreens ? cleanScreens(member.jobScreens) : [...SCREENS];
+  const [ownScreens, setOwnScreens] = useState<Screen[] | null>(
+    member.screens ? cleanScreens(member.screens) : null,
+  );
   useCloseOnSuccess(state);
 
   return (
@@ -179,6 +192,30 @@ function EditMemberForm({
             <option value="disabled">{t("team.disabled")}</option>
           </SelectField>
         </div>
+        <fieldset>
+          <legend className="text-sm font-medium">{t("team.screens.title")}</legend>
+          <input type="hidden" name="screensMode" value={ownScreens ? "custom" : "job"} />
+          {(ownScreens ?? []).map((s) => (
+            <input key={s} type="hidden" name="screens" value={s} />
+          ))}
+          <div className="mt-1 mb-3">
+            <Checkbox
+              label={
+                member.jobName
+                  ? t("team.screens.followJob", { job: member.jobName })
+                  : t("team.screens.followRole")
+              }
+              checked={!ownScreens}
+              onChange={(e) => setOwnScreens(e.target.checked ? null : jobScreens)}
+            />
+          </div>
+          <ScreenPicker
+            value={ownScreens ?? jobScreens}
+            onChange={setOwnScreens}
+            kind={kind}
+            disabled={!ownScreens}
+          />
+        </fieldset>
         <fieldset>
           <legend className="text-sm font-medium">{t("team.permissions")}</legend>
           <p className="mb-3 text-sm text-fg-muted">

@@ -29,7 +29,7 @@ async function Pos({ params, searchParams }: Pick<Props, "params" | "searchParam
     sp.channel === "delivery" || sp.channel === "takeaway" || sp.channel === "dine_in"
       ? sp.channel
       : undefined;
-  const ctx = await requireRestaurant(restaurantId, "orders.create");
+  const ctx = await requireRestaurant(restaurantId, "orders.create", "pos");
   const [menu, tables, config, shift, format, zones] = await Promise.all([
     getPublicMenu(ctx.restaurant.id),
     listTables(db, ctx),

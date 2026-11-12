@@ -24,7 +24,7 @@ export default function BranchesPage({ params }: Props) {
 
 async function Branches({ params }: Pick<Props, "params">) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "restaurant.view");
+  const ctx = await requireRestaurant(restaurantId, "restaurant.view", "branches");
   const [t, tKind, locale, rows] = await Promise.all([
     getTranslations("branches"),
     getTranslations("kinds"),

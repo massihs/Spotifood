@@ -19,7 +19,7 @@ export default function KitchenPage({ params }: { params: Params }) {
 
 async function Kitchen({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "orders.view");
+  const ctx = await requireRestaurant(restaurantId, "orders.view", "kitchen");
   // Active orders + those served/cancelled in the last 30 minutes.
   const [active, setup, acceptAtTill] = await Promise.all([
     listActiveOrders(db, ctx, { includeRecentMinutes: 30 }),

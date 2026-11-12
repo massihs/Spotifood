@@ -20,7 +20,7 @@ export default function InvoicesPage({ params }: { params: Params }) {
 
 async function Invoices({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "invoices.view");
+  const ctx = await requireRestaurant(restaurantId, "invoices.view", "invoices");
   const [t, locale, list] = await Promise.all([getTranslations(), getLocale(), listInvoices(db, ctx)]);
   return (
     <>

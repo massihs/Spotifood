@@ -18,6 +18,7 @@ import { JobPicker } from "./job-picker";
 import { JobGuide } from "./job-guide";
 import { cn } from "@/lib/cn";
 import { isJob, staffLinkPath } from "@/lib/jobs";
+import { resolveScreens } from "@/lib/screens";
 import { qrSvg } from "@/server/modules/tables/qr";
 import { JOB_TONES, jobOf } from "./job-meta";
 import { listTeamJobs } from "@/server/modules/team/jobs";
@@ -38,7 +39,7 @@ export default function TeamPage({ params }: { params: Params }) {
 
 async function Team({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "members.manage");
+  const ctx = await requireRestaurant(restaurantId, "members.manage", "team");
   const [t, format, members, { stations }, sections, calls, jobs] = await Promise.all([
     getTranslations(),
     getFormatter(),
@@ -94,6 +95,7 @@ async function Team({ params }: { params: Params }) {
         counts={jobCounts}
         links={links}
         allowManager={roles.includes("admin")}
+        kind={ctx.restaurant.kind}
       />
       <SectionsPanel
         restaurantId={ctx.restaurant.id}
@@ -213,7 +215,17 @@ async function Team({ params }: { params: Params }) {
                     {editable ? (
                       <EditMemberDialog
                         restaurantId={ctx.restaurant.id}
-                        member={m}
+                        member={{
+                          ...m,
+                          jobName: jobOf(jobs, m.teamJobId, m.job)?.name ?? null,
+                          jobScreens: resolveScreens({
+                            role: m.role,
+                            job: m.job,
+                            // As the dashboard reads it: the member's own job only.
+                            jobScreens: jobs.find((j) => j.id === m.teamJobId)?.screens,
+                          }),
+                        }}
+                        kind={ctx.restaurant.kind}
                         roles={[...roles]}
                         allPermissions={[...PERMISSIONS]}
                         roleDefaults={roleDefaults}

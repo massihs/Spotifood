@@ -22,7 +22,7 @@ export default function WaiterPage({ params }: { params: Params }) {
 
 async function Waiter({ params }: { params: Params }) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "orders.create");
+  const ctx = await requireRestaurant(restaurantId, "orders.create", "waiter");
   assertCan(ctx, "tables.view");
   const [t, menu, floor, rounds] = await Promise.all([
     getTranslations("waiter"),

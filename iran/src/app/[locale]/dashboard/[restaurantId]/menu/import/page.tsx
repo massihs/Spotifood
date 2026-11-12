@@ -18,7 +18,7 @@ export default function MenuImportPage(props: Props) {
 
 async function ImportPage({ params }: Props) {
   const { restaurantId } = await params;
-  const ctx = await requireRestaurant(restaurantId, "menu.manage");
+  const ctx = await requireRestaurant(restaurantId, "menu.manage", "menu");
   const t = await getTranslations("menuImport");
   return (
     <div className="xl:max-w-5xl">
