@@ -126,7 +126,7 @@ export function TradeOrderDesk({
               <li
                 key={p.id}
                 className={cn(
-                  "flex items-center gap-3 rounded-2xl border bg-surface p-2.5 transition-colors",
+                  "flex items-start gap-3 rounded-2xl border bg-surface p-2.5 transition-colors",
                   n ? "border-accent bg-accent-soft/30" : "border-border",
                   !p.isAvailable && "opacity-50",
                 )}
@@ -139,41 +139,43 @@ export function TradeOrderDesk({
                   </span>
                 )}
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{p.name}</span>
-                  <span className="block text-xs text-fg-muted tabular-nums">
-                    <b className="text-fg">{money(price)}</b>
-                    {price < retail ? <s className="ms-1.5 text-fg-subtle">{money(retail)}</s> : null}
-                  </span>
-                </span>
-                <span className="flex shrink-0 items-center gap-1">
-                  {n ? (
-                    <>
+                  <span className="line-clamp-2 text-sm leading-5 font-semibold">{p.name}</span>
+                  <span className="mt-1 flex items-center justify-between gap-2">
+                    <span className="min-w-0 truncate text-xs text-fg-muted tabular-nums">
+                      <b className="text-fg">{money(price)}</b>
+                      {price < retail ? <s className="ms-1.5 text-fg-subtle">{money(retail)}</s> : null}
+                    </span>
+                    <span className="flex shrink-0 items-center gap-1">
+                      {n ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => set(p.id, n - 1)}
+                            aria-label={t("less", { name: p.name })}
+                            className="grid size-9 place-items-center rounded-full bg-surface-2"
+                          >
+                            <Minus className="size-4" aria-hidden="true" />
+                          </button>
+                          <input
+                            inputMode="numeric"
+                            value={n}
+                            onChange={(e) => set(p.id, Number(e.target.value.replace(/\D/g, "")) || 0)}
+                            aria-label={t("quantity", { name: p.name })}
+                            className="h-9 w-12 rounded-lg border border-border text-center text-sm font-bold tabular-nums"
+                          />
+                        </>
+                      ) : null}
                       <button
                         type="button"
-                        onClick={() => set(p.id, n - 1)}
-                        aria-label={t("less", { name: p.name })}
-                        className="grid size-9 place-items-center rounded-full bg-surface-2"
+                        disabled={!p.isAvailable}
+                        onClick={() => set(p.id, n + 1)}
+                        aria-label={t("more", { name: p.name })}
+                        className="grid size-9 place-items-center rounded-full bg-accent text-accent-fg disabled:opacity-40"
                       >
-                        <Minus className="size-4" aria-hidden="true" />
+                        <Plus className="size-4" aria-hidden="true" />
                       </button>
-                      <input
-                        inputMode="numeric"
-                        value={n}
-                        onChange={(e) => set(p.id, Number(e.target.value.replace(/\D/g, "")) || 0)}
-                        aria-label={t("quantity", { name: p.name })}
-                        className="h-9 w-12 rounded-lg border border-border text-center text-sm font-bold tabular-nums"
-                      />
-                    </>
-                  ) : null}
-                  <button
-                    type="button"
-                    disabled={!p.isAvailable}
-                    onClick={() => set(p.id, n + 1)}
-                    aria-label={t("more", { name: p.name })}
-                    className="grid size-9 place-items-center rounded-full bg-accent text-accent-fg disabled:opacity-40"
-                  >
-                    <Plus className="size-4" aria-hidden="true" />
-                  </button>
+                    </span>
+                  </span>
                 </span>
               </li>
             );

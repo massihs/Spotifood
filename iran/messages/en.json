@@ -2475,7 +2475,36 @@
     "accountInfo": "Owed: {balance} · credit left: {available}",
     "densityPhotos": "With photos",
     "densityCompact": "Compact",
-    "tableNRoom": "Room {label}"
+    "tableNRoom": "Room {label}",
+    "quickCash": "Cash (exact)",
+    "quickCard": "Card (paid)",
+    "quickCardTerminal": "Card → terminal",
+    "keysHint": "Keyboard: digits = quantity · Enter = charge · Del = last line · / = search",
+    "multiplierClear": "Clear the quantity",
+    "customerDisplay": "Open the customer display (2nd screen)",
+    "sendToTerminal": "Send to the terminal",
+    "terminalManualHint": "Type the amount on the terminal, then confirm here. With the PC app, the amount goes to the terminal on its own.",
+    "terminal": {
+      "waiting": "Amount sent to the terminal: the customer presents their card…",
+      "declined": "Payment declined by the bank.",
+      "cancelled": "Payment cancelled.",
+      "timeout": "The terminal did not answer in time.",
+      "error": "Terminal unreachable. Check it is on and on the network.",
+      "approved": "Payment approved.",
+      "retry": "Try again",
+      "paidAnyway": "The terminal did approve: record it",
+      "cancel": "Cancel"
+    },
+    "display": {
+      "welcome": "Welcome!",
+      "total": "Total",
+      "discount": "Discount",
+      "toPay": "To pay",
+      "card": "Present your card on the terminal",
+      "thanks": "Thank you!",
+      "change": "Your change:",
+      "order": "Order"
+    }
   },
   "inventory": {
     "title": "Stock",

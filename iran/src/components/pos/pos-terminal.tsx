@@ -23,6 +23,8 @@ import {
   Trash2,
   UtensilsCrossed,
   X,
+  Zap,
+  MonitorSmartphone,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
@@ -34,6 +36,8 @@ import { couponDiscount } from "@/lib/coupon";
 import { parseMoneyInput } from "@/lib/money";
 import { normalizeIranMobile } from "@/lib/phone";
 import { forChannel } from "@/lib/channel-price";
+import { terminalBridge, useCardTerminal, type TerminalResult } from "@/lib/card-terminal";
+import { makeDisplayPublisher } from "@/lib/customer-display";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
 import {
   checkCouponAction,
@@ -45,6 +49,21 @@ type Line = { key: string; product: PublicProduct; optionValueIds: string[]; qua
 
 const newKey = () =>
   Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(16).padStart(2, "0")).join("");
+
+/** Search folding for Persian/Arabic letter variants and case. */
+const fold = (s: string) =>
+  s
+    .normalize("NFKD")
+    .replace(/[ً-ٰٟ]/g, "")
+    .replace(/[يى]/g, "ی")
+    .replace(/ك/g, "ک")
+    .toLowerCase();
+
+type Payment = {
+  provider: "cash" | "on_site_terminal" | "account";
+  tenderedCents: number | null;
+  terminalRef?: string;
+};
 
 function unitPrice(p: PublicProduct, valueIds: string[]) {
   const deltas = p.optionGroups.flatMap((g) => g.values).filter((v) => valueIds.includes(v.id));
@@ -116,14 +135,16 @@ export function PosTerminal({
   const [pending, start] = useTransition();
   const density = usePref("sf-pos-density", "photos") === "compact" ? "compact" : "photos";
   const searchRef = useRef<HTMLInputElement>(null);
-  // "/" jumps to the search, like most tills and web apps.
+  /** Typed before a tap: "3" then a coffee rings up three coffees. */
+  const [mult, setMult] = useState("");
+  const terminalReady = useCardTerminal();
+  const [card, setCard] = useState<{ phase: "waiting" } | { phase: "failed"; result: TerminalResult } | null>(
+    null,
+  );
+  const keys = useRef<(e: KeyboardEvent) => void>(() => {});
+  // Till keyboard: "/" search, digits a quantity, Enter to charge, Delete the last line, Esc clears.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement;
-      if (e.key !== "/" || /input|textarea|select/i.test(el.tagName)) return;
-      e.preventDefault();
-      searchRef.current?.focus();
-    };
+    const onKey = (e: KeyboardEvent) => keys.current(e);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
@@ -134,7 +155,8 @@ export function PosTerminal({
       category === "all"
         ? menu.categories.flatMap((c) => c.productIds)
         : (menu.categories.find((c) => c.id === category)?.productIds ?? []);
-    return ids.map((id) => menu.products[id]!).filter((p) => !q || p.name.toLowerCase().includes(q));
+    const f = fold(q);
+    return ids.map((id) => menu.products[id]!).filter((p) => !q || fold(p.name).includes(f));
   }, [menu, category, query]);
 
   const subtotal = lines.reduce(
@@ -193,16 +215,18 @@ export function PosTerminal({
   const count = lines.reduce((s, l) => s + l.quantity, 0);
 
   const add = (p: PublicProduct, optionValueIds: string[] = []) => {
+    const n = Math.min(99, Math.max(1, Number(mult) || 1));
+    setMult("");
     setDone(null);
     setLines((ls) => {
       const same = ls.find(
         (l) =>
           l.product.id === p.id && l.optionValueIds.join() === [...optionValueIds].sort().join() && !l.note,
       );
-      if (same) return ls.map((l) => (l === same ? { ...l, quantity: Math.min(99, l.quantity + 1) } : l));
+      if (same) return ls.map((l) => (l === same ? { ...l, quantity: Math.min(99, l.quantity + n) } : l));
       return [
         ...ls,
-        { key: newKey(), product: p, optionValueIds: [...optionValueIds].sort(), quantity: 1, note: "" },
+        { key: newKey(), product: p, optionValueIds: [...optionValueIds].sort(), quantity: n, note: "" },
       ];
     });
   };
@@ -216,9 +240,7 @@ export function PosTerminal({
       q <= 0 ? ls.filter((l) => l.key !== key) : ls.map((l) => (l.key === key ? { ...l, quantity: q } : l)),
     );
 
-  const submit = (
-    payment: { provider: "cash" | "on_site_terminal" | "account"; tenderedCents: number | null } | null,
-  ) =>
+  const submit = (payment: Payment | null) =>
     start(async () => {
       setError(null);
       const res = await createPosOrderAction(restaurantId, {
@@ -257,8 +279,74 @@ export function PosTerminal({
         setCoupon(null);
         setPaying(false);
         setTicketOpen(false);
-      } else if (res && !res.ok) setError(tErr.has(res.error) ? tErr(res.error) : tErr("internal"));
+        setCard(null);
+      } else if (res && !res.ok) {
+        setCard(null);
+        setError(tErr.has(res.error) ? tErr(res.error) : tErr("internal"));
+      }
     });
+
+  /** Card: the amount goes to the terminal, the customer pays there, the sale is recorded. */
+  const chargeCard = async () => {
+    const bridge = terminalBridge();
+    if (!bridge || !terminalReady) return submit({ provider: "on_site_terminal", tenderedCents: null });
+    setPaying(false);
+    setError(null);
+    setCard({ phase: "waiting" });
+    const result = await bridge
+      .pay({ amountCents: total, currency, reference: newKey().slice(0, 12) })
+      .catch((): TerminalResult => ({ status: "error", message: "bridge" }));
+    if (result.status === "approved")
+      submit({ provider: "on_site_terminal", tenderedCents: null, terminalRef: result.rrn ?? undefined });
+    else setCard({ phase: "failed", result });
+  };
+  const pay = (payment: Payment) =>
+    payment.provider === "on_site_terminal" && terminalReady ? void chargeCard() : submit(payment);
+
+  const onKeys = (e: KeyboardEvent) => {
+    const el = e.target as HTMLElement;
+    if (/input|textarea|select/i.test(el.tagName) || el.isContentEditable) return;
+    if (picking || card) return;
+    if (e.key === "/") {
+      e.preventDefault();
+      searchRef.current?.focus();
+    } else if (/^[0-9]$/.test(e.key) && !paying) {
+      setMult((m) => (m + e.key).replace(/^0+/, "").slice(0, 2));
+    } else if (e.key === "Escape") {
+      if (paying) setPaying(false);
+      else setMult("");
+    } else if (e.key === "Enter" && !paying && lines.length && canPay && methods.length && !pending) {
+      e.preventDefault();
+      setPaying(true);
+    } else if ((e.key === "Delete" || e.key === "Backspace") && !paying && lines.length) {
+      if (mult) setMult((m) => m.slice(0, -1));
+      else setLines((ls) => ls.slice(0, -1));
+    }
+  };
+  useEffect(() => {
+    keys.current = onKeys;
+  });
+
+  // The customer display (second screen) follows the ticket.
+  const display = useRef<ReturnType<typeof makeDisplayPublisher> | null>(null);
+  useEffect(() => {
+    display.current = makeDisplayPublisher(restaurantId);
+    return () => display.current?.close();
+  }, [restaurantId]);
+  useEffect(() => {
+    display.current?.send({
+      status: card ? "card" : paying ? "paying" : lines.length ? "cart" : done ? "paid" : "idle",
+      lines: lines.map((l) => ({
+        name: l.product.name,
+        quantity: l.quantity,
+        totalCents: unitPrice(forChannel(l.product, channel), l.optionValueIds) * l.quantity,
+      })),
+      discountCents,
+      totalCents: lines.length ? total : 0,
+      changeCents: done?.change ?? null,
+      number: done?.number ?? null,
+    });
+  }, [lines, total, discountCents, paying, card, done, channel]);
 
   const ticket = (
     <div className="flex h-full min-h-0 flex-col">
@@ -582,6 +670,34 @@ export function PosTerminal({
             {t("charge")}
           </button>
         </div>
+        {/* One tap: exact cash, or the amount straight to the card terminal. */}
+        {canPay && lines.length ? (
+          <div className="grid grid-cols-2 gap-2">
+            {methods.includes("cash") ? (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => submit({ provider: "cash", tenderedCents: total })}
+                className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-success-soft text-sm font-bold text-success ring-1 ring-success/25 disabled:opacity-40"
+              >
+                <Zap className="size-4" aria-hidden="true" />
+                {t("quickCash")}
+              </button>
+            ) : null}
+            {methods.includes("on_site_terminal") ? (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => pay({ provider: "on_site_terminal", tenderedCents: null })}
+                className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-tone-indigo/10 text-sm font-bold text-tone-indigo ring-1 ring-tone-indigo/25 disabled:opacity-40"
+              >
+                <CreditCard className="size-4" aria-hidden="true" />
+                {terminalReady ? t("quickCardTerminal") : t("quickCard")}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+        <p className="hidden text-center text-[11px] text-fg-subtle lg:block">{t("keysHint")}</p>
       </div>
     </div>
   );
@@ -603,6 +719,26 @@ export function PosTerminal({
               /
             </kbd>
           </label>
+          {mult ? (
+            <button
+              type="button"
+              onClick={() => setMult("")}
+              aria-label={t("multiplierClear")}
+              className="animate-pop-in flex h-11 shrink-0 items-center gap-1 rounded-xl bg-ink px-3 text-lg font-black text-ink-fg tabular-nums"
+            >
+              ×{mult}
+              <X className="size-4 opacity-70" aria-hidden="true" />
+            </button>
+          ) : null}
+          <a
+            href={`/display/${restaurantId}`}
+            target="sf-customer-display"
+            title={t("customerDisplay")}
+            aria-label={t("customerDisplay")}
+            className="hidden size-11 shrink-0 place-items-center rounded-xl border border-border bg-surface text-fg-muted hover:text-fg lg:grid"
+          >
+            <MonitorSmartphone className="size-5" aria-hidden="true" />
+          </a>
           <div className="flex shrink-0 rounded-xl border border-border bg-surface p-1" role="group">
             {(["photos", "compact"] as const).map((d) => (
               <button
@@ -782,7 +918,22 @@ export function PosTerminal({
           }
           pending={pending}
           onClose={() => setPaying(false)}
-          onPay={(provider, tendered) => submit({ provider, tenderedCents: tendered })}
+          terminalReady={terminalReady}
+          onPay={(provider, tendered) => pay({ provider, tenderedCents: tendered })}
+        />
+      ) : null}
+      {card ? (
+        <CardWaiting
+          total={total}
+          currency={currency}
+          state={card}
+          pending={pending}
+          onCancel={() => {
+            void terminalBridge()?.cancel();
+            setCard(null);
+          }}
+          onRetry={() => void chargeCard()}
+          onManual={() => submit({ provider: "on_site_terminal", tenderedCents: null })}
         />
       ) : null}
     </div>
@@ -884,11 +1035,13 @@ function PayDialog({
   methods,
   account,
   pending,
+  terminalReady,
   onClose,
   onPay,
 }: {
   total: number;
   currency: string;
+  terminalReady: boolean;
   methods: ("cash" | "on_site_terminal")[];
   /** The customer has a house account: what is left on their credit. */
   account: { available: number; balance: number } | null;
@@ -1003,9 +1156,97 @@ function PayDialog({
           onClick={() => onPay(method, method === "cash" ? tenderedCents : null)}
           className="mt-5 flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-lg font-bold text-accent-fg disabled:opacity-40"
         >
-          {pending ? <Loader2 className="size-5 animate-spin" /> : <Check className="size-5" />}
-          {t("confirmPayment")}
+          {pending ? (
+            <Loader2 className="size-5 animate-spin" />
+          ) : method === "on_site_terminal" && terminalReady ? (
+            <CreditCard className="size-5" />
+          ) : (
+            <Check className="size-5" />
+          )}
+          {method === "on_site_terminal" && terminalReady ? t("sendToTerminal") : t("confirmPayment")}
         </button>
+        {method === "on_site_terminal" && !terminalReady ? (
+          <p className="mt-2 text-center text-xs text-fg-muted">{t("terminalManualHint")}</p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+/** While the customer pays on the card terminal: the amount, then the result. */
+function CardWaiting({
+  total,
+  currency,
+  state,
+  pending,
+  onCancel,
+  onRetry,
+  onManual,
+}: {
+  total: number;
+  currency: string;
+  state: { phase: "waiting" } | { phase: "failed"; result: TerminalResult };
+  pending: boolean;
+  onCancel: () => void;
+  onRetry: () => void;
+  onManual: () => void;
+}) {
+  const t = useTranslations("pos");
+  const money = useMoney(currency);
+  const failed = state.phase === "failed";
+  return (
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-black/45 p-4"
+      role="alertdialog"
+      aria-modal="true"
+    >
+      <div className="animate-pop-in w-full max-w-sm rounded-3xl bg-surface p-6 text-center">
+        <span
+          className={cn(
+            "mx-auto grid size-16 place-items-center rounded-full",
+            failed ? "bg-danger-soft text-danger" : "bg-tone-indigo/12 text-tone-indigo",
+          )}
+        >
+          {failed ? (
+            <X className="size-8" aria-hidden="true" />
+          ) : pending ? (
+            <Loader2 className="size-8 animate-spin" aria-hidden="true" />
+          ) : (
+            <CreditCard className="size-8 animate-pulse" aria-hidden="true" />
+          )}
+        </span>
+        <p className="mt-4 text-3xl font-black tabular-nums">{money(total)}</p>
+        <p className="mt-2 text-sm text-fg-muted" role="status">
+          {failed ? t(`terminal.${state.result.status}`) : t("terminal.waiting")}
+        </p>
+        <div className="mt-5 grid gap-2">
+          {failed ? (
+            <>
+              <button
+                type="button"
+                onClick={onRetry}
+                className="h-12 rounded-xl bg-accent font-bold text-accent-fg"
+              >
+                {t("terminal.retry")}
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={onManual}
+                className="h-11 rounded-xl text-sm font-semibold ring-1 ring-border"
+              >
+                {t("terminal.paidAnyway")}
+              </button>
+            </>
+          ) : null}
+          <button
+            type="button"
+            onClick={onCancel}
+            className="h-11 rounded-xl text-sm font-semibold text-fg-muted"
+          >
+            {t("terminal.cancel")}
+          </button>
+        </div>
       </div>
     </div>
   );

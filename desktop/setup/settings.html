@@ -45,6 +45,7 @@
         <select id="startScreen" class="field" style="max-width: 260px"></select></label>
       <label class="check"><input type="checkbox" id="fullscreen" /><span id="fullscreenLabel"></span></label>
       <label class="check"><input type="checkbox" id="keepAwake" /><span id="keepAwakeLabel"></span></label>
+      <label class="check"><input type="checkbox" id="customerDisplay" /><span id="customerDisplayLabel"></span></label>
       <label class="check" id="autoStartRow"><input type="checkbox" id="autoStart" /><span id="autoStartLabel"></span></label>
       <div class="row"><span id="textSizeLabel" style="font-weight: 600"></span>
         <button class="btn" id="zoomOut" aria-label="−">−</button><span class="zoom" id="zoom"></span><button class="btn" id="zoomIn" aria-label="+">+</button><button class="btn" id="zoomReset">100%</button></div>
@@ -68,6 +69,30 @@
     <div id="printers" style="display: grid; gap: 10px"></div>
     <div class="row" style="margin-top: 12px"><button class="btn" id="addSystem"></button><button class="btn" id="addNetwork"></button><button class="btn dark" id="savePrinters"></button></div>
     <p class="muted" id="printerMsg" style="margin-top: 8px"></p>
+  </section>
+
+  <section class="card">
+    <h2 id="terminalTitle"></h2>
+    <p class="muted" id="terminalBody"></p>
+    <div class="printer">
+      <label><span id="terminalDriverLabel"></span><select class="field" id="terminalDriver"></select></label>
+      <label class="tcp">IP<input class="field" dir="ltr" id="terminalHost" placeholder="192.168.1.60"></label>
+      <label class="tcp">Port<input class="field" dir="ltr" id="terminalPort"></label>
+      <label class="tcp"><span id="terminalTimeoutLabel"></span><input class="field" dir="ltr" id="terminalTimeout"></label>
+    </div>
+    <details class="tcp" style="margin-top: 10px">
+      <summary id="terminalAdvanced" style="cursor: pointer; font-weight: 700"></summary>
+      <p class="muted" id="terminalAdvancedBody" style="margin-top: 8px"></p>
+      <div class="printer">
+        <label><span id="terminalTemplateLabel"></span><input class="field" dir="ltr" id="terminalTemplate"></label>
+        <label><span id="terminalTerminatorLabel"></span><select class="field" id="terminalTerminator"><option value="none">—</option><option value="crlf">CR LF</option><option value="lf">LF</option><option value="etx">ETX</option></select></label>
+        <label><span id="terminalApprovedLabel"></span><input class="field" dir="ltr" id="terminalApproved"></label>
+        <label><span id="terminalDeclinedLabel"></span><input class="field" dir="ltr" id="terminalDeclined"></label>
+        <label><span id="terminalRrnLabel"></span><input class="field" dir="ltr" id="terminalRrn"></label>
+      </div>
+    </details>
+    <div class="row" style="margin-top: 12px"><button class="btn" id="testTerminal"></button><button class="btn dark" id="saveTerminal"></button></div>
+    <p class="muted" id="terminalMsg" style="margin-top: 8px"></p>
   </section>
 
   <section class="card">

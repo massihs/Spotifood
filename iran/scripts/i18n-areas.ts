@@ -30,6 +30,7 @@ export const AREA_ROUTES = {
     "t",
     "invoice",
     "print",
+    "display",
   ],
   table: ["table"],
   online: ["r"],

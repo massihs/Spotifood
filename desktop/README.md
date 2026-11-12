@@ -46,6 +46,21 @@ Le PC apparaît dans **Réglages → Logiciel PC** ; *Retirer* le déconnecte im
 - **Journaux** : *Réglages → Journaux → Ouvrir le dossier* (`logs/spotifood.log`), à envoyer à
   l'assistance en cas de problème.
 
+## Terminal de paiement (PC-POS) et afficheur client
+
+- **Réglages → Terminal de paiement** : le logiciel envoie le montant de la caisse au terminal de
+  la banque (PC-POS), qui l'affiche au client ; il présente sa carte et le résultat (accepté avec sa
+  référence, ou refusé) revient tout seul dans la caisse. Le terminal doit être sur le réseau du
+  restaurant (IP et port fournis par le PSP : Behpardakht, Sadad, Saman, Pasargad, Parsian…).
+  Le message PC-POS se règle comme le PSP l'indique : modèle avec `{amount_rial}`, `{amount_toman}`,
+  `{ref}`, et motifs (regex) pour « accepté », « refusé » et la référence. *Tester avec 1 000 tomans*
+  vérifie la liaison. Le **simulateur** sert à former l'équipe (aucun paiement réel).
+- Sans terminal relié (ou dans un navigateur), la caisse reste en saisie manuelle : le montant est
+  tapé sur le terminal puis confirmé dans la caisse.
+- **Réglages → Écran et affichage → Afficheur client** : une fenêtre plein écran sur le 2e écran du
+  PC (tourné vers le client) montre le ticket en cours, le montant à payer, puis « merci » et la
+  monnaie. Sans 2e écran, le bouton écran de la caisse ouvre l'afficheur dans une fenêtre.
+
 ## Fonctionnement
 
 | Pièce | Rôle |
@@ -55,6 +70,7 @@ Le PC apparaît dans **Réglages → Logiciel PC** ; *Retirer* le déconnecte im
 | `src/updates.js` | mises à jour (GitHub releases : `latest.yml`, installateur Windows) |
 | `src/logger.js` | journal sur disque (1 Mo, 3 anciens fichiers) |
 | `src/sync.js` | surveillance de la connexion, copie du menu (5 min), envoi des commandes hors ligne, file d'impression du site |
+| `src/terminal.js` | terminal de paiement (PC-POS) : envoi du montant en TCP, lecture du résultat, simulateur |
 | `src/printer.js`, `src/escpos.js`, `src/tickets.js` | tickets dessinés par Chromium (persan correct) puis envoyés en raster ESC/POS |
 | `offline/` | écrans hors ligne (prise de commande, commandes, cuisine), partagés PC / téléphones |
 | `setup/` | barre d'état, premier lancement, réglages du PC (imprimantes locales, code, délier) |

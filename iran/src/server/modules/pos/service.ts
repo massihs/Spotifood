@@ -83,6 +83,12 @@ export const posOrderSchema = z.object({
       /** "account": put on the customer's house account (نسیه), within their credit limit. */
       provider: z.enum(["cash", "on_site_terminal", "account"]),
       tenderedCents: amount.nullable().optional(),
+      /** Reference (RRN) the card terminal returned when it approved the payment. */
+      terminalRef: z
+        .string()
+        .trim()
+        .regex(/^[\w-]{0,32}$/)
+        .optional(),
     })
     .nullable()
     .optional(),
@@ -328,7 +334,11 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
           currency: ctx.restaurant.currency,
           idempotencyKey: input.idempotencyKey,
           recordedByUserId: ctx.user.id,
-          metadata: { pos: true, ...(tendered != null ? { tenderedCents: tendered } : {}) },
+          metadata: {
+            pos: true,
+            ...(tendered != null ? { tenderedCents: tendered } : {}),
+            ...(input.payment.terminalRef ? { terminalRef: input.payment.terminalRef } : {}),
+          },
         })
         .returning();
       await tx.insert(paymentAllocations).values({

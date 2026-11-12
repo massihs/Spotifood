@@ -36,6 +36,7 @@ for (const [id, key] of Object.entries({
   startLabel: "startScreen",
   fullscreenLabel: "fullscreenStart",
   keepAwakeLabel: "keepAwake",
+  customerDisplayLabel: "customerDisplay",
   autoStartLabel: "autoStart",
   textSizeLabel: "textSize",
   shortcuts: "shortcuts",
@@ -43,7 +44,59 @@ for (const [id, key] of Object.entries({
   checkUpdate: "checkUpdates",
   logsTitle: "logsTitle",
   openLogs: "openLogs",
+  terminalTitle: "terminalTitle",
+  terminalBody: "terminalBody",
+  terminalDriverLabel: "terminalDriver",
+  terminalTimeoutLabel: "terminalTimeout",
+  terminalAdvanced: "terminalAdvanced",
+  terminalAdvancedBody: "terminalAdvancedBody",
+  terminalTemplateLabel: "terminalTemplate",
+  terminalTerminatorLabel: "terminalTerminator",
+  terminalApprovedLabel: "terminalApproved",
+  terminalDeclinedLabel: "terminalDeclined",
+  terminalRrnLabel: "terminalRrn",
+  testTerminal: "terminalTest",
+  saveTerminal: "save",
 })) $(id).textContent = t(key);
+
+// Card terminal: the till sends the amount, the terminal shows it to the customer.
+const DRIVERS = { none: "terminalNone", tcp: "terminalTcp", simulator: "terminalSimulator" };
+$("terminalDriver").innerHTML = Object.entries(DRIVERS)
+  .map(([v, k]) => `<option value="${v}">${t(k)}</option>`)
+  .join("");
+const TERMINAL_FIELDS = {
+  terminalDriver: "driver",
+  terminalHost: "host",
+  terminalPort: "port",
+  terminalTimeout: "timeoutSec",
+  terminalTemplate: "template",
+  terminalTerminator: "terminator",
+  terminalApproved: "approved",
+  terminalDeclined: "declined",
+  terminalRrn: "rrn",
+};
+function renderTerminal() {
+  for (const [id, k] of Object.entries(TERMINAL_FIELDS)) $(id).value = s.terminal[k] ?? "";
+  const tcp = s.terminal.driver === "tcp";
+  for (const el of document.querySelectorAll(".tcp")) el.classList.toggle("hidden", !tcp);
+}
+const readTerminal = () =>
+  Object.fromEntries(Object.entries(TERMINAL_FIELDS).map(([id, k]) => [k, $(id).value]));
+$("terminalDriver").onchange = () => {
+  s.terminal = { ...s.terminal, driver: $("terminalDriver").value };
+  renderTerminal();
+};
+$("saveTerminal").onclick = async () => {
+  s = await api.action("setTerminal", readTerminal());
+  renderTerminal();
+  $("terminalMsg").textContent = "✓";
+};
+$("testTerminal").onclick = async () => {
+  s = await api.action("setTerminal", readTerminal());
+  $("terminalMsg").textContent = t("terminalWaiting");
+  const r = await api.action("testTerminal");
+  $("terminalMsg").textContent = r.status === "approved" ? `✓ ${r.rrn ?? ""}` : `✗ ${r.status} ${r.message ?? ""}`;
+};
 
 // How this PC shows Spotifood: the kitchen TV in full screen on the kitchen, the till on its orders…
 const START = { last: "startLast", home: "startHome", pos: "startPos", orders: "startOrders", kitchen: "startKitchen", waiter: "startWaiter" };
@@ -53,6 +106,7 @@ $("startScreen").innerHTML = Object.entries(START)
 $("startScreen").onchange = (e) => api.action("setPc", { startScreen: e.target.value });
 $("fullscreen").onchange = (e) => api.action("setPc", { fullscreen: e.target.checked });
 $("keepAwake").onchange = (e) => api.action("setPc", { keepAwake: e.target.checked });
+$("customerDisplay").onchange = (e) => api.action("setPc", { customerDisplay: e.target.checked });
 $("autoStart").onchange = (e) => api.action("setPc", { autoStart: e.target.checked });
 $("zoomIn").onclick = () => api.action("zoom", 0.1);
 $("zoomOut").onclick = () => api.action("zoom", -0.1);
@@ -93,6 +147,7 @@ function renderState() {
   $("startScreen").value = s.pc.startScreen;
   $("fullscreen").checked = s.pc.fullscreen;
   $("keepAwake").checked = s.pc.keepAwake;
+  $("customerDisplay").checked = !!s.pc.customerDisplay;
   $("autoStart").checked = s.autoStart;
   $("autoStartRow").classList.toggle("hidden", s.platform === "linux");
   $("zoom").textContent = `${Math.round(s.pc.zoom * 100)}%`;
@@ -205,3 +260,4 @@ api.onState((next) => {
 });
 renderState();
 renderPrinters();
+renderTerminal();

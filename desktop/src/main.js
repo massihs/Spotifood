@@ -1,6 +1,7 @@
 import {
   app,
   BaseWindow,
+  BrowserWindow,
   WebContentsView,
   dialog,
   ipcMain,
@@ -25,6 +26,7 @@ import { createStore } from "./store.js";
 import { createSync } from "./sync.js";
 import { createLogger } from "./logger.js";
 import { createUpdates } from "./updates.js";
+import { cleanTerminal, createTerminal } from "./terminal.js";
 import { translator } from "../offline/i18n.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -43,7 +45,7 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const store = createStore(path.join(app.getPath("userData"), "data"));
 /** How this PC shows Spotifood (kitchen TV in full screen, a till on the orders…). */
-const PC_DEFAULTS = { startScreen: "last", fullscreen: false, keepAwake: false, zoom: 1 };
+const PC_DEFAULTS = { startScreen: "last", fullscreen: false, keepAwake: false, zoom: 1, customerDisplay: false };
 let config = { serverUrl: DEFAULT_SERVER, localPrinters: [], ...store.read("config", {}) };
 config.pc = { ...PC_DEFAULTS, ...config.pc };
 // Older versions could pick OneNote / "Print to PDF" as the ticket printer: drop them.
@@ -55,6 +57,7 @@ const saveConfig = (patch) => {
   pushState();
 };
 const { log, dir: logsDir } = createLogger(path.join(app.getPath("userData"), "logs"));
+const terminal = createTerminal({ getConfig: () => config.terminal ?? {}, log });
 process.on("uncaughtException", (e) => log("uncaught", e));
 process.on("unhandledRejection", (e) => log("unhandled", e));
 const tr = () => translator(hub.snapshot?.restaurant.defaultLocale ?? config.locale ?? "fa");
@@ -185,6 +188,7 @@ function state() {
     version: app.getVersion(),
     toast,
     pc: config.pc,
+    terminal: cleanTerminal(config.terminal ?? {}),
     autoStart: autoStartOn(),
     update: updates.state,
     platform: process.platform,
@@ -224,6 +228,7 @@ async function link(restaurantId) {
   app.setLoginItemSettings({ openAtLogin: true });
   await sync.refreshSnapshot().catch((e) => log(`snapshot: ${e.message}`));
   sync.start();
+  syncCustomerDisplay();
   flash("linked", { name: restaurant.name });
 }
 
@@ -376,6 +381,38 @@ function createWindow() {
   else showSetup();
 }
 
+/**
+ * The customer display: the till's second screen (facing the customer) shows the ticket and the
+ * amount to pay. The site's till broadcasts it; this window only opens the page full screen there.
+ */
+let displayWin = null;
+function syncCustomerDisplay() {
+  const want = !!(config.pc.customerDisplay && config.deviceToken && config.restaurantId);
+  if (!want) {
+    displayWin?.destroy();
+    displayWin = null;
+    return;
+  }
+  if (displayWin) return;
+  const primary = screen.getPrimaryDisplay();
+  const other = screen.getAllDisplays().find((d) => d.id !== primary.id) ?? null;
+  const area = (other ?? primary).bounds;
+  displayWin = new BrowserWindow({
+    x: area.x,
+    y: area.y,
+    width: other ? area.width : 1024,
+    height: other ? area.height : 700,
+    fullscreen: !!other,
+    autoHideMenuBar: true,
+    title: "Spotifood",
+    backgroundColor: "#ffffff",
+    icon: path.join(root, "build", "icon.png"),
+    webPreferences: { contextIsolation: true, sandbox: true },
+  });
+  void displayWin.loadURL(`${config.serverUrl.replace(/\/+$/, "")}/display/${config.restaurantId}`);
+  displayWin.on("closed", () => (displayWin = null));
+}
+
 function showWindow() {
   if (!win) createWindow();
   if (win.isMinimized()) win.restore();
@@ -477,6 +514,24 @@ function trusted(e) {
 }
 
 ipcMain.handle("state", (e) => (trusted(e) ? state() : null));
+
+/** The restaurant's site (top frame only) may use the card terminal; nothing else of this PC. */
+function fromSite(e) {
+  const frame = e.senderFrame;
+  if (!frame || frame.parent) return false;
+  try {
+    return new URL(frame.url).origin === new URL(config.serverUrl).origin;
+  } catch {
+    return false;
+  }
+}
+ipcMain.handle("terminal", async (e, name, arg) => {
+  if (!fromSite(e) && !trusted(e)) throw new Error("forbidden");
+  if (name === "info") return terminal.info();
+  if (name === "cancel") return terminal.cancel();
+  if (name === "pay") return terminal.pay(arg ?? {});
+  throw new Error("unknown_action");
+});
 ipcMain.handle("action", async (e, name, arg) => {
   if (!trusted(e)) throw new Error("forbidden");
   switch (name) {
@@ -553,6 +608,7 @@ ipcMain.handle("action", async (e, name, arg) => {
       if (response !== 0) return state();
       sync.stop();
       saveConfig({ deviceToken: null, deviceId: null, restaurantId: null, restaurantName: null, lastUrl: null });
+      syncCustomerDisplay();
       showSetup();
       return state();
     }
@@ -563,13 +619,21 @@ ipcMain.handle("action", async (e, name, arg) => {
         ...(a.startScreen && ["last", ...Object.keys(START_PATHS)].includes(a.startScreen) ? { startScreen: a.startScreen } : {}),
         ...(typeof a.fullscreen === "boolean" ? { fullscreen: a.fullscreen } : {}),
         ...(typeof a.keepAwake === "boolean" ? { keepAwake: a.keepAwake } : {}),
+        ...(typeof a.customerDisplay === "boolean" ? { customerDisplay: a.customerDisplay } : {}),
       };
       if (typeof a.fullscreen === "boolean" && win) win.setFullScreen(a.fullscreen);
       if (typeof a.keepAwake === "boolean") setKeepAwake(a.keepAwake);
       if (typeof a.autoStart === "boolean") app.setLoginItemSettings({ openAtLogin: a.autoStart });
       saveConfig({ pc });
+      syncCustomerDisplay();
       return state();
     }
+    case "setTerminal":
+      saveConfig({ terminal: cleanTerminal(arg ?? {}) });
+      return state();
+    case "testTerminal":
+      // 1 000 tomans: enough to see the amount on the terminal, cancel it there.
+      return terminal.pay({ amountCents: 1_000_000, currency: "IRR", reference: "TEST" });
     case "zoom":
       zoomBy(Number(arg) || 0);
       return state();
@@ -605,6 +669,7 @@ app.whenReady().then(async () => {
     }
   }
   createWindow();
+  syncCustomerDisplay();
   createTray();
   setKeepAwake(config.pc.keepAwake);
   if (config.deviceToken) sync.start();

@@ -2475,7 +2475,36 @@
     "accountInfo": "المستحق: {balance} · الرصيد المتاح: {available}",
     "densityPhotos": "مع الصور",
     "densityCompact": "مضغوط",
-    "tableNRoom": "Table {label}"
+    "tableNRoom": "Table {label}",
+    "quickCash": "نقداً (المبلغ بالضبط)",
+    "quickCard": "بطاقة (مدفوع)",
+    "quickCardTerminal": "بطاقة ← الجهاز",
+    "keysHint": "لوحة المفاتيح: الأرقام = الكمية · Enter = الدفع · Del = السطر الأخير · / = البحث",
+    "multiplierClear": "مسح الكمية",
+    "customerDisplay": "فتح شاشة العميل (الشاشة الثانية)",
+    "sendToTerminal": "إرسال إلى الجهاز",
+    "terminalManualHint": "أدخل المبلغ في جهاز الدفع ثم أكّد هنا. مع برنامج الحاسوب يذهب المبلغ إلى الجهاز تلقائياً.",
+    "terminal": {
+      "waiting": "أُرسل المبلغ إلى الجهاز: يقدّم العميل بطاقته…",
+      "declined": "رفض البنك الدفع.",
+      "cancelled": "أُلغي الدفع.",
+      "timeout": "لم يردّ الجهاز في الوقت المحدد.",
+      "error": "تعذّر الوصول إلى الجهاز. تحقق من تشغيله واتصاله بالشبكة.",
+      "approved": "تمت الموافقة على الدفع.",
+      "retry": "إعادة المحاولة",
+      "paidAnyway": "وافق الجهاز فعلاً: سجّل الدفع",
+      "cancel": "إلغاء"
+    },
+    "display": {
+      "welcome": "أهلاً بكم!",
+      "total": "المجموع",
+      "discount": "الخصم",
+      "toPay": "المطلوب",
+      "card": "قدّم بطاقتك على جهاز الدفع",
+      "thanks": "شكراً!",
+      "change": "الباقي:",
+      "order": "الطلب"
+    }
   },
   "inventory": {
     "title": "المخزون",

@@ -2483,7 +2483,36 @@
     "accountInfo": "Dû : {balance} · crédit restant : {available}",
     "densityPhotos": "Avec photos",
     "densityCompact": "Compact",
-    "tableNRoom": "Chambre {label}"
+    "tableNRoom": "Chambre {label}",
+    "quickCash": "Espèces (compte juste)",
+    "quickCard": "Carte (payé)",
+    "quickCardTerminal": "Carte → terminal",
+    "keysHint": "Clavier : chiffres = quantité · Entrée = encaisser · Suppr = dernière ligne · / = recherche",
+    "multiplierClear": "Effacer la quantité",
+    "customerDisplay": "Ouvrir l'afficheur client (2e écran)",
+    "sendToTerminal": "Envoyer au terminal",
+    "terminalManualHint": "Saisissez le montant sur le terminal, puis confirmez ici. Avec le logiciel PC, le montant part tout seul au terminal.",
+    "terminal": {
+      "waiting": "Montant envoyé au terminal : le client présente sa carte…",
+      "declined": "Paiement refusé par la banque.",
+      "cancelled": "Paiement annulé.",
+      "timeout": "Le terminal n'a pas répondu à temps.",
+      "error": "Terminal injoignable. Vérifiez qu'il est allumé et sur le réseau.",
+      "approved": "Paiement accepté.",
+      "retry": "Réessayer",
+      "paidAnyway": "Le terminal a bien accepté : enregistrer",
+      "cancel": "Annuler"
+    },
+    "display": {
+      "welcome": "Bienvenue !",
+      "total": "Total",
+      "discount": "Remise",
+      "toPay": "À payer",
+      "card": "Présentez votre carte sur le terminal",
+      "thanks": "Merci !",
+      "change": "Monnaie à rendre :",
+      "order": "Commande"
+    }
   },
   "inventory": {
     "title": "Stocks",

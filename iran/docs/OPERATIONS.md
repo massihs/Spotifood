@@ -139,3 +139,32 @@ L'équipe active les push depuis la cloche de notifications ; le client depuis l
 Attention : Chrome et Android passent par le service de Google (FCM), souvent filtré en Iran ;
 quand il est injoignable, l'envoi échoue sans rien bloquer et les SMS / alertes du tableau de bord
 restent la solution sûre.
+
+## Accès par écran
+
+Équipe → un poste (Cuisine, Caisse…) → _Écrans de ce poste_ : le responsable coche ce que le poste
+voit ; Modifier un membre → _Écrans visibles_ pour une personne. Le premier écran coché est la page
+d'accueil. Par défaut : cuisine et bar → Cuisine ; serveur → Prise de commande, commandes, salle,
+réservations ; caisse → commandes, caisse, livraison, ventes pro, clients, paiements, factures ;
+gérant et propriétaire → tout. Les pages non ouvertes renvoient vers l'écran d'accueil (côté serveur).
+
+## Comptabilité
+
+Finances → Comptabilité : les écritures sont générées à chaque ouverture (ventes par canal,
+remboursements, ventes en compte et règlements, dépenses, achats, paiements fournisseurs, chèques).
+Clôture et export (FEC ou journal Excel en rials) dans _Fiscalité et clôture_. Seul le propriétaire
+peut rouvrir une période clôturée.
+
+## Ventes pro (B2B)
+
+Ventes et service → Ventes pro : clients professionnels (identifiant, adresse, délai, plafond,
+remise), commandes au prix pro (Menu → produit → _Prix pro_ ; catégorie _Réservée aux clients pros_
+masquée des menus clients), facture au nom de la société, règlements (dont chèques). Module
+désactivable dans Réglages → Modules.
+
+## Terminal de paiement et afficheur client
+
+Le logiciel PC (Réglages → Terminal de paiement) envoie le montant au TPE (PC-POS en TCP, modèle de
+message fourni par le PSP) ; la caisse affiche « Carte → terminal » et enregistre la référence
+renvoyée. L'afficheur client (`/display/{restaurantId}`) s'ouvre sur le 2e écran du PC (option du
+logiciel) ou depuis le bouton écran de la caisse.
