@@ -20,6 +20,7 @@ export async function listCategories(db: Database, ctx: RestaurantContext) {
       icon: categories.icon,
       templateKey: categories.templateKey,
       isActive: categories.isActive,
+      tradeOnly: categories.tradeOnly,
       sortOrder: categories.sortOrder,
       productCount:
         sql<number>`(select count(*) from products p where p.category_id = "categories"."id" and p.deleted_at is null)`.mapWith(

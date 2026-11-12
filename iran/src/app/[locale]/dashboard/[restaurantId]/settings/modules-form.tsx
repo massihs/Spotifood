@@ -3,6 +3,7 @@
 import {
   Bike,
   Boxes,
+  Briefcase,
   Calculator,
   CalendarClock,
   ChefHat,
@@ -29,6 +30,7 @@ const ICONS: Record<ModuleKey, ReactNode> = {
   invoices: <FileText />,
   branches: <Network />,
   music: <Music />,
+  b2b: <Briefcase />,
 };
 
 /** On/off switches for optional modules: what is off disappears from the navigation. */

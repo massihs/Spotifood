@@ -60,6 +60,8 @@ export const categorySchema = z.object({
     .optional(),
   templateKey: text(48),
   isActive: z.boolean().default(true),
+  /** Sold to professional customers only (B2B): hidden from the guests' menus. */
+  tradeOnly: z.boolean().default(false),
 });
 export type CategoryInput = z.input<typeof categorySchema>;
 
@@ -73,6 +75,8 @@ export const productSchema = z
     compareAtPriceCents: cents.nullable().optional(),
     takeawayPriceCents: cents.nullable().optional(),
     deliveryPriceCents: cents.nullable().optional(),
+    /** Trade price for professional customers (B2B). */
+    tradePriceCents: cents.nullable().optional(),
     taxRateId: z.uuid().nullable().optional(),
     ingredients: text(1000),
     allergens: z.array(z.enum(ALLERGENS)).max(ALLERGENS.length).default([]),

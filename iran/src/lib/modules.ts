@@ -10,6 +10,7 @@ export const MODULES = [
   "invoices",
   "branches",
   "music",
+  "b2b",
 ] as const;
 export type ModuleKey = (typeof MODULES)[number];
 

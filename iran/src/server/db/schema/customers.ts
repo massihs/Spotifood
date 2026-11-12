@@ -39,12 +39,23 @@ export const customers = pgTable(
     /** House account (حساب اعتباری / نسیه): null = not allowed; balance is what the customer owes. */
     creditLimitCents: money(),
     balanceCents: money().notNull().default(0),
+    /** A professional customer (another café, a restaurant, an office): buys at trade prices. */
+    isBusiness: boolean().notNull().default(false),
+    /** Company id on invoices (شناسه ملی / کد اقتصادی, SIRET…). */
+    taxId: varchar({ length: 24 }),
+    /** Delivery / invoicing address of a trade customer. */
+    address: text(),
+    /** Days a trade customer has to pay an invoice put on account. */
+    paymentTermsDays: integer().notNull().default(30),
+    /** Extra discount of this trade customer on the trade prices, in basis points (1000 = 10 %). */
+    tradeDiscountBps: integer().notNull().default(0),
     ...timestamps,
   },
   (t) => [
     uniqueIndex("customers_restaurant_phone_uq").on(t.restaurantId, t.phone),
     index("customers_restaurant_last_idx").on(t.restaurantId, t.lastOrderAt),
     check("customers_points_chk", sql`${t.points} >= 0`),
+    check("customers_trade_discount_chk", sql`${t.tradeDiscountBps} between 0 and 9000`),
   ],
 );
 

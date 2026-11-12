@@ -20,6 +20,8 @@ export type PublicProduct = PricedProduct & {
   /** Price lists per sales type (null = menu price). */
   takeawayPriceCents: number | null;
   deliveryPriceCents: number | null;
+  /** Trade price for professional customers (null = menu price). */
+  tradePriceCents: number | null;
   isFeatured: boolean;
   allergens: string[];
   tags: string[];
@@ -49,7 +51,11 @@ export type PublicMenu = {
  * Products as the guest may see/order them: active category, active and not deleted product.
  * Sold-out products are included (shown as "Épuisé") but `isAvailable=false` blocks ordering.
  */
-export async function loadPublicMenu(db: DbOrTx, restaurantId: string): Promise<PublicMenu> {
+export async function loadPublicMenu(
+  db: DbOrTx,
+  restaurantId: string,
+  opts: { trade?: boolean } = {},
+): Promise<PublicMenu> {
   const cats = await db
     .select({
       id: categories.id,
@@ -64,12 +70,16 @@ export async function loadPublicMenu(db: DbOrTx, restaurantId: string): Promise<
         eq(categories.restaurantId, restaurantId),
         isNull(categories.deletedAt),
         eq(categories.isActive, true),
+        opts.trade ? undefined : eq(categories.tradeOnly, false),
       ),
     )
     .orderBy(asc(categories.sortOrder), asc(categories.createdAt));
   if (cats.length === 0) return { categories: [], products: {} };
 
-  const items = await loadPricedProducts(db, restaurantId, { categoryIds: cats.map((c) => c.id) });
+  const items = await loadPricedProducts(db, restaurantId, {
+    categoryIds: cats.map((c) => c.id),
+    trade: opts.trade,
+  });
   const byCategory = new Map<string, string[]>();
   for (const p of items) {
     const list = byCategory.get(p.categoryId) ?? [];
@@ -92,7 +102,7 @@ export async function loadPublicMenu(db: DbOrTx, restaurantId: string): Promise<
 export async function loadPricedProducts(
   db: DbOrTx,
   restaurantId: string,
-  filter: { categoryIds?: string[]; productIds?: string[] },
+  filter: { categoryIds?: string[]; productIds?: string[]; trade?: boolean },
 ): Promise<PublicProduct[]> {
   const conditions = [
     eq(products.restaurantId, restaurantId),
@@ -113,6 +123,7 @@ export async function loadPricedProducts(
         categoryActive: categories.isActive,
         categoryName: categories.name,
         categoryDeleted: categories.deletedAt,
+        tradeOnly: categories.tradeOnly,
       })
       .from(products)
       .innerJoin(categories, eq(categories.id, products.categoryId))
@@ -131,7 +142,10 @@ export async function loadPricedProducts(
       )
       .limit(1),
   ]);
-  const visible = rows.filter((r) => r.categoryActive && !r.categoryDeleted);
+  // Trade-only categories are sold to professional customers only (B2B screen).
+  const visible = rows.filter(
+    (r) => r.categoryActive && !r.categoryDeleted && (filter.trade || !r.tradeOnly),
+  );
   if (visible.length === 0) return [];
   const ids = visible.map((r) => r.p.id);
 
@@ -191,6 +205,7 @@ export async function loadPricedProducts(
     compareAtPriceCents: p.compareAtPriceCents,
     takeawayPriceCents: p.takeawayPriceCents,
     deliveryPriceCents: p.deliveryPriceCents,
+    tradePriceCents: p.tradePriceCents,
     isAvailable: p.isAvailable,
     isFeatured: p.isFeatured,
     allergens: p.allergens,
@@ -207,4 +222,4 @@ export async function loadPricedProducts(
   }));
 }
 
-export { forChannel } from "@/lib/channel-price";
+export { forChannel, forTrade } from "@/lib/channel-price";

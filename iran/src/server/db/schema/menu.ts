@@ -46,6 +46,8 @@ export const categories = pgTable(
     templateKey: varchar({ length: 48 }),
     /** Kitchen station preparing this category (null = every screen). */
     stationId: uuid(),
+    /** Sold to professional customers only (B2B): hidden from the guests' menus. */
+    tradeOnly: boolean().notNull().default(false),
     sortOrder: integer().notNull().default(0),
     isActive: boolean().notNull().default(true),
     ...timestamps,
@@ -72,6 +74,8 @@ export const products = pgTable(
     /** Price lists per sales type (null = same as the menu price). */
     takeawayPriceCents: money(),
     deliveryPriceCents: money(),
+    /** Trade price for professional customers (B2B; null = the menu price). */
+    tradePriceCents: money(),
     taxRateId: uuid().references(() => taxRates.id, { onDelete: "set null" }),
     ingredients: text(),
     /** EU 14 allergens codes: gluten, crustaceans, eggs, fish, peanuts, soy, milk, nuts, celery, mustard, sesame, sulphites, lupin, molluscs. */

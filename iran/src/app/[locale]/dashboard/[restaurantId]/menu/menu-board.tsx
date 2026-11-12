@@ -64,6 +64,7 @@ export type CategoryRow = {
   description: string | null;
   icon: string | null;
   isActive: boolean;
+  tradeOnly?: boolean;
   templateKey: string | null;
   productCount: number;
 };
@@ -131,6 +132,12 @@ function CategoryForm({
           name="isActive"
           label={t("menu.categoryActive")}
           defaultChecked={category?.isActive ?? true}
+        />
+        <Checkbox
+          name="tradeOnly"
+          label={t("menu.categoryTradeOnly")}
+          description={t("menu.categoryTradeOnlyHint")}
+          defaultChecked={category?.tradeOnly ?? false}
         />
         <div className="flex justify-end">
           <SubmitButton>{category ? t("common.save") : t("common.add")}</SubmitButton>
@@ -459,6 +466,7 @@ export function MenuBoard({
                       </span>
                       <span className="flex shrink-0 items-center gap-1.5">
                         {!c.isActive ? <Badge>{t("menu.hidden")}</Badge> : null}
+                        {c.tradeOnly ? <Badge tone="accent">B2B</Badge> : null}
                         {soldOut ? (
                           <span
                             className="rounded-full bg-warning-soft px-1.5 text-[11px] font-bold text-warning tabular-nums"

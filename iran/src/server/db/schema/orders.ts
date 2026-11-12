@@ -77,6 +77,8 @@ export const orders = pgTable(
     number: varchar({ length: 24 }).notNull(),
     seq: integer().notNull(),
     channel: orderChannel().notNull().default("dine_in"),
+    /** A trade sale (B2B) to a professional customer, at its trade prices. */
+    isB2b: boolean().notNull().default(false),
     tableId: uuid().references(() => diningTables.id, { onDelete: "set null" }),
     tableSessionId: uuid().references(() => tableSessions.id, { onDelete: "set null" }),
     participantId: uuid().references(() => sessionParticipants.id, { onDelete: "set null" }),

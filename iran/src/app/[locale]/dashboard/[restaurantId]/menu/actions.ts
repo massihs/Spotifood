@@ -69,6 +69,7 @@ const categoryFields = (fd: FormData) => ({
   description: str(fd, "description"),
   icon: str(fd, "icon"),
   isActive: fd.get("isActive") === "on",
+  tradeOnly: fd.get("tradeOnly") === "on",
 });
 
 export async function createCategoryAction(restaurantId: string, _prev: unknown, fd: FormData) {
@@ -140,6 +141,7 @@ function productFields(fd: FormData, currency: string) {
     compareAtPriceCents: money(fd, "compareAt", false, currency),
     takeawayPriceCents: money(fd, "takeawayPrice", false, currency),
     deliveryPriceCents: money(fd, "deliveryPrice", false, currency),
+    tradePriceCents: money(fd, "tradePrice", false, currency),
     taxRateId: str(fd, "taxRateId") || null,
     ingredients: str(fd, "ingredients"),
     allergens: fd.getAll("allergens").map(String) as Allergen[],

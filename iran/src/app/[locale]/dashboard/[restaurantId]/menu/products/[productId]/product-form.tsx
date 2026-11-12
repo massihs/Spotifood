@@ -40,6 +40,7 @@ export type ProductValues = {
   priceCents: number | null;
   compareAtPriceCents: number | null;
   takeawayPriceCents: number | null;
+  tradePriceCents: number | null;
   deliveryPriceCents: number | null;
   taxRateId: string | null;
   ingredients: string | null;
@@ -202,6 +203,14 @@ export function ProductForm({
               defaultValue={centsToInput(values.deliveryPriceCents, locale, currency)}
               hint={t("product.channelPriceHint")}
               error={err("deliveryPrice") ?? err("deliveryPriceCents")}
+            />
+            <MoneyField
+              label={t("product.tradePrice")}
+              name="tradePrice"
+              currency={currency}
+              defaultValue={centsToInput(values.tradePriceCents, locale, currency)}
+              hint={t("product.tradePriceHint")}
+              error={err("tradePrice") ?? err("tradePriceCents")}
             />
             <SelectField
               label={t("product.taxRate")}

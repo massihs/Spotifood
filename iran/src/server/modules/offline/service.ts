@@ -187,7 +187,12 @@ export async function getSnapshot(db: DbOrTx, auth: DeviceAuth) {
       })
       .from(categories)
       .where(
-        and(eq(categories.restaurantId, rid), isNull(categories.deletedAt), eq(categories.isActive, true)),
+        and(
+          eq(categories.restaurantId, rid),
+          isNull(categories.deletedAt),
+          eq(categories.isActive, true),
+          eq(categories.tradeOnly, false),
+        ),
       )
       .orderBy(asc(categories.sortOrder), asc(categories.createdAt)),
     loadPricedProducts(db, rid, {}),

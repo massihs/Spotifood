@@ -23,7 +23,7 @@ import { AppError, conflict, forbidden, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
 import { MAX_AMOUNT_CENTS, taxFromGross, taxFromNet } from "@/lib/money";
 import { normalizeIranMobile } from "@/lib/phone";
-import { forChannel, loadPricedProducts } from "@/server/modules/menu/public";
+import { forChannel, forTrade, loadPricedProducts } from "@/server/modules/menu/public";
 import { computeTotals, priceLine, type PricedLine } from "@/server/modules/pricing";
 import { nextCounterValue } from "@/server/modules/restaurants/service";
 import { stationsOf } from "@/server/modules/kitchen/stations";
@@ -87,6 +87,11 @@ export const posOrderSchema = z.object({
     .nullable()
     .optional(),
   idempotencyKey: z.string().regex(/^[A-Za-z0-9_-]{16,64}$/),
+  /**
+   * A trade sale (B2B) to the professional customer of `customerPhone`: trade prices less their
+   * own discount, trade-only products allowed, no coupon nor loyalty points.
+   */
+  b2b: z.boolean().default(false),
 });
 export type PosOrderInput = z.input<typeof posOrderSchema>;
 
@@ -105,6 +110,11 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
     if (input.payment.provider === "account") {
       if (!input.customerPhone) throw new AppError("VALIDATION", "phone_required", { field: "phone" });
     } else if (!config.offline.includes(input.payment.provider)) throw forbidden("payment_method_disabled");
+  }
+
+  if (input.b2b) {
+    if (!input.customerPhone) throw new AppError("VALIDATION", "phone_required", { field: "phone" });
+    if (input.couponCode || input.redeemPoints || input.discountPct) throw conflict("b2b_no_discounts");
   }
 
   if (input.channel === "delivery") {
@@ -132,8 +142,23 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
       sessionId = await seatTable(tx, rid, t.id);
     }
 
+    // A trade sale: the professional customer and their discount on the trade prices.
+    const [trade] = input.b2b
+      ? await tx
+          .select({ id: customers.id, discountBps: customers.tradeDiscountBps })
+          .from(customers)
+          .where(
+            and(
+              eq(customers.restaurantId, rid),
+              eq(customers.phone, input.customerPhone!),
+              eq(customers.isBusiness, true),
+            ),
+          )
+      : [];
+    if (input.b2b && !trade) throw notFound("trade_customer_not_found");
     const products = await loadPricedProducts(tx, rid, {
       productIds: [...new Set(input.lines.map((l) => l.productId))],
+      trade: input.b2b,
     });
     const byId = new Map(products.map((p) => [p.id, p]));
     const lines: {
@@ -145,7 +170,11 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
     }[] = [];
     for (const item of input.lines) {
       const base = byId.get(item.productId);
-      const product = base ? forChannel(base, input.channel) : undefined;
+      const product = base
+        ? trade
+          ? forTrade(base, trade.discountBps)
+          : forChannel(base, input.channel)
+        : undefined;
       const priced = product ? priceLine(product, item.optionValueIds, item.quantity) : null;
       if (!product || !priced?.ok) throw conflict("product_unavailable", { productId: item.productId });
       lines.push({
@@ -203,6 +232,7 @@ export async function createPosOrder(db: Database, ctx: RestaurantContext, raw: 
         number,
         seq,
         channel: input.channel,
+        isB2b: input.b2b,
         tableId: table?.id ?? null,
         tableSessionId: sessionId,
         tableLabel: table?.label ?? null,

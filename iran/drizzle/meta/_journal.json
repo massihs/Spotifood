@@ -337,6 +337,13 @@
       "when": 1794492054314,
       "tag": "0047_screens",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1794492677543,
+      "tag": "0048_ledger_b2b",
+      "breakpoints": true
     }
   ]
 }

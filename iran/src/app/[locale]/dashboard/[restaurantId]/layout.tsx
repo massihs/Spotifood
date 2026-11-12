@@ -3,6 +3,8 @@ import { sectionFilterOf } from "@/server/modules/team/sections";
 import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import {
+  BookOpenText,
+  Briefcase,
   Boxes,
   HeartHandshake,
   ChartColumn,
@@ -243,6 +245,15 @@ async function RestaurantShell({
         groupKey: "sales",
         group: g.sales,
       },
+      // Trade sales: a café or a roastery selling to other venues at trade prices.
+      {
+        show: on("b2b") && can(ctx, "orders.create") && can(ctx, "customers.view"),
+        href: `${base}/b2b`,
+        label: t("nav.b2b"),
+        icon: <Briefcase />,
+        groupKey: "sales",
+        group: g.sales,
+      },
       // Menu & stock: what the restaurant sells and where it is served.
       {
         show: can(ctx, "menu.view"),
@@ -301,6 +312,14 @@ async function RestaurantShell({
         href: `${base}/reports`,
         label: t("nav.reports"),
         icon: <ChartColumn />,
+        groupKey: "finance",
+        group: g.finance,
+      },
+      {
+        show: can(ctx, "accounting.manage"),
+        href: `${base}/accounting`,
+        label: t("nav.accounting"),
+        icon: <BookOpenText />,
         groupKey: "finance",
         group: g.finance,
       },
