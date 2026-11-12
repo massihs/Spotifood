@@ -144,6 +144,11 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   guestCalls: jsonb().$type<GuestCallOption[]>(),
   /** Targets on the overview, with alerts: null = no target. */
   kpiGoals: jsonb().$type<KpiGoals>().notNull().default({}),
+  /** Report centre: business day start hour, default period. */
+  reportSettings: jsonb().$type<{
+    dayStartHour?: number;
+    defaultPreset?: "today" | "7d" | "30d" | "month";
+  }>(),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */
   zarinpalMerchantId: varchar({ length: 64 }),
   /**

@@ -10,6 +10,7 @@ import { parseMoneyInput } from "@/lib/money";
 import {
   createExpenseAction,
   deleteExpenseAction,
+  saveReportSettingsAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/reports/actions";
 
 const CATEGORIES = [
@@ -209,5 +210,76 @@ export function DeleteExpense({ rid, id }: { rid: string; id: string }) {
     >
       <Trash2 className="size-4" />
     </button>
+  );
+}
+
+/** Report settings: when the business day starts, and the period the reports open on. */
+export function ReportSettingsForm({
+  rid,
+  dayStartHour,
+  defaultPreset,
+}: {
+  rid: string;
+  dayStartHour: number;
+  defaultPreset: string;
+}) {
+  const t = useTranslations("reports.center.settings");
+  const tp = useTranslations("reports.presets");
+  const { pending, error, run } = useRun();
+  const [hour, setHour] = useState(dayStartHour);
+  const [preset, setPreset] = useState(defaultPreset);
+  const [saved, setSaved] = useState(false);
+  return (
+    <div className="max-w-xl space-y-4 rounded-2xl border border-border bg-surface p-5">
+      <label className="block text-sm font-medium">
+        {t("dayStart")}
+        <select
+          value={hour}
+          onChange={(e) => {
+            setHour(Number(e.target.value));
+            setSaved(false);
+          }}
+          className={cn(field, "mt-1")}
+        >
+          {[0, 1, 2, 3, 4, 5, 6].map((h) => (
+            <option key={h} value={h}>
+              {t("hour", { h: String(h).padStart(2, "0") })}
+            </option>
+          ))}
+        </select>
+        <span className="mt-1 block text-xs font-normal text-fg-muted">{t("dayStartHint")}</span>
+      </label>
+      <label className="block text-sm font-medium">
+        {t("defaultPeriod")}
+        <select
+          value={preset}
+          onChange={(e) => {
+            setPreset(e.target.value);
+            setSaved(false);
+          }}
+          className={cn(field, "mt-1")}
+        >
+          {(["today", "7d", "30d", "month"] as const).map((p) => (
+            <option key={p} value={p}>
+              {tp(p)}
+            </option>
+          ))}
+        </select>
+      </label>
+      {error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p> : null}
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() =>
+          run(
+            () => saveReportSettingsAction(rid, { dayStartHour: hour, defaultPreset: preset }),
+            () => setSaved(true),
+          )
+        }
+        className="h-11 rounded-xl bg-accent px-5 font-bold text-accent-fg disabled:opacity-50"
+      >
+        {saved ? "✓" : t("save")}
+      </button>
+    </div>
   );
 }

@@ -344,6 +344,13 @@
       "when": 1794492677543,
       "tag": "0048_ledger_b2b",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1794495768210,
+      "tag": "0049_report_settings",
+      "breakpoints": true
     }
   ]
 }

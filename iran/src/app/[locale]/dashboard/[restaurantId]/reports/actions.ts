@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
 import { createExpense, deleteExpense, type EXPENSE_CATEGORIES } from "@/server/modules/reports/service";
+import { saveReportSettings } from "@/server/modules/reports/center";
 
 export async function createExpenseAction(
   rid: string,
@@ -26,6 +27,17 @@ export async function deleteExpenseAction(rid: string, id: string) {
   return runAction(async () => {
     const ctx = await actionContext(rid, "accounting.manage");
     await deleteExpense(db, ctx, id);
+    refresh();
+  });
+}
+
+export async function saveReportSettingsAction(
+  rid: string,
+  input: { dayStartHour: number; defaultPreset: string },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "accounting.manage");
+    await saveReportSettings(db, ctx, input);
     refresh();
   });
 }
