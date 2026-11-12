@@ -140,12 +140,12 @@ export function TradeOrderDesk({
                 )}
                 <span className="min-w-0 flex-1">
                   <span className="line-clamp-2 text-sm leading-5 font-semibold">{p.name}</span>
-                  <span className="mt-1 flex items-center justify-between gap-2">
-                    <span className="min-w-0 truncate text-xs text-fg-muted tabular-nums">
+                  <span className="mt-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
+                    <span className="text-xs text-fg-muted tabular-nums">
                       <b className="text-fg">{money(price)}</b>
-                      {price < retail ? <s className="ms-1.5 text-fg-subtle">{money(retail)}</s> : null}
+                      {price < retail && !n ? <s className="ms-1.5 text-fg-subtle">{money(retail)}</s> : null}
                     </span>
-                    <span className="flex shrink-0 items-center gap-1">
+                    <span className="ms-auto flex shrink-0 items-center gap-1">
                       {n ? (
                         <>
                           <button
