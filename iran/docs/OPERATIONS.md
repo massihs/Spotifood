@@ -148,6 +148,10 @@ d'accueil. Par défaut : cuisine et bar → Cuisine ; serveur → Prise de comma
 réservations ; caisse → commandes, caisse, livraison, ventes pro, clients, paiements, factures ;
 gérant et propriétaire → tout. Les pages non ouvertes renvoient vers l'écran d'accueil (côté serveur).
 
+Espace équipe : **spotifood.ir/pro**. Chaque membre s'y connecte et arrive sur son premier écran
+autorisé ; quelqu'un qui travaille dans plusieurs établissements choisit le sien. « Se déconnecter »
+revient sur /pro (pratique pour un poste partagé).
+
 ## Comptabilité
 
 Finances → Comptabilité : les écritures sont générées à chaque ouverture (ventes par canal,

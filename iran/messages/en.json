@@ -310,6 +310,19 @@
       "subtitle": "Sign in with your team account: you land straight on the “{job}” screen.",
       "otherAccount": "You are signed in as {email}, who has no access to this venue. Sign in with your team account.",
       "bookmark": "Tip: add this page to the home screen of the station's tablet or phone."
+    },
+    "pro": {
+      "title": "Team space",
+      "subtitle": "Sign in with the account your manager created: you land straight on your screen (kitchen, till, floor…), with only what they opened to you.",
+      "noAccount": "No account yet? Ask your manager to add you in Team; they choose your job and the screens you see.",
+      "owner": "Owner or manager? Regular sign-in",
+      "hello": "Hello {name}",
+      "chooseTitle": "Choose your venue",
+      "allScreens": "All screens",
+      "noVenue": "The account {email} is not part of any active team. Ask your manager to add you.",
+      "admin": "Platform administration",
+      "logout": "Sign out",
+      "loginLink": "Team member? Team space (spotifood.ir/pro)"
     }
   },
   "nav": {

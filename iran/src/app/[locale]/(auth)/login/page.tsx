@@ -22,6 +22,11 @@ export default async function LoginPage({ params }: PageProps<"/[locale]/login">
           {t("goSignup")}
         </Link>
       </p>
+      <p className="mt-3 text-center text-sm">
+        <Link href="/pro" className="font-medium text-fg-muted hover:text-fg hover:underline">
+          {t("pro.loginLink")}
+        </Link>
+      </p>
     </div>
   );
 }

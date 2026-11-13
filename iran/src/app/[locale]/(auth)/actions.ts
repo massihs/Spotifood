@@ -96,3 +96,9 @@ export async function logoutAction() {
   await endSession();
   redirect("/login");
 }
+
+/** Sign out from the team space: back to its sign-in (a shared till stays on /pro). */
+export async function proLogoutAction() {
+  await endSession();
+  redirect("/pro");
+}

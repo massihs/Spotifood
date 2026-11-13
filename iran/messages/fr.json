@@ -310,6 +310,19 @@
       "subtitle": "Connectez-vous avec votre compte d'équipe : vous arrivez directement sur l'écran « {job} ».",
       "otherAccount": "Vous êtes connecté avec {email}, qui n'a pas accès à cet établissement. Connectez-vous avec votre compte d'équipe.",
       "bookmark": "Astuce : ajoutez cette page à l'écran d'accueil de la tablette ou du téléphone du poste."
+    },
+    "pro": {
+      "title": "Espace équipe",
+      "subtitle": "Connectez-vous avec le compte que votre responsable a créé : vous arrivez directement sur votre écran (cuisine, caisse, salle…), avec seulement ce qu'il vous a ouvert.",
+      "noAccount": "Pas encore de compte ? Demandez à votre responsable de vous ajouter dans Équipe ; il choisit votre poste et les écrans que vous voyez.",
+      "owner": "Propriétaire ou gérant ? Connexion classique",
+      "hello": "Bonjour {name}",
+      "chooseTitle": "Choisissez votre établissement",
+      "allScreens": "Tous les écrans",
+      "noVenue": "Le compte {email} ne fait partie d'aucune équipe active. Demandez à votre responsable de vous ajouter.",
+      "admin": "Administration de la plateforme",
+      "logout": "Se déconnecter",
+      "loginLink": "Membre d'une équipe ? Espace équipe (spotifood.ir/pro)"
     }
   },
   "nav": {
