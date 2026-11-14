@@ -7,7 +7,13 @@ import { requestMeta, requireSuperAdmin } from "@/server/auth/current";
 import { recordAudit } from "@/server/audit";
 import { setRestaurantStatus } from "@/server/modules/restaurants/service";
 import { resolveError } from "@/server/modules/ops/errors";
-import { adminGrantPlan, adminUpdatePlan, billingCurrency } from "@/server/modules/billing/service";
+import {
+  adminEndOffer,
+  adminGrantPlan,
+  adminOfferPlan,
+  adminUpdatePlan,
+  billingCurrency,
+} from "@/server/modules/billing/service";
 import { parseMoneyInput } from "@/lib/money";
 
 const statusSchema = z.object({
@@ -82,5 +88,28 @@ export async function grantPlanAction(formData: FormData) {
     });
   const amount = parseMoneyInput(String(formData.get("amount") ?? "") || "0", billingCurrency()) ?? 0;
   await adminGrantPlan(db, admin.id, { ...input, amountCents: amount });
+  refresh();
+}
+
+export async function offerPlanAction(formData: FormData) {
+  const admin = await requireSuperAdmin();
+  const get = (k: string) => {
+    const v = formData.get(k);
+    return v === null || v === "" ? undefined : String(v);
+  };
+  await adminOfferPlan(db, admin.id, {
+    restaurantId: String(formData.get("restaurantId") ?? ""),
+    planCode: String(formData.get("planCode") ?? ""),
+    unit: (get("unit") ?? "months") as "months",
+    amount: get("amount") ? Number(get("amount")) : undefined,
+    until: get("until"),
+    note: get("note") ?? "",
+  });
+  refresh();
+}
+
+export async function endOfferAction(formData: FormData) {
+  const admin = await requireSuperAdmin();
+  await adminEndOffer(db, admin.id, z.uuid().parse(formData.get("restaurantId")));
   refresh();
 }

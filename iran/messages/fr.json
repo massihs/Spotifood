@@ -600,7 +600,23 @@
       "noEnd": "Sans fin",
       "monthsN": "{count} mois",
       "amount": "Montant reçu (facultatif)",
-      "apply": "Appliquer"
+      "apply": "Appliquer",
+      "offer": "Offrir un forfait",
+      "offerHint": "Sans facture ni paiement. Pendant l'offre, le restaurant a ce forfait ; à la fin (ou si vous la retirez), il retrouve son forfait actuel.",
+      "offerAmount": "Durée",
+      "offerUntil": "Date de fin (si « jusqu'au »)",
+      "offerNote": "Note interne (partenaire, lancement…)",
+      "offerApply": "Offrir",
+      "offerRunning": "Offert : {plan} jusqu'au {date}",
+      "offerRunningNoEnd": "Offert : {plan} sans fin",
+      "offerEnd": "Retirer l'offre",
+      "unit": {
+        "days": "jours",
+        "weeks": "semaines",
+        "months": "mois",
+        "until": "jusqu'au…",
+        "forever": "sans fin"
+      }
     },
     "growth": {
       "active7d": "Restaurants actifs (7 j)",
@@ -851,7 +867,10 @@
     "b2b_no_discounts": "Une vente pro se fait au tarif pro, sans remise ni points.",
     "trade_customer_not_found": "Client pro introuvable.",
     "no_account": "Ce client pro n'a pas de compte (plafond de crédit) : choisissez un autre mode de paiement.",
-    "too_many_lines": "Trop de lignes dans la commande."
+    "too_many_lines": "Trop de lignes dans la commande.",
+    "offer_in_past": "La date de fin est déjà passée.",
+    "offer_duration_required": "Indiquez la durée de l'offre.",
+    "plan_not_found": "Forfait introuvable."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -3997,7 +4016,10 @@
       "expired": "Votre forfait {plan} a expiré : retour aux limites du forfait Gratuit.",
       "renew": "Renouveler",
       "choose": "Choisir un forfait"
-    }
+    },
+    "giftBadge": "Offert",
+    "giftUntil": "Offert par Spotifood jusqu'au {date} ({days} j). Ensuite, votre forfait actuel reprend.",
+    "giftNoEnd": "Offert par Spotifood, sans date de fin."
   },
   "pricing": {
     "metaTitle": "Tarifs — Spotifood",

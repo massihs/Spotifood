@@ -58,15 +58,21 @@ async function Billing({ params, searchParams }: Props) {
             <p className="text-2xl font-bold">{s.kind === "free" ? t("freePlan") : s.planName}</p>
             {s.kind === "trial" ? <Badge tone="accent">{t("trialBadge")}</Badge> : null}
             {s.kind === "expired" ? <Badge tone="danger">{t("expiredBadge")}</Badge> : null}
-            {s.kind === "paid" ? <Badge tone="success">{t("activeBadge")}</Badge> : null}
+            {s.kind === "paid" ? (
+              <Badge tone={s.gift ? "accent" : "success"}>{s.gift ? t("giftBadge") : t("activeBadge")}</Badge>
+            ) : null}
           </div>
           <p className="mt-2 text-sm text-fg-muted">
             {s.kind === "trial"
               ? t("trialUntil", { date: date(s.endsAt), days: s.daysLeft })
               : s.kind === "paid"
-                ? s.endsAt
-                  ? t("paidUntil", { date: date(s.endsAt), days: s.daysLeft ?? 0 })
-                  : t("noEnd")
+                ? s.gift
+                  ? s.endsAt
+                    ? t("giftUntil", { date: date(s.endsAt), days: s.daysLeft ?? 0 })
+                    : t("giftNoEnd")
+                  : s.endsAt
+                    ? t("paidUntil", { date: date(s.endsAt), days: s.daysLeft ?? 0 })
+                    : t("noEnd")
                 : s.kind === "expired"
                   ? t("expiredSince", { date: date(s.endedAt) })
                   : t("freeBody")}

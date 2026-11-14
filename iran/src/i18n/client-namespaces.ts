@@ -127,6 +127,7 @@ export const CLIENT_NAMESPACES = {
   admin: [
     "admin",
     "common",
+    "dateInput",
     "errorCodes",
     "errors",
     "feedback",

@@ -68,6 +68,8 @@ export async function startingSubscription(tx: DbOrTx, organizationId: string, n
 type SubRow = {
   id: string;
   status: string;
+  /** "gift": a plan the platform offered for a while (see adminOfferPlan). */
+  provider?: string | null;
   currentPeriodEnd: Date | null;
   planId: string;
   planCode: string;
@@ -83,6 +85,7 @@ async function latestSubscription(db: DbOrTx, organizationId: string): Promise<S
       planId: subscriptions.planId,
       planCode: plans.code,
       planName: plans.name,
+      provider: subscriptions.provider,
     })
     .from(subscriptions)
     .innerJoin(plans, eq(plans.id, subscriptions.planId))
@@ -92,7 +95,12 @@ async function latestSubscription(db: DbOrTx, organizationId: string): Promise<S
         inArray(subscriptions.status, ["trialing", "active", "past_due"]),
       ),
     )
-    .orderBy(desc(subscriptions.createdAt))
+    // A running offer wins; once over, the subscription underneath shows again.
+    .orderBy(
+      sql`(${subscriptions.provider} = 'gift' and (${subscriptions.currentPeriodEnd} is null or ${subscriptions.currentPeriodEnd} > now())) desc`,
+      sql`coalesce(${subscriptions.provider}, '') = 'gift'`,
+      desc(subscriptions.createdAt),
+    )
     .limit(1);
   return row ?? null;
 }
@@ -100,7 +108,15 @@ async function latestSubscription(db: DbOrTx, organizationId: string): Promise<S
 export type SubscriptionState =
   | { kind: "free" }
   | { kind: "trial"; planCode: string; planName: string; endsAt: Date; daysLeft: number }
-  | { kind: "paid"; planCode: string; planName: string; endsAt: Date | null; daysLeft: number | null }
+  | {
+      kind: "paid";
+      planCode: string;
+      planName: string;
+      endsAt: Date | null;
+      daysLeft: number | null;
+      /** Offered by the platform, not paid. */
+      gift?: boolean;
+    }
   | { kind: "expired"; planCode: string; planName: string; endedAt: Date; wasTrial: boolean };
 
 export function stateOf(sub: SubRow | null, now = new Date()): SubscriptionState {
@@ -124,7 +140,14 @@ export function stateOf(sub: SubRow | null, now = new Date()): SubscriptionState
       endsAt: end,
       daysLeft: daysLeft!,
     };
-  return { kind: "paid", planCode: sub.planCode, planName: sub.planName, endsAt: end, daysLeft };
+  return {
+    kind: "paid",
+    planCode: sub.planCode,
+    planName: sub.planName,
+    endsAt: end,
+    daysLeft,
+    gift: sub.provider === "gift",
+  };
 }
 
 async function orgOf(db: DbOrTx, restaurantId: string) {
@@ -506,6 +529,134 @@ export async function adminGrantPlan(
     });
     return result;
   });
+}
+
+export const offerSchema = z
+  .object({
+    restaurantId: z.uuid(),
+    planCode: z.string().min(1).max(32),
+    /** A number of days / weeks / months, a chosen end day, or no end. */
+    unit: z.enum(["days", "weeks", "months", "until", "forever"]),
+    amount: z.coerce.number().int().min(1).max(3650).optional(),
+    until: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    note: z.string().trim().max(200).default(""),
+  })
+  .refine((v) => v.unit === "forever" || (v.unit === "until" ? !!v.until : !!v.amount), {
+    message: "offer_duration_required",
+  });
+
+/** End of an offer starting `now` (null: no end). */
+export function offerEnd(input: { unit: string; amount?: number; until?: string }, now = new Date()) {
+  if (input.unit === "forever") return null;
+  if (input.unit === "until") return new Date(`${input.until}T23:59:59Z`);
+  const n = input.amount ?? 0;
+  if (input.unit === "months") return addMonths(now, n);
+  return new Date(now.getTime() + n * (input.unit === "weeks" ? 7 : 1) * DAY);
+}
+
+/**
+ * The platform offers a plan to a restaurant for a while (launch, partner, apology, test…):
+ * no invoice, nothing paid. It sits on top of the current subscription: while it runs the
+ * restaurant has the offered plan; when it ends (or is withdrawn) the plan it had comes back.
+ * A new offer replaces a running one.
+ */
+export async function adminOfferPlan(
+  db: Database,
+  adminId: string,
+  raw: z.input<typeof offerSchema>,
+  now = new Date(),
+) {
+  const input = offerSchema.parse(raw);
+  const [plan] = await db.select().from(plans).where(eq(plans.code, input.planCode));
+  if (!plan) throw validation("plan_not_found");
+  const end = offerEnd(input, now);
+  if (end && end.getTime() <= now.getTime()) throw validation("offer_in_past");
+  const organizationId = await orgOf(db, input.restaurantId);
+  return db.transaction(async (tx) => {
+    await tx
+      .update(subscriptions)
+      .set({ status: "canceled", cancelAt: now })
+      .where(
+        and(
+          eq(subscriptions.organizationId, organizationId),
+          eq(subscriptions.provider, "gift"),
+          inArray(subscriptions.status, ["active", "trialing"]),
+        ),
+      );
+    const [row] = await tx
+      .insert(subscriptions)
+      .values({
+        organizationId,
+        planId: plan.id,
+        status: "active",
+        provider: "gift",
+        providerRef: input.note.slice(0, 128) || null,
+        currentPeriodEnd: end,
+      })
+      .returning();
+    await recordAudit(tx, {
+      action: "admin.plan_offered",
+      actorUserId: adminId,
+      restaurantId: input.restaurantId,
+      entityType: "organization",
+      entityId: organizationId,
+      metadata: { plan: plan.code, until: end?.toISOString() ?? null, note: input.note || null },
+    });
+    return row!;
+  });
+}
+
+/** Ends the running offer now: the restaurant goes back to the plan underneath. */
+export async function adminEndOffer(db: Database, adminId: string, restaurantId: string, now = new Date()) {
+  if (!isUuid(restaurantId)) throw notFound();
+  const organizationId = await orgOf(db, restaurantId);
+  const ended = await db
+    .update(subscriptions)
+    .set({ status: "canceled", cancelAt: now })
+    .where(
+      and(
+        eq(subscriptions.organizationId, organizationId),
+        eq(subscriptions.provider, "gift"),
+        inArray(subscriptions.status, ["active", "trialing"]),
+      ),
+    )
+    .returning({ id: subscriptions.id });
+  await recordAudit(db, {
+    action: "admin.offer_ended",
+    actorUserId: adminId,
+    restaurantId,
+    entityType: "organization",
+    entityId: organizationId,
+    metadata: { ended: ended.length },
+  });
+  return ended.length;
+}
+
+/** The running offer of each organization (plan, end, note), for the admin's list. */
+export async function offersByOrganization(db: DbOrTx, organizationIds: string[]) {
+  const ids = [...new Set(organizationIds)];
+  if (!ids.length) return new Map<string, { planName: string; endsAt: Date | null; note: string | null }>();
+  const rows = await db
+    .select({
+      organizationId: subscriptions.organizationId,
+      planName: plans.name,
+      endsAt: subscriptions.currentPeriodEnd,
+      note: subscriptions.providerRef,
+    })
+    .from(subscriptions)
+    .innerJoin(plans, eq(plans.id, subscriptions.planId))
+    .where(
+      and(
+        inArray(subscriptions.organizationId, ids),
+        eq(subscriptions.provider, "gift"),
+        eq(subscriptions.status, "active"),
+        sql`(${subscriptions.currentPeriodEnd} is null or ${subscriptions.currentPeriodEnd} > now())`,
+      ),
+    );
+  return new Map(rows.map((r) => [r.organizationId, r]));
 }
 
 /** Plan and end date of each organization, for the admin's restaurant list. */

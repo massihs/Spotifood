@@ -9,8 +9,16 @@ import { Link } from "@/i18n/navigation";
 import { requireSuperAdmin } from "@/server/auth/current";
 import { db } from "@/server/db/client";
 import { listRestaurantsForAdmin } from "@/server/modules/admin/service";
-import { grantPlanAction, setRestaurantStatusAction } from "../actions";
-import { adminListPlans, subscriptionsByOrganization } from "@/server/modules/billing/service";
+import { endOfferAction, grantPlanAction, offerPlanAction, setRestaurantStatusAction } from "../actions";
+import { DateInput } from "@/components/ui/date-input";
+import {
+  adminListPlans,
+  offersByOrganization,
+  subscriptionsByOrganization,
+} from "@/server/modules/billing/service";
+
+/** A day from now ("YYYY-MM-DD"), for the offer's default end. */
+const inDays = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10);
 
 export default function AdminRestaurantsPage({ searchParams }: PageProps<"/[locale]/admin/restaurants">) {
   return (
@@ -36,10 +44,17 @@ async function RestaurantsTable({
     listRestaurantsForAdmin(db, { q, status }),
     adminListPlans(db),
   ]);
-  const subs = await subscriptionsByOrganization(
-    db,
-    rows.map((r) => r.organizationId),
-  );
+  const [subs, offers] = await Promise.all([
+    subscriptionsByOrganization(
+      db,
+      rows.map((r) => r.organizationId),
+    ),
+    offersByOrganization(
+      db,
+      rows.map((r) => r.organizationId),
+    ),
+  ]);
+  const inMonth = inDays(30);
   const subLine = (orgId: string) => {
     const s = subs.get(orgId);
     if (!s || s.kind === "free") return t("plans.stateFree");
@@ -94,6 +109,83 @@ async function RestaurantsTable({
                 <p className="text-sm">
                   <span className="text-fg-muted">{t("plans.current")}</span> {subLine(r.organizationId)}
                 </p>
+                {offers.get(r.organizationId) ? (
+                  <div className="flex flex-wrap items-center gap-2 rounded-xl bg-accent-soft px-3 py-2 text-sm text-accent-text">
+                    <span className="font-semibold">
+                      {(() => {
+                        const o = offers.get(r.organizationId)!;
+                        return o.endsAt
+                          ? t("plans.offerRunning", {
+                              plan: o.planName,
+                              date: format.dateTime(o.endsAt, { dateStyle: "medium" }),
+                            })
+                          : t("plans.offerRunningNoEnd", { plan: o.planName });
+                      })()}
+                    </span>
+                    {offers.get(r.organizationId)!.note ? (
+                      <span className="text-xs opacity-80">· {offers.get(r.organizationId)!.note}</span>
+                    ) : null}
+                    <form action={endOfferAction} className="ms-auto">
+                      <input type="hidden" name="restaurantId" value={r.id} />
+                      <Button type="submit" size="sm" variant="ghost">
+                        {t("plans.offerEnd")}
+                      </Button>
+                    </form>
+                  </div>
+                ) : null}
+                <details className="rounded-xl bg-surface-2 p-3 text-sm">
+                  <summary className="cursor-pointer font-medium">{t("plans.offer")}</summary>
+                  <p className="mt-2 text-xs text-fg-muted">{t("plans.offerHint")}</p>
+                  <form action={offerPlanAction} className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <input type="hidden" name="restaurantId" value={r.id} />
+                    <select
+                      name="planCode"
+                      defaultValue={plans.find((p) => p.code !== "free")?.code}
+                      className="h-10 rounded-lg border border-border bg-surface px-2 sm:col-span-2"
+                      aria-label={t("plans.title")}
+                    >
+                      {plans.map((p) => (
+                        <option key={p.id} value={p.code}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                    <Input
+                      name="amount"
+                      type="number"
+                      min={1}
+                      max={3650}
+                      defaultValue="1"
+                      className="h-10"
+                      aria-label={t("plans.offerAmount")}
+                    />
+                    <select
+                      name="unit"
+                      defaultValue="months"
+                      className="h-10 rounded-lg border border-border bg-surface px-2"
+                      aria-label={t("plans.months")}
+                    >
+                      {(["days", "weeks", "months", "until", "forever"] as const).map((u) => (
+                        <option key={u} value={u}>
+                          {t(`plans.unit.${u}`)}
+                        </option>
+                      ))}
+                    </select>
+                    <label className="text-xs text-fg-muted sm:col-span-2">
+                      {t("plans.offerUntil")}
+                      <DateInput name="until" defaultValue={inMonth} className="mt-1" />
+                    </label>
+                    <Input
+                      name="note"
+                      maxLength={200}
+                      placeholder={t("plans.offerNote")}
+                      className="h-10 sm:col-span-2"
+                    />
+                    <Button type="submit" size="sm" className="sm:col-span-2">
+                      {t("plans.offerApply")}
+                    </Button>
+                  </form>
+                </details>
                 <details className="rounded-xl bg-surface-2 p-3 text-sm">
                   <summary className="cursor-pointer font-medium">{t("plans.grant")}</summary>
                   <form action={grantPlanAction} className="mt-3 grid gap-2 sm:grid-cols-3">

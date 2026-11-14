@@ -600,7 +600,23 @@
       "noEnd": "No end",
       "monthsN": "{count} months",
       "amount": "Amount received (optional)",
-      "apply": "Apply"
+      "apply": "Apply",
+      "offer": "Offer a plan",
+      "offerHint": "No invoice, nothing paid. During the offer the restaurant has this plan; when it ends (or you withdraw it), its current plan comes back.",
+      "offerAmount": "Duration",
+      "offerUntil": "End date (for \"until\")",
+      "offerNote": "Internal note (partner, launch…)",
+      "offerApply": "Offer",
+      "offerRunning": "Offered: {plan} until {date}",
+      "offerRunningNoEnd": "Offered: {plan}, no end",
+      "offerEnd": "Withdraw offer",
+      "unit": {
+        "days": "days",
+        "weeks": "weeks",
+        "months": "months",
+        "until": "until…",
+        "forever": "no end"
+      }
     },
     "growth": {
       "active7d": "Active restaurants (7 d)",
@@ -851,7 +867,10 @@
     "b2b_no_discounts": "A trade sale is at trade prices, without discount or points.",
     "trade_customer_not_found": "Trade customer not found.",
     "no_account": "This trade customer has no account (credit limit): choose another payment method.",
-    "too_many_lines": "Too many lines in the order."
+    "too_many_lines": "Too many lines in the order.",
+    "offer_in_past": "The end date is already past.",
+    "offer_duration_required": "Give the offer's duration.",
+    "plan_not_found": "Plan not found."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -3989,7 +4008,10 @@
       "expired": "Your {plan} plan has expired: back to the Free plan’s limits.",
       "renew": "Renew",
       "choose": "Choose a plan"
-    }
+    },
+    "giftBadge": "Offered",
+    "giftUntil": "Offered by Spotifood until {date} ({days} d). Then your current plan resumes.",
+    "giftNoEnd": "Offered by Spotifood, no end date."
   },
   "pricing": {
     "metaTitle": "Pricing — Spotifood",
