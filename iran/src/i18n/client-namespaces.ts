@@ -4,7 +4,7 @@
  * Server components read every message on the server; only client components need these.
  */
 export const CLIENT_NAMESPACES = {
-  site: ["auth", "common", "directory", "kinds", "music", "orders", "payments", "theme"],
+  site: ["auth", "common", "directory", "errors", "kinds", "music", "orders", "payments", "theme"],
   table: [
     "alerts",
     "allergens",

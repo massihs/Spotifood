@@ -11,6 +11,8 @@ import {
   setReservationStatusAction,
   updateReservationSettingsAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/reservations/actions";
+import { EmptyState } from "@/components/ui/empty-state";
+import { openSheet, useCreateParam } from "@/lib/use-create-param";
 
 export type ReservationRow = {
   id: string;
@@ -66,11 +68,7 @@ export function BookingList({
   const time = (iso: string) =>
     new Intl.DateTimeFormat(locale, { timeZone, hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   if (!rows.length)
-    return (
-      <p className="rounded-2xl border border-dashed border-border-strong px-6 py-12 text-center text-fg-muted">
-        {t("noBookings")}
-      </p>
-    );
+    return <EmptyState icon={<CalendarPlus />} title={t("noBookings")} description={t("noBookingsHint")} />;
   const hourOf = (iso: string) =>
     Number(
       new Intl.DateTimeFormat("en-US", { timeZone, hour: "2-digit", hourCycle: "h23" }).format(new Date(iso)),
@@ -241,8 +239,8 @@ export function QueueBoard({ rid, rows }: { rid: string; rows: ReservationRow[] 
             </li>
           ))}
           {!waiting.length ? (
-            <li className="rounded-2xl border border-dashed border-border-strong px-6 py-12 text-center text-fg-muted">
-              {t("queueEmpty")}
+            <li>
+              <EmptyState icon={<Users />} title={t("queueEmpty")} size="sm" />
             </li>
           ) : null}
         </ul>
@@ -312,6 +310,7 @@ export function NewBookingButton({
 }) {
   const t = useTranslations("reservations");
   const [open, setOpen] = useState(false);
+  useCreateParam("booking", openSheet(setOpen));
   return (
     <>
       <button

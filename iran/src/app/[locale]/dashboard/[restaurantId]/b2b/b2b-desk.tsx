@@ -17,6 +17,7 @@ import {
   removeTradeCustomerAction,
   saveTradeCustomerAction,
 } from "./actions";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export type TradeCustomerView = {
   id: string;
@@ -94,11 +95,7 @@ export function TradeOrderDesk({
   const set = (id: string, n: number) => setQty((m) => ({ ...m, [id]: Math.max(0, Math.min(9999, n)) }));
 
   if (!customers.length)
-    return (
-      <div className="rounded-2xl border border-dashed border-border-strong px-4 py-10 text-center text-sm text-fg-muted">
-        {t("noCustomersYet")}
-      </div>
-    );
+    return <EmptyState icon={<Building2 />} title={t("noCustomersYet")} description={t("emptyHint")} />;
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
@@ -636,9 +633,7 @@ export function TradeCustomers({
         ))}
       </ul>
       {!customers.length ? (
-        <p className="rounded-2xl border border-dashed border-border-strong px-4 py-10 text-center text-sm text-fg-muted">
-          {t("noCustomers")}
-        </p>
+        <EmptyState icon={<Building2 />} title={t("noCustomers")} description={t("emptyHint")} />
       ) : null}
       {edit ? (
         <TradeCustomerSheet

@@ -11,6 +11,7 @@ import { can } from "@/server/tenancy";
 import { getBillingView } from "@/server/modules/billing/service";
 import { planFeatureLines } from "@/server/modules/billing/features";
 import { Checkout } from "./checkout";
+import { planLabel } from "@/lib/plan-name";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/billing">;
 
@@ -26,8 +27,9 @@ async function Billing({ params, searchParams }: Props) {
   const { restaurantId } = await params;
   const sp = await searchParams;
   const ctx = await requireRestaurant(restaurantId, "restaurant.view", "billing");
-  const [t, format, view, locale] = await Promise.all([
+  const [t, tAll, format, view, locale] = await Promise.all([
     getTranslations("billing"),
+    getTranslations(),
     getFormatter(),
     getBillingView(db, ctx),
     getLocale(),
@@ -55,7 +57,9 @@ async function Billing({ params, searchParams }: Props) {
         <Card className="p-5 sm:p-6">
           <p className="text-sm text-fg-muted">{t("current")}</p>
           <div className="mt-1 flex flex-wrap items-center gap-3">
-            <p className="text-2xl font-bold">{s.kind === "free" ? t("freePlan") : s.planName}</p>
+            <p className="text-2xl font-bold">
+              {s.kind === "free" ? t("freePlan") : planLabel(s.planCode, s.planName, tAll)}
+            </p>
             {s.kind === "trial" ? <Badge tone="accent">{t("trialBadge")}</Badge> : null}
             {s.kind === "expired" ? <Badge tone="danger">{t("expiredBadge")}</Badge> : null}
             {s.kind === "paid" ? (

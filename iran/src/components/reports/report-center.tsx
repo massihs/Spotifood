@@ -1,4 +1,5 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { Inbox } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { PrintButton } from "@/components/ui/print-button";
 import { Link } from "@/i18n/navigation";
@@ -26,6 +27,7 @@ import {
 } from "@/server/modules/reports/center";
 import { Bars, DailyChart, HourChart, Kpi, Row } from "./report-parts";
 import { ReportSettingsForm } from "./reports-ui";
+import { EmptyState } from "@/components/ui/empty-state";
 
 /** The time the report is read (outside the components, which must stay pure). */
 const nowMs = () => Date.now();
@@ -81,11 +83,7 @@ function Table({ children, min = 640 }: { children: React.ReactNode; min?: numbe
 }
 
 function Empty({ text }: { text: string }) {
-  return (
-    <p className="rounded-2xl border border-dashed border-border-strong px-4 py-10 text-center text-sm text-fg-muted">
-      {text}
-    </p>
-  );
+  return <EmptyState icon={<Inbox />} title={text} size="sm" />;
 }
 
 /** The report centre's pages (the period is already the business-day range). */

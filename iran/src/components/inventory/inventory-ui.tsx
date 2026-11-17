@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ClipboardCheck, Pencil, Plus, Trash2, Truck, X } from "lucide-react";
+import { AlertTriangle, Boxes, ClipboardCheck, Pencil, Plus, Trash2, Truck, X } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useMoney } from "@/components/ui/use-money";
@@ -17,6 +17,8 @@ import {
   setRecipeAction,
   updateStockItemAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/inventory/actions";
+import { EmptyState } from "@/components/ui/empty-state";
+import { openNew, useCreateParam } from "@/lib/use-create-param";
 
 const UNITS = ["g", "kg", "ml", "l", "piece", "pack"] as const;
 type Unit = (typeof UNITS)[number];
@@ -47,6 +49,7 @@ export function StockTable({
   const format = useFormatter();
   const money = useMoney(currency);
   const [edit, setEdit] = useState<StockRow | "new" | null>(null);
+  useCreateParam("item", openNew(setEdit));
   const [adjust, setAdjust] = useState<{ item: StockRow; kind: "count" | "waste" } | null>(null);
   const value = items.reduce((s, i) => s + Math.max(0, i.quantity) * i.avgCostCents, 0);
   return (
@@ -74,9 +77,7 @@ export function StockTable({
         ) : null}
       </div>
       {items.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border-strong px-6 py-12 text-center text-fg-muted">
-          {t("noItems")}
-        </p>
+        <EmptyState icon={<Boxes />} title={t("noItems")} description={t("noItemsHint")} />
       ) : (
         <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
           {items.map((i) => {

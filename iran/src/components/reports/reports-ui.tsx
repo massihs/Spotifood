@@ -12,6 +12,7 @@ import {
   deleteExpenseAction,
   saveReportSettingsAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/reports/actions";
+import { openSheet, useCreateParam } from "@/lib/use-create-param";
 
 const CATEGORIES = [
   "rent",
@@ -93,6 +94,7 @@ export function NewExpenseButton({ rid, currency, today }: { rid: string; curren
   const [paidAt, setPaidAt] = useState(today);
   const cents = parseMoneyInput(amount, currency);
   const reset = () => (setOpen(false), setAmount(""), setDescription(""));
+  useCreateParam("expense", openSheet(setOpen));
   return (
     <>
       <button

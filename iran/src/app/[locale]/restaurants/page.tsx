@@ -22,6 +22,7 @@ import { db } from "@/server/db/client";
 import { getDirectory } from "@/server/modules/directory/cache";
 import { directoryFacets, searchDirectory } from "@/server/modules/directory/service";
 import { defaultWishTime, slotsNear } from "@/server/modules/reservations/service";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type Props = PageProps<"/[locale]/restaurants">;
 
@@ -227,11 +228,7 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
             ))}
           </ul>
         ) : (
-          <div className="rounded-3xl border border-dashed border-border-strong px-6 py-14 text-center">
-            <Store className="mx-auto size-10 text-fg-subtle" aria-hidden="true" />
-            <p className="mt-4 text-lg font-bold">{t("emptyTitle")}</p>
-            <p className="mt-1 text-fg-muted">{t("emptyBody")}</p>
-          </div>
+          <EmptyState icon={<Store />} title={t("emptyTitle")} description={t("emptyBody")} />
         )}
 
         {popular.length > 1 ? (

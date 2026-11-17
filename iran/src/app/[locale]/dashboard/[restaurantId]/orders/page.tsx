@@ -21,6 +21,7 @@ import { listActiveOrders } from "@/server/modules/orders/service";
 import { onlineServiceStatus } from "@/server/modules/online/service";
 import { getPaymentMethods } from "@/server/modules/payments/service";
 import { ACTIVE_STATUSES } from "@/server/modules/orders/status";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/orders">;
 
@@ -353,9 +354,7 @@ function OrdersBoard({
                 ))}
               </ul>
             ) : (
-              <p className="rounded-2xl border border-dashed border-border-strong px-4 py-10 text-center text-sm text-fg-muted">
-                {empty}
-              </p>
+              <EmptyState icon={<ReceiptText />} title={empty} size="sm" />
             )}
           </section>
         );

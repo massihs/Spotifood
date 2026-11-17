@@ -20,6 +20,8 @@ import {
   repayAccountAction,
   setCreditLimitAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/customers/actions";
+import { EmptyState } from "@/components/ui/empty-state";
+import { openSheet, useCreateParam } from "@/lib/use-create-param";
 
 const pill = "inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold";
 const primary = cn(pill, "bg-accent text-accent-fg disabled:opacity-50");
@@ -35,6 +37,7 @@ export function NewCustomerButton({ rid }: { rid: string }) {
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
+  useCreateParam("customer", openSheet(setOpen));
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className={primary}>
@@ -255,9 +258,7 @@ export function CouponList({
       ) : null}
       {error ? <p className="mb-3 text-sm text-danger">{error}</p> : null}
       {coupons.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border-strong px-6 py-12 text-center text-fg-muted">
-          {t("noCoupons")}
-        </p>
+        <EmptyState icon={<Ticket />} title={t("noCoupons")} description={t("noCouponsHint")} />
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {coupons.map((c) => {

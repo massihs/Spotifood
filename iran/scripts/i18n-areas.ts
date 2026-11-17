@@ -20,6 +20,7 @@ export const AREA_ROUTES = {
     "layout.tsx",
     "page.tsx",
     "not-found.tsx",
+    "error.tsx",
     "[...rest]",
     "(auth)",
     "pricing",

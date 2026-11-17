@@ -522,6 +522,30 @@
       "minutes": "{n} min",
       "hours": "{n, plural, one {# hour} other {# hours}}",
       "error": "That didn't work, try again."
+    },
+    "create": {
+      "button": "Create",
+      "title": "Quick create",
+      "items": {
+        "sale": "Sale",
+        "tableOrder": "Table order",
+        "booking": "Booking",
+        "dish": "Dish",
+        "customer": "Customer",
+        "expense": "Expense",
+        "stock": "Stock item",
+        "member": "Team member"
+      },
+      "hints": {
+        "sale": "Ring up at the counter",
+        "tableOrder": "Take a table's order",
+        "booking": "Note a booking",
+        "dish": "Add to the menu",
+        "customer": "Create a file",
+        "expense": "Rent, bill, purchase…",
+        "stock": "Ingredient or supply",
+        "member": "Invite to the team"
+      }
     }
   },
   "roles": {
@@ -692,11 +716,19 @@
     }
   },
   "errors": {
-    "notFoundTitle": "Page not found",
-    "notFoundBody": "This page does not exist or is no longer available.",
+    "notFoundTitle": "This dish is not on the menu",
+    "notFoundBody": "The page you asked for does not exist or has moved. Check the address, or start again from the home page.",
     "forbiddenTitle": "Access denied",
     "forbiddenBody": "You don't have permission to access this page.",
-    "home": "Back to home"
+    "home": "Back to home",
+    "errorCode": "Error",
+    "errorTitle": "A hiccup in the kitchen",
+    "errorBody": "Something went wrong on our side. Try again in a moment; if it keeps happening, our team has already been told.",
+    "errorBodyDashboard": "This page could not load. Your data is safe: try again, or go back to the dashboard's home.",
+    "retry": "Try again",
+    "back": "Previous page",
+    "reference": "Reference",
+    "overview": "Dashboard home"
   },
   "errorCodes": {
     "validation": "Please check the form fields.",
@@ -2597,7 +2629,7 @@
     "lowCount": "Running low",
     "newItem": "New item",
     "editItem": "Edit item",
-    "noItems": "No item yet. Add your ingredients.",
+    "noItems": "No stock item yet",
     "avgCost": "avg {amount} per {unit}",
     "threshold": "alert below {qty} {unit}",
     "count": "Count",
@@ -2651,7 +2683,8 @@
       "sale_cancel": "Cancelled",
       "adjustment": "Adjustment",
       "waste": "Waste"
-    }
+    },
+    "noItemsHint": "Add your ingredients and their alert level: stock goes down by itself with each sale (recipes) and you are warned before running out."
   },
   "customers": {
     "title": "Customer club",
@@ -2677,7 +2710,7 @@
     "statPoints": "Open points",
     "statSpent": "Total spent",
     "search": "Search name or number…",
-    "noCustomers": "No customers yet. A file is created automatically when a phone number is given at the till or at checkout.",
+    "noCustomers": "No customer yet",
     "unnamed": "No name",
     "ordersCount": "{count} orders",
     "points": "Points",
@@ -2698,7 +2731,7 @@
       "new": "New (30 days)"
     },
     "newCoupon": "New promo code",
-    "noCoupons": "No promo codes yet.",
+    "noCoupons": "No promo code",
     "code": "Code",
     "kinds": {
       "percent": "Percent",
@@ -2751,6 +2784,21 @@
         "payment": "Repayment",
         "adjust": "Adjustment"
       }
+    },
+    "noCustomersHint": "A file is created as soon as a mobile number is entered at the till or when ordering, with loyalty points and history.",
+    "noCouponsHint": "Create a percentage or amount code, with a minimum order and an end date, to share by SMS or in the dining room.",
+    "col": {
+      "customer": "Customer",
+      "orders": "Orders",
+      "last": "Last visit",
+      "spent": "Total spent",
+      "points": "Points"
+    },
+    "badge": {
+      "loyal": "Loyal",
+      "new": "New",
+      "inactive": "Inactive",
+      "owes": "Owes {amount}"
     }
   },
   "reports": {
@@ -3168,7 +3216,7 @@
       "settings": "Settings",
       "agenda": "Agenda"
     },
-    "noBookings": "No bookings for this day.",
+    "noBookings": "No booking this day",
     "tableN": "Table {label}",
     "noTable": "No table",
     "sources": {
@@ -3322,7 +3370,8 @@
       },
       "zoomIn": "Zoom in",
       "zoomFit": "Fit to screen"
-    }
+    },
+    "noBookingsHint": "Online, phone and walk-in bookings show up here, sorted by service."
   },
   "booking": {
     "people": "Guests",
@@ -4069,7 +4118,76 @@
     "free": "Free",
     "contact": "Contact us",
     "start": "Get started",
-    "eyebrow": "Pricing"
+    "eyebrow": "Pricing",
+    "period": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "save": "2 months free"
+    },
+    "billedYearly": "that is {amount} a year",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "tagline": "To get started, with no time limit"
+      },
+      "starter": {
+        "name": "Essential",
+        "tagline": "For a café or a small restaurant"
+      },
+      "professional": {
+        "name": "Professional",
+        "tagline": "For busy restaurants"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "tagline": "For chains and groups"
+      }
+    },
+    "compare": {
+      "title": "Compare plans",
+      "subtitle": "Every plan includes the QR menu, the till and the kitchen screen.",
+      "unlimited": "Unlimited",
+      "tables": "Tables",
+      "staff": "Team members",
+      "venues": "Venues",
+      "orders": "Orders per month",
+      "yes": "Included",
+      "no": "Not included",
+      "included": {
+        "qr": "QR menu and table ordering",
+        "pos": "Till and order taking",
+        "kitchen": "Kitchen screen and tickets",
+        "reports": "Sales reports",
+        "accounting": "Accounting and invoicing"
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "trial": {
+        "q": "Can I try before paying?",
+        "a": "Yes. The Free plan has no time limit. When the trial is open, every new restaurant also gets a few days of the Professional plan, with no card."
+      },
+      "change": {
+        "q": "Can I change plans?",
+        "a": "Any time, from the Subscription page of your dashboard. The new plan applies as soon as you pay."
+      },
+      "payment": {
+        "q": "How do I pay?",
+        "a": "Online by bank card through Zarinpal, for 1, 3 or 12 months (12 months for the price of 10)."
+      },
+      "invoice": {
+        "q": "Do I get an invoice?",
+        "a": "Yes, every payment has its official invoice, to download from the Subscription page."
+      },
+      "cancel": {
+        "q": "Is there a commitment?",
+        "a": "No. Nothing renews automatically: when the period ends, your restaurant keeps working with the Free plan's limits until the next payment."
+      },
+      "data": {
+        "q": "Is my data mine?",
+        "a": "Yes. Your menu, orders and customers belong to you; reports and accounting export (Excel, CSV, FEC) at any time."
+      }
+    }
   },
   "menuImport": {
     "title": "Import the menu",
@@ -4702,6 +4820,21 @@
     "overdueDays": "{days} d late",
     "edit": "Edit",
     "collect": "Collect",
-    "noCustomers": "No trade customer."
+    "noCustomers": "No trade customer.",
+    "emptyHint": "Add the cafés, restaurants or offices you sell to: their discount, credit limit and payment terms."
+  },
+  "workspace": {
+    "logout": "Sign out",
+    "hello": "Hello {name}",
+    "summary": "{venues, plural, one {# venue} other {# venues}} · {live, plural, =0 {no order in progress} one {# order in progress} other {# orders in progress}}",
+    "teamSpace": "Team space",
+    "adminHint": "Restaurants, plans, users and platform health.",
+    "noVenueHint": "Your account is not linked to any active venue. Ask your manager to add you in Team.",
+    "planTrial": "{plan} trial · {days} d",
+    "planExpired": "{plan} expired",
+    "today": "Today",
+    "live": "In progress",
+    "tables": "Open tables",
+    "open": "Open"
   }
 }

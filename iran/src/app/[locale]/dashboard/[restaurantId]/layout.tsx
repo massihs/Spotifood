@@ -3,6 +3,8 @@ import { sectionFilterOf } from "@/server/modules/team/sections";
 import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import {
+  CalendarPlus,
+  UserPlus,
   BookOpenText,
   Briefcase,
   Boxes,
@@ -53,6 +55,7 @@ import { checkKpiAlerts } from "@/server/modules/kpi/service";
 import { vapidPublicKey } from "@/server/modules/push/service";
 import { after } from "next/server";
 import { SubscriptionBanner } from "@/components/dashboard/subscription-banner";
+import { QuickCreate, type QuickCreateItem } from "@/components/dashboard/quick-create";
 import { countOpenRequests } from "@/server/modules/hotel/requests";
 
 /**
@@ -380,6 +383,66 @@ async function RestaurantShell({
 
   // Go-anywhere search also reaches the tabs inside pages and the settings sections.
   const visible = new Set(nav.map((n) => n.href));
+  // "+ Create": the forms people open most, if their screens and rights allow it.
+  const sees = (screen: string) => visible.has(screen === "overview" ? base : `${base}/${screen}`);
+  const tc = (k: string) => t(`dashboard.create.items.${k}`);
+  const tch = (k: string) => t(`dashboard.create.hints.${k}`);
+  const create: QuickCreateItem[] = (
+    [
+      sees("pos") && {
+        key: "sale",
+        href: `${base}/pos`,
+        icon: <Calculator />,
+        tone: "bg-tone-emerald/12 text-tone-emerald",
+      },
+      sees("waiter") && {
+        key: "tableOrder",
+        href: `${base}/waiter`,
+        icon: <NotebookPen />,
+        tone: "bg-tone-sky/12 text-tone-sky",
+      },
+      sees("reservations") && {
+        key: "booking",
+        href: `${base}/reservations?tab=bookings&create=booking`,
+        icon: <CalendarPlus />,
+        tone: "bg-tone-violet/12 text-tone-violet",
+      },
+      sees("menu") &&
+        can(ctx, "menu.manage") && {
+          key: "dish",
+          href: `${base}/menu/products/new`,
+          icon: <UtensilsCrossed />,
+          tone: "bg-tone-orange/12 text-tone-orange",
+        },
+      sees("customers") &&
+        can(ctx, "customers.manage") && {
+          key: "customer",
+          href: `${base}/customers?create=customer`,
+          icon: <UserPlus />,
+          tone: "bg-tone-rose/12 text-tone-rose",
+        },
+      sees("reports") && {
+        key: "expense",
+        href: `${base}/reports?tab=expenses&create=expense`,
+        icon: <Wallet />,
+        tone: "bg-tone-amber/18 text-tone-amber",
+      },
+      sees("inventory") &&
+        can(ctx, "inventory.manage") && {
+          key: "stock",
+          href: `${base}/inventory?create=item`,
+          icon: <Boxes />,
+          tone: "bg-tone-teal/12 text-tone-teal",
+        },
+      sees("team") && {
+        key: "member",
+        href: `${base}/team`,
+        icon: <Users />,
+        tone: "bg-tone-indigo/12 text-tone-indigo",
+      },
+    ].filter(Boolean) as Omit<QuickCreateItem, "label" | "hint">[]
+  ).map((i) => ({ ...i, label: tc(i.key), hint: tch(i.key) }));
+
   const sub = (page: string, ns: string, tabs: readonly string[], key = "tab") =>
     visible.has(`${base}/${page}`)
       ? tabs.map((k) => ({
@@ -429,6 +492,7 @@ async function RestaurantShell({
                 <Shield className="size-4" aria-hidden="true" />
               </Link>
             ) : null}
+            <QuickCreate items={create} />
             <OrderAlerts
               restaurantId={ctx.restaurant.id}
               newOrders={newOrders}

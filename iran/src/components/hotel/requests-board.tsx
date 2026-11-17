@@ -7,6 +7,7 @@ import { moveRequestAction } from "@/app/[locale]/dashboard/[restaurantId]/reque
 import { CALL_ICON } from "@/components/guest/call-icons";
 import { useRun } from "@/components/ui/sheet-kit";
 import { cn } from "@/lib/cn";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export type RequestView = {
   id: string;
@@ -143,9 +144,7 @@ export function RequestsBoard({
               </h2>
               <div className="space-y-2.5">
                 {list.length === 0 ? (
-                  <p className="rounded-2xl border border-dashed border-border-strong px-4 py-8 text-center text-sm text-fg-muted">
-                    {t(`empty.${status}`)}
-                  </p>
+                  <EmptyState icon={<Inbox />} title={t(`empty.${status}`)} size="sm" />
                 ) : (
                   list.map((r) => {
                     const KindIcon = CALL_ICON[icons[r.kind] ?? "bell"] ?? BellRing;

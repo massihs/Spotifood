@@ -1,4 +1,4 @@
-import { Check, CreditCard, FileText, Smartphone } from "lucide-react";
+import { Check, ChevronDown, CreditCard, FileText, Minus, Smartphone } from "lucide-react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: { absolute: t("metaTitle") }, description: t("subtitle") };
 }
 
-export default async function PricingPage({ params }: Props) {
+export default async function PricingPage({ params, searchParams }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("pricing");
@@ -49,10 +49,10 @@ export default async function PricingPage({ params }: Props) {
             {t("subtitle")}
           </p>
           <Suspense fallback={<div className="mt-12 h-96 animate-pulse rounded-3xl bg-surface-2" />}>
-            <Plans />
+            <Plans searchParams={searchParams} />
           </Suspense>
-          <p className="mt-10 text-center text-sm text-fg-muted">{t("yearly")}</p>
           <TrustStrip />
+          <Faq />
         </div>
       </main>
       <SiteFooter />
@@ -60,17 +60,25 @@ export default async function PricingPage({ params }: Props) {
   );
 }
 
-async function Plans() {
+/** The default plans have a translated name and a one-line "for whom"; renamed or new plans keep theirs. */
+const KNOWN = ["free", "starter", "professional", "enterprise"];
+
+async function Plans({ searchParams }: { searchParams: Props["searchParams"] }) {
   // Plans live in the database (Admin > Plans): read at request time.
   await connection();
-  const [t, tb, locale, plans] = await Promise.all([
+  const [t, tb, locale, plans, sp] = await Promise.all([
     getTranslations("pricing"),
     getTranslations("billing"),
     getLocale(),
     listPublicPlans(db),
+    searchParams,
   ]);
   const trial = billingEnabled();
   const highlight = "professional";
+  const yearly = sp.period === "yearly";
+  const name = (p: { code: string; name: string }) =>
+    KNOWN.includes(p.code) ? t(`plans.${p.code}.name`) : p.name;
+  const money = (c: number) => formatMoney(c, edition.platformCurrency, locale);
   return (
     <>
       {trial ? (
@@ -78,6 +86,28 @@ async function Plans() {
           {t("trial", { days: TRIAL_DAYS })}
         </p>
       ) : null}
+      {/* Monthly or yearly (12 months for the price of 10). */}
+      <div className="mx-auto mt-8 flex w-fit items-center gap-1 rounded-full bg-surface p-1 shadow-[var(--shadow-soft)] ring-1 ring-border">
+        {(["monthly", "yearly"] as const).map((k) => (
+          <Link
+            key={k}
+            href={k === "yearly" ? "/pricing?period=yearly" : "/pricing"}
+            scroll={false}
+            aria-current={(k === "yearly") === yearly ? "true" : undefined}
+            className={cn(
+              "inline-flex h-10 items-center gap-2 rounded-full px-5 text-sm font-bold transition-colors",
+              (k === "yearly") === yearly ? "bg-ink text-ink-fg" : "text-fg-muted hover:text-fg",
+            )}
+          >
+            {t(`period.${k}`)}
+            {k === "yearly" ? (
+              <span className="rounded-full bg-success-soft px-2 py-0.5 text-[11px] font-bold text-success">
+                {t("period.save")}
+              </span>
+            ) : null}
+          </Link>
+        ))}
+      </div>
       {/* Phones: plans side by side to swipe, the recommended one first. */}
       <ul className="mt-10 flex snap-x snap-mandatory [scrollbar-width:none] gap-4 overflow-x-auto py-3 max-sm:-mx-4 max-sm:px-4 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:py-0 lg:grid-cols-4">
         {plans.map((p) => {
@@ -100,14 +130,19 @@ async function Plans() {
                 />
               ) : null}
               <div className="flex items-center justify-between gap-2">
-                <h2 className="text-xl font-bold">{p.name}</h2>
+                <h2 className="text-xl font-bold">{name(p)}</h2>
                 {hot ? (
                   <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-accent-fg">
                     {t("popular")}
                   </span>
                 ) : null}
               </div>
-              <p className="mt-4">
+              {KNOWN.includes(p.code) ? (
+                <p className={cn("mt-1 text-sm", hot ? "text-white/60" : "text-fg-muted")}>
+                  {t(`plans.${p.code}.tagline`)}
+                </p>
+              ) : null}
+              <p className="mt-4 min-h-[4.5rem]">
                 {custom ? (
                   <span className="text-2xl font-bold">{t("onQuote")}</span>
                 ) : p.priceMonthlyCents === 0 ? (
@@ -115,11 +150,16 @@ async function Plans() {
                 ) : (
                   <>
                     <span className="text-3xl font-bold tabular-nums">
-                      {formatMoney(p.priceMonthlyCents, edition.platformCurrency, locale)}
+                      {money(yearly ? Math.round((p.priceMonthlyCents * 10) / 12) : p.priceMonthlyCents)}
                     </span>{" "}
                     <span className={cn("text-sm", hot ? "text-white/60" : "text-fg-muted")}>
                       {tb("perMonth")}
                     </span>
+                    {yearly ? (
+                      <span className={cn("mt-1 block text-xs", hot ? "text-white/60" : "text-fg-muted")}>
+                        {t("billedYearly", { amount: money(p.priceMonthlyCents * 10) })}
+                      </span>
+                    ) : null}
                   </>
                 )}
               </p>
@@ -153,7 +193,123 @@ async function Plans() {
           );
         })}
       </ul>
+      <p className="mt-8 text-center text-sm text-fg-muted">{t("yearly")}</p>
+      <Compare plans={plans.map((p) => ({ ...p, label: name(p) }))} />
     </>
+  );
+}
+
+/** Every plan side by side: limits, then what each one includes. */
+async function Compare({
+  plans,
+}: {
+  plans: {
+    id: string;
+    code: string;
+    label: string;
+    limits: Awaited<ReturnType<typeof listPublicPlans>>[number]["limits"];
+  }[];
+}) {
+  const [t, tb, locale] = await Promise.all([
+    getTranslations("pricing"),
+    getTranslations("billing"),
+    getLocale(),
+  ]);
+  const limit = (v: number | null) =>
+    v === null ? t("compare.unlimited") : new Intl.NumberFormat(locale).format(v);
+  const rows: { label: string; cell: (p: (typeof plans)[number]) => React.ReactNode }[] = [
+    { label: t("compare.tables"), cell: (p) => limit(p.limits.maxTables) },
+    { label: t("compare.staff"), cell: (p) => limit(p.limits.maxStaff) },
+    { label: t("compare.venues"), cell: (p) => limit(p.limits.maxRestaurants) },
+    { label: t("compare.orders"), cell: (p) => limit(p.limits.maxOrdersPerMonth) },
+    ...["qr", "pos", "kitchen", "reports", "accounting"].map((k) => ({
+      label: t(`compare.included.${k}`),
+      cell: () => true as React.ReactNode,
+    })),
+    ...["online_payments", "invoices_email", "analytics_advanced", "custom_branding", "priority_support"].map(
+      (f) => ({
+        label: tb(`features.${f}`),
+        cell: (p: (typeof plans)[number]) => p.limits.features.includes(f) as React.ReactNode,
+      }),
+    ),
+  ];
+  return (
+    <section className="mt-20">
+      <h2 className="text-center text-2xl font-black tracking-tight sm:text-3xl">{t("compare.title")}</h2>
+      <p className="mx-auto mt-2 max-w-xl text-center text-fg-muted">{t("compare.subtitle")}</p>
+      <div className="mt-8 overflow-x-auto rounded-3xl bg-surface shadow-[var(--shadow-soft)] ring-1 ring-border">
+        <table className="w-full min-w-[640px] text-sm">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="px-5 py-4 text-start font-semibold text-fg-muted" />
+              {plans.map((p) => (
+                <th
+                  key={p.id}
+                  className={cn(
+                    "px-4 py-4 text-center text-base font-bold",
+                    p.code === "professional" && "text-accent-text",
+                  )}
+                >
+                  {p.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {rows.map((r) => (
+              <tr key={r.label} className="hover:bg-surface-2/50">
+                <td className="px-5 py-3 font-medium">{r.label}</td>
+                {plans.map((p) => {
+                  const v = r.cell(p);
+                  return (
+                    <td
+                      key={p.id}
+                      className={cn(
+                        "px-4 py-3 text-center tabular-nums",
+                        p.code === "professional" && "bg-accent-soft/30",
+                      )}
+                    >
+                      {v === true ? (
+                        <Check className="mx-auto size-5 text-success" aria-label={t("compare.yes")} />
+                      ) : v === false ? (
+                        <Minus className="mx-auto size-4 text-fg-subtle" aria-label={t("compare.no")} />
+                      ) : (
+                        <span className="font-semibold">{v}</span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+/** What owners ask before paying. */
+async function Faq() {
+  const t = await getTranslations("pricing.faq");
+  const keys = ["trial", "change", "payment", "invoice", "cancel", "data"] as const;
+  return (
+    <section className="mx-auto mt-20 max-w-3xl">
+      <h2 className="text-center text-2xl font-black tracking-tight sm:text-3xl">{t("title")}</h2>
+      <div className="mt-8 space-y-3">
+        {keys.map((k) => (
+          <details
+            key={k}
+            className="group rounded-2xl bg-surface px-5 py-4 shadow-[var(--shadow-soft)] ring-1 ring-border open:ring-accent/40"
+          >
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
+              {t(`${k}.q`)}
+              <ChevronDown className="size-5 shrink-0 text-fg-muted transition-transform group-open:rotate-180" />
+            </summary>
+            <p className="mt-3 text-sm leading-7 text-fg-muted">{t(`${k}.a`)}</p>
+          </details>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -522,6 +522,30 @@
       "minutes": "{n} min",
       "hours": "{n} h",
       "error": "Échec, réessayez."
+    },
+    "create": {
+      "button": "Créer",
+      "title": "Créer rapidement",
+      "items": {
+        "sale": "Vente",
+        "tableOrder": "Commande à table",
+        "booking": "Réservation",
+        "dish": "Plat",
+        "customer": "Client",
+        "expense": "Dépense",
+        "stock": "Article de stock",
+        "member": "Membre d'équipe"
+      },
+      "hints": {
+        "sale": "Encaisser au comptoir",
+        "tableOrder": "Prendre la commande d'une table",
+        "booking": "Noter une réservation",
+        "dish": "Ajouter au menu",
+        "customer": "Créer une fiche",
+        "expense": "Loyer, facture, achat…",
+        "stock": "Ingrédient ou fourniture",
+        "member": "Inviter dans l'équipe"
+      }
     }
   },
   "roles": {
@@ -692,11 +716,19 @@
     }
   },
   "errors": {
-    "notFoundTitle": "Page introuvable",
-    "notFoundBody": "Cette page n'existe pas ou n'est plus disponible.",
+    "notFoundTitle": "Ce plat n'est pas au menu",
+    "notFoundBody": "La page demandée n'existe pas ou a été déplacée. Vérifiez l'adresse, ou repartez de l'accueil.",
     "forbiddenTitle": "Accès refusé",
     "forbiddenBody": "Vous n'avez pas les droits nécessaires pour accéder à cette page.",
-    "home": "Retour à l'accueil"
+    "home": "Retour à l'accueil",
+    "errorCode": "Erreur",
+    "errorTitle": "Un imprévu en cuisine",
+    "errorBody": "Quelque chose s'est mal passé de notre côté. Réessayez dans un instant ; si cela continue, notre équipe est déjà prévenue.",
+    "errorBodyDashboard": "Cette page n'a pas pu se charger. Vos données sont intactes : réessayez, ou revenez à l'accueil du tableau de bord.",
+    "retry": "Réessayer",
+    "back": "Page précédente",
+    "reference": "Référence",
+    "overview": "Accueil du tableau de bord"
   },
   "errorCodes": {
     "validation": "Merci de vérifier les champs du formulaire.",
@@ -2605,7 +2637,7 @@
     "lowCount": "Stock bas",
     "newItem": "Nouvel article",
     "editItem": "Edit item",
-    "noItems": "No item yet. Add your ingredients.",
+    "noItems": "Aucun article en stock pour l'instant",
     "avgCost": "avg {amount} per {unit}",
     "threshold": "alert below {qty} {unit}",
     "count": "Inventaire",
@@ -2659,7 +2691,8 @@
       "sale_cancel": "Cancelled",
       "adjustment": "Adjustment",
       "waste": "Waste"
-    }
+    },
+    "noItemsHint": "Ajoutez vos ingrédients et leur seuil d'alerte : le stock baisse tout seul à chaque vente (recettes) et vous êtes prévenu avant la rupture."
   },
   "customers": {
     "title": "Club clients",
@@ -2685,7 +2718,7 @@
     "statPoints": "Points en cours",
     "statSpent": "Total dépensé",
     "search": "Rechercher nom ou numéro…",
-    "noCustomers": "Aucun client. Une fiche est créée automatiquement quand un numéro est saisi en caisse ou à la commande.",
+    "noCustomers": "Aucun client pour l'instant",
     "unnamed": "Sans nom",
     "ordersCount": "{count} commandes",
     "points": "Points",
@@ -2706,7 +2739,7 @@
       "new": "Nouveaux (30 j)"
     },
     "newCoupon": "Nouveau code promo",
-    "noCoupons": "Aucun code promo.",
+    "noCoupons": "Aucun code promo",
     "code": "Code",
     "kinds": {
       "percent": "Pourcentage",
@@ -2759,6 +2792,21 @@
         "payment": "Remboursement",
         "adjust": "Ajustement"
       }
+    },
+    "noCustomersHint": "Une fiche se crée toute seule dès qu'un mobile est saisi en caisse ou à la commande, avec ses points de fidélité et son historique.",
+    "noCouponsHint": "Créez un code en pourcentage ou en montant, avec un minimum de commande et une date de fin, à partager par SMS ou en salle.",
+    "col": {
+      "customer": "Client",
+      "orders": "Commandes",
+      "last": "Dernière visite",
+      "spent": "Total dépensé",
+      "points": "Points"
+    },
+    "badge": {
+      "loyal": "Fidèle",
+      "new": "Nouveau",
+      "inactive": "Inactif",
+      "owes": "Doit {amount}"
     }
   },
   "reports": {
@@ -3176,7 +3224,7 @@
       "settings": "Réglages",
       "agenda": "Agenda"
     },
-    "noBookings": "Aucune réservation ce jour.",
+    "noBookings": "Aucune réservation ce jour",
     "tableN": "Table {label}",
     "noTable": "Sans table",
     "sources": {
@@ -3330,7 +3378,8 @@
       },
       "zoomIn": "Agrandir",
       "zoomFit": "Tout voir"
-    }
+    },
+    "noBookingsHint": "Les réservations en ligne, par téléphone ou sur place s'affichent ici, rangées par service."
   },
   "booking": {
     "people": "Couverts",
@@ -4077,7 +4126,76 @@
     "free": "Gratuit",
     "contact": "Nous contacter",
     "start": "Commencer",
-    "eyebrow": "Tarifs"
+    "eyebrow": "Tarifs",
+    "period": {
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "save": "2 mois offerts"
+    },
+    "billedYearly": "soit {amount} par an",
+    "plans": {
+      "free": {
+        "name": "Gratuit",
+        "tagline": "Pour découvrir, sans limite de durée"
+      },
+      "starter": {
+        "name": "Essentiel",
+        "tagline": "Pour un café ou un petit restaurant"
+      },
+      "professional": {
+        "name": "Professionnel",
+        "tagline": "Pour les restaurants qui tournent fort"
+      },
+      "enterprise": {
+        "name": "Entreprise",
+        "tagline": "Pour les chaînes et les groupes"
+      }
+    },
+    "compare": {
+      "title": "Comparer les forfaits",
+      "subtitle": "Tous les forfaits incluent le menu QR, la caisse et l'écran cuisine.",
+      "unlimited": "Illimité",
+      "tables": "Tables",
+      "staff": "Membres d'équipe",
+      "venues": "Établissements",
+      "orders": "Commandes par mois",
+      "yes": "Inclus",
+      "no": "Non inclus",
+      "included": {
+        "qr": "Menu QR et commande à table",
+        "pos": "Caisse et prise de commande",
+        "kitchen": "Écran cuisine et tickets",
+        "reports": "Rapports de ventes",
+        "accounting": "Comptabilité et facturation"
+      }
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "trial": {
+        "q": "Puis-je essayer avant de payer ?",
+        "a": "Oui. Le forfait Gratuit n'a pas de limite de durée. Quand l'essai est ouvert, chaque nouveau restaurant profite aussi de quelques jours du forfait Professionnel, sans carte bancaire."
+      },
+      "change": {
+        "q": "Puis-je changer de forfait ?",
+        "a": "À tout moment, depuis la page Abonnement de votre tableau de bord. Le nouveau forfait s'applique dès le paiement."
+      },
+      "payment": {
+        "q": "Comment se fait le paiement ?",
+        "a": "En ligne par carte bancaire via Zarinpal, pour 1, 3 ou 12 mois (12 mois au prix de 10)."
+      },
+      "invoice": {
+        "q": "Est-ce que je reçois une facture ?",
+        "a": "Oui, chaque paiement a sa facture officielle, à télécharger depuis la page Abonnement."
+      },
+      "cancel": {
+        "q": "Y a-t-il un engagement ?",
+        "a": "Non. Il n'y a pas de renouvellement automatique : à la fin de la période, votre restaurant continue de fonctionner avec les limites du forfait Gratuit jusqu'au prochain paiement."
+      },
+      "data": {
+        "q": "Mes données restent-elles à moi ?",
+        "a": "Oui. Votre menu, vos commandes et vos clients vous appartiennent ; rapports et comptabilité s'exportent (Excel, CSV, FEC) à tout moment."
+      }
+    }
   },
   "menuImport": {
     "title": "Importer le menu",
@@ -4710,6 +4828,21 @@
     "overdueDays": "retard de {days} j",
     "edit": "Modifier",
     "collect": "Encaisser",
-    "noCustomers": "Aucun client pro."
+    "noCustomers": "Aucun client pro.",
+    "emptyHint": "Ajoutez les cafés, restaurants ou bureaux à qui vous vendez : leur remise, leur plafond de crédit et leurs conditions de paiement."
+  },
+  "workspace": {
+    "logout": "Se déconnecter",
+    "hello": "Bonjour {name}",
+    "summary": "{venues, plural, one {# établissement} other {# établissements}} · {live, plural, =0 {aucune commande en cours} one {# commande en cours} other {# commandes en cours}}",
+    "teamSpace": "Espace équipe",
+    "adminHint": "Restaurants, forfaits, utilisateurs et santé de la plateforme.",
+    "noVenueHint": "Votre compte n'est rattaché à aucun établissement actif. Demandez à votre responsable de vous ajouter dans Équipe.",
+    "planTrial": "Essai {plan} · {days} j",
+    "planExpired": "{plan} expiré",
+    "today": "CA du jour",
+    "live": "En cours",
+    "tables": "Tables ouvertes",
+    "open": "Ouvrir"
   }
 }
