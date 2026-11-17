@@ -22,6 +22,9 @@ import {
   FileText,
   LayoutDashboard,
   LayoutGrid,
+  Laptop,
+  Download,
+  Apple,
   NotebookPen,
   Music,
   QrCode,
@@ -41,6 +44,7 @@ import type { SearchEntry } from "@/components/dashboard/command-palette";
 import { can } from "@/server/tenancy";
 import { requireRestaurant } from "@/server/auth/current";
 import { Link } from "@/i18n/navigation";
+import { desktopDownloads } from "@/lib/desktop";
 import { db } from "@/server/db/client";
 import { listNotifications } from "@/server/modules/notifications/service";
 import { LiveProvider } from "@/components/realtime/live";
@@ -468,6 +472,8 @@ async function RestaurantShell({
       : []),
   ];
 
+  const desktop = desktopDownloads();
+
   return (
     <LiveProvider url={`/api/v1/realtime/restaurant/${ctx.restaurant.id}`}>
       <AppShell
@@ -516,6 +522,34 @@ async function RestaurantShell({
               <LayoutGrid className="size-4" aria-hidden="true" />
               {t("nav.switchRestaurant")}
             </Link>
+            {desktop.windows || desktop.mac ? (
+              <div className="rounded-xl bg-surface-2 p-2.5">
+                <p className="flex items-center gap-2 px-1 text-xs font-semibold text-fg-muted">
+                  <Laptop className="size-4" aria-hidden="true" />
+                  {t("nav.desktopApp")}
+                </p>
+                <div className="mt-2 grid grid-cols-2 gap-1.5">
+                  {desktop.windows ? (
+                    <a
+                      href={desktop.windows}
+                      className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-surface text-xs font-semibold ring-1 ring-border hover:bg-accent-soft hover:text-accent-text"
+                    >
+                      <Download className="size-3.5" aria-hidden="true" />
+                      {t("nav.desktopWindows")}
+                    </a>
+                  ) : null}
+                  {desktop.mac ? (
+                    <a
+                      href={desktop.mac}
+                      className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-surface text-xs font-semibold ring-1 ring-border hover:bg-accent-soft hover:text-accent-text"
+                    >
+                      <Apple className="size-3.5" aria-hidden="true" />
+                      {t("nav.desktopMac")}
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
             {ctx.user.isSuperAdmin ? (
               <Link
                 href="/admin"
