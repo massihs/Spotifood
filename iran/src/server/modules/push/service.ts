@@ -114,6 +114,28 @@ export async function pushToRestaurant(
   return deliver(db, subs, payload);
 }
 
+/** The owner and the managers (admins) only: the evening report, money matters. */
+export async function pushToManagers(db: Database, restaurantId: string, payload: PushPayload) {
+  if (!pushEnabled()) return 0;
+  const rows = await db
+    .select({ sub: pushSubscriptions })
+    .from(pushSubscriptions)
+    .innerJoin(
+      restaurantMembers,
+      and(
+        eq(restaurantMembers.userId, pushSubscriptions.userId),
+        eq(restaurantMembers.restaurantId, restaurantId),
+        inArray(restaurantMembers.role, ["owner", "admin"]),
+      ),
+    )
+    .where(and(eq(pushSubscriptions.restaurantId, restaurantId), isNotNull(pushSubscriptions.userId)));
+  return deliver(
+    db,
+    rows.map((r) => r.sub),
+    payload,
+  );
+}
+
 /** A guest: their seat at the table and/or their account. */
 export async function pushToGuest(
   db: Database,

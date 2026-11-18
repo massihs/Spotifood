@@ -14,6 +14,7 @@ import {
   updateStockItem,
   type STOCK_UNITS,
 } from "@/server/modules/inventory/service";
+import { transferStock } from "@/server/modules/inventory/transfers";
 
 type Unit = (typeof STOCK_UNITS)[number];
 
@@ -111,6 +112,17 @@ export async function setRecipeAction(
   return runAction(async () => {
     const ctx = await actionContext(rid, "inventory.manage");
     await setRecipe(db, ctx, productId, { items });
+    refresh();
+  });
+}
+
+export async function transferStockAction(
+  rid: string,
+  input: { toRestaurantId: string; note: string; lines: { stockItemId: string; quantity: number }[] },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "inventory.manage");
+    await transferStock(db, ctx, input);
     refresh();
   });
 }

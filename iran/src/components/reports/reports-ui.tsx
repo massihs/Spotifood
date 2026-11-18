@@ -11,6 +11,7 @@ import {
   createExpenseAction,
   deleteExpenseAction,
   saveReportSettingsAction,
+  saveDailyReportAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/reports/actions";
 import { openSheet, useCreateParam } from "@/lib/use-create-param";
 
@@ -298,6 +299,91 @@ export function ReportSettingsForm({
                 defaultPreset: preset,
                 foodCostTargetPct: target,
               }),
+            () => setSaved(true),
+          )
+        }
+        className="h-11 rounded-xl bg-accent px-5 font-bold text-accent-fg disabled:opacity-50"
+      >
+        {saved ? "✓" : t("save")}
+      </button>
+    </div>
+  );
+}
+
+/** The evening report: on or off, the hour, and an SMS copy to a mobile number. */
+export function DailyReportForm({
+  rid,
+  initial,
+}: {
+  rid: string;
+  initial: { enabled: boolean; hour: number; sms: boolean; phone: string };
+}) {
+  const t = useTranslations("dailyReport.settings");
+  const { pending, error, run } = useRun();
+  const [v, setV] = useState(initial);
+  const [saved, setSaved] = useState(false);
+  const set = (patch: Partial<typeof v>) => {
+    setV({ ...v, ...patch });
+    setSaved(false);
+  };
+  return (
+    <div className="max-w-xl space-y-4 rounded-2xl border border-border bg-surface p-5">
+      <div>
+        <p className="font-semibold">{t("title")}</p>
+        <p className="mt-1 text-sm text-fg-muted">{t("hint")}</p>
+      </div>
+      <label className="flex items-center gap-3 text-sm font-medium">
+        <input
+          type="checkbox"
+          className="size-5 accent-[var(--accent)]"
+          checked={v.enabled}
+          onChange={(e) => set({ enabled: e.target.checked })}
+        />
+        {t("enabled")}
+      </label>
+      <label className="block text-sm font-medium">
+        {t("hour")}
+        <select
+          value={v.hour}
+          onChange={(e) => set({ hour: Number(e.target.value) })}
+          className={cn(field, "mt-1 max-w-40")}
+          disabled={!v.enabled}
+        >
+          {Array.from({ length: 24 }, (_, h) => (
+            <option key={h} value={h}>
+              {String(h).padStart(2, "0")}:00
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex items-center gap-3 text-sm font-medium">
+        <input
+          type="checkbox"
+          className="size-5 accent-[var(--accent)]"
+          checked={v.sms}
+          disabled={!v.enabled}
+          onChange={(e) => set({ sms: e.target.checked })}
+        />
+        {t("sms")}
+      </label>
+      {v.sms && v.enabled ? (
+        <input
+          className={field}
+          dir="ltr"
+          inputMode="tel"
+          placeholder="09xx xxx xxxx"
+          value={v.phone}
+          onChange={(e) => set({ phone: e.target.value })}
+        />
+      ) : null}
+      <p className="text-xs text-fg-muted">{t("push")}</p>
+      {error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p> : null}
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() =>
+          run(
+            () => saveDailyReportAction(rid, v),
             () => setSaved(true),
           )
         }

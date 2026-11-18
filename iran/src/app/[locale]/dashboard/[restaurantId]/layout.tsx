@@ -22,6 +22,7 @@ import {
   FileText,
   LayoutDashboard,
   LayoutGrid,
+  Clock3,
   Laptop,
   Download,
   Apple,
@@ -45,6 +46,9 @@ import { can } from "@/server/tenancy";
 import { requireRestaurant } from "@/server/auth/current";
 import { Link } from "@/i18n/navigation";
 import { desktopDownloads } from "@/lib/desktop";
+import { clockStatus } from "@/server/modules/staff/service";
+import { sendDueDailyReports } from "@/server/modules/reports/daily";
+import { ClockButton } from "@/components/staff/staff-ui";
 import { db } from "@/server/db/client";
 import { listNotifications } from "@/server/modules/notifications/service";
 import { LiveProvider } from "@/components/realtime/live";
@@ -138,6 +142,8 @@ async function RestaurantShell({
   after(() => sendDueFeedback(db, ctx.restaurant.id).catch(() => 0));
   // Missed targets (kitchen time, rating, takings) become notifications.
   after(() => checkKpiAlerts(db, ctx.restaurant).catch(() => []));
+  // The evening report, if its hour came while the periodic job was not running.
+  after(() => sendDueDailyReports(db, new Date(), ctx.restaurant.id).catch(() => 0));
   const off = new Set(disabled);
   const on = (m: ModuleKey) => !off.has(m);
   const g = {
@@ -364,6 +370,14 @@ async function RestaurantShell({
         group: g.manage,
       },
       {
+        show: can(ctx, "members.manage"),
+        href: `${base}/staff`,
+        label: t("nav.staff"),
+        icon: <Clock3 />,
+        groupKey: "manage",
+        group: g.manage,
+      },
+      {
         show: can(ctx, "restaurant.manage"),
         href: `${base}/billing`,
         label: t("nav.billing"),
@@ -473,6 +487,7 @@ async function RestaurantShell({
   ];
 
   const desktop = desktopDownloads();
+  const clock = await clockStatus(db, ctx);
 
   return (
     <LiveProvider url={`/api/v1/realtime/restaurant/${ctx.restaurant.id}`}>
@@ -497,6 +512,9 @@ async function RestaurantShell({
               >
                 <Shield className="size-4" aria-hidden="true" />
               </Link>
+            ) : null}
+            {clock ? (
+              <ClockButton rid={ctx.restaurant.id} since={clock.since?.toISOString() ?? null} />
             ) : null}
             <QuickCreate items={create} />
             <OrderAlerts

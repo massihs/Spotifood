@@ -387,7 +387,8 @@
     "roomsQr": "Room QR codes",
     "adminPayouts": "Payouts",
     "accounting": "Accounting",
-    "b2b": "Trade sales (B2B)"
+    "b2b": "Trade sales (B2B)",
+    "staff": "Team time & pay"
   },
   "dashboard": {
     "welcome": "Hello {name}",
@@ -757,7 +758,7 @@
     "invalid_time": "Invalid time.",
     "tax_rate_default": "The default rate cannot be deleted.",
     "tax_rate_in_use": "This rate is used by products.",
-    "invalid_rate": "Invalid rate (0 to 100).",
+    "invalid_rate": "Invalid hourly rate.",
     "image_empty": "Empty file.",
     "image_too_large": "Image too large (8 MB max).",
     "image_invalid": "This file is not a valid image.",
@@ -905,7 +906,15 @@
     "too_many_lines": "Too many lines in the order.",
     "offer_in_past": "The end date is already past.",
     "offer_duration_required": "Give the offer's duration.",
-    "plan_not_found": "Plan not found."
+    "plan_not_found": "Plan not found.",
+    "already_clocked_in": "You have already clocked in.",
+    "not_clocked_in": "You have not clocked in.",
+    "not_a_member": "For team members only.",
+    "week_not_empty": "This week already has a planning.",
+    "not_enough_stock": "Not enough stock.",
+    "same_venue": "Choose another venue.",
+    "end_before_start": "The end must be after the start.",
+    "too_long": "More than 24 hours: check the times."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -2129,6 +2138,9 @@
       },
       "cost": {
         "rise": "{name} went up {percent}%: {count} dish(es) now exceed the food-cost target"
+      },
+      "report": {
+        "daily": "Today's report: {amount} · {count} orders"
       }
     }
   },
@@ -2631,7 +2643,8 @@
       "suppliers": "Suppliers",
       "movements": "Movements",
       "plan": "Shopping list",
-      "costs": "Food cost"
+      "costs": "Food cost",
+      "transfers": "Transfers"
     },
     "stockValue": "Stock value",
     "lowCount": "Running low",
@@ -2690,9 +2703,27 @@
       "sale": "Sale",
       "sale_cancel": "Cancelled",
       "adjustment": "Adjustment",
-      "waste": "Waste"
+      "waste": "Waste",
+      "transfer_in": "Received",
+      "transfer_out": "Sent"
     },
-    "noItemsHint": "Add your ingredients and their alert level: stock goes down by itself with each sale (recipes) and you are warned before running out."
+    "noItemsHint": "Add your ingredients and their alert level: stock goes down by itself with each sale (recipes) and you are warned before running out.",
+    "transfer": {
+      "button": "Transfer",
+      "title": "Transfer stock",
+      "to": "To venue",
+      "item": "Item",
+      "quantity": "Quantity",
+      "addLine": "Add an item",
+      "note": "Note (optional)",
+      "hint": "The stock leaves here and enters there at this venue's average cost. The item is matched by name, else created.",
+      "send": "Send",
+      "empty": "No transfers",
+      "emptyHint": "Send stock to another of your venues with \"Transfer\".",
+      "noBranch": "Transfers link the venues of one group (see Branches).",
+      "sent": "Sent",
+      "received": "Received"
+    }
   },
   "customers": {
     "title": "Customer club",
@@ -4939,6 +4970,108 @@
       },
       "footer": "Compared with twice the team's median.",
       "seeEvents": "See the actions in detail"
+    }
+  },
+  "staff": {
+    "title": "Team time and pay",
+    "subtitle": "Who is working now, the week's planning, hours clocked, tips and pay.",
+    "h": "h",
+    "tabs": {
+      "now": "Now",
+      "planning": "Planning",
+      "clock": "Time clock",
+      "payroll": "Pay & tips"
+    },
+    "presets": {
+      "today": "Today",
+      "7d": "7 days",
+      "30d": "30 days",
+      "month": "This month"
+    },
+    "clock": {
+      "in": "Clock in",
+      "out": "Clock out",
+      "working": "On shift {time}",
+      "add": "Add hours",
+      "edit": "Correct",
+      "edited": "corrected",
+      "empty": "No hours clocked in this period",
+      "emptyHint": "Each member clocks in and out with the button at the top of the dashboard."
+    },
+    "form": {
+      "person": "Person",
+      "day": "Day",
+      "start": "Start",
+      "end": "End",
+      "endOptional": "End (empty = still on shift)",
+      "overnight": "An end before the start counts as the next morning (night shift).",
+      "note": "Note (optional)"
+    },
+    "now": {
+      "working": "On shift ({n})",
+      "since": "since {time}",
+      "nobody": "Nobody has clocked in",
+      "nobodyHint": "Clock-ins show up here live.",
+      "planned": "Planned today",
+      "here": "Here",
+      "late": "Late",
+      "expected": "Expected",
+      "noPlan": "No planning for today",
+      "openPlanning": "Make the planning",
+      "howTo": "Everyone clocks in from their dashboard (\"Clock in\" button at the top). Forgotten clock-outs are fixed in the Time clock tab."
+    },
+    "planning": {
+      "person": "Person",
+      "hours": "Hours",
+      "add": "Add a shift",
+      "remove": "Remove this shift",
+      "removeConfirm": "Remove this shift from the planning?",
+      "copyWeek": "Copy last week",
+      "hint": "Tap \"+\" in a cell to add a shift, a shift to remove it. Lateness and absences come from the time clock."
+    },
+    "payroll": {
+      "hours": "Hours",
+      "pay": "Pay",
+      "tips": "Tips",
+      "total": "Total",
+      "person": "Person",
+      "rate": "Hourly rate",
+      "shifts": "{n} shifts",
+      "late": "{n} late · {min} min",
+      "missed": "{n} absence(s)",
+      "onTime": "On time",
+      "punctuality": "Punctuality",
+      "hint": "Pay = hours clocked × hourly rate (leave empty for a fixed salary). Copy these amounts into your payroll."
+    },
+    "tips": {
+      "title": "Tips",
+      "hint": "Enter the day's tips (jar, cards): they are shared by the hours worked that day.",
+      "day": "Day",
+      "amount": "Amount",
+      "note": "Note",
+      "add": "Add",
+      "nobody": "Nobody clocked in that day"
+    }
+  },
+  "dailyReport": {
+    "settings": {
+      "title": "Evening report",
+      "hint": "Every evening, the day's takings, the comparison with last week, the best dish and the alerts on your phone.",
+      "enabled": "Get the evening report",
+      "hour": "Sending time",
+      "sms": "Also by SMS",
+      "push": "It arrives as a notification on the phones of the owner and managers who turned on Spotifood notifications.",
+      "save": "Save"
+    },
+    "text": {
+      "title": "{name} · today's report",
+      "revenue": "Takings: {amount} ({orders} orders)",
+      "up": "▲ +{pct}% vs last week",
+      "down": "▼ −{pct}% vs last week",
+      "top": "Best dish: {name} ({n})",
+      "cancelled": "{n} cancellation(s)",
+      "lowStock": "{n} item(s) running out",
+      "staff": "{n} fraud signal(s) to check"
     }
   }
 }

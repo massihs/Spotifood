@@ -5,6 +5,7 @@ import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
 import { createExpense, deleteExpense, type EXPENSE_CATEGORIES } from "@/server/modules/reports/service";
 import { saveReportSettings } from "@/server/modules/reports/center";
+import { saveDailyReportSettings } from "@/server/modules/reports/daily";
 
 export async function createExpenseAction(
   rid: string,
@@ -38,6 +39,17 @@ export async function saveReportSettingsAction(
   return runAction(async () => {
     const ctx = await actionContext(rid, "accounting.manage");
     await saveReportSettings(db, ctx, input);
+    refresh();
+  });
+}
+
+export async function saveDailyReportAction(
+  rid: string,
+  input: { enabled: boolean; hour: number; sms: boolean; phone: string },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "accounting.manage");
+    await saveDailyReportSettings(db, ctx, input);
     refresh();
   });
 }

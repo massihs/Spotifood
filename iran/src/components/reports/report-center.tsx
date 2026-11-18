@@ -26,7 +26,8 @@ import {
   type ReportSettings,
 } from "@/server/modules/reports/center";
 import { Bars, DailyChart, HourChart, Kpi, Row } from "./report-parts";
-import { ReportSettingsForm } from "./reports-ui";
+import { DailyReportForm, ReportSettingsForm } from "./reports-ui";
+import { getDailyReportSettings } from "@/server/modules/reports/daily";
 import { EmptyState } from "@/components/ui/empty-state";
 
 /** The time the report is read (outside the components, which must stay pure). */
@@ -144,6 +145,7 @@ export async function ReportCenter({
           defaultPreset={settings.defaultPreset}
           foodCostTargetPct={settings.foodCostTargetPct}
         />
+        <DailyReportForm rid={rid} initial={await getDailyReportSettings(db, rid)} />
       </div>
     );
 

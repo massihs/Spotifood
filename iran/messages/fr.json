@@ -387,7 +387,8 @@
     "roomsQr": "QR des chambres",
     "adminPayouts": "Versements",
     "accounting": "Comptabilité",
-    "b2b": "Ventes pro (B2B)"
+    "b2b": "Ventes pro (B2B)",
+    "staff": "Équipe : temps et paie"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -757,7 +758,7 @@
     "invalid_time": "Heure invalide.",
     "tax_rate_default": "Le taux par défaut ne peut pas être supprimé.",
     "tax_rate_in_use": "Ce taux est utilisé par des produits.",
-    "invalid_rate": "Taux invalide (0 à 100).",
+    "invalid_rate": "Taux horaire invalide.",
     "image_empty": "Fichier vide.",
     "image_too_large": "Image trop lourde (8 Mo maximum).",
     "image_invalid": "Ce fichier n'est pas une image valide.",
@@ -905,7 +906,15 @@
     "too_many_lines": "Trop de lignes dans la commande.",
     "offer_in_past": "La date de fin est déjà passée.",
     "offer_duration_required": "Indiquez la durée de l'offre.",
-    "plan_not_found": "Forfait introuvable."
+    "plan_not_found": "Forfait introuvable.",
+    "already_clocked_in": "Vous avez déjà pointé votre arrivée.",
+    "not_clocked_in": "Vous n'avez pas pointé votre arrivée.",
+    "not_a_member": "Réservé aux membres de l'équipe.",
+    "week_not_empty": "Cette semaine a déjà un planning.",
+    "not_enough_stock": "Stock insuffisant.",
+    "same_venue": "Choisissez un autre établissement.",
+    "end_before_start": "La fin doit être après le début.",
+    "too_long": "Plus de 24 heures : vérifiez les horaires."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -2129,6 +2138,9 @@
       },
       "cost": {
         "rise": "{name} a augmenté de {percent} % : {count} plat(s) dépassent l'objectif de coût matière"
+      },
+      "report": {
+        "daily": "Rapport du jour : {amount} · {count} commandes"
       }
     }
   },
@@ -2639,7 +2651,8 @@
       "suppliers": "Fournisseurs",
       "movements": "Mouvements",
       "plan": "Liste d'achats",
-      "costs": "Coût matière"
+      "costs": "Coût matière",
+      "transfers": "Transferts"
     },
     "stockValue": "Valeur du stock",
     "lowCount": "Stock bas",
@@ -2698,9 +2711,27 @@
       "sale": "Sale",
       "sale_cancel": "Cancelled",
       "adjustment": "Adjustment",
-      "waste": "Waste"
+      "waste": "Waste",
+      "transfer_in": "Reçu",
+      "transfer_out": "Envoyé"
     },
-    "noItemsHint": "Ajoutez vos ingrédients et leur seuil d'alerte : le stock baisse tout seul à chaque vente (recettes) et vous êtes prévenu avant la rupture."
+    "noItemsHint": "Ajoutez vos ingrédients et leur seuil d'alerte : le stock baisse tout seul à chaque vente (recettes) et vous êtes prévenu avant la rupture.",
+    "transfer": {
+      "button": "Transférer",
+      "title": "Transférer du stock",
+      "to": "Vers l'établissement",
+      "item": "Article",
+      "quantity": "Quantité",
+      "addLine": "Ajouter un article",
+      "note": "Note (facultatif)",
+      "hint": "Le stock sort d'ici et entre là-bas au coût moyen d'ici. L'article est retrouvé par son nom, sinon créé.",
+      "send": "Envoyer",
+      "empty": "Aucun transfert",
+      "emptyHint": "Envoyez du stock à un autre de vos établissements avec « Transférer ».",
+      "noBranch": "Les transferts relient les établissements d'un même groupe (voir Branches).",
+      "sent": "Envoyé",
+      "received": "Reçu"
+    }
   },
   "customers": {
     "title": "Club clients",
@@ -4947,6 +4978,108 @@
       },
       "footer": "Comparaison au double de la médiane de l'équipe.",
       "seeEvents": "Voir le détail des actions"
+    }
+  },
+  "staff": {
+    "title": "Temps et paie de l'équipe",
+    "subtitle": "Qui travaille maintenant, le planning de la semaine, les heures pointées, les pourboires et la paie.",
+    "h": "h",
+    "tabs": {
+      "now": "Maintenant",
+      "planning": "Planning",
+      "clock": "Pointage",
+      "payroll": "Paie et pourboires"
+    },
+    "presets": {
+      "today": "Aujourd'hui",
+      "7d": "7 jours",
+      "30d": "30 jours",
+      "month": "Ce mois"
+    },
+    "clock": {
+      "in": "Pointer l'arrivée",
+      "out": "Pointer le départ",
+      "working": "En service {time}",
+      "add": "Ajouter des heures",
+      "edit": "Corriger",
+      "edited": "corrigé",
+      "empty": "Aucune heure pointée sur la période",
+      "emptyHint": "Chaque membre pointe son arrivée et son départ avec le bouton en haut du tableau de bord."
+    },
+    "form": {
+      "person": "Personne",
+      "day": "Jour",
+      "start": "Début",
+      "end": "Fin",
+      "endOptional": "Fin (vide = encore en service)",
+      "overnight": "Une fin avant le début compte pour le lendemain matin (service de nuit).",
+      "note": "Note (facultatif)"
+    },
+    "now": {
+      "working": "En service ({n})",
+      "since": "depuis {time}",
+      "nobody": "Personne n'a pointé",
+      "nobodyHint": "Les arrivées pointées apparaissent ici en direct.",
+      "planned": "Prévu aujourd'hui",
+      "here": "Présent",
+      "late": "En retard",
+      "expected": "Attendu",
+      "noPlan": "Pas de planning pour aujourd'hui",
+      "openPlanning": "Faire le planning",
+      "howTo": "Chacun pointe depuis son tableau de bord (bouton « Pointer l'arrivée » en haut). Les oublis se corrigent dans l'onglet Pointage."
+    },
+    "planning": {
+      "person": "Personne",
+      "hours": "Heures",
+      "add": "Ajouter un service",
+      "remove": "Retirer ce service",
+      "removeConfirm": "Retirer ce service du planning ?",
+      "copyWeek": "Reprendre la semaine précédente",
+      "hint": "Touchez « + » dans une case pour ajouter un service, un service pour le retirer. Les retards et absences se calculent avec le pointage."
+    },
+    "payroll": {
+      "hours": "Heures",
+      "pay": "Salaire",
+      "tips": "Pourboires",
+      "total": "Total",
+      "person": "Personne",
+      "rate": "Taux horaire",
+      "shifts": "{n} services",
+      "late": "{n} retard(s) · {min} min",
+      "missed": "{n} absence(s)",
+      "onTime": "Ponctuel",
+      "punctuality": "Ponctualité",
+      "hint": "Salaire = heures pointées × taux horaire (laissez vide pour un salaire fixe). Exportez ou recopiez ces montants dans votre logiciel de paie."
+    },
+    "tips": {
+      "title": "Pourboires",
+      "hint": "Saisissez les pourboires du jour (boîte, cartes) : ils sont partagés au prorata des heures travaillées ce jour-là.",
+      "day": "Jour",
+      "amount": "Montant",
+      "note": "Note",
+      "add": "Ajouter",
+      "nobody": "Personne n'a pointé ce jour"
+    }
+  },
+  "dailyReport": {
+    "settings": {
+      "title": "Rapport du soir",
+      "hint": "Chaque soir, le chiffre du jour, la comparaison avec la semaine dernière, le plat vedette et les alertes sur votre téléphone.",
+      "enabled": "Recevoir le rapport du soir",
+      "hour": "Heure d'envoi",
+      "sms": "Aussi par SMS",
+      "push": "Il arrive en notification sur les téléphones du patron et des gérants qui ont activé les notifications Spotifood.",
+      "save": "Enregistrer"
+    },
+    "text": {
+      "title": "{name} · rapport du jour",
+      "revenue": "Chiffre : {amount} ({orders} commandes)",
+      "up": "▲ +{pct} % vs la semaine dernière",
+      "down": "▼ −{pct} % vs la semaine dernière",
+      "top": "Plat vedette : {name} ({n})",
+      "cancelled": "{n} annulation(s)",
+      "lowStock": "{n} article(s) presque épuisé(s)",
+      "staff": "{n} signal(aux) de fraude à regarder"
     }
   }
 }

@@ -149,6 +149,8 @@ export const restaurantSettings = pgTable("restaurant_settings", {
     dayStartHour?: number;
     defaultPreset?: "today" | "7d" | "30d" | "month";
   }>(),
+  /** The evening report sent to the owner's phone (push, and SMS if asked): when, and the last day sent. */
+  dailyReport: jsonb().$type<{ enabled?: boolean; hour?: number; sms?: boolean; lastDay?: string }>(),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */
   zarinpalMerchantId: varchar({ length: 64 }),
   /**
@@ -215,6 +217,8 @@ export const restaurantMembers = pgTable(
       .notNull()
       .default(sql`ARRAY[]::text[]`),
     status: memberStatus().notNull().default("active"),
+    /** Hourly pay, for the payroll of the hours clocked (null: not paid by the hour). */
+    hourlyRateCents: bigint({ mode: "number" }),
     /** Job in the restaurant (manager, cashier, waiter, bar, kitchen): permission preset and home screen. */
     job: varchar({ length: 16 }),
     /** Kitchen station a bar / kitchen member works at (their screen shows only its items). */

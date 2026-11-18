@@ -166,7 +166,13 @@ export async function purchasePlan(
 /** Cancellations, discounts, refunds and cash differences per person over the period. */
 export async function staffAnomalies(db: DbOrTx, ctx: RestaurantContext, r: Range) {
   assertCan(ctx, "audit.view");
-  const rid = ctx.restaurant.id;
+  const toleranceCents = cashTolerance(ctx.restaurant.currency);
+  return { rows: await staffAnomaliesFor(db, ctx.restaurant, r), toleranceCents };
+}
+
+/** The same review for a restaurant, without a signed-in person (the evening report). */
+export async function staffAnomaliesFor(db: DbOrTx, restaurant: { id: string; currency: string }, r: Range) {
+  const rid = restaurant.id;
   const period = (col: Parameters<typeof gte>[0]) => and(gte(col, r.from), lt(col, r.to));
   const [sales, cancels, refundRows, shifts] = await Promise.all([
     db
@@ -231,7 +237,7 @@ export async function staffAnomalies(db: DbOrTx, ctx: RestaurantContext, r: Rang
   const ids = [
     ...new Set([...sales, ...cancels, ...refundRows, ...shifts].map((x) => x.userId).filter(Boolean)),
   ] as string[];
-  if (!ids.length) return { rows: [], toleranceCents: 0 };
+  if (!ids.length) return [];
   const names = await db
     .select({ id: users.id, name: users.fullName })
     .from(users)
@@ -251,9 +257,7 @@ export async function staffAnomalies(db: DbOrTx, ctx: RestaurantContext, r: Rang
       cashDifferenceCents: shifts.find((x) => x.userId === id)?.cents ?? 0,
     };
   });
-  // A few coins either way at the till are normal: 1 % of the average ticket, at least 0.
-  const toleranceCents = cashTolerance(ctx.restaurant.currency);
-  return { rows: reviewStaff(stats, toleranceCents), toleranceCents };
+  return reviewStaff(stats, cashTolerance(restaurant.currency));
 }
 
 /** Cash shortfall worth a look: 100 000 rials (10 000 tomans), 5 € elsewhere. */

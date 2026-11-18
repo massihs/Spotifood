@@ -31,6 +31,7 @@ export const SCREENS = [
   "invoices",
   "branches",
   "team",
+  "staff",
   "billing",
   "settings",
 ] as const;

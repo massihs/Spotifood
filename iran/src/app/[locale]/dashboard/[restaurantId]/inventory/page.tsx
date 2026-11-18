@@ -17,6 +17,10 @@ import {
 } from "@/server/modules/inventory/service";
 import { can } from "@/server/tenancy";
 import { foodCosts, purchasePlan } from "@/server/modules/insights/service";
+import { listTransfers, transferTargets } from "@/server/modules/inventory/transfers";
+import { TransferButton } from "@/components/inventory/transfer-ui";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ArrowLeftRight } from "lucide-react";
 import {
   FoodCostView,
   PLAN_DAYS,
@@ -25,7 +29,16 @@ import {
 } from "@/components/insights/insights-views";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/inventory">;
-const TABS = ["stock", "plan", "costs", "purchases", "recipes", "suppliers", "movements"] as const;
+const TABS = [
+  "stock",
+  "plan",
+  "costs",
+  "purchases",
+  "recipes",
+  "suppliers",
+  "transfers",
+  "movements",
+] as const;
 /** Tabs that need the right to manage the stock (they show costs and prices). */
 const MANAGE_TABS: readonly string[] = ["plan", "costs"];
 
@@ -45,11 +58,12 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
     ? (sp.tab as (typeof TABS)[number])
     : "stock";
   const tab = MANAGE_TABS.includes(asked) && !can(ctx, "inventory.manage") ? "stock" : asked;
-  const [t, format, items, suppliers] = await Promise.all([
+  const [t, format, items, suppliers, targets] = await Promise.all([
     getTranslations("inventory"),
     getFormatter(),
     listStock(db, ctx),
     listSuppliers(db, ctx),
+    transferTargets(db, ctx),
   ]);
   const manage = can(ctx, "inventory.manage");
   const base = `/dashboard/${ctx.restaurant.id}/inventory`;
@@ -63,7 +77,12 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
         description={t("subtitle")}
         actions={
           manage ? (
-            <PurchaseForm rid={ctx.restaurant.id} items={items} suppliers={suppliers} currency={cur} />
+            <div className="flex flex-wrap gap-2">
+              {targets.length && items.length ? (
+                <TransferButton rid={ctx.restaurant.id} targets={targets} items={items} />
+              ) : null}
+              <PurchaseForm rid={ctx.restaurant.id} items={items} suppliers={suppliers} currency={cur} />
+            </div>
           ) : null
         }
       />
@@ -133,6 +152,51 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
           t={(k, v) => t(k, v)}
         />
       ) : null}
+      {tab === "transfers"
+        ? await (async () => {
+            const rows = await listTransfers(db, ctx);
+            if (!rows.length)
+              return (
+                <EmptyState
+                  icon={<ArrowLeftRight />}
+                  title={t("transfer.empty")}
+                  description={t(targets.length ? "transfer.emptyHint" : "transfer.noBranch")}
+                />
+              );
+            return (
+              <Card>
+                <ul className="divide-y divide-border">
+                  {rows.map((r) => (
+                    <li key={r.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm">
+                      <span
+                        className={cn(
+                          "w-24 shrink-0 rounded-full px-2 py-0.5 text-center text-xs font-semibold",
+                          r.out ? "bg-warning-soft text-warning" : "bg-success-soft text-success",
+                        )}
+                      >
+                        {t(r.out ? "transfer.sent" : "transfer.received")}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate font-medium">{r.item}</span>
+                      <span className="text-fg-muted">{r.other}</span>
+                      <span dir="ltr" className="font-bold tabular-nums">
+                        {r.out ? "−" : "+"}
+                        {r.quantity} {t(`units.${r.unit}`)}
+                      </span>
+                      <span className="w-24 text-end tabular-nums">{money(r.valueCents)}</span>
+                      <span className="w-28 shrink-0 text-end text-xs text-fg-subtle">
+                        {format.dateTime(r.createdAt, {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                          timeZone: ctx.restaurant.timezone,
+                        })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            );
+          })()
+        : null}
       {tab === "movements" ? (
         <Card>
           <ul className="divide-y divide-border">
