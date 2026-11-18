@@ -2126,6 +2126,9 @@
       },
       "payout": {
         "sent": "Spotifood paid you {amount}"
+      },
+      "cost": {
+        "rise": "{name} went up {percent}%: {count} dish(es) now exceed the food-cost target"
       }
     }
   },
@@ -2626,7 +2629,9 @@
       "purchases": "Purchases",
       "recipes": "Recipes & cost",
       "suppliers": "Suppliers",
-      "movements": "Movements"
+      "movements": "Movements",
+      "plan": "Shopping list",
+      "costs": "Food cost"
     },
     "stockValue": "Stock value",
     "lowCount": "Running low",
@@ -2838,7 +2843,9 @@
       "occupancy": "Table occupancy",
       "bank": "Bank",
       "full": "Full report",
-      "settings": "Settings"
+      "settings": "Settings",
+      "menu": "Menu analysis",
+      "anomalies": "Fraud signals"
     },
     "revenue": "Revenue",
     "ordersN": "{count} orders",
@@ -3009,7 +3016,9 @@
         "dayStartHint": "For a café open after midnight: sales at 1 a.m. count in the day before.",
         "hour": "{h}:00",
         "defaultPeriod": "Period on opening",
-        "save": "Save"
+        "save": "Save",
+        "foodCostTarget": "Food-cost target (%)",
+        "foodCostTargetHint": "Above it, a dish is flagged and a price is suggested (often 28 to 35%)."
       },
       "col": {
         "day": "Day",
@@ -4839,5 +4848,97 @@
     "live": "In progress",
     "tables": "Open tables",
     "open": "Open"
+  },
+  "insights": {
+    "plan": {
+      "hint": "What to buy, from each day's usage over the last 4 weeks (a Friday is not a Tuesday), plus the alert threshold, minus the stock.",
+      "days": "For the next",
+      "daysN": "{n} d",
+      "factor": "Period",
+      "normal": "Normal",
+      "print": "Print the list",
+      "noHistory": "No sales with recipes over 4 weeks yet: the list only uses the alert thresholds.",
+      "toBuyCount": "Items to buy",
+      "ofItems": "of {n} items",
+      "budget": "Estimated budget",
+      "budgetHint": "at average purchase cost",
+      "runningOut": "Running out soon",
+      "runningOutHint": "within {n} days",
+      "printTitle": "Shopping list · {n} days",
+      "item": "Item",
+      "inStock": "In stock",
+      "perDay": "Per day",
+      "daysLeft": "Left",
+      "toBuy": "To buy",
+      "cost": "Cost",
+      "noItems": "No stock items",
+      "noItemsHint": "Add your ingredients and the dishes' recipes: the shopping list works itself out."
+    },
+    "cost": {
+      "empty": "No dish with a recipe",
+      "emptyHint": "Fill in the recipes (Recipes tab) to know each dish's food cost.",
+      "target": "Food-cost target",
+      "targetHint": "share of the price",
+      "overCount": "Dishes above",
+      "ofDishes": "of {n} dishes with a recipe",
+      "average": "Average",
+      "hint": "When an ingredient gets dearer, you are told and the price to charge is worked out.",
+      "changeTarget": "Change the target",
+      "editPrices": "Edit prices",
+      "dish": "Dish",
+      "price": "Price",
+      "cost": "Food cost",
+      "share": "Share",
+      "suggested": "Suggested price"
+    },
+    "menu": {
+      "empty": "No sales in this period yet",
+      "emptyHint": "The analysis ranks your dishes from the first sales.",
+      "dishesN": "{n} dishes",
+      "classes": {
+        "star": "Stars",
+        "plowhorse": "Plowhorses",
+        "puzzle": "Puzzles",
+        "dog": "Dogs"
+      },
+      "advice": {
+        "star": "Popular and profitable: keep them at the top of the menu.",
+        "plowhorse": "Sell a lot but little margin: raise the price a little or trim the portion.",
+        "puzzle": "Good margin but few sales: promote them, photo, waiter's suggestion.",
+        "dog": "Few sales and little margin: remove or rethink."
+      },
+      "hint": "Profitable = margin per portion of at least {margin} (menu average); popular = at least {mix}% of sales.",
+      "uncosted": "{n} dish(es) without a recipe are not ranked.",
+      "dish": "Dish",
+      "sold": "Sold",
+      "mix": "Mix",
+      "unitMargin": "Margin / portion",
+      "foodCost": "Food cost",
+      "class": "Class",
+      "noRecipe": "No recipe"
+    },
+    "anomalies": {
+      "empty": "No staff activity in this period",
+      "emptyHint": "Each person's sales, cancellations and discounts will show here.",
+      "hint": "Each person's cancellations, discounts, refunds and cash differences, compared with the team. A signal is a reason to look, never a proof.",
+      "flagged": "{n} person(s) worth a closer look",
+      "allClear": "Nothing unusual in this period",
+      "person": "Person",
+      "ordersN": "{n} orders",
+      "sales": "Sales",
+      "cancellations": "Cancellations",
+      "discounts": "Discounts",
+      "refunds": "Refunds",
+      "cash": "Cash difference",
+      "signals": "Signals",
+      "signal": {
+        "cancellations": "High cancellations",
+        "discounts": "High discounts",
+        "refunds": "High refunds",
+        "cash": "Cash missing"
+      },
+      "footer": "Compared with twice the team's median.",
+      "seeEvents": "See the actions in detail"
+    }
   }
 }

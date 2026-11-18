@@ -122,7 +122,11 @@ describe("report centre", () => {
 
     // Settings: a business day starting at 4 a.m.
     await saveReportSettings(db, ctx, { dayStartHour: 4, defaultPreset: "7d" });
-    expect(await getReportSettings(db, restaurant.id)).toEqual({ dayStartHour: 4, defaultPreset: "7d" });
+    expect(await getReportSettings(db, restaurant.id)).toEqual({
+      dayStartHour: 4,
+      defaultPreset: "7d",
+      foodCostTargetPct: 35,
+    });
     expect(businessRange(r, 4).from.getTime() - r.from.getTime()).toBe(4 * 3_600_000);
     await expect(saveReportSettings(db, ctx, { dayStartHour: 9, defaultPreset: "7d" })).rejects.toThrow();
   });

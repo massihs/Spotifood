@@ -2126,6 +2126,9 @@
       },
       "payout": {
         "sent": "Spotifood vous a versé {amount}"
+      },
+      "cost": {
+        "rise": "{name} a augmenté de {percent} % : {count} plat(s) dépassent l'objectif de coût matière"
       }
     }
   },
@@ -2634,7 +2637,9 @@
       "purchases": "Achats",
       "recipes": "Recettes & coût",
       "suppliers": "Fournisseurs",
-      "movements": "Mouvements"
+      "movements": "Mouvements",
+      "plan": "Liste d'achats",
+      "costs": "Coût matière"
     },
     "stockValue": "Valeur du stock",
     "lowCount": "Stock bas",
@@ -2846,7 +2851,9 @@
       "occupancy": "Taux d'occupation des tables",
       "bank": "Banque",
       "full": "Rapport complet",
-      "settings": "Réglages"
+      "settings": "Réglages",
+      "menu": "Analyse du menu",
+      "anomalies": "Signaux de fraude"
     },
     "revenue": "Chiffre d'affaires",
     "ordersN": "{count} commandes",
@@ -3017,7 +3024,9 @@
         "dayStartHint": "Pour un café ouvert après minuit : les ventes de 1 h compteront dans la veille.",
         "hour": "{h}:00",
         "defaultPeriod": "Période à l'ouverture",
-        "save": "Enregistrer"
+        "save": "Enregistrer",
+        "foodCostTarget": "Objectif de coût matière (%)",
+        "foodCostTargetHint": "Au-delà, un plat est signalé et un prix est conseillé (souvent 28 à 35 %)."
       },
       "col": {
         "day": "Jour",
@@ -4847,5 +4856,97 @@
     "live": "En cours",
     "tables": "Tables ouvertes",
     "open": "Ouvrir"
+  },
+  "insights": {
+    "plan": {
+      "hint": "Ce qu'il faut acheter, calculé sur la consommation des 4 dernières semaines, jour par jour (un vendredi n'est pas un mardi), plus le seuil d'alerte, moins le stock.",
+      "days": "Pour les",
+      "daysN": "{n} j",
+      "factor": "Période",
+      "normal": "Normale",
+      "print": "Imprimer la liste",
+      "noHistory": "Pas encore de ventes avec recettes sur 4 semaines : la liste ne tient compte que des seuils d'alerte.",
+      "toBuyCount": "Articles à acheter",
+      "ofItems": "sur {n} articles",
+      "budget": "Budget estimé",
+      "budgetHint": "au coût moyen d'achat",
+      "runningOut": "En rupture bientôt",
+      "runningOutHint": "avant {n} jours",
+      "printTitle": "Liste d'achats · {n} jours",
+      "item": "Article",
+      "inStock": "En stock",
+      "perDay": "Par jour",
+      "daysLeft": "Reste",
+      "toBuy": "À acheter",
+      "cost": "Coût",
+      "noItems": "Aucun article en stock",
+      "noItemsHint": "Ajoutez vos ingrédients et les recettes des plats : la liste d'achats se calcule seule."
+    },
+    "cost": {
+      "empty": "Aucun plat avec recette",
+      "emptyHint": "Renseignez les recettes (onglet Recettes) pour connaître le coût matière de chaque plat.",
+      "target": "Objectif coût matière",
+      "targetHint": "part du prix",
+      "overCount": "Plats au-dessus",
+      "ofDishes": "sur {n} plats avec recette",
+      "average": "Moyenne",
+      "hint": "Quand un ingrédient augmente, vous êtes prévenu et le prix à pratiquer est calculé.",
+      "changeTarget": "Changer l'objectif",
+      "editPrices": "Modifier les prix",
+      "dish": "Plat",
+      "price": "Prix",
+      "cost": "Coût matière",
+      "share": "Part",
+      "suggested": "Prix conseillé"
+    },
+    "menu": {
+      "empty": "Pas encore de ventes sur la période",
+      "emptyHint": "L'analyse classe vos plats dès les premières ventes.",
+      "dishesN": "{n} plats",
+      "classes": {
+        "star": "Vedettes",
+        "plowhorse": "Locomotives",
+        "puzzle": "Énigmes",
+        "dog": "Poids morts"
+      },
+      "advice": {
+        "star": "Populaires et rentables : gardez-les en haut de la carte.",
+        "plowhorse": "Très vendus mais peu de marge : augmentez un peu le prix ou réduisez la portion.",
+        "puzzle": "Belle marge mais peu vendus : mettez-les en avant, photo, suggestion du serveur.",
+        "dog": "Peu vendus et peu rentables : à retirer ou à repenser."
+      },
+      "hint": "Rentable = marge par portion d'au moins {margin} (moyenne de la carte) ; populaire = au moins {mix} % des ventes.",
+      "uncosted": "{n} plat(s) sans recette ne sont pas classés.",
+      "dish": "Plat",
+      "sold": "Vendus",
+      "mix": "Part",
+      "unitMargin": "Marge / portion",
+      "foodCost": "Coût matière",
+      "class": "Classe",
+      "noRecipe": "Sans recette"
+    },
+    "anomalies": {
+      "empty": "Aucune activité du personnel sur la période",
+      "emptyHint": "Les ventes, annulations et remises de chacun apparaîtront ici.",
+      "hint": "Annulations, remises, remboursements et écarts de caisse de chaque personne, comparés à l'équipe. Un signal est une raison de regarder, jamais une preuve.",
+      "flagged": "{n} personne(s) à regarder de plus près",
+      "allClear": "Rien d'anormal sur la période",
+      "person": "Personne",
+      "ordersN": "{n} commandes",
+      "sales": "Ventes",
+      "cancellations": "Annulations",
+      "discounts": "Remises",
+      "refunds": "Remboursements",
+      "cash": "Écart de caisse",
+      "signals": "Signaux",
+      "signal": {
+        "cancellations": "Annulations élevées",
+        "discounts": "Remises élevées",
+        "refunds": "Remboursements élevés",
+        "cash": "Caisse manquante"
+      },
+      "footer": "Comparaison au double de la médiane de l'équipe.",
+      "seeEvents": "Voir le détail des actions"
+    }
   }
 }

@@ -83,6 +83,8 @@ export function NotificationBell({
           unit: String(n.payload.unit ?? ""),
           ibanLast4: String(n.payload.ibanLast4 ?? ""),
           by: String(n.payload.by ?? ""),
+          percent: String(n.payload.percent ?? ""),
+          count: String(n.payload.count ?? ""),
           amount:
             typeof n.payload.amountCents === "number" && typeof n.payload.currency === "string"
               ? formatMoney(n.payload.amountCents, n.payload.currency, locale)

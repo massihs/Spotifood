@@ -15,6 +15,8 @@ import {
   ReceiptText,
   Settings2,
   ShieldAlert,
+  Siren,
+  Sparkles,
   UserRoundSearch,
   UsersRound,
   Wallet,
@@ -38,17 +40,20 @@ import { listSecurityEvents, profitAndLoss } from "@/server/modules/reports/serv
 import { businessRange, getReportSettings } from "@/server/modules/reports/center";
 import { CENTER_TABS, ReportCenter, type CenterTab } from "@/components/reports/report-center";
 import { can } from "@/server/tenancy";
+import { engineerMenu } from "@/server/modules/insights/analysis";
+import { staffAnomalies } from "@/server/modules/insights/service";
+import { AnomaliesView, MenuEngineeringView } from "@/components/insights/insights-views";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/reports">;
-const TABS = ["overview", "products", "expenses", "security", ...CENTER_TABS] as const;
+const TABS = ["overview", "products", "menu", "expenses", "security", "anomalies", ...CENTER_TABS] as const;
 type Tab = (typeof TABS)[number];
 
 /** The report centre in four groups, like the reports menu of Iranian restaurant software. */
 const GROUPS: { key: string; tabs: Tab[] }[] = [
-  { key: "sales", tabs: ["overview", "sales", "charts", "plans", "products", "staff", "invoices"] },
+  { key: "sales", tabs: ["overview", "sales", "charts", "plans", "products", "menu", "staff", "invoices"] },
   { key: "accounts", tabs: ["accounts", "statement", "onAccount", "debtors", "openBills"] },
   { key: "guests", tabs: ["upcoming", "walkins", "occupancy"] },
-  { key: "finance", tabs: ["bank", "expenses", "full", "security", "settings"] },
+  { key: "finance", tabs: ["bank", "expenses", "full", "security", "anomalies", "settings"] },
 ];
 const ICONS: Record<Tab, LucideIcon> = {
   overview: Gauge,
@@ -70,8 +75,12 @@ const ICONS: Record<Tab, LucideIcon> = {
   expenses: Wallet,
   full: ClipboardList,
   security: ShieldAlert,
+  anomalies: Siren,
+  menu: Sparkles,
   settings: Settings2,
 };
+/** Reports that show what each person did: for those allowed to review it. */
+const AUDIT_TABS: Tab[] = ["security", "anomalies"];
 /** Reports of the present moment: no period to choose. */
 const NO_PERIOD: Tab[] = ["openBills", "debtors", "upcoming", "settings"];
 
@@ -164,7 +173,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
         aria-label={t("title")}
       >
         {GROUPS.flatMap((g) => g.tabs)
-          .filter((k) => k !== "security" || can(ctx, "audit.view"))
+          .filter((k) => !AUDIT_TABS.includes(k) || can(ctx, "audit.view"))
           .map((k) => (
             <Link
               key={k}
@@ -189,7 +198,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
               </p>
               <ul className="space-y-0.5">
                 {g.tabs
-                  .filter((k) => k !== "security" || can(ctx, "audit.view"))
+                  .filter((k) => !AUDIT_TABS.includes(k) || can(ctx, "audit.view"))
                   .map((k) => {
                     const Icon = ICONS[k];
                     return (
@@ -460,6 +469,16 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
               })()
             : null}
 
+          {tab === "menu" ? (
+            <MenuEngineeringView result={engineerMenu(sales.products)} currency={cur} />
+          ) : null}
+          {tab === "anomalies" && can(ctx, "audit.view") ? (
+            <AnomaliesView
+              rows={(await staffAnomalies(db, ctx, range)).rows}
+              currency={cur}
+              securityHref={tabHref("security")}
+            />
+          ) : null}
           {tab === "expenses" ? (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

@@ -1,3 +1,4 @@
+import { alertCostRises } from "@/server/modules/insights/service";
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { notifyTeam } from "@/server/modules/team/sections";
 import { z } from "zod";
@@ -239,7 +240,8 @@ export async function createPurchase(
   assertCan(ctx, "inventory.manage");
   const input = purchaseSchema.parse(raw);
   const rid = ctx.restaurant.id;
-  return db.transaction(async (tx) => {
+  const rises: { stockItemId: string; name: string; before: number; after: number }[] = [];
+  const purchase = await db.transaction(async (tx) => {
     if (input.supplierId) {
       const [s] = await tx
         .select({ id: suppliers.id })
@@ -276,6 +278,7 @@ export async function createPurchase(
         base + l.quantity > 0
           ? Math.round((base * item.avgCostCents + l.quantity * l.unitCostCents) / (base + l.quantity))
           : l.unitCostCents;
+      rises.push({ stockItemId: item.id, name: item.name, before: item.avgCostCents, after: avg });
       item.quantity = newQty;
       item.avgCostCents = avg;
       await tx
@@ -302,6 +305,9 @@ export async function createPurchase(
     });
     return purchase!;
   });
+  // Dearer ingredients: which dishes now cost too much to make (never blocks the purchase).
+  await alertCostRises(db, rid, rises).catch((e) => console.error("[inventory] cost alert", e));
+  return purchase;
 }
 
 export async function listPurchases(db: DbOrTx, ctx: RestaurantContext, limit = 50) {

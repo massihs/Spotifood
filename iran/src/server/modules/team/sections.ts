@@ -32,7 +32,7 @@ export const NOTIFY_OPTIONS = {
   ],
   reservations: ["reservation.created", "reservation.cancelled"],
   feedback: ["feedback.unhappy"],
-  stock: ["stock.low"],
+  stock: ["stock.low", "cost.rise"],
   goals: ["kpi.prep_slow", "kpi.rating_low", "kpi.revenue_missed"],
 } as const;
 export type NotifyOption = keyof typeof NOTIFY_OPTIONS;

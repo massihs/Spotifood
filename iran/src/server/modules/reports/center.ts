@@ -38,13 +38,19 @@ const DAY_MS = 86_400_000;
 
 // ─── Settings ────────────────────────────────────────────────────────────────
 
-export type ReportSettings = { dayStartHour: number; defaultPreset: Preset };
-export const DEFAULT_REPORT_SETTINGS: ReportSettings = { dayStartHour: 0, defaultPreset: "30d" };
+export type ReportSettings = { dayStartHour: number; defaultPreset: Preset; foodCostTargetPct: number };
+export const DEFAULT_REPORT_SETTINGS: ReportSettings = {
+  dayStartHour: 0,
+  defaultPreset: "30d",
+  foodCostTargetPct: 35,
+};
 
 export const reportSettingsSchema = z.object({
   /** The business day starts at this hour (a bar closing at 3 a.m. counts the night in the day before). */
   dayStartHour: z.coerce.number().int().min(0).max(6),
   defaultPreset: z.enum(PRESETS).refine((p) => p !== "custom"),
+  /** Share of the price the ingredients may cost before a dish is flagged (usually 28–35 %). */
+  foodCostTargetPct: z.coerce.number().int().min(10).max(80).default(35),
 });
 
 export async function getReportSettings(db: DbOrTx, restaurantId: string): Promise<ReportSettings> {

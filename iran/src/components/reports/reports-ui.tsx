@@ -220,16 +220,19 @@ export function ReportSettingsForm({
   rid,
   dayStartHour,
   defaultPreset,
+  foodCostTargetPct,
 }: {
   rid: string;
   dayStartHour: number;
   defaultPreset: string;
+  foodCostTargetPct: number;
 }) {
   const t = useTranslations("reports.center.settings");
   const tp = useTranslations("reports.presets");
   const { pending, error, run } = useRun();
   const [hour, setHour] = useState(dayStartHour);
   const [preset, setPreset] = useState(defaultPreset);
+  const [target, setTarget] = useState(foodCostTargetPct);
   const [saved, setSaved] = useState(false);
   return (
     <div className="max-w-xl space-y-4 rounded-2xl border border-border bg-surface p-5">
@@ -268,13 +271,33 @@ export function ReportSettingsForm({
           ))}
         </select>
       </label>
+      <label className="block text-sm font-medium">
+        {t("foodCostTarget")}
+        <input
+          type="number"
+          min={10}
+          max={80}
+          value={target}
+          onChange={(e) => {
+            setTarget(Number(e.target.value));
+            setSaved(false);
+          }}
+          className={cn(field, "mt-1 max-w-32")}
+        />
+        <span className="mt-1 block text-xs font-normal text-fg-muted">{t("foodCostTargetHint")}</span>
+      </label>
       {error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p> : null}
       <button
         type="button"
         disabled={pending}
         onClick={() =>
           run(
-            () => saveReportSettingsAction(rid, { dayStartHour: hour, defaultPreset: preset }),
+            () =>
+              saveReportSettingsAction(rid, {
+                dayStartHour: hour,
+                defaultPreset: preset,
+                foodCostTargetPct: target,
+              }),
             () => setSaved(true),
           )
         }

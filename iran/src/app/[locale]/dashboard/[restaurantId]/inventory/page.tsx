@@ -16,9 +16,18 @@ import {
   listSuppliers,
 } from "@/server/modules/inventory/service";
 import { can } from "@/server/tenancy";
+import { foodCosts, purchasePlan } from "@/server/modules/insights/service";
+import {
+  FoodCostView,
+  PLAN_DAYS,
+  PLAN_FACTORS,
+  PurchasePlanView,
+} from "@/components/insights/insights-views";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/inventory">;
-const TABS = ["stock", "purchases", "recipes", "suppliers", "movements"] as const;
+const TABS = ["stock", "plan", "costs", "purchases", "recipes", "suppliers", "movements"] as const;
+/** Tabs that need the right to manage the stock (they show costs and prices). */
+const MANAGE_TABS: readonly string[] = ["plan", "costs"];
 
 export default function InventoryPage({ params, searchParams }: Props) {
   return (
@@ -32,9 +41,10 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
   const { restaurantId } = await params;
   const ctx = await requireRestaurant(restaurantId, "inventory.view", "inventory");
   const sp = await searchParams;
-  const tab = (TABS as readonly string[]).includes(String(sp.tab))
+  const asked = (TABS as readonly string[]).includes(String(sp.tab))
     ? (sp.tab as (typeof TABS)[number])
     : "stock";
+  const tab = MANAGE_TABS.includes(asked) && !can(ctx, "inventory.manage") ? "stock" : asked;
   const [t, format, items, suppliers] = await Promise.all([
     getTranslations("inventory"),
     getFormatter(),
@@ -61,7 +71,7 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
         className="-mx-4 mb-5 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
         aria-label={t("title")}
       >
-        {TABS.map((k) => (
+        {TABS.filter((k) => manage || !MANAGE_TABS.includes(k)).map((k) => (
           <Link
             key={k}
             href={k === "stock" ? base : `${base}?tab=${k}`}
@@ -78,6 +88,29 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
 
       {tab === "stock" ? (
         <StockTable rid={ctx.restaurant.id} items={items} currency={cur} canManage={manage} />
+      ) : null}
+      {tab === "plan"
+        ? await (async () => {
+            const days = PLAN_DAYS.find((d) => String(d) === sp.days) ?? 3;
+            const factor = PLAN_FACTORS.find((f) => String(f) === sp.factor) ?? 1;
+            return (
+              <PurchasePlanView
+                plan={await purchasePlan(db, ctx, { days, factor })}
+                days={days}
+                factor={factor}
+                base={base}
+                currency={cur}
+              />
+            );
+          })()
+        : null}
+      {tab === "costs" ? (
+        <FoodCostView
+          data={await foodCosts(db, ctx)}
+          currency={cur}
+          menuHref={`/dashboard/${ctx.restaurant.id}/menu`}
+          settingsHref={`/dashboard/${ctx.restaurant.id}/reports?tab=settings`}
+        />
       ) : null}
       {tab === "suppliers" ? (
         <SupplierList rid={ctx.restaurant.id} suppliers={suppliers} canManage={manage} />

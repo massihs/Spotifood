@@ -142,6 +142,7 @@ export async function ReportCenter({
           rid={rid}
           dayStartHour={settings.dayStartHour}
           defaultPreset={settings.defaultPreset}
+          foodCostTargetPct={settings.foodCostTargetPct}
         />
       </div>
     );

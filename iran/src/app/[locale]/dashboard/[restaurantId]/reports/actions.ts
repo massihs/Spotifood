@@ -33,7 +33,7 @@ export async function deleteExpenseAction(rid: string, id: string) {
 
 export async function saveReportSettingsAction(
   rid: string,
-  input: { dayStartHour: number; defaultPreset: string },
+  input: { dayStartHour: number; defaultPreset: string; foodCostTargetPct?: number },
 ) {
   return runAction(async () => {
     const ctx = await actionContext(rid, "accounting.manage");
