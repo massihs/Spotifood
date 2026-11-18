@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
-import { createUpdates, newer, versionOf } from "../src/updates.js";
+import { createUpdates, newer, SNOOZE, versionOf } from "../src/updates.js";
 import { createLogger } from "../src/logger.js";
 
 test("compares versions number by number", () => {
@@ -90,4 +90,45 @@ test("the log file rotates and keeps three old files", () => {
   const names = fs.readdirSync(dir).sort();
   assert.deepEqual(names, ["spotifood.log", "spotifood.log.1", "spotifood.log.2", "spotifood.log.3"]);
   assert.ok(fs.statSync(file).size <= 1024 * 1024 + 400_000);
+});
+
+test("a new version is proposed until someone answers, and comes back after « Later »", async () => {
+  let clock = 1_000;
+  const changes = [];
+  const u = createUpdates({
+    current: "1.2.0",
+    platform: "darwin",
+    packaged: true,
+    autoUpdater: null,
+    fetchImpl: async () => ({ ok: true, status: 200, text: async () => "version: 1.3.0\n" }),
+    openExternal: async () => {},
+    log: () => {},
+    onChange: (s) => changes.push(s.prompt),
+    now: () => clock,
+  });
+  assert.equal(u.state.prompt, false);
+  assert.equal((await u.check()).prompt, true);
+  u.later();
+  assert.equal(u.state.prompt, false);
+  assert.equal((await u.check()).prompt, false);
+  clock += SNOOZE + 1;
+  assert.equal((await u.check()).prompt, true);
+});
+
+test("Windows: the question comes only once the update is downloaded", async () => {
+  const handlers = {};
+  const prompts = [];
+  const autoUpdater = {
+    on: (e, fn) => (handlers[e] = fn),
+    checkForUpdates: async () => {
+      handlers["update-available"]({ version: "1.3.0" });
+      prompts.push(u.state.prompt);
+      handlers["update-downloaded"]({ version: "1.3.0" });
+    },
+    quitAndInstall() {},
+  };
+  const u = createUpdates({ current: "1.2.0", platform: "win32", packaged: true, autoUpdater, fetchImpl: null, log() {}, onChange() {} });
+  await u.check();
+  assert.deepEqual(prompts, [false]);
+  assert.equal(u.state.prompt, true);
 });

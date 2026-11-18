@@ -32,9 +32,12 @@ Le PC apparaît dans **Réglages → Logiciel PC** ; *Retirer* le déconnecte im
 - **Toujours actif** : fermer la fenêtre la masque seulement ; l'impression des tickets et le mode
   hors ligne continuent. L'icône près de l'horloge (barre des menus sur macOS) rouvre Spotifood ou
   le quitte (avec un avertissement s'il reste des commandes hors ligne à envoyer).
-- **Mises à jour** : à partir de la 1.1.0, Windows télécharge la nouvelle version en arrière-plan et
-  l'installe au prochain redémarrage (ou tout de suite avec *Redémarrer et installer* dans la barre).
-  macOS signale la nouvelle version et ouvre son téléchargement (l'app n'est pas signée Apple).
+- **Mises à jour** : dès qu'une version est publiée (workflow *Desktop app*), chaque PC connecté à
+  internet la trouve (au démarrage, toutes les heures et au retour d'internet) et la propose : un
+  bandeau sous la barre (*Redémarrer et installer* / *Plus tard*, qui la repropose 4 h après) et une
+  notification si personne ne regarde l'app. Windows la télécharge d'abord en arrière-plan ; sans
+  réponse, elle s'installe à la prochaine fermeture. macOS propose son téléchargement (l'app n'est
+  pas signée Apple).
 - **Réglages → Écran et affichage** : écran à l'ouverture (dernière page, caisse, commandes,
   cuisine, prise de commande), plein écran à l'ouverture (télévision en cuisine), écran toujours
   allumé, démarrage avec l'ordinateur, taille du texte.

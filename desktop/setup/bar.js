@@ -1,4 +1,5 @@
 import { isRtl, translator } from "/i18n.js";
+import { icon } from "/icons.js";
 
 const $ = (id) => document.getElementById(id);
 let t = translator("fa");
@@ -29,23 +30,38 @@ function render(s) {
           : "";
   }
   // Phones join the hub with this code (useful mostly offline).
-  $("phones").innerHTML =
-    s.linked && (s.mode === "local" || !online) && s.addresses[0]
-      ? `${t("phones")}: <span dir="ltr">${s.addresses[0]}</span> · ${t("code")} <b class="code">${s.pairCode}</b>`
-      : "";
-  $("site").textContent = t("site");
+  const phones = s.linked && (s.mode === "local" || !online) && s.addresses[0];
+  $("phones").classList.toggle("hidden", !phones);
+  $("phones").innerHTML = phones
+    ? `${icon("phone")}<span dir="ltr">${s.addresses[0]}</span> · ${t("code")} <span class="code">${s.pairCode}</span>`
+    : "";
+  $("site").innerHTML = `${icon("globe")}<span class="wide">${t("site")}</span>`;
+  $("site").title = t("site");
   $("site").setAttribute("aria-pressed", String(s.mode === "site" || s.mode === "setup"));
-  $("local").textContent = t("local");
+  $("local").innerHTML = `${icon("wifiOff")}<span class="wide">${t("local")}</span>`;
+  $("local").title = t("local");
   $("local").setAttribute("aria-pressed", String(s.mode === "local"));
-  $("local").classList.toggle("hidden", !s.linked);
-  $("sync").textContent = t("syncNow");
+  $("views").classList.toggle("hidden", !s.linked);
+  $("sync").innerHTML = `${icon("refresh")}${t("syncNow")}`;
   $("sync").classList.toggle("hidden", !s.linked || !s.status.pending);
+  $("settings").innerHTML = icon("settings");
+  $("settings").title = t("settings");
+  $("settings").setAttribute("aria-label", t("settings"));
   $("settings").setAttribute("aria-pressed", String(s.mode === "settings"));
-  // A new version: one tap installs it (Windows) or opens the download (macOS).
+
+  // A new version: proposed in the banner; once answered "Later", a small button stays.
   const u = s.update ?? {};
-  $("update").classList.toggle("hidden", !["ready", "available"].includes(u.status));
-  $("update").textContent = u.status === "ready" ? t("restartUpdate") : t("downloadUpdate");
-  $("update").title = u.version ?? "";
+  const offered = ["ready", "available"].includes(u.status);
+  const ready = u.status === "ready";
+  $("banner").classList.toggle("hidden", !u.prompt);
+  $("spark").innerHTML = icon("sparkles");
+  $("bannerTitle").textContent = t("bannerTitle", { v: u.version ?? "" });
+  $("bannerBody").textContent = t(ready ? "bannerReady" : "bannerAvailable");
+  $("go").innerHTML = `${icon(ready ? "refresh" : "download")}${t(ready ? "restartUpdate" : "downloadUpdate")}`;
+  $("later").textContent = t("later");
+  $("update").classList.toggle("hidden", !offered || !!u.prompt);
+  $("update").innerHTML = `${icon("sparkles")}<span class="wide">${u.version ?? ""}</span>`;
+  $("update").title = t(ready ? "restartUpdate" : "downloadUpdate");
 }
 
 $("site").onclick = () => window.spotifood.action("site");
@@ -53,6 +69,8 @@ $("local").onclick = () => window.spotifood.action("local");
 $("sync").onclick = () => window.spotifood.action("sync").then(render);
 $("settings").onclick = () => window.spotifood.action("settings");
 $("update").onclick = () => window.spotifood.action("applyUpdate");
+$("go").onclick = () => window.spotifood.action("applyUpdate");
+$("later").onclick = () => window.spotifood.action("laterUpdate").then(render);
 window.spotifood.onState(render);
 window.spotifood.state().then(render);
 setInterval(() => window.spotifood.state().then(render), 4000);

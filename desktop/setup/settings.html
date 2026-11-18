@@ -2,59 +2,83 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:" />
 <title>Spotifood</title>
 <link rel="stylesheet" href="/app.css" />
 <style>
-  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; display: grid; gap: 16px; }
-  section { padding: 20px; }
-  h1 { font-size: 22px; margin: 0; }
-  h2 { font-size: 16px; margin: 0 0 6px; }
-  p { margin: 0 0 12px; line-height: 1.6; }
+  .layout { max-width: 1140px; margin: 0 auto; padding: 24px 20px 80px; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 24px; align-items: start; }
+  nav.side { position: sticky; top: 20px; display: grid; gap: 2px; padding: 8px; }
+  nav.side a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; font-weight: 800; font-size: 14px; }
+  nav.side a .ic { font-size: 17px; }
+  nav.side a:hover { background: var(--surface-2); color: var(--fg); }
+  nav.side a.on { background: var(--accent-soft); color: var(--accent-text); }
+  main { display: grid; gap: 16px; min-width: 0; }
+  .hero { position: relative; overflow: hidden; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 16px; padding: 22px 24px; border-radius: 24px; background: var(--ink); color: #fff; box-shadow: var(--shadow-lg); }
+  .hero::before { content: ""; position: absolute; inset: -60% -10% auto auto; width: 380px; height: 380px; border-radius: 50%; background: radial-gradient(circle, rgb(240 106 12 / 0.45), transparent 65%); }
+  .hero > * { position: relative; }
+  .hero .mark { width: 54px; height: 54px; border-radius: 17px; }
+  .hero .who { flex: 1; min-width: 200px; }
+  .hero h1 { font-size: 22px; margin: 0; font-weight: 900; }
+  .hero p { margin: 2px 0 0; color: #b9b6c0; font-size: 13.5px; }
+  .hero .btn { background: rgb(255 255 255 / 0.1); color: #fff; }
+  section { padding: 22px; scroll-margin-top: 20px; }
+  .sh { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .si { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-size: 19px; flex-shrink: 0; }
+  h2 { font-size: 17px; margin: 0; font-weight: 900; }
+  p { margin: 0 0 14px; line-height: 1.7; }
   .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .code { font-size: 34px; font-weight: 900; letter-spacing: 0.15em; font-variant-numeric: tabular-nums; }
+  .code { font-size: 38px; font-weight: 900; letter-spacing: 0.18em; font-variant-numeric: tabular-nums; padding: 6px 20px; border-radius: 18px; background: var(--ink); color: #fff; }
   .addr { direction: ltr; unicode-bidi: isolate; font-weight: 800; font-size: 18px; }
-  .printer { border: 1px solid var(--border); border-radius: 16px; padding: 14px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); align-items: end; }
-  .printer label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; }
-  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .opts { display: grid; gap: 12px; }
-  .check { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; }
-  .check input { width: 20px; height: 20px; accent-color: var(--accent); }
-  .zoom { font-variant-numeric: tabular-nums; min-width: 56px; text-align: center; font-weight: 800; }
+  .printer { border: 1px solid var(--border); background: var(--surface-2); border-radius: 18px; padding: 14px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: end; }
+  .printer label { display: grid; gap: 6px; font-size: 13px; font-weight: 800; }
+  .opts { display: grid; }
+  .opts > * { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .opts > *:last-child { border-bottom: 0; }
+  .check { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-weight: 700; cursor: pointer; }
+  .zoom { font-variant-numeric: tabular-nums; min-width: 60px; text-align: center; font-weight: 900; }
+  .ok { color: var(--success); font-weight: 800; display: inline-flex; align-items: center; gap: 6px; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } nav.side { display: none; } }
 </style>
 </head>
 <body>
+<div class="layout">
+<nav class="card side" id="nav"></nav>
 <main>
-  <div class="top"><h1 id="title"></h1><button class="btn" id="back"></button></div>
+  <div class="hero">
+    <img class="mark" src="/brand/mark.svg" alt="" />
+    <div class="who"><h1 id="title"></h1><p id="heroSub"></p></div>
+    <span class="badge" id="heroStatus"></span>
+    <button class="btn" id="back"></button>
+  </div>
 
-  <section class="card">
-    <h2 id="serverTitle"></h2>
+  <section class="card" id="sec-server" data-icon="server">
+    <div class="sh"><span class="si" data-icon="server"></span><h2 id="serverTitle"></h2></div>
     <div class="row"><input id="server" class="field" dir="ltr" spellcheck="false" style="max-width: 420px" /><button class="btn dark" id="serverSave"></button></div>
     <p class="muted" id="serverErr" style="margin-top: 6px"></p>
   </section>
 
-  <section class="card">
-    <h2 id="pcTitle"></h2>
+  <section class="card" id="sec-pc" data-icon="laptop">
+    <div class="sh"><span class="si" data-icon="laptop"></span><h2 id="pcTitle"></h2></div>
     <div class="row"><input id="pcName" class="field" style="max-width: 320px" /><button class="btn dark" id="pcSave"></button></div>
   </section>
 
-  <section class="card">
-    <h2 id="screenTitle"></h2>
+  <section class="card" id="sec-screen" data-icon="monitor">
+    <div class="sh"><span class="si" data-icon="monitor"></span><h2 id="screenTitle"></h2></div>
     <div class="opts">
       <label class="row" style="gap: 12px"><span id="startLabel" style="font-weight: 600"></span>
         <select id="startScreen" class="field" style="max-width: 260px"></select></label>
-      <label class="check"><input type="checkbox" id="fullscreen" /><span id="fullscreenLabel"></span></label>
-      <label class="check"><input type="checkbox" id="keepAwake" /><span id="keepAwakeLabel"></span></label>
-      <label class="check"><input type="checkbox" id="customerDisplay" /><span id="customerDisplayLabel"></span></label>
-      <label class="check" id="autoStartRow"><input type="checkbox" id="autoStart" /><span id="autoStartLabel"></span></label>
+      <label class="check"><span id="fullscreenLabel"></span><input type="checkbox" class="switch" id="fullscreen" /></label>
+      <label class="check"><span id="keepAwakeLabel"></span><input type="checkbox" class="switch" id="keepAwake" /></label>
+      <label class="check"><span id="customerDisplayLabel"></span><input type="checkbox" class="switch" id="customerDisplay" /></label>
+      <label class="check" id="autoStartRow"><span id="autoStartLabel"></span><input type="checkbox" class="switch" id="autoStart" /></label>
       <div class="row"><span id="textSizeLabel" style="font-weight: 600"></span>
         <button class="btn" id="zoomOut" aria-label="−">−</button><span class="zoom" id="zoom"></span><button class="btn" id="zoomIn" aria-label="+">+</button><button class="btn" id="zoomReset">100%</button></div>
       <p class="muted" id="shortcuts" style="margin: 0; font-size: 13px"></p>
     </div>
   </section>
 
-  <section class="card">
-    <h2 id="phonesTitle"></h2>
+  <section class="card" id="sec-phones" data-icon="phone">
+    <div class="sh"><span class="si" data-icon="phone"></span><h2 id="phonesTitle"></h2></div>
     <p class="muted" id="phonesBody"></p>
     <div class="row" style="gap: 24px">
       <div id="addrs" style="display: grid; gap: 4px"></div>
@@ -63,16 +87,16 @@
     <div class="row" style="margin-top: 12px"><button class="btn" id="newCode"></button><button class="btn danger" id="unpairAll"></button></div>
   </section>
 
-  <section class="card">
-    <h2 id="printersTitle"></h2>
+  <section class="card" id="sec-printers" data-icon="printer">
+    <div class="sh"><span class="si" data-icon="printer"></span><h2 id="printersTitle"></h2></div>
     <p class="muted" id="printersBody"></p>
     <div id="printers" style="display: grid; gap: 10px"></div>
     <div class="row" style="margin-top: 12px"><button class="btn" id="addSystem"></button><button class="btn" id="addNetwork"></button><button class="btn dark" id="savePrinters"></button></div>
     <p class="muted" id="printerMsg" style="margin-top: 8px"></p>
   </section>
 
-  <section class="card">
-    <h2 id="terminalTitle"></h2>
+  <section class="card" id="sec-terminal" data-icon="card">
+    <div class="sh"><span class="si" data-icon="card"></span><h2 id="terminalTitle"></h2></div>
     <p class="muted" id="terminalBody"></p>
     <div class="printer">
       <label><span id="terminalDriverLabel"></span><select class="field" id="terminalDriver"></select></label>
@@ -95,24 +119,26 @@
     <p class="muted" id="terminalMsg" style="margin-top: 8px"></p>
   </section>
 
-  <section class="card">
-    <h2 id="syncTitle"></h2>
+  <section class="card" id="sec-sync" data-icon="refresh">
+    <div class="sh"><span class="si" data-icon="refresh"></span><h2 id="syncTitle"></h2></div>
     <p class="muted" id="syncInfo"></p>
     <div class="row"><button class="btn dark" id="syncNow"></button><button class="btn danger" id="unlink"></button></div>
   </section>
 
-  <section class="card">
-    <h2 id="updatesTitle"></h2>
-    <p class="muted" id="updateInfo"></p>
+  <section class="card" id="sec-updates" data-icon="sparkles">
+    <div class="sh"><span class="si" data-icon="sparkles"></span><h2 id="updatesTitle"></h2></div>
+    <p class="muted" id="updateAuto"></p>
+    <p id="updateInfo" style="font-weight: 800"></p>
     <div class="row"><button class="btn" id="checkUpdate"></button><button class="btn dark hidden" id="applyUpdate"></button></div>
     <p class="muted" id="version" style="margin-top: 12px; font-size: 12px"></p>
   </section>
 
-  <section class="card">
-    <h2 id="logsTitle"></h2>
+  <section class="card" id="sec-logs" data-icon="file">
+    <div class="sh"><span class="si" data-icon="file"></span><h2 id="logsTitle"></h2></div>
     <div class="row"><button class="btn" id="openLogs"></button></div>
   </section>
 </main>
+</div>
 <script type="module" src="./settings.js"></script>
 </body>
 </html>

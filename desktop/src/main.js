@@ -32,7 +32,9 @@ import { translator } from "../offline/i18n.js";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, "..");
 const DEFAULT_SERVER = process.env.SPOTIFOOD_URL ?? "https://spotifood.ir";
-const BAR_H = 44;
+const BAR_H = 48;
+/** The "new version" banner under the bar, while an update is proposed. */
+const BANNER_H = 60;
 const UUID = /\/dashboard\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/;
 
 // A separate data folder (tests, or two restaurants on one PC).
@@ -93,7 +95,11 @@ const sync = createSync({
   onChange(e) {
     if (e.online === false && mode === "site") showLocal(localFor(content?.webContents.getURL()));
     if (e.synced) flash("synced", { n: e.synced });
-    if (e.online === true) flash("online");
+    if (e.online === true) {
+      flash("online");
+      // Back online: a version published meanwhile is proposed without waiting the hourly check.
+      updates.checkSoon();
+    }
     if (e.revoked) {
       saveConfig({ deviceToken: null, deviceId: null });
       flash("revoked");
@@ -110,11 +116,29 @@ const updates = createUpdates({
   autoUpdater: process.platform === "win32" ? updaterPkg.autoUpdater : null,
   openExternal: (url) => shell.openExternal(url),
   log,
-  onChange: () => {
+  onChange: (u) => {
+    if (u.prompt && !prompted) announceUpdate(u);
+    prompted = u.prompt;
+    layout();
     pushState();
     refreshTray();
   },
 });
+let prompted = false;
+
+/** A new version: the banner under the bar, and a notification if nobody is looking at the app. */
+function announceUpdate(u) {
+  log(`update: proposing ${u.version}`);
+  const looking = win && !win.isDestroyed() && win.isVisible() && win.isFocused();
+  if (looking || !Notification.isSupported()) return;
+  const t = tr();
+  const n = new Notification({
+    title: t("updateNotifTitle", { v: u.version }),
+    body: t(u.status === "ready" ? "updateNotifReady" : "updateNotifAvailable"),
+  });
+  n.on("click", showWindow);
+  n.show();
+}
 
 // ─── Views ───────────────────────────────────────────────────────────────────
 
@@ -125,8 +149,9 @@ const siteUrl = () => `${config.serverUrl.replace(/\/+$/, "")}/dashboard/${confi
 function layout() {
   if (!win) return;
   const { width, height } = win.getContentBounds();
-  bar.setBounds({ x: 0, y: 0, width, height: BAR_H });
-  content.setBounds({ x: 0, y: BAR_H, width, height: Math.max(0, height - BAR_H) });
+  const top = BAR_H + (updates.state.prompt ? BANNER_H : 0);
+  bar.setBounds({ x: 0, y: 0, width, height: top });
+  content.setBounds({ x: 0, y: top, width, height: Math.max(0, height - top) });
 }
 
 const START_PATHS = { home: "", pos: "/pos", orders: "/orders", kitchen: "/kitchen", waiter: "/waiter" };
@@ -311,7 +336,7 @@ function createWindow() {
     minWidth: 380,
     minHeight: 560,
     title: "Spotifood",
-    backgroundColor: "#f6f7f9",
+    backgroundColor: "#0f1115",
     icon: path.join(root, "build", "icon.png"),
     autoHideMenuBar: true,
     fullscreen: config.pc.fullscreen,
@@ -645,8 +670,15 @@ ipcMain.handle("action", async (e, name, arg) => {
     case "checkUpdate":
       await updates.check();
       return state();
-    case "applyUpdate":
-      return updates.apply();
+    case "applyUpdate": {
+      const done = updates.apply();
+      // macOS: the download is open in the browser, the banner can go.
+      if (done && updates.state.status === "available") updates.later();
+      return done;
+    }
+    case "laterUpdate":
+      updates.later();
+      return state();
     default:
       throw new Error("unknown_action");
   }
@@ -690,6 +722,11 @@ async function smoke(dir) {
     log(`smoke ${name}: ${content.webContents.getURL()}`);
   };
   await shot(mode);
+  if (process.env.SPOTIFOOD_SMOKE_UPDATE) {
+    updates.preview(process.env.SPOTIFOOD_SMOKE_UPDATE);
+    await shot("update");
+    updates.later();
+  }
   if (process.env.SPOTIFOOD_SMOKE_CHECKS) {
     // Window behaviour: closing hides (the hub keeps serving), zoom and full screen apply.
     win.close();

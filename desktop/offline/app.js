@@ -1,5 +1,6 @@
 import { buildLine, formatMoney, parseMoney, priceFor, totalsOf } from "/model.js";
 import { isRtl, translator } from "/i18n.js";
+import { icon } from "/icons.js";
 
 /**
  * The screens of the local hub: order taking (till and waiters' phones), the orders list and the
@@ -55,6 +56,15 @@ const money = (c) => formatMoney(c, data.snapshot.restaurant.currency, locale);
 const num = (n) => new Intl.NumberFormat(locale).format(n);
 const route = () => (location.hash.replace(/^#\/?/, "") || pref("screen") || "order").split("?")[0];
 
+/** An empty list: an icon in a soft halo and one line. */
+const emptyBox = (name, text, style = "") => `<div class="empty" ${style}><span class="halo">${icon(name)}</span>${text}</div>`;
+/** Each category its own colour on the product tiles, so the till reads at a glance. */
+const TONES = ["#f06a0c", "#2563eb", "#15924a", "#9333ea", "#db2777", "#0891b2", "#ca8a04", "#4f46e5"];
+const toneOf = (categoryId) => {
+  const i = data.snapshot.categories.findIndex((c) => c.id === categoryId);
+  return TONES[(i < 0 ? 0 : i) % TONES.length];
+};
+
 // ─── Loading ─────────────────────────────────────────────────────────────────
 
 async function load() {
@@ -62,7 +72,7 @@ async function load() {
     data = await api("/api/state");
   } catch (e) {
     if (e.status === 401) return renderPair();
-    app.innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+    app.innerHTML = emptyBox("wifiOff", esc(e.message));
     return;
   }
   locale = data.snapshot?.restaurant.defaultLocale ?? navigator.language?.slice(0, 2) ?? "fa";
@@ -114,7 +124,8 @@ function renderPair() {
   t = translator(["fr", "en", "ar"].includes(lang) ? lang : "fa");
   document.documentElement.dir = lang === "fr" || lang === "en" ? "ltr" : "rtl";
   app.innerHTML = `<div class="pair"><form class="card" id="pair">
-    <h2 style="margin:0">${t("pairTitle")}</h2><p class="muted" style="margin:0">${t("pairBody")}</p>
+    <img class="logo-mark" src="/brand/mark.svg" alt="">
+    <h2>${t("pairTitle")}</h2><p class="muted" style="margin:0">${t("pairBody")}</p>
     <input class="field" id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" dir="ltr" autofocus>
     <button class="btn primary lg">${t("pairGo")}</button><p class="muted" id="perr"></p></form></div>`;
   document.getElementById("pair").onsubmit = async (e) => {
@@ -137,18 +148,22 @@ function header() {
   const screen = route();
   const staff = s.staff ?? [];
   const me = pref("staff");
+  const TAB_ICONS = { order: "receipt", orders: "bag", kitchen: "chef" };
   return `<header class="top">
-    <span class="name">${esc(s.restaurant.name)}</span>
-    <span class="badge ${st.online ? "on" : "off"}">${st.online ? t("online") : t("offline")}</span>
-    ${st.pending ? `<span class="badge warn">${t("pending", { n: st.pending })}</span>` : ""}
+    <span class="brand"><img class="logo-mark" src="/brand/mark.svg" alt=""><span class="name">${esc(s.restaurant.name)}</span></span>
+    <span class="badge ${st.online ? "on" : "off"}"><span class="dot"></span>${st.online ? t("online") : t("offline")}</span>
+    ${st.pending ? `<span class="badge warn">${icon("refresh")}${t("pending", { n: st.pending })}</span>` : ""}
     <nav class="tabs">
       ${["order", "orders", "kitchen"]
-        .map((k) => `<a href="#/${k}" ${screen === k ? 'aria-current="page"' : ""}>${t(`tab${k[0].toUpperCase()}${k.slice(1)}`)}</a>`)
+        .map(
+          (k) =>
+            `<a href="#/${k}" ${screen === k ? 'aria-current="page"' : ""}>${icon(TAB_ICONS[k])}<span>${t(`tab${k[0].toUpperCase()}${k.slice(1)}`)}</span></a>`,
+        )
         .join("")}
     </nav>
     ${
       staff.length && screen !== "kitchen"
-        ? `<label class="staff"><select id="staff" aria-label="${t("whoAmI")}"><option value="">${t("whoAmI")}</option>${staff
+        ? `<label class="staff">${icon("user")}<select id="staff" aria-label="${t("whoAmI")}"><option value="">${t("whoAmI")}</option>${staff
             .map((m) => `<option value="${esc(m.userId)}" ${m.userId === me ? "selected" : ""}>${esc(m.name)}</option>`)
             .join("")}</select></label>`
         : ""
@@ -158,10 +173,11 @@ function header() {
 
 function render() {
   if (!data.snapshot) {
-    app.innerHTML = `<div class="empty">${t("noMenu")}</div>`;
+    app.innerHTML = emptyBox("utensils", t("noMenu"));
     return;
   }
   const screen = route();
+  document.body.classList.toggle("dark-screen", screen === "kitchen");
   pref("screen", screen);
   const body = screen === "orders" ? ordersScreen() : screen === "kitchen" ? kitchenScreen() : orderScreen();
   app.innerHTML = header() + body;
@@ -205,10 +221,10 @@ function orderScreen() {
     <section class="menu">
       <div class="row">
         <div class="seg">
-          <button data-channel="dine_in" aria-pressed="${cart.channel === "dine_in"}">${t("dineIn")}</button>
-          <button data-channel="takeaway" aria-pressed="${cart.channel === "takeaway"}">${t("takeaway")}</button>
+          <button data-channel="dine_in" aria-pressed="${cart.channel === "dine_in"}">${icon("utensils")}${t("dineIn")}</button>
+          <button data-channel="takeaway" aria-pressed="${cart.channel === "takeaway"}">${icon("bag")}${t("takeaway")}</button>
         </div>
-        ${cart.channel === "dine_in" ? `<button class="btn ${table ? "dark" : "primary"}" data-act="tables">${table ? esc(t("table", { t: table.label })) : t("chooseTable")}</button>` : ""}
+        ${cart.channel === "dine_in" ? `<button class="btn ${table ? "dark" : "primary"}" data-act="tables">${icon("table")}${table ? esc(t("table", { t: table.label })) : t("chooseTable")}</button>` : ""}
       </div>
       <div class="scroll">
         <button class="chip" data-cat="all" aria-pressed="${category === "all"}">${t("all")}</button>
@@ -217,7 +233,7 @@ function orderScreen() {
       <div class="grid">
         ${list
           .map(
-            (p) => `<button class="prod" data-add="${esc(p.id)}" ${p.isAvailable ? "" : "disabled"}>
+            (p) => `<button class="prod" style="--tone:${toneOf(p.categoryId)}" data-add="${esc(p.id)}" ${p.isAvailable ? "" : "disabled"}>
               <b>${esc(p.name)}</b>
               ${inCart.get(p.id) ? `<span class="in num">${num(inCart.get(p.id))}</span>` : ""}
               <span class="price num">${p.isAvailable ? money(priceFor(p, cart.channel)) : t("soldOut")}</span>
@@ -227,32 +243,32 @@ function orderScreen() {
       </div>
     </section>
     <aside class="card ticket ${ticketOpen ? "open" : ""}" id="ticket">
-      <div class="head"><b>${t("ticket")}${table && cart.channel === "dine_in" ? ` · ${esc(t("table", { t: table.label }))}` : cart.channel === "takeaway" ? ` · ${t("takeaway")}` : ""}</b>
-        <button class="btn" data-act="closeTicket" style="height:32px">✕</button></div>
+      <div class="head"><b>${icon("receipt")}${t("ticket")}${table && cart.channel === "dine_in" ? ` · ${esc(t("table", { t: table.label }))}` : cart.channel === "takeaway" ? ` · ${t("takeaway")}` : ""}</b>
+        <button class="btn icon" data-act="closeTicket" aria-label="${t("cancel")}" style="height:36px;width:36px">${icon("x")}</button></div>
       <div class="lines">
         ${
           lines.length
             ? lines
                 .map(
                   (l) => `<div class="line"><div><b>${esc(l.name)}</b></div>
-                <div class="qty"><button data-dec="${esc(l.key)}">−</button><span class="num">${num(l.quantity)}</span><button data-inc="${esc(l.key)}">+</button></div>
+                <div class="qty"><button data-dec="${esc(l.key)}" aria-label="−">${icon("minus")}</button><span class="num">${num(l.quantity)}</span><button data-inc="${esc(l.key)}" aria-label="+">${icon("plus")}</button></div>
                 ${l.options.length || l.note ? `<div class="opts">${esc(l.options.map((o) => o.valueName).join(" · "))}${l.note ? ` « ${esc(l.note)} »` : ""}</div>` : ""}
                 <div class="opts num" style="color:var(--fg);font-weight:700">${money(l.lineTotalCents)}</div></div>`,
                 )
                 .join("")
-            : `<div class="empty">${t("empty")}</div>`
+            : emptyBox("receipt", t("empty"))
         }
       </div>
       <div class="foot">
         <input class="field" id="note" placeholder="${t("note")}" value="${esc(cart.note)}" maxlength="500">
         <div class="total"><span>${t("total")}</span><span class="num">${money(totals.totalCents)}</span></div>
         <div class="row" style="flex-wrap:nowrap">
-          <button class="btn lg" style="flex:1" data-act="send" ${lines.length && !busy ? "" : "disabled"}>${t("send")}</button>
-          <button class="btn primary lg" style="flex:1" data-act="pay" ${lines.length && !busy ? "" : "disabled"}>${t("payNow")}</button>
+          <button class="btn dark lg" style="flex:1" data-act="send" ${lines.length && !busy ? "" : "disabled"}>${icon("chef")}${t("send")}</button>
+          <button class="btn primary lg" style="flex:1" data-act="pay" ${lines.length && !busy ? "" : "disabled"}>${icon("cash")}${t("payNow")}</button>
         </div>
       </div>
     </aside>
-    <div class="mobile-bar"><button class="btn dark" data-act="openTicket"><span>${t("ticket")} · <span class="num">${num(count)}</span></span><span class="num">${money(totals.totalCents)}</span></button></div>
+    <div class="mobile-bar"><button class="btn dark" data-act="openTicket"><span>${icon("receipt")} ${t("ticket")} · <span class="num">${num(count)}</span></span><span class="num">${money(totals.totalCents)}</span></button></div>
   </div>`;
 }
 
@@ -352,6 +368,7 @@ function chooseTable() {
   };
 }
 
+const PAY_ICONS = { cash: "cash", card: "card", card_terminal: "card", on_site_terminal: "card", online: "globe" };
 /** Payment sheet: method, cash received, change. Resolves with the payment or null. */
 function askPayment(totalCents) {
   return new Promise((resolve) => {
@@ -360,8 +377,8 @@ function askPayment(totalCents) {
     const draw = () => {
       const tendered = parseMoney(document.getElementById("tendered")?.value ?? "", data.snapshot.restaurant.currency);
       modal.innerHTML = `<div class="sheet"><h3>${t("payNow")}</h3>
-        <div class="big num" style="text-align:center">${money(totalCents)}</div>
-        <div class="pay">${methods.map((m) => `<button data-m="${m}" aria-pressed="${m === method}">${t(m)}</button>`).join("")}</div>
+        <div class="amount"><small>${t("total")}</small><div class="big num">${money(totalCents)}</div></div>
+        <div class="pay">${methods.map((m) => `<button data-m="${m}" aria-pressed="${m === method}">${icon(PAY_ICONS[m] ?? "cash")}${t(m)}</button>`).join("")}</div>
         ${
           method === "cash"
             ? `<label class="muted" for="tendered">${t("tendered")}</label><input class="field num" id="tendered" inputmode="numeric" dir="ltr" value="${
@@ -370,7 +387,7 @@ function askPayment(totalCents) {
                <div class="total"><span>${t("change")}</span><span class="num" id="change">${tendered != null && tendered >= totalCents ? money(tendered - totalCents) : "—"}</span></div>`
             : ""
         }
-        <div class="row" style="justify-content:flex-end"><button class="btn" data-close>${t("cancel")}</button><button class="btn primary lg" data-ok>${t("confirmPay")}</button></div></div>`;
+        <div class="row" style="justify-content:flex-end"><button class="btn" data-close>${t("cancel")}</button><button class="btn primary lg" data-ok>${icon("check")}${t("confirmPay")}</button></div></div>`;
       document.getElementById("tendered")?.addEventListener("input", (e) => {
         const v = parseMoney(e.target.value, data.snapshot.restaurant.currency);
         document.getElementById("change").textContent = v != null && v >= totalCents ? money(v - totalCents) : "—";
@@ -443,17 +460,17 @@ function orderCard(o) {
   const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(o.placedAt));
   return `<article class="card ocard">
     <div class="top2"><div><div class="no num" dir="ltr">${esc(o.localNumber)}</div>
-      <div class="muted" style="font-size:13px">${o.channel === "takeaway" ? t("takeaway") : esc(t("table", { t: o.tableLabel ?? "—" }))} · ${time}${o.staffName ? ` · ${esc(o.staffName)}` : ""}</div></div>
+      <div class="meta"><span>${icon(o.channel === "takeaway" ? "bag" : "table")}${o.channel === "takeaway" ? t("takeaway") : esc(t("table", { t: o.tableLabel ?? "—" }))}</span><span>${icon("clock")}${time}</span>${o.staffName ? `<span>${icon("user")}${esc(o.staffName)}</span>` : ""}</div></div>
       <span class="st ${o.status}">${statusLabel(o.status)}</span></div>
     <ul>${items}</ul>
     <div class="total" style="font-size:16px"><span>${o.payment ? t("paid") : t("unpaid")}</span><span class="num">${money(o.totalCents)}</span></div>
-    ${o.printErrors?.length ? `<div class="warnline">${esc(t("printFailed", { p: o.printErrors.join("، ") }))}</div>` : ""}
-    ${o.syncedAt ? `<div class="muted" style="font-size:13px">✓ ${esc(t("synced", { n: o.cloudNumber ?? "" }))}</div>` : o.syncError ? `<div class="warnline">${esc(t("syncError", { e: o.syncError }))}</div>` : `<div class="muted" style="font-size:13px">${t("waitingSync")}</div>`}
+    ${o.printErrors?.length ? `<div class="warnline">${icon("printer")}${esc(t("printFailed", { p: o.printErrors.join("، ") }))}</div>` : ""}
+    ${o.syncedAt ? `<div class="sync ok">${icon("check")}${esc(t("synced", { n: o.cloudNumber ?? "" }))}</div>` : o.syncError ? `<div class="warnline">${icon("wifiOff")}${esc(t("syncError", { e: o.syncError }))}</div>` : `<div class="sync">${icon("refresh")}${t("waitingSync")}</div>`}
     <div class="acts">
-      ${editable && !o.payment && o.status !== "cancelled" ? `<button class="btn primary" data-pay="${o.id}">${t("payNow")}</button>` : ""}
+      ${editable && !o.payment && o.status !== "cancelled" ? `<button class="btn primary" data-pay="${o.id}">${icon("cash")}${t("payNow")}</button>` : ""}
       ${editable && NEXT[o.status] ? `<button class="btn dark" data-status="${o.id}" data-to="${NEXT[o.status]}">${t(NEXT[o.status] === "ready" ? "toReady" : "toServed")}</button>` : ""}
-      <button class="btn" data-print="${o.id}" data-kind="kitchen">${t("reprintKitchen")}</button>
-      <button class="btn" data-print="${o.id}" data-kind="bill">${t("reprintBill")}</button>
+      <button class="btn" data-print="${o.id}" data-kind="kitchen">${icon("printer")}${t("reprintKitchen")}</button>
+      <button class="btn" data-print="${o.id}" data-kind="bill">${icon("receipt")}${t("reprintBill")}</button>
       ${editable && !o.payment && !["served", "cancelled"].includes(o.status) ? `<button class="btn danger" data-cancel="${o.id}" data-no="${esc(o.localNumber)}">${t("toCancel")}</button>` : ""}
     </div></article>`;
 }
@@ -463,9 +480,9 @@ function ordersScreen() {
   const open = list.filter((o) => ["accepted", "preparing", "ready"].includes(o.status) || (!o.payment && o.status === "served" && !o.syncedAt));
   const done = list.filter((o) => !open.includes(o));
   return `<div class="orders">
-    <h2 class="sec">${t("open")} · <span class="num">${num(open.length)}</span></h2>
-    ${open.length ? `<div class="cards">${open.map(orderCard).join("")}</div>` : `<div class="empty">${t("noOrders")}</div>`}
-    ${done.length ? `<h2 class="sec">${t("done")}</h2><div class="cards">${done.map(orderCard).join("")}</div>` : ""}
+    <h2 class="sec">${t("open")} <span class="count num">${num(open.length)}</span></h2>
+    ${open.length ? `<div class="cards">${open.map(orderCard).join("")}</div>` : `<div class="card">${emptyBox("bag", t("noOrders"))}</div>`}
+    ${done.length ? `<h2 class="sec done">${t("done")} <span class="count num">${num(done.length)}</span></h2><div class="cards">${done.map(orderCard).join("")}</div>` : ""}
   </div>`;
 }
 
@@ -484,8 +501,8 @@ function kitchenScreen() {
       const min = Math.max(0, Math.floor((now - Date.parse(o.placedAt)) / 60_000));
       return `<article class="kcard ${o.status !== "ready" && min >= 20 ? "late" : o.status !== "ready" && min >= 10 ? "warn" : ""}">
         <div class="top2" style="display:flex;justify-content:space-between;gap:8px"><div><div class="no num" dir="ltr">${esc(o.localNumber)}</div>
-          <div style="color:#aab2bf;font-size:14px">${o.channel === "takeaway" ? t("takeaway") : esc(t("table", { t: o.tableLabel ?? "—" }))}</div></div>
-          <div style="text-align:end"><span class="st ${o.status}">${statusLabel(o.status)}</span><div class="num" style="margin-top:6px;font-weight:800">${t("min", { n: num(min) })}</div></div></div>
+          <div class="where">${o.channel === "takeaway" ? t("takeaway") : esc(t("table", { t: o.tableLabel ?? "—" }))}</div></div>
+          <div style="text-align:end"><span class="st ${o.status}">${statusLabel(o.status)}</span><div><span class="timer num">${icon("clock")}${t("min", { n: num(min) })}</span></div></div></div>
         <ul>${lines
           .map(
             (l) => `<li>${num(l.quantity)} × ${esc(l.name)}${l.options.length ? `<span>${esc(l.options.map((x) => x.valueName).join(" · "))}</span>` : ""}${l.note ? `<em>↳ ${esc(l.note)}</em>` : ""}</li>`,
@@ -495,18 +512,22 @@ function kitchenScreen() {
         ${
           !o.syncedAt
             ? `<div class="row">${o.status === "accepted" ? `<button class="btn" data-status="${o.id}" data-to="preparing">${t("toPreparing")}</button>` : ""}
-          ${o.status !== "ready" ? `<button class="btn primary lg" style="flex:1" data-status="${o.id}" data-to="ready">${t("toReady")}</button>` : `<button class="btn lg" style="flex:1" data-status="${o.id}" data-to="served">${t("toServed")}</button>`}</div>`
+          ${o.status !== "ready" ? `<button class="btn primary lg" style="flex:1" data-status="${o.id}" data-to="ready">${icon("check")}${t("toReady")}</button>` : `<button class="btn lg" style="flex:1" data-status="${o.id}" data-to="served">${t("toServed")}</button>`}</div>`
             : ""
         }
       </article>`;
     })
     .join("");
+  const waiting = active.filter((o) => o.status !== "ready").length;
   return `<div class="kds">
-    <div class="scroll" style="margin-bottom:12px">
-      <button class="chip" data-station="all" aria-pressed="${station === "all"}">${t("all")}</button>
-      ${(s.stations ?? []).map((x) => `<button class="chip" data-station="${esc(x.id)}" aria-pressed="${station === x.id}">${esc(x.name)}</button>`).join("")}
+    <div class="bar">
+      <div class="scroll">
+        <button class="chip" data-station="all" aria-pressed="${station === "all"}">${t("all")}</button>
+        ${(s.stations ?? []).map((x) => `<button class="chip" data-station="${esc(x.id)}" aria-pressed="${station === x.id}">${esc(x.name)}</button>`).join("")}
+      </div>
+      <div class="tally"><span>${icon("chef")}${t("statusPreparing")} <b class="num">${num(waiting)}</b></span><span>${icon("check")}${t("statusReady")} <b class="num">${num(active.length - waiting)}</b></span></div>
     </div>
-    ${cards.trim() ? `<div class="cards">${cards}</div>` : `<div class="empty" style="color:#aab2bf">${t("noOrders")}</div>`}
+    ${cards.trim() ? `<div class="cards">${cards}</div>` : emptyBox("chef", t("noOrders"))}
   </div>`;
 }
 

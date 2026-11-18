@@ -1,4 +1,5 @@
 import { isRtl, translator } from "/i18n.js";
+import { icon } from "/icons.js";
 
 const $ = (id) => document.getElementById(id);
 const api = window.spotifood;
@@ -59,6 +60,26 @@ for (const [id, key] of Object.entries({
   saveTerminal: "save",
 })) $(id).textContent = t(key);
 
+// Section icons and the side menu that jumps to each section.
+for (const el of document.querySelectorAll(".si[data-icon]")) el.innerHTML = icon(el.dataset.icon);
+const sections = [...document.querySelectorAll("section[id^='sec-']")];
+$("nav").innerHTML = sections
+  .map((sec) => `<a href="#${sec.id}" data-for="${sec.id}">${icon(sec.dataset.icon)}<span>${sec.querySelector("h2").textContent}</span></a>`)
+  .join("");
+const spy = new IntersectionObserver(
+  (entries) => {
+    for (const e of entries)
+      if (e.isIntersecting)
+        for (const a of $("nav").querySelectorAll("a")) a.classList.toggle("on", a.dataset.for === e.target.id);
+  },
+  { rootMargin: "-20% 0px -70% 0px" },
+);
+for (const sec of sections) spy.observe(sec);
+$("back").innerHTML = `${icon("arrow", { cls: "back" })}${t("back")}`;
+$("updateAuto").textContent = t("updateAuto");
+for (const [id, i] of Object.entries({ checkUpdate: "refresh", syncNow: "refresh", openLogs: "file", testTerminal: "card", addSystem: "printer", addNetwork: "plus", newCode: "refresh" }))
+  $(id).innerHTML = `${icon(i)}${$(id).textContent}`;
+
 // Card terminal: the till sends the amount, the terminal shows it to the customer.
 const DRIVERS = { none: "terminalNone", tcp: "terminalTcp", simulator: "terminalSimulator" };
 $("terminalDriver").innerHTML = Object.entries(DRIVERS)
@@ -89,7 +110,7 @@ $("terminalDriver").onchange = () => {
 $("saveTerminal").onclick = async () => {
   s = await api.action("setTerminal", readTerminal());
   renderTerminal();
-  $("terminalMsg").textContent = "✓";
+  $("terminalMsg").innerHTML = `<span class="ok">${icon("check")} ${t("saved")}</span>`;
 };
 $("testTerminal").onclick = async () => {
   s = await api.action("setTerminal", readTerminal());
@@ -135,6 +156,10 @@ function updateText(u) {
 
 function renderState() {
   $("pcName").value ||= s.deviceName;
+  $("heroSub").textContent = [s.restaurantName, s.deviceName, t("version", { v: s.version })].filter(Boolean).join(" · ");
+  const hs = $("heroStatus");
+  hs.className = `badge ${!s.linked ? "warn" : s.status.online ? "on" : "off"}`;
+  hs.innerHTML = `<span class="dot"></span>${!s.linked ? t("notLinked") : s.status.online ? t("online") : t("offline")}`;
   $("addrs").innerHTML = s.addresses.map((a) => `<span class="addr">${a}</span>`).join("") || "—";
   $("code").textContent = s.pairCode;
   $("syncInfo").textContent = [
@@ -186,7 +211,7 @@ function renderPrinters() {
               .join("")}</select></label>`
           : ""
       }
-      <div class="row"><button class="btn" data-test="${i}">${t("test")}</button><button class="btn danger" data-remove="${i}">${t("remove")}</button></div>
+      <div class="row"><button class="btn" data-test="${i}">${icon("printer")}${t("test")}</button><button class="btn danger" data-remove="${i}">${icon("x")}${t("remove")}</button></div>
     </div>`,
     )
     .join("");
@@ -234,7 +259,7 @@ $("addNetwork").onclick = () => {
 };
 $("savePrinters").onclick = async () => {
   await api.action("setLocalPrinters", printers);
-  $("printerMsg").textContent = "✓";
+  $("printerMsg").innerHTML = `<span class="ok">${icon("check")} ${t("saved")}</span>`;
 };
 $("server").value = s.serverUrl;
 // The address is tied to the restaurant the PC is linked to: change it only before linking.

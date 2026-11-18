@@ -9,24 +9,37 @@
   src: url("./fonts/vazirmatn-latin-wght-normal.woff2") format("woff2-variations");
   font-weight: 100 900;
 }
+/* The Spotifood palette: warm whites, ink, and the orange of the logo. */
 :root {
-  --bg: #f6f7f9;
+  --bg: #f5f4f2;
   --surface: #ffffff;
-  --surface-2: #f0f2f5;
-  --border: #e3e6eb;
-  --fg: #14171c;
-  --muted: #646b76;
-  --subtle: #9aa1ab;
-  --accent: #e65a2b;
-  --accent-soft: #fde9e1;
-  --accent-text: #b8401a;
-  --success: #16a34a;
-  --success-soft: #dcf5e4;
-  --warning: #c27803;
-  --warning-soft: #fdf2d8;
-  --danger: #dc2626;
-  --danger-soft: #fde4e4;
-  --shadow: 0 1px 2px rgb(16 24 40 / 0.05), 0 4px 14px rgb(16 24 40 / 0.06);
+  --surface-2: #f1efec;
+  --surface-3: #e9e6e2;
+  --border: #e6e2dd;
+  --border-strong: #d4cfc8;
+  --fg: #16130f;
+  --muted: #6b655e;
+  --subtle: #a19a92;
+  --ink: #111014;
+  --ink-2: #1c1b21;
+  --ink-3: #2a2930;
+  --accent: #f06a0c;
+  --accent-2: #d63f1e;
+  --accent-soft: #fff0e4;
+  --accent-text: #b8470a;
+  --gradient: linear-gradient(135deg, #ff9b30 0%, #f06a0c 50%, #d63f1e 100%);
+  --success: #15924a;
+  --success-soft: #dff5e7;
+  --warning: #b86e00;
+  --warning-soft: #fdf1d6;
+  --danger: #d9362b;
+  --danger-soft: #fde6e3;
+  --info: #2563eb;
+  --info-soft: #e3ecfd;
+  --shadow: 0 1px 2px rgb(22 19 15 / 0.05), 0 6px 18px -6px rgb(22 19 15 / 0.1);
+  --shadow-lg: 0 2px 6px rgb(22 19 15 / 0.06), 0 24px 48px -16px rgb(22 19 15 / 0.22);
+  --ring: 0 0 0 4px rgb(240 106 12 / 0.18);
+  --radius: 18px;
   color-scheme: light;
 }
 * { box-sizing: border-box; }
@@ -36,32 +49,61 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-size: 15px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+:focus-visible { outline: none; box-shadow: var(--ring); }
+.ic { flex-shrink: 0; vertical-align: -0.125em; }
 .num { font-variant-numeric: tabular-nums; }
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  height: 40px; padding: 0 16px; border-radius: 999px; border: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 42px; padding: 0 18px; border-radius: 999px; border: 0;
   background: var(--surface-2); font-weight: 700; font-size: 14px; white-space: nowrap;
+  transition: transform 0.08s, filter 0.15s, background 0.15s;
 }
-.btn:hover:not(:disabled) { filter: brightness(0.97); }
-.btn.primary { background: var(--accent); color: #fff; }
-.btn.dark { background: var(--fg); color: #fff; }
-.btn.danger { background: transparent; color: var(--danger); box-shadow: inset 0 0 0 1px rgb(220 38 38 / 0.35); }
-.btn.lg { height: 52px; font-size: 16px; padding: 0 22px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); }
+.btn:hover:not(:disabled) { filter: brightness(0.96); }
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn .ic { font-size: 17px; }
+.btn.primary { background: var(--gradient); color: #fff; box-shadow: 0 6px 16px -6px rgb(240 106 12 / 0.6); }
+.btn.dark { background: var(--ink); color: #fff; }
+.btn.ghost { background: transparent; box-shadow: inset 0 0 0 1px var(--border-strong); }
+.btn.danger { background: transparent; color: var(--danger); box-shadow: inset 0 0 0 1px rgb(217 54 43 / 0.35); }
+.btn.lg { height: 54px; font-size: 16px; padding: 0 24px; border-radius: 18px; }
+.btn.icon { width: 42px; padding: 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
 .field {
-  height: 44px; width: 100%; border-radius: 12px; border: 1px solid #cfd4db; background: var(--surface);
-  padding: 0 12px; font-size: 15px; outline: none;
+  height: 46px; width: 100%; border-radius: 14px; border: 1px solid var(--border-strong); background: var(--surface);
+  padding: 0 14px; font-size: 15px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
 }
-.field:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgb(230 90 43 / 0.15); }
+select.field { padding-inline-end: 8px; }
+.field:focus { border-color: var(--accent); box-shadow: var(--ring); }
+.field:disabled { background: var(--surface-2); color: var(--muted); }
 .chip {
-  display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 999px;
-  background: var(--surface); border: 1px solid var(--border); font-weight: 600; font-size: 14px; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border); font-weight: 700; font-size: 14px; white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
 }
-.chip[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
 .muted { color: var(--muted); }
 .hidden { display: none !important; }
+.logo-mark { width: 32px; height: 32px; border-radius: 10px; display: block; }
+.badge { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12.5px; font-weight: 800; white-space: nowrap; }
+.badge .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.badge.off { background: var(--danger); color: #fff; }
+.badge.off .dot { animation: pulse 1.4s infinite; }
+.badge.on { background: var(--success-soft); color: var(--success); }
+.badge.warn { background: var(--warning-soft); color: var(--warning); }
+@keyframes pulse { 50% { opacity: 0.35; } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+
+/* A switch made of a checkbox. */
+.switch { appearance: none; -webkit-appearance: none; width: 44px; height: 26px; border-radius: 999px; background: var(--surface-3); position: relative; cursor: pointer; flex-shrink: 0; transition: background 0.15s; margin: 0; }
+.switch::after { content: ""; position: absolute; top: 3px; inset-inline-start: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); transition: inset-inline-start 0.15s; }
+.switch:checked { background: var(--accent); }
+.switch:checked::after { inset-inline-start: 21px; }
+/* An arrow that points forward in both directions of writing. */
+[dir="ltr"] .ic.flip { transform: scaleX(-1); }
+[dir="rtl"] .ic.back { transform: scaleX(-1); }
