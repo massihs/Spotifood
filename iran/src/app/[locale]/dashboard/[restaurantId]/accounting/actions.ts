@@ -17,6 +17,7 @@ import {
   type manualEntrySchema,
 } from "@/server/modules/ledger/service";
 import { paySupplier, setChequeStatus, type supplierPaymentSchema } from "@/server/modules/ledger/finance";
+import { retryMoadian, saveMoadian, syncMoadian } from "@/server/modules/moadian/service";
 
 const done = <T>(v: T) => {
   refresh();
@@ -55,3 +56,41 @@ export const paySupplierAction = async (rid: string, input: z.input<typeof suppl
   runAction(async () =>
     done((await paySupplier(db, await actionContext(rid, "accounting.manage"), input)).id),
   );
+
+export async function saveMoadianAction(
+  rid: string,
+  input: {
+    enabled: boolean;
+    mode: "direct" | "provider";
+    sandbox: boolean;
+    memoryId: string;
+    sellerId: string;
+    serviceId: string;
+    unitCode: string;
+    privateKey: string;
+    certificate: string;
+  },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "restaurant.manage");
+    await saveMoadian(db, ctx, input);
+    refresh();
+  });
+}
+
+export async function syncMoadianAction(rid: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "accounting.manage");
+    const r = await syncMoadian(db, ctx.restaurant.id);
+    refresh();
+    return r;
+  });
+}
+
+export async function retryMoadianAction(rid: string, ids: string[]) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "accounting.manage");
+    await retryMoadian(db, ctx, ids);
+    refresh();
+  });
+}

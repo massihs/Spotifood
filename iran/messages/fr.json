@@ -922,7 +922,14 @@
     "unknown_products": "Certains plats ne sont pas dans votre menu.",
     "too_late": "Trop tard pour cette commande.",
     "invalid_ref": "Numéro de commande invalide.",
-    "product_required": "Choisissez un plat."
+    "product_required": "Choisissez un plat.",
+    "invalid_memory_id": "Identifiant de mémoire fiscale invalide (6 caractères).",
+    "invalid_seller_id": "Code économique invalide.",
+    "invalid_service_id": "Identifiant de bien/service invalide (13 chiffres).",
+    "invalid_unit_code": "Code d'unité invalide.",
+    "invalid_private_key": "Clé privée illisible (format PEM attendu).",
+    "private_key_required": "La clé privée est nécessaire pour l'envoi direct.",
+    "moadian_not_set": "Réglez d'abord le système fiscal."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -4590,7 +4597,8 @@
       "chart": "Plan comptable & budgets",
       "close": "Clôture & export",
       "cheques": "Chèques",
-      "payables": "Fournisseurs"
+      "payables": "Fournisseurs",
+      "moadian": "Factures électroniques (مؤدیان)"
     },
     "type": {
       "asset": "Actif",
@@ -4791,7 +4799,9 @@
     "mixHint": "Chiffre d'affaires et charges de chaque canal (sur place, emporter, livraison, pro), avec sa marge.",
     "receivablesHint": "Ce que doivent les clients en compte (comptes clients et professionnels), par ancienneté : les règlements soldent d'abord les plus anciennes ventes.",
     "cashTitle": "Trésorerie par compte",
-    "cashHint": "Caisse, banque, cartes et paiements en ligne : entrées, sorties et solde."
+    "cashHint": "Caisse, banque, cartes et paiements en ligne : entrées, sorties et solde.",
+    "pack": "Dossier de l'expert-comptable (ZIP) · {from} → {to}",
+    "packHint": "Journal, balance, TVA par mois et saison, liste des factures avec leur numéro fiscal : des fichiers CSV qu'Excel, Sepidar ou Hamkaran ouvrent tels quels."
   },
   "dateInput": {
     "pick": "Choisir une date",
@@ -5206,6 +5216,49 @@
       "net": "Net : {amount}",
       "direct": "Direct (site, bot)",
       "noCommission": "Aucune commission"
+    }
+  },
+  "moadian": {
+    "intro": "Chaque facture émise après l'activation reçoit son numéro fiscal (22 caractères) et part vers le système fiscal : envoyée directement par Spotifood avec votre clé, ou exportée pour votre prestataire agréé (شرکت معتمد). Faites un premier essai en mode bac à sable.",
+    "status": {
+      "pending": "En attente",
+      "sent": "Envoyées",
+      "accepted": "Acceptées",
+      "failed": "Refusées"
+    },
+    "export": "Exporter pour un prestataire (JSON) · {from} → {to}",
+    "invoice": "Facture",
+    "taxId": "Numéro fiscal",
+    "state": "État",
+    "empty": "Aucune facture dans la file pour l'instant.",
+    "syncNow": "Envoyer maintenant",
+    "retry": "Renvoyer",
+    "form": {
+      "enabled": "Envoyer mes factures au système fiscal",
+      "modes": {
+        "provider": {
+          "title": "Par mon prestataire agréé",
+          "hint": "Spotifood prépare les factures, votre شرکت معتمد les envoie."
+        },
+        "direct": {
+          "title": "Directement par Spotifood",
+          "hint": "Avec votre clé privée et votre certificat du système fiscal."
+        }
+      },
+      "memoryId": "Identifiant de mémoire fiscale",
+      "memoryIdHint": "6 caractères (شناسه یکتای حافظه مالیاتی), sur votre espace du système fiscal.",
+      "sellerId": "Code économique ou identifiant national",
+      "sellerIdHint": "کد اقتصادی / شناسه ملی du vendeur (10 à 14 chiffres).",
+      "serviceId": "Identifiant du bien / service",
+      "serviceIdHint": "شناسه کالا و خدمت (13 chiffres) des repas servis, fourni par le système fiscal.",
+      "unitCode": "Code d'unité de mesure",
+      "unitCodeHint": "کد واحد اندازه‌گیری des portions (vérifiez-le dans la liste officielle).",
+      "privateKey": "Clé privée (PEM)",
+      "certificate": "Certificat (PEM, facultatif)",
+      "saved": "enregistré",
+      "sandbox": "Bac à sable (sandboxrc) : essai sans valeur fiscale",
+      "keyHint": "La clé est chiffrée et n'est jamais réaffichée. Laissez vide pour garder celle enregistrée.",
+      "save": "Enregistrer"
     }
   }
 }

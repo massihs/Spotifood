@@ -24,3 +24,4 @@ export * from "./push";
 export * from "./payouts";
 export * from "./staff";
 export * from "./marketing";
+export * from "./tax";

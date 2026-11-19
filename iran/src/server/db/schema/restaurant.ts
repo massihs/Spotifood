@@ -113,6 +113,21 @@ export type OpeningHours = Partial<
   Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", { open: string; close: string }[]>
 >;
 
+export type MoadianSettings = {
+  enabled: boolean;
+  /** "direct": sent by Spotifood; "provider": exported for a trusted provider (شرکت معتمد). */
+  mode: "direct" | "provider";
+  sandbox: boolean;
+  memoryId: string;
+  sellerId: string;
+  serviceId: string;
+  unitCode: string;
+  keySealed?: string | null;
+  certSealed?: string | null;
+  /** Invoices issued from this moment on are sent (older ones were declared another way). */
+  since: string;
+};
+
 export type SmsAutomations = {
   birthday?: { enabled: boolean; text?: string };
   winback?: { enabled: boolean; days: number; text?: string };
@@ -170,6 +185,8 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   }>(),
   /** Delivery platforms: commission of each, and the hash of the key their orders come in with. */
   platforms: jsonb().$type<{ commissions?: Record<string, number>; apiKeyHash?: string | null }>(),
+  /** The tax system (سامانه مؤدیان): identifiers, sealed key and certificate, mode, codes. */
+  moadian: jsonb().$type<MoadianSettings>(),
   /** The evening report sent to the owner's phone (push, and SMS if asked): when, and the last day sent. */
   dailyReport: jsonb().$type<{ enabled?: boolean; hour?: number; sms?: boolean; lastDay?: string }>(),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */

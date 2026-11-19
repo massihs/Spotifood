@@ -922,7 +922,14 @@
     "unknown_products": "Some dishes are not on your menu.",
     "too_late": "Too late for this order.",
     "invalid_ref": "Invalid order number.",
-    "product_required": "Choose a dish."
+    "product_required": "Choose a dish.",
+    "invalid_memory_id": "Invalid fiscal memory id (6 characters).",
+    "invalid_seller_id": "Invalid economic code.",
+    "invalid_service_id": "Invalid goods/service id (13 digits).",
+    "invalid_unit_code": "Invalid unit code.",
+    "invalid_private_key": "Unreadable private key (PEM expected).",
+    "private_key_required": "The private key is needed for direct sending.",
+    "moadian_not_set": "Set up the tax system first."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -4582,7 +4589,8 @@
       "chart": "Chart of accounts & budgets",
       "close": "Closing & export",
       "cheques": "Cheques",
-      "payables": "Payables"
+      "payables": "Payables",
+      "moadian": "E-invoices (Moadian)"
     },
     "type": {
       "asset": "Asset",
@@ -4783,7 +4791,9 @@
     "mixHint": "Revenue and costs of each channel (dine-in, takeaway, delivery, trade), with its margin.",
     "receivablesHint": "What customers on account owe (house accounts and trade customers), by age: payments settle the oldest sales first.",
     "cashTitle": "Cash by account",
-    "cashHint": "Till, bank, cards and online payments: in, out and balance."
+    "cashHint": "Till, bank, cards and online payments: in, out and balance.",
+    "pack": "Accountant's pack (ZIP) · {from} → {to}",
+    "packHint": "Journal, trial balance, VAT per month and season, invoices with their tax id: CSV files Excel, Sepidar or Hamkaran open as they are."
   },
   "dateInput": {
     "pick": "Pick a date",
@@ -5198,6 +5208,49 @@
       "net": "Net: {amount}",
       "direct": "Direct (site, bot)",
       "noCommission": "No commission"
+    }
+  },
+  "moadian": {
+    "intro": "Every invoice issued after the switch-on gets its tax id (22 characters) and goes to the tax system: sent directly by Spotifood with your key, or exported for your trusted provider. Try the sandbox first.",
+    "status": {
+      "pending": "Waiting",
+      "sent": "Sent",
+      "accepted": "Accepted",
+      "failed": "Refused"
+    },
+    "export": "Export for a provider (JSON) · {from} → {to}",
+    "invoice": "Invoice",
+    "taxId": "Tax id",
+    "state": "Status",
+    "empty": "No invoice in the queue yet.",
+    "syncNow": "Send now",
+    "retry": "Send again",
+    "form": {
+      "enabled": "Send my invoices to the tax system",
+      "modes": {
+        "provider": {
+          "title": "Through my trusted provider",
+          "hint": "Spotifood prepares the invoices, your provider sends them."
+        },
+        "direct": {
+          "title": "Directly by Spotifood",
+          "hint": "With your private key and certificate from the tax system."
+        }
+      },
+      "memoryId": "Fiscal memory id",
+      "memoryIdHint": "6 characters, from your tax system account.",
+      "sellerId": "Economic code or national id",
+      "sellerIdHint": "The seller's id (10 to 14 digits).",
+      "serviceId": "Goods / service id",
+      "serviceIdHint": "13-digit id of the meals served, from the tax system.",
+      "unitCode": "Unit of measure code",
+      "unitCodeHint": "Code of a portion (check the official list).",
+      "privateKey": "Private key (PEM)",
+      "certificate": "Certificate (PEM, optional)",
+      "saved": "saved",
+      "sandbox": "Sandbox: test with no tax value",
+      "keyHint": "The key is encrypted and never shown again. Leave empty to keep the saved one.",
+      "save": "Save"
     }
   }
 }

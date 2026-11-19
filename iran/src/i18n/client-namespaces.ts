@@ -98,6 +98,7 @@ export const CLIENT_NAMESPACES = {
     "menu",
     "menuImport",
     "menuThemes",
+    "moadian",
     "music",
     "nav",
     "notifications",

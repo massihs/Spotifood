@@ -16,6 +16,8 @@ import {
   Wallet,
 } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/app-shell";
+import { MoadianForm, MoadianRetryButton, MoadianSyncButton } from "@/components/ledger/moadian-ui";
+import { moadianStatus, moadianView } from "@/server/modules/moadian/service";
 import { Card, CardHeader, StatCard } from "@/components/ui/card";
 import { buttonClasses } from "@/components/ui/button";
 import {
@@ -71,6 +73,7 @@ const TABS = [
   "cheques",
   "payables",
   "tax",
+  "moadian",
   "bank",
   "chart",
   "close",
@@ -84,7 +87,7 @@ const GROUPS: { key: string; Icon: typeof Gauge; tabs: Tab[] }[] = [
   { key: "statements", Icon: ChartColumn, tabs: ["income", "balance"] },
   { key: "parties", Icon: UsersRound, tabs: ["receivables", "payables", "cheques"] },
   { key: "treasury", Icon: Wallet, tabs: ["bank"] },
-  { key: "closing", Icon: Lock, tabs: ["tax", "chart", "close"] },
+  { key: "closing", Icon: Lock, tabs: ["tax", "moadian", "chart", "close"] },
 ];
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/accounting">;
 
@@ -979,6 +982,102 @@ async function Ledger({ params, searchParams }: Props) {
         </section>
       </div>
     );
+  } else if (tab === "moadian") {
+    const [view, status] = await Promise.all([moadianView(db, ctx), moadianStatus(db, ctx)]);
+    const tm = await getTranslations("moadian");
+    const prefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
+    body = (
+      <div className="space-y-5">
+        <p className="max-w-3xl text-sm text-fg-muted">{tm("intro")}</p>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {(["pending", "sent", "accepted", "failed"] as const).map((k) => (
+            <div key={k} className="rounded-2xl border border-border bg-surface px-4 py-3">
+              <p className="text-xs text-fg-muted">{tm(`status.${k}`)}</p>
+              <p
+                className={cn(
+                  "text-xl font-bold tabular-nums",
+                  k === "failed" && status.failed && "text-danger",
+                  k === "accepted" && "text-success",
+                )}
+              >
+                {status[k]}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <MoadianForm
+            rid={rid}
+            initial={view}
+            canManage={ctx.role === "owner" || ctx.permissions.has("restaurant.manage")}
+          />
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {view.enabled && view.mode === "direct" ? <MoadianSyncButton rid={rid} /> : null}
+              <a
+                href={`${prefix}/dashboard/${rid}/accounting/moadian-export?from=${from}&to=${to}`}
+                className={buttonClasses("secondary", "md")}
+              >
+                <Download className="size-4" aria-hidden="true" />
+                {tm("export", { from: day(from), to: day(to) })}
+              </a>
+            </div>
+            <Table min={560}>
+              <thead>
+                <tr>
+                  <th className={th}>{tm("invoice")}</th>
+                  <th className={th}>{tm("taxId")}</th>
+                  <th className={th}>{tm("state")}</th>
+                  <th className={th} />
+                </tr>
+              </thead>
+              <tbody>
+                {status.recent.map((r) => (
+                  <tr key={r.id}>
+                    <td className={td}>
+                      <span className="font-semibold">{r.number}</span>
+                      <span className="block text-xs text-fg-muted">{money(r.totalCents)}</span>
+                    </td>
+                    <td className={cn(td, "latin-digits font-mono text-xs")} dir="ltr">
+                      {r.taxId}
+                    </td>
+                    <td className={td}>
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-xs font-semibold",
+                          r.status === "accepted"
+                            ? "bg-success-soft text-success"
+                            : r.status === "failed"
+                              ? "bg-danger-soft text-danger"
+                              : "bg-surface-2 text-fg-muted",
+                        )}
+                      >
+                        {tm(`status.${r.status}`)}
+                      </span>
+                      {r.error ? (
+                        <span className="mt-1 block max-w-60 truncate text-xs text-danger">{r.error}</span>
+                      ) : null}
+                    </td>
+                    <td className={td}>
+                      {r.status === "failed" || (r.status === "pending" && r.attempts >= 5) ? (
+                        <MoadianRetryButton rid={rid} id={r.id} />
+                      ) : null}
+                    </td>
+                  </tr>
+                ))}
+                {!status.recent.length ? (
+                  <tr>
+                    <td colSpan={4} className="px-3 py-8 text-center text-fg-muted">
+                      {tm("empty")}
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </Table>
+          </div>
+        </div>
+      </div>
+    );
   } else {
     body = (
       <div className="max-w-2xl space-y-5">
@@ -1004,6 +1103,14 @@ async function Ledger({ params, searchParams }: Props) {
             <Download className="size-4" aria-hidden="true" />
             {t(EDITION === "iran" ? "exportExcel" : "exportFec", { from: day(from), to: day(to) })}
           </a>
+          <a
+            href={`${locale === DEFAULT_LOCALE ? "" : `/${locale}`}/dashboard/${rid}/accounting/pack?from=${from}&to=${to}`}
+            className={buttonClasses("primary", "md")}
+          >
+            <Download className="size-4" aria-hidden="true" />
+            {t("pack", { from: day(from), to: day(to) })}
+          </a>
+          <p className="text-xs text-fg-muted">{t("packHint")}</p>
         </section>
         <section className="space-y-3 rounded-2xl border border-border bg-surface p-5">
           <h2 className="font-semibold">{t("syncTitle")}</h2>
