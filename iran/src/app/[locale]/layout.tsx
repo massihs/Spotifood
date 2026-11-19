@@ -21,14 +21,29 @@ const persian = localFont({
   weight: "100 900",
   variable: "--font-fa-loaded",
   display: "swap",
+  // Its Arial-based fallback would catch the Latin letters before Inter (Persian comes first now).
+  adjustFontFallback: false,
   // Font loader options must be literals: not preloaded (≈ 60 KB), fetched as soon as Persian/Arabic
   // text is rendered, with `swap` so text is never invisible.
   preload: false,
 });
-// Persian UI font with Persian digits (non-Latin subset, ≈ 22 KB per weight): any number on a Persian
-// page renders as ۰-۹ — prices, table labels, quantities, order numbers — whatever produced it.
+// Persian digits only (unicode-range 0-9): any number on a Persian page — prices, table labels,
+// quantities, order numbers — renders as ۰-۹ whatever produced it, in every weight. Letters come
+// from the variable Vazirmatn above (all weights, no synthesised bold).
 const persianDigits = localFont({
   src: [
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-Thin.woff2",
+      weight: "100",
+    },
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-ExtraLight.woff2",
+      weight: "200",
+    },
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-Light.woff2",
+      weight: "300",
+    },
     {
       path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-Regular.woff2",
       weight: "400",
@@ -49,9 +64,25 @@ const persianDigits = localFont({
       path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-ExtraBold.woff2",
       weight: "800",
     },
+    {
+      path: "../../../node_modules/vazirmatn/misc/UI-Farsi-Digits-Non-Latin/fonts/webfonts/Vazirmatn-UI-FD-NL-Black.woff2",
+      weight: "900",
+    },
   ],
   variable: "--font-fa-digits",
   display: "swap",
+  preload: false,
+  declarations: [{ prop: "unicode-range", value: "U+0030-0039" }],
+  // No metric-adjusted Arial fallback: it has no unicode-range and would take the letters.
+  adjustFontFallback: false,
+});
+// Headings in Persian: Estedad, a modern geometric face that gives titles more character.
+const persianDisplay = localFont({
+  src: "../../../node_modules/@fontsource-variable/estedad/files/estedad-arabic-wght-normal.woff2",
+  weight: "100 900",
+  variable: "--font-fa-display",
+  display: "swap",
+  adjustFontFallback: false,
   preload: false,
 });
 
@@ -109,7 +140,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <html
       lang={locale}
       dir={localeDirection(locale)}
-      className={`${sans.variable} ${persian.variable} ${persianDigits.variable} ${menuSerif.variable} ${menuKufi.variable}`}
+      className={`${sans.variable} ${persian.variable} ${persianDigits.variable} ${persianDisplay.variable} ${menuSerif.variable} ${menuKufi.variable}`}
       data-scroll-behavior="smooth"
       // The boot script may set data-theme before React hydrates.
       suppressHydrationWarning

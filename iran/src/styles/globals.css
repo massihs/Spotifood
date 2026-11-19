@@ -308,6 +308,7 @@
   --color-tone-indigo: var(--tone-indigo);
   --color-tone-lime: var(--tone-lime);
   --font-sans: var(--app-font);
+  --font-display: var(--display-font);
   --font-mono: var(--font-mono-loaded), ui-monospace, monospace;
   --radius-card: 1.25rem;
   --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 6px 18px -10px hsl(var(--shadow-color) / 0.12);
@@ -317,17 +318,40 @@
   --shadow-accent-sm: 0 1px 2px oklch(var(--brand-l) var(--brand-c) var(--brand-h) / 0.3);
 }
 
-/* Persian: Vazirmatn "Farsi digits" first, so every number (prices, table labels, counts, codes)
-   renders with Persian digits whatever its source; Latin letters fall through to Inter. */
+/* Persian: the digits-only face first (every number renders ۰-۹), then the variable Vazirmatn for
+   the letters (every weight, no synthesised bold), Latin letters fall through to Inter.
+   Headings get Estedad, more characterful, with the same Persian digits. */
 :root {
   --app-font:
     var(--font-sans-loaded), var(--font-fa-loaded), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     "Vazirmatn", "Noto Sans Arabic", sans-serif;
+  --display-font: var(--app-font);
 }
 :root:lang(fa) {
   --app-font:
-    var(--font-fa-digits), var(--font-sans-loaded), var(--font-fa-loaded), ui-sans-serif, system-ui,
+    var(--font-fa-digits), var(--font-fa-loaded), var(--font-sans-loaded), ui-sans-serif, system-ui,
     "Vazirmatn", sans-serif;
+  --display-font:
+    var(--font-fa-digits), var(--font-fa-display), var(--font-fa-loaded), var(--font-sans-loaded),
+    ui-sans-serif, system-ui, sans-serif;
+}
+:root:lang(ar) {
+  --display-font: var(--font-fa-display), var(--app-font);
+}
+:where(h1, h2, .font-display) {
+  font-family: var(--display-font);
+}
+/* Persian and Arabic letters are joined: spacing them out breaks the joins, so tracking utilities
+   (tight titles, wide labels) do nothing in these languages. Line height a touch taller for the
+   script's ascenders and dots. */
+:lang(fa) [class*="tracking-"],
+:lang(ar) [class*="tracking-"] {
+  letter-spacing: normal !important;
+}
+:root:lang(fa) body,
+:root:lang(ar) body {
+  line-height: 1.6;
+  font-feature-settings: "kern", "calt";
 }
 /* Machine values (IDs, merchant codes, URLs) keep Latin digits. */
 .latin-digits {
