@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import type { z } from "zod";
 import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
+import { saveListing } from "@/server/modules/b2b/marketplace";
 import {
   createTradeOrder,
   receiveTradePayment,
@@ -40,6 +41,17 @@ export async function createTradeOrderAction(rid: string, input: z.input<typeof 
 export async function receiveTradePaymentAction(rid: string, input: z.input<typeof tradePaymentSchema>) {
   return runAction(async () => {
     await receiveTradePayment(db, await actionContext(rid, "payments.record"), input);
+    refresh();
+  });
+}
+
+export async function saveListingAction(
+  rid: string,
+  input: { listed: boolean; pitch: string; minOrderCents: number },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "restaurant.manage");
+    await saveListing(db, ctx, input);
     refresh();
   });
 }

@@ -20,7 +20,13 @@ import { foodCosts, purchasePlan } from "@/server/modules/insights/service";
 import { listTransfers, transferTargets } from "@/server/modules/inventory/transfers";
 import { TransferButton } from "@/components/inventory/transfer-ui";
 import { EmptyState } from "@/components/ui/empty-state";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Store } from "lucide-react";
+import { SupplierOrder } from "@/components/inventory/marketplace-ui";
+import {
+  listSuppliers as listMarketSuppliers,
+  myMarketplaceOrders,
+  supplierCatalogue,
+} from "@/server/modules/b2b/marketplace";
 import {
   FoodCostView,
   PLAN_DAYS,
@@ -36,11 +42,12 @@ const TABS = [
   "purchases",
   "recipes",
   "suppliers",
+  "market",
   "transfers",
   "movements",
 ] as const;
 /** Tabs that need the right to manage the stock (they show costs and prices). */
-const MANAGE_TABS: readonly string[] = ["plan", "costs"];
+const MANAGE_TABS: readonly string[] = ["plan", "costs", "market"];
 
 export default function InventoryPage({ params, searchParams }: Props) {
   return (
@@ -152,6 +159,91 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
           t={(k, v) => t(k, v)}
         />
       ) : null}
+      {tab === "market"
+        ? await (async () => {
+            const tm = await getTranslations("marketplace");
+            const sellerId = typeof sp.supplier === "string" ? sp.supplier : null;
+            if (sellerId) {
+              const cat = await supplierCatalogue(db, ctx, sellerId);
+              return (
+                <div className="space-y-4">
+                  <Link href={`${base}?tab=market`} className="text-sm font-semibold text-accent-text">
+                    ‹ {tm("allSuppliers")}
+                  </Link>
+                  <div>
+                    <p className="text-lg font-bold">{cat.seller.name}</p>
+                    {cat.listing.pitch ? <p className="text-sm text-fg-muted">{cat.listing.pitch}</p> : null}
+                  </div>
+                  {cat.items.length ? (
+                    <SupplierOrder
+                      rid={ctx.restaurant.id}
+                      sellerId={cat.seller.id}
+                      items={cat.items}
+                      currency={cat.seller.currency}
+                      minOrderCents={cat.listing.minOrderCents}
+                    />
+                  ) : (
+                    <EmptyState icon={<Store />} title={tm("noItems")} />
+                  )}
+                </div>
+              );
+            }
+            const [suppliersList, mine] = await Promise.all([
+              listMarketSuppliers(db, ctx),
+              myMarketplaceOrders(db, ctx),
+            ]);
+            return (
+              <div className="space-y-5">
+                <p className="text-sm text-fg-muted">{tm("hint")}</p>
+                {suppliersList.length ? (
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {suppliersList.map((v) => (
+                      <Link
+                        key={v.id}
+                        href={`${base}?tab=market&supplier=${v.id}`}
+                        className="rounded-2xl border border-border bg-surface p-4 transition-colors hover:border-accent/50"
+                      >
+                        <p className="font-semibold">{v.name}</p>
+                        <p className="text-xs text-fg-muted">{v.city ?? ""}</p>
+                        {v.pitch ? <p className="mt-2 line-clamp-2 text-sm">{v.pitch}</p> : null}
+                        {v.minOrderCents ? (
+                          <p className="mt-2 text-xs text-fg-muted">
+                            {tm("minimum", { amount: formatMoney(v.minOrderCents, v.currency, "fa") })}
+                          </p>
+                        ) : null}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    icon={<Store />}
+                    title={tm("noSuppliers")}
+                    description={tm("noSuppliersHint")}
+                  />
+                )}
+                {mine.length ? (
+                  <Card>
+                    <p className="border-b border-border px-4 py-3 font-semibold">{tm("myOrders")}</p>
+                    <ul className="divide-y divide-border">
+                      {mine.map((o) => (
+                        <li key={o.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm">
+                          <span className="flex-1 font-medium">{o.supplier}</span>
+                          <span className="text-fg-muted" dir="ltr">
+                            {o.number}
+                          </span>
+                          <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs">
+                            {tm(`status.${o.status}`)}
+                          </span>
+                          <span className="font-semibold tabular-nums">{money(o.totalCents)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                ) : null}
+              </div>
+            );
+          })()
+        : null}
       {tab === "transfers"
         ? await (async () => {
             const rows = await listTransfers(db, ctx);

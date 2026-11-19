@@ -929,7 +929,12 @@
     "invalid_unit_code": "Code d'unité invalide.",
     "invalid_private_key": "Clé privée illisible (format PEM attendu).",
     "private_key_required": "La clé privée est nécessaire pour l'envoi direct.",
-    "moadian_not_set": "Réglez d'abord le système fiscal."
+    "moadian_not_set": "Réglez d'abord le système fiscal.",
+    "buyer_phone_required": "Ajoutez le numéro de mobile de votre établissement (Réglages) : le fournisseur en a besoin.",
+    "below_minimum_order": "Commande sous le minimum de ce fournisseur.",
+    "own_restaurant": "Vous ne pouvez pas commander à votre propre établissement.",
+    "invalid_snappfood_link": "Lien Snappfood non reconnu.",
+    "snappfood_unreachable": "Snappfood ne répond pas : collez le JSON de la page."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -2158,6 +2163,9 @@
       },
       "report": {
         "daily": "Rapport du jour : {amount} · {count} commandes"
+      },
+      "marketplace": {
+        "order": "Nouvelle commande pro de {name} · {amount} (n° {number})"
       }
     }
   },
@@ -2669,7 +2677,8 @@
       "movements": "Mouvements",
       "plan": "Liste d'achats",
       "costs": "Coût matière",
-      "transfers": "Transferts"
+      "transfers": "Transferts",
+      "market": "Place de marché"
     },
     "stockValue": "Valeur du stock",
     "lowCount": "Stock bas",
@@ -4291,7 +4300,12 @@
       "missing_category": "Catégorie manquante",
       "bad_price": "Prix invalide"
     },
-    "help": "Astuce : une cellule de catégorie vide reprend celle de la ligne du dessus. Les prix sont en tomans, sans séparateur ou avec. Photos et options s’ajoutent ensuite plat par plat."
+    "help": "Astuce : une cellule de catégorie vide reprend celle de la ligne du dessus. Les prix sont en tomans, sans séparateur ou avec. Photos et options s’ajoutent ensuite plat par plat.",
+    "snappfoodTitle": "Importer depuis Snappfood",
+    "snappfoodHint": "Collez le lien de votre page Snappfood : catégories, plats, prix et descriptions arrivent dans l'aperçu, rien n'est créé avant votre validation.",
+    "snappfoodGo": "Récupérer le menu",
+    "snappfoodRial": "Les prix de l'aperçu sont 10 fois trop grands (Snappfood les a donnés en rials)",
+    "snappfoodPaste": "Le lien ne marche pas ? Collez le JSON de la page"
   },
   "feedbackPage": {
     "title": "Votre avis",
@@ -4824,7 +4838,8 @@
     "tabs": {
       "order": "Nouvelle commande",
       "customers": "Clients pros",
-      "orders": "Commandes"
+      "orders": "Commandes",
+      "listing": "Place de marché"
     },
     "col": {
       "number": "N°",
@@ -5259,6 +5274,35 @@
       "sandbox": "Bac à sable (sandboxrc) : essai sans valeur fiscale",
       "keyHint": "La clé est chiffrée et n'est jamais réaffichée. Laissez vide pour garder celle enregistrée.",
       "save": "Enregistrer"
+    }
+  },
+  "marketplace": {
+    "hint": "Commandez directement aux cafés, torréfacteurs, boulangeries et cuisines centrales sur Spotifood, à leurs prix pro. La commande arrive chez eux comme une vente pro, et vous la suivez ici.",
+    "allSuppliers": "Tous les fournisseurs",
+    "noItems": "Ce fournisseur n'a pas encore de produits pro.",
+    "noSuppliers": "Aucun fournisseur pour l'instant",
+    "noSuppliersHint": "Les établissements qui vendent aux pros apparaîtront ici dès qu'ils s'inscrivent sur la place de marché.",
+    "myOrders": "Mes commandes fournisseurs",
+    "note": "Note pour le fournisseur (livraison, horaire…)",
+    "minimum": "Commande minimum : {amount}",
+    "done": "Commande {number} envoyée au fournisseur.",
+    "order": "Commander",
+    "listing": {
+      "title": "Vendre sur la place de marché Spotifood",
+      "hint": "Les autres établissements de Spotifood voient votre catalogue pro (prix pro, catégories réservées aux pros) et vous commandent directement : la commande arrive dans Ventes pro.",
+      "listed": "Apparaître sur la place de marché",
+      "pitch": "Votre présentation en une phrase (spécialité, livraison, délais…)",
+      "minimum": "Commande minimum (facultatif)",
+      "save": "Enregistrer"
+    },
+    "status": {
+      "received": "Reçue",
+      "accepted": "Acceptée",
+      "preparing": "En préparation",
+      "ready": "Prête",
+      "served": "Livrée",
+      "cancelled": "Annulée",
+      "pending_payment": "En attente"
     }
   }
 }

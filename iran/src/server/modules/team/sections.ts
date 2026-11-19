@@ -20,7 +20,7 @@ import { isUuid } from "@/lib/ids";
 
 /** What a section can be notified of (the notification types each covers). */
 export const NOTIFY_OPTIONS = {
-  orders: ["order.created"],
+  orders: ["order.created", "marketplace.order"],
   ready: ["order.ready"],
   calls: ["waiter.call"],
   payments: [

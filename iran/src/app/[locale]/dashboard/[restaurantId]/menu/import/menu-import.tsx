@@ -7,7 +7,7 @@ import { Button, buttonClasses } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
-import { applyImportAction, previewImportAction } from "./actions";
+import { applyImportAction, previewImportAction, snappfoodCsvAction } from "./actions";
 
 type Preview = {
   rows: {
@@ -54,6 +54,33 @@ export function MenuImport({ restaurantId, currency }: { restaurantId: string; c
     URL.revokeObjectURL(a.href);
   };
 
+  const previewFile = (f: File | null) => {
+    setFile(f);
+    setPreview(null);
+    setDone(null);
+    setError(null);
+    if (!f) return;
+    const fd = new FormData();
+    fd.set("file", f);
+    startTransition(async () => {
+      const res = await previewImportAction(restaurantId, fd);
+      if (res?.ok && res.data) setPreview(res.data);
+      else fail(res?.ok === false ? res.error : "internal");
+    });
+  };
+
+  // A menu from the restaurant's Snappfood page, turned into the same spreadsheet.
+  const [sfUrl, setSfUrl] = useState("");
+  const [sfJson, setSfJson] = useState("");
+  const [sfRial, setSfRial] = useState(false);
+  const fromSnappfood = (divideBy10 = sfRial) =>
+    startTransition(async () => {
+      setError(null);
+      const res = await snappfoodCsvAction(restaurantId, { url: sfUrl, json: sfJson, divideBy10 });
+      if (res?.ok && res.data) previewFile(new File([res.data.csv], "snappfood.csv", { type: "text/csv" }));
+      else fail(res?.ok === false ? res.error : "internal");
+    });
+
   const ok = preview?.rows.filter((r) => !r.error && !r.duplicate).length ?? 0;
 
   return (
@@ -67,21 +94,7 @@ export function MenuImport({ restaurantId, currency }: { restaurantId: string; c
           type="file"
           accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           className="sr-only"
-          onChange={(e) => {
-            const f = e.currentTarget.files?.[0] ?? null;
-            setFile(f);
-            setPreview(null);
-            setDone(null);
-            setError(null);
-            if (!f) return;
-            const fd = new FormData();
-            fd.set("file", f);
-            startTransition(async () => {
-              const res = await previewImportAction(restaurantId, fd);
-              if (res?.ok && res.data) setPreview(res.data);
-              else fail(res?.ok === false ? res.error : "internal");
-            });
-          }}
+          onChange={(e) => previewFile(e.currentTarget.files?.[0] ?? null)}
         />
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <Button disabled={pending} onClick={() => input.current?.click()}>
@@ -97,6 +110,47 @@ export function MenuImport({ restaurantId, currency }: { restaurantId: string; c
             {file.name}
           </p>
         ) : null}
+      </div>
+      <div className="space-y-3 rounded-2xl border border-border bg-surface p-5">
+        <p className="font-semibold">{t("snappfoodTitle")}</p>
+        <p className="text-sm text-fg-muted">{t("snappfoodHint")}</p>
+        <div className="flex flex-wrap gap-2">
+          <input
+            dir="ltr"
+            className="h-11 min-w-0 flex-1 rounded-xl border border-border-strong bg-surface px-3 text-sm"
+            placeholder="https://snappfood.ir/restaurant/menu/…-r-xxxxxx/"
+            value={sfUrl}
+            onChange={(e) => setSfUrl(e.target.value)}
+          />
+          <Button disabled={pending || (!sfUrl.trim() && !sfJson.trim())} onClick={() => fromSnappfood()}>
+            {t("snappfoodGo")}
+          </Button>
+        </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="size-4 accent-[var(--accent)]"
+            checked={sfRial}
+            onChange={(e) => {
+              setSfRial(e.target.checked);
+              if (preview && file?.name === "snappfood.csv") fromSnappfood(e.target.checked);
+            }}
+          />
+          {t("snappfoodRial")}
+        </label>
+        <details>
+          <summary className="cursor-pointer text-sm font-medium text-fg-muted">
+            {t("snappfoodPaste")}
+          </summary>
+          <textarea
+            dir="ltr"
+            rows={4}
+            className="mt-2 w-full rounded-xl border border-border-strong bg-surface p-2 font-mono text-xs"
+            placeholder='{"data": {"menus": [...]}}'
+            value={sfJson}
+            onChange={(e) => setSfJson(e.target.value)}
+          />
+        </details>
       </div>
 
       {error ? (

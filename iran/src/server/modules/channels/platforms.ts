@@ -8,13 +8,12 @@ import {
   paymentAllocations,
   payments,
   products,
-  restaurantMembers,
   restaurantSettings,
-  users,
 } from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import { notFound, validation } from "@/server/errors";
-import { assertCan, loadRestaurantContext, type RestaurantContext } from "@/server/tenancy";
+import { assertCan, type RestaurantContext } from "@/server/tenancy";
+import { ownerContext } from "./owner";
 import { createPosOrder } from "@/server/modules/pos/service";
 import { emitPaymentUpdate, settleAllocations } from "@/server/modules/payments/service";
 import { DEFAULT_COMMISSION_BPS } from "./domain";
@@ -101,20 +100,7 @@ export async function integrationContext(db: Database, restaurantId: string, key
   const a = Buffer.from(hashKey(key));
   const b = Buffer.from(stored);
   if (a.length !== b.length || !timingSafeEqual(a, b)) throw notFound();
-  const [owner] = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      fullName: users.fullName,
-      locale: users.locale,
-      isSuperAdmin: users.isSuperAdmin,
-    })
-    .from(restaurantMembers)
-    .innerJoin(users, eq(users.id, restaurantMembers.userId))
-    .where(and(eq(restaurantMembers.restaurantId, restaurantId), eq(restaurantMembers.role, "owner")))
-    .limit(1);
-  if (!owner) throw notFound();
-  return loadRestaurantContext(db, owner, restaurantId);
+  return ownerContext(db, restaurantId);
 }
 
 export const platformOrderSchema = z.object({

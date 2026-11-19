@@ -185,6 +185,8 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   }>(),
   /** Delivery platforms: commission of each, and the hash of the key their orders come in with. */
   platforms: jsonb().$type<{ commissions?: Record<string, number>; apiKeyHash?: string | null }>(),
+  /** The B2B marketplace: listed as a supplier for other venues, with a pitch and a minimum order. */
+  marketplace: jsonb().$type<{ listed: boolean; pitch?: string; minOrderCents?: number }>(),
   /** The tax system (سامانه مؤدیان): identifiers, sealed key and certificate, mode, codes. */
   moadian: jsonb().$type<MoadianSettings>(),
   /** The evening report sent to the owner's phone (push, and SMS if asked): when, and the last day sent. */

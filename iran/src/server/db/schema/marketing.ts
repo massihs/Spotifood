@@ -1,5 +1,6 @@
 import { index, jsonb, pgTable, uuid, varchar, uniqueIndex, bigint } from "drizzle-orm/pg-core";
-import { pk, timestamps, tstz } from "./_helpers";
+import { money, pk, timestamps, tstz } from "./_helpers";
+import { orders } from "./orders";
 import { customers } from "./customers";
 import { restaurants } from "./restaurant";
 
@@ -39,4 +40,28 @@ export const botCarts = pgTable(
     ...timestamps,
   },
   (t) => [uniqueIndex("bot_carts_chat_uq").on(t.restaurantId, t.chatId)],
+);
+
+/** An order placed on the B2B marketplace: by one venue (the buyer) to another (the supplier). */
+export const marketplaceOrders = pgTable(
+  "marketplace_orders",
+  {
+    id: pk(),
+    sellerId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    buyerId: uuid()
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    /** The order in the supplier's books (a trade order to the buyer's customer file). */
+    orderId: uuid()
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    totalCents: money().notNull(),
+    createdAt: tstz().notNull().defaultNow(),
+  },
+  (t) => [
+    index("marketplace_orders_buyer_idx").on(t.buyerId, t.createdAt),
+    index("marketplace_orders_seller_idx").on(t.sellerId, t.createdAt),
+  ],
 );

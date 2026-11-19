@@ -929,7 +929,12 @@
     "invalid_unit_code": "Invalid unit code.",
     "invalid_private_key": "Unreadable private key (PEM expected).",
     "private_key_required": "The private key is needed for direct sending.",
-    "moadian_not_set": "Set up the tax system first."
+    "moadian_not_set": "Set up the tax system first.",
+    "buyer_phone_required": "Add your venue's mobile number (Settings): the supplier needs it.",
+    "below_minimum_order": "Below this supplier's minimum order.",
+    "own_restaurant": "You cannot order from your own venue.",
+    "invalid_snappfood_link": "Snappfood link not recognised.",
+    "snappfood_unreachable": "Snappfood does not answer: paste the page's JSON."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -2158,6 +2163,9 @@
       },
       "report": {
         "daily": "Today's report: {amount} · {count} orders"
+      },
+      "marketplace": {
+        "order": "New trade order from {name} · {amount} (no. {number})"
       }
     }
   },
@@ -2661,7 +2669,8 @@
       "movements": "Movements",
       "plan": "Shopping list",
       "costs": "Food cost",
-      "transfers": "Transfers"
+      "transfers": "Transfers",
+      "market": "Marketplace"
     },
     "stockValue": "Stock value",
     "lowCount": "Running low",
@@ -4283,7 +4292,12 @@
       "missing_category": "Missing category",
       "bad_price": "Invalid price"
     },
-    "help": "Tip: an empty category cell repeats the one above. Prices in tomans, with or without separators. Photos and options are added afterwards, dish by dish."
+    "help": "Tip: an empty category cell repeats the one above. Prices in tomans, with or without separators. Photos and options are added afterwards, dish by dish.",
+    "snappfoodTitle": "Import from Snappfood",
+    "snappfoodHint": "Paste the link of your Snappfood page: categories, dishes, prices and descriptions come into the preview, nothing is created before you confirm.",
+    "snappfoodGo": "Get the menu",
+    "snappfoodRial": "The preview prices are 10 times too big (Snappfood gave rials)",
+    "snappfoodPaste": "Link not working? Paste the page's JSON"
   },
   "feedbackPage": {
     "title": "Your feedback",
@@ -4816,7 +4830,8 @@
     "tabs": {
       "order": "New order",
       "customers": "Trade customers",
-      "orders": "Orders"
+      "orders": "Orders",
+      "listing": "Marketplace"
     },
     "col": {
       "number": "No.",
@@ -5251,6 +5266,35 @@
       "sandbox": "Sandbox: test with no tax value",
       "keyHint": "The key is encrypted and never shown again. Leave empty to keep the saved one.",
       "save": "Save"
+    }
+  },
+  "marketplace": {
+    "hint": "Order straight from the cafés, roasters, bakeries and central kitchens on Spotifood, at their trade prices. The order reaches them as a trade sale, and you follow it here.",
+    "allSuppliers": "All suppliers",
+    "noItems": "This supplier has no trade products yet.",
+    "noSuppliers": "No suppliers yet",
+    "noSuppliersHint": "Venues selling to professionals will show here as soon as they join the marketplace.",
+    "myOrders": "My supplier orders",
+    "note": "Note for the supplier (delivery, time…)",
+    "minimum": "Minimum order: {amount}",
+    "done": "Order {number} sent to the supplier.",
+    "order": "Order",
+    "listing": {
+      "title": "Sell on the Spotifood marketplace",
+      "hint": "Other venues on Spotifood see your trade catalogue (trade prices, trade-only categories) and order from you directly: orders reach Trade sales.",
+      "listed": "Show on the marketplace",
+      "pitch": "Your pitch in one sentence (speciality, delivery, lead times…)",
+      "minimum": "Minimum order (optional)",
+      "save": "Save"
+    },
+    "status": {
+      "received": "Received",
+      "accepted": "Accepted",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "served": "Delivered",
+      "cancelled": "Cancelled",
+      "pending_payment": "Waiting"
     }
   }
 }

@@ -15,6 +15,7 @@ import {
   type STOCK_UNITS,
 } from "@/server/modules/inventory/service";
 import { transferStock } from "@/server/modules/inventory/transfers";
+import { placeMarketplaceOrder } from "@/server/modules/b2b/marketplace";
 
 type Unit = (typeof STOCK_UNITS)[number];
 
@@ -124,5 +125,18 @@ export async function transferStockAction(
     const ctx = await actionContext(rid, "inventory.manage");
     await transferStock(db, ctx, input);
     refresh();
+  });
+}
+
+export async function placeMarketplaceOrderAction(
+  rid: string,
+  sellerId: string,
+  input: { lines: { productId: string; quantity: number }[]; note: string; idempotencyKey: string },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "inventory.manage");
+    const r = await placeMarketplaceOrder(db, ctx, sellerId, input);
+    refresh();
+    return r;
   });
 }

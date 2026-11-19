@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Briefcase, FileText, ShoppingBasket, UsersRound } from "lucide-react";
+import { Briefcase, FileText, ShoppingBasket, Store, UsersRound } from "lucide-react";
+import { ListingForm } from "@/components/inventory/marketplace-ui";
+import { getListing } from "@/server/modules/b2b/marketplace";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { Card, StatCard } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -15,7 +17,7 @@ import { TradeCustomers, TradeOrderDesk } from "./b2b-desk";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/b2b">;
 const monthAgo = () => new Date(Date.now() - 30 * 86_400_000);
-const TABS = ["order", "customers", "orders"] as const;
+const TABS = ["order", "customers", "orders", "listing"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function B2bPage({ params, searchParams }: Props) {
@@ -62,7 +64,7 @@ async function B2b({ params, searchParams }: Props) {
     }),
   );
   const base = `/dashboard/${ctx.restaurant.id}/b2b`;
-  const icons = { order: ShoppingBasket, customers: UsersRound, orders: FileText };
+  const icons = { order: ShoppingBasket, customers: UsersRound, orders: FileText, listing: Store };
 
   return (
     <>
@@ -110,6 +112,13 @@ async function B2b({ params, searchParams }: Props) {
           currency={cur}
           customers={customers}
           products={products}
+        />
+      ) : tab === "listing" ? (
+        <ListingForm
+          rid={ctx.restaurant.id}
+          initial={await getListing(db, ctx.restaurant.id)}
+          currency={cur}
+          canManage={can(ctx, "restaurant.manage")}
         />
       ) : tab === "customers" ? (
         <TradeCustomers
