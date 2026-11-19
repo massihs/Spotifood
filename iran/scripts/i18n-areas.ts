@@ -34,7 +34,7 @@ export const AREA_ROUTES = {
     "display",
   ],
   table: ["table"],
-  online: ["r"],
+  online: ["r", "d"],
   kiosk: ["kiosk"],
   feedback: ["f"],
   pay: ["pay"],

@@ -1,3 +1,4 @@
+import { daysAgo } from "@/lib/days";
 import { Suspense } from "react";
 import { Search, Star, TrendingUp, UserRound, Users, Wallet } from "lucide-react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -26,9 +27,17 @@ import {
 } from "@/server/modules/customers/service";
 import { can } from "@/server/tenancy";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AnnounceDish, AutomationsForm } from "@/components/customers/automations-ui";
+import {
+  automationResults,
+  birthdaysKnown,
+  defaultTexts,
+  getAutomations,
+  recentDishes,
+} from "@/server/modules/marketing/automations";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/customers">;
-const TABS = ["customers", "coupons", "campaigns", "loyalty"] as const;
+const TABS = ["customers", "coupons", "campaigns", "automations", "loyalty"] as const;
 
 export default function CustomersPage({ params, searchParams }: Props) {
   return (
@@ -116,6 +125,46 @@ async function Customers({ params, searchParams }: Pick<Props, "params" | "searc
           </Card>
         </div>
       ) : null}
+      {tab === "automations"
+        ? await (async () => {
+            const since = daysAgo(30);
+            const [settings, defaults, results, known, dishes] = await Promise.all([
+              getAutomations(db, rid),
+              defaultTexts(ctx.restaurant.defaultLocale),
+              automationResults(db, ctx, since),
+              birthdaysKnown(db, ctx),
+              recentDishes(db, rid),
+            ]);
+            const ta = await getTranslations("automations");
+            return (
+              <div className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {results.map((r) => (
+                    <Card key={r.kind} className="p-4">
+                      <p className="text-sm font-semibold">{ta(`results.${r.kind}`)}</p>
+                      <p className="mt-1 text-2xl font-bold tabular-nums">{money(r.revenueCents)}</p>
+                      <p className="text-xs text-fg-muted">
+                        {ta("results.line", { sent: r.sent, guests: r.guests, orders: r.orders })}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
+                <p className="text-sm text-fg-muted">{ta("hint", { known })}</p>
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <AutomationsForm
+                    rid={rid}
+                    initial={settings}
+                    defaults={{ birthday: defaults.birthday, winback: defaults.winback }}
+                    canManage={manage}
+                  />
+                  {manage && dishes.length ? (
+                    <AnnounceDish rid={rid} dishes={dishes} defaultText={defaults.newDish} />
+                  ) : null}
+                </div>
+              </div>
+            );
+          })()
+        : null}
       {tab === "loyalty" ? (
         <LoyaltySettings rid={rid} currency={cur} initial={await loyaltyConfig(db, rid)} canManage={manage} />
       ) : null}

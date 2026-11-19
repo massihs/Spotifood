@@ -914,7 +914,15 @@
     "not_enough_stock": "Not enough stock.",
     "same_venue": "Choose another venue.",
     "end_before_start": "The end must be after the start.",
-    "too_long": "More than 24 hours: check the times."
+    "too_long": "More than 24 hours: check the times.",
+    "invalid_domain": "Invalid domain.",
+    "domain_taken": "This domain is already used.",
+    "bot_token_rejected": "The messenger rejected the token: check it.",
+    "invalid_token": "Invalid token.",
+    "unknown_products": "Some dishes are not on your menu.",
+    "too_late": "Too late for this order.",
+    "invalid_ref": "Invalid order number.",
+    "product_required": "Choose a dish."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1458,7 +1466,9 @@
       "ownHint": "The money goes straight to your Zarinpal account (you need a merchant id).",
       "merchant": "Zarinpal merchant id",
       "merchantHint": "In your Zarinpal panel: Payment gateway → merchant id (36 characters)."
-    }
+    },
+    "channels": "Sales channels",
+    "channelsHint": "Your domain, the Bale / Telegram bot and the delivery platforms."
   },
   "guest": {
     "table": "Table {label}",
@@ -2732,7 +2742,8 @@
       "customers": "Customers",
       "coupons": "Promo codes",
       "campaigns": "SMS campaigns",
-      "loyalty": "Loyalty"
+      "loyalty": "Loyalty",
+      "automations": "Automatic texts"
     },
     "newCustomer": "New customer",
     "phone": "Mobile number",
@@ -2838,7 +2849,9 @@
       "new": "New",
       "inactive": "Inactive",
       "owes": "Owes {amount}"
-    }
+    },
+    "birthDate": "Birthday",
+    "birthDateHint": "For the birthday text (the year is optional: pick any)."
   },
   "reports": {
     "title": "Reports & accounting",
@@ -3203,7 +3216,8 @@
     "tabs": {
       "board": "Dispatch board",
       "settlement": "Courier settlement",
-      "settings": "Zones & couriers"
+      "settings": "Zones & couriers",
+      "platforms": "Platforms"
     },
     "cols": {
       "toAssign": "Ready to dispatch",
@@ -4413,7 +4427,12 @@
       "paidShort": "Paid online"
     },
     "pausedBanner": "This restaurant is not taking online orders right now. Back at {time}.",
-    "pausedButton": "Ordering paused"
+    "pausedButton": "Ordering paused",
+    "kioskPayCard": "Pay by card here",
+    "kioskCardWaiting": "Present your card on the terminal…",
+    "kioskCardFailed": "Payment declined or cancelled: try again or pay at the counter.",
+    "kioskOrPayCounter": "Or pay at the counter.",
+    "kioskPaid": "Paid, thank you! Your order is being prepared."
   },
   "kpi": {
     "title": "Today’s targets",
@@ -5072,6 +5091,113 @@
       "cancelled": "{n} cancellation(s)",
       "lowStock": "{n} item(s) running out",
       "staff": "{n} fraud signal(s) to check"
+    }
+  },
+  "automations": {
+    "defaults": {
+      "birthday": "Happy birthday '{name}'! '{restaurant}' has a treat for you on your next visit. Order: '{link}'",
+      "winback": "'{name}', we miss you! Come back to '{restaurant}'. Order: '{link}'",
+      "newDish": "New at '{restaurant}': '{dish}'! Try it today: '{link}'"
+    },
+    "birthday": {
+      "title": "Birthday text",
+      "hint": "On their birthday, guests whose date is known get a message (between 10 am and 8 pm)."
+    },
+    "winback": {
+      "title": "Guests who stopped coming",
+      "hint": "A message when a guest has not ordered for a while, once per absence.",
+      "after": "After",
+      "days": "days without an order"
+    },
+    "variables": "Leave empty for the suggested text. Variables: '{name}', '{restaurant}', '{link}'. The opt-out keyword is added at the end.",
+    "save": "Save",
+    "newDish": {
+      "title": "Announce a new dish",
+      "hint": "A text to guests who came in the last 90 days, once per dish. Extra variable: '{dish}'.",
+      "send": "Send the announcement",
+      "done": "{sent} texts sent to {total} guests."
+    },
+    "results": {
+      "birthday": "Birthdays (30 d)",
+      "winback": "Win-backs (30 d)",
+      "new_dish": "New dishes (30 d)",
+      "line": "{sent} texts · {guests} guests back · {orders} orders within 7 days"
+    },
+    "hint": "Amounts = orders placed within 7 days after a text. {known} guests have a birthday on file."
+  },
+  "bot": {
+    "welcome": "Welcome to {name}! Pick a category, add your dishes, then order.",
+    "category": "{name}: tap a dish to add it.",
+    "cartButton": "🛒 My basket",
+    "openSite": "🌐 Ordering site",
+    "onSite": "choose on the site",
+    "soldOut": "sold out",
+    "back": "‹ Menu",
+    "added": "✓ {name} added ({count} in basket)",
+    "more": "Add more dishes",
+    "empty": "Your basket is empty.",
+    "cartTitle": "🛒 Your basket:",
+    "total": "Total: {amount}",
+    "checkout": "✅ Order and pay",
+    "clear": "Empty"
+  },
+  "channels": {
+    "domain": {
+      "title": "Your own ordering site",
+      "hint": "Guests order on your domain, under your name, with no commission.",
+      "savings": "Last 30 days: {orders} direct orders ({total}), about {saved} of commission avoided ({pct}% on a platform).",
+      "save": "Save",
+      "step1": "Pick a subdomain (e.g. order.myrestaurant.ir) and type it here.",
+      "step2": "At your registrar, add a CNAME record pointing to {host}.",
+      "step3": "Add the domain in Spotifood's Liara panel (or ask support): the HTTPS certificate is created automatically."
+    },
+    "bot": {
+      "title": "Ordering bot on Bale / Telegram",
+      "hint": "Guests browse the menu and fill their basket in the messenger, then pay on your site.",
+      "connected": "Connected to {provider}",
+      "providers": {
+        "bale": "Bale",
+        "telegram": "Telegram"
+      },
+      "disconnect": "Disconnect",
+      "step1": {
+        "bale": "In Bale, open @botfather, create a bot and copy its token.",
+        "telegram": "In Telegram, open @BotFather, send /newbot and copy the token."
+      },
+      "step2": "Paste the token below: the bot answers your guests right away.",
+      "connect": "Connect"
+    },
+    "platforms": {
+      "title": "Snappfood, Tapsi Food and other platforms",
+      "hint": "Their orders reach the kitchen like the others, paid by the platform. Enter their commission to see what they cost.",
+      "names": {
+        "snappfood": "Snappfood",
+        "tapsifood": "Tapsi Food",
+        "other": "Other"
+      },
+      "saveCommissions": "Save commissions",
+      "integration": "Automatic integration",
+      "integrationHint": "An integrator or software linked to the platform can send orders to this address with the key (x-api-key header).",
+      "keyOnce": "Copy the key now: it will not be shown again.",
+      "newKey": "New key (the old one stops working)",
+      "createKey": "Create a key"
+    },
+    "entry": {
+      "button": "Snappfood / Tapsi order",
+      "title": "Platform order",
+      "ref": "Order number",
+      "customer": "Guest (optional)",
+      "addLine": "Add a dish",
+      "done": "Order {number} sent to the kitchen.",
+      "send": "Send to the kitchen"
+    },
+    "report": {
+      "hint": "Last 30 days: what each platform brings, its commission, and your direct orders (site, bot) with no commission.",
+      "orders": "{n} orders",
+      "commission": "Commission: {amount} ({pct}%)",
+      "net": "Net: {amount}",
+      "direct": "Direct (site, bot)",
+      "noCommission": "No commission"
     }
   }
 }

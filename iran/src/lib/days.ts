@@ -12,3 +12,6 @@ export function addDays(day: string, n: number) {
 export function daysBetween(from: string, to: string) {
   return Math.round((Date.parse(`${to}T12:00:00Z`) - Date.parse(`${from}T12:00:00Z`)) / DAY);
 }
+
+/** The moment `n` days ago (for "the last 30 days" in server pages). */
+export const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000);

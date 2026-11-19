@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { db } from "@/server/db/client";
 import { actionContext, runAction } from "@/server/actions";
+import { announceDish, saveAutomations } from "@/server/modules/marketing/automations";
 import {
   adjustPoints,
   createCoupon,
@@ -32,7 +33,7 @@ export async function createCustomerAction(
 export async function updateCustomerAction(
   rid: string,
   id: string,
-  input: { name: string; note: string; smsOptOut: boolean },
+  input: { name: string; note: string; smsOptOut: boolean; birthDate?: string },
 ) {
   return runAction(async () => {
     const ctx = await actionContext(rid, "customers.manage");
@@ -121,5 +122,26 @@ export async function repayAccountAction(
     const res = await repayAccount(db, ctx, id, input);
     refresh();
     return res;
+  });
+}
+
+export async function saveAutomationsAction(
+  rid: string,
+  input: {
+    birthday: { enabled: boolean; text: string };
+    winback: { enabled: boolean; days: number; text: string };
+  },
+) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "customers.manage");
+    await saveAutomations(db, ctx, input);
+    refresh();
+  });
+}
+
+export async function announceDishAction(rid: string, productId: string, text: string) {
+  return runAction(async () => {
+    const ctx = await actionContext(rid, "customers.manage");
+    return announceDish(db, ctx, productId, text);
   });
 }

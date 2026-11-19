@@ -382,6 +382,11 @@ export const customerSchema = z.object({
   name: z.string().trim().max(120).default(""),
   note: z.string().trim().max(1000).default(""),
   smsOptOut: z.boolean().default(false),
+  /** "YYYY-MM-DD" (empty: unknown). */
+  birthDate: z
+    .string()
+    .regex(/^(\d{4}-\d{2}-\d{2})?$/)
+    .default(""),
 });
 
 export async function createCustomer(
@@ -399,6 +404,7 @@ export async function createCustomer(
       name: input.name || null,
       note: input.note || null,
       smsOptOut: input.smsOptOut,
+      birthDate: input.birthDate || null,
     })
     .onConflictDoNothing()
     .returning();
@@ -417,7 +423,12 @@ export async function updateCustomer(
   if (!isUuid(id)) throw notFound();
   const res = await db
     .update(customers)
-    .set({ name: input.name || null, note: input.note || null, smsOptOut: input.smsOptOut })
+    .set({
+      name: input.name || null,
+      note: input.note || null,
+      smsOptOut: input.smsOptOut,
+      birthDate: input.birthDate || null,
+    })
     .where(and(eq(customers.id, id), eq(customers.restaurantId, ctx.restaurant.id)))
     .returning({ id: customers.id });
   if (res.length === 0) throw notFound();

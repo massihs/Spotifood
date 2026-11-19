@@ -128,6 +128,9 @@ export const orders = pgTable(
     offlineRef: uuid(),
     /** Number printed on the offline tickets ("L-12"), kept to match paper and screen. */
     offlineNumber: varchar({ length: 24 }),
+    /** Came from a delivery platform (snappfood, tapsifood, other) and its order number there. */
+    platform: varchar({ length: 16 }),
+    externalRef: varchar({ length: 64 }),
     ...timestamps,
   },
   (t) => [
@@ -137,6 +140,9 @@ export const orders = pgTable(
       .on(t.restaurantId, t.offlineRef)
       .where(sql`${t.offlineRef} is not null`),
     index("orders_restaurant_placed_idx").on(t.restaurantId, t.placedAt),
+    uniqueIndex("orders_platform_ref_uq")
+      .on(t.restaurantId, t.platform, t.externalRef)
+      .where(sql`${t.externalRef} is not null`),
     index("orders_restaurant_status_idx").on(t.restaurantId, t.status),
     index("orders_session_idx").on(t.tableSessionId),
     index("orders_participant_idx").on(t.participantId),

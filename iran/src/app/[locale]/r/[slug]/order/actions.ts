@@ -13,6 +13,7 @@ import {
   cancelUnpaidOnlineOrder,
   payOnlineOrderOnSite,
   placeKioskOrder,
+  payKioskOrderByTerminal,
   placeOnlineOrder,
 } from "@/server/modules/online/service";
 import { startOnlineOrderPayment } from "@/server/modules/payments/service";
@@ -32,7 +33,15 @@ export async function placeKioskOrderAction(token: string, input: unknown) {
   return runAction(async () => {
     await enforceRateLimit("qrEntry", `kiosk:${token}`);
     const order = await placeKioskOrder(db, token, input);
-    return { orderId: order.id, number: order.number };
+    return { orderId: order.id, number: order.number, totalCents: order.totalCents };
+  });
+}
+
+/** The kiosk's card terminal approved the payment of the order just placed. */
+export async function payKioskByTerminalAction(token: string, orderId: string, terminalRef: string) {
+  return runAction(async () => {
+    await enforceRateLimit("qrEntry", `kiosk:${token}`);
+    return payKioskOrderByTerminal(db, token, orderId, terminalRef);
   });
 }
 

@@ -1,3 +1,4 @@
+import { daysAgo } from "@/lib/days";
 import { edition } from "@/config/edition";
 import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -6,6 +7,7 @@ import {
   Blocks,
   Building2,
   Globe,
+  Megaphone,
   Target,
   Clock,
   CreditCard,
@@ -47,6 +49,11 @@ import { isModule } from "@/lib/modules";
 import { listGuestBlocks } from "@/server/modules/guest/safety";
 import { SecurityPanel } from "./security-panel";
 import { OnlinePanel } from "./online-panel";
+import { BotPanel, DomainPanel, PlatformsPanel } from "@/components/channels/channels-ui";
+import { formatMoney } from "@/lib/money";
+import { botStatus } from "@/server/modules/channels/bot";
+import { directSavings, getCustomDomain } from "@/server/modules/channels/domain";
+import { platformSettings } from "@/server/modules/channels/platforms";
 import { KioskPanel } from "./kiosk-panel";
 import { GoalsForm } from "./goals-form";
 import { getKpiGoals } from "@/server/modules/kpi/service";
@@ -286,6 +293,48 @@ async function Settings({ params }: { params: Params }) {
               </div>
             </div>
           </Card>
+          <Card id="channels" className="scroll-mt-24">
+            <CardHeader
+              title={<SectionTitle icon={<Megaphone />}>{t("channels")}</SectionTitle>}
+              description={t("channelsHint")}
+            />
+            <div className="grid gap-4 p-5 sm:p-6 lg:grid-cols-2">
+              {await (async () => {
+                const since = daysAgo(30);
+                const [domain, savings, bot, platforms] = await Promise.all([
+                  getCustomDomain(db, rid),
+                  directSavings(db, ctx, since),
+                  botStatus(db, rid),
+                  platformSettings(db, rid),
+                ]);
+                const fmt = (c: number) => formatMoney(c, r.currency, locale);
+                return (
+                  <>
+                    <DomainPanel
+                      rid={rid}
+                      domain={domain}
+                      appHost={new URL(env().APP_URL).hostname}
+                      disabled={readOnly}
+                      savings={{
+                        orders: savings.orders,
+                        total: fmt(savings.totalCents),
+                        saved: fmt(savings.savedCents),
+                        pct: Math.round(savings.commissionBps / 100),
+                      }}
+                    />
+                    <BotPanel rid={rid} status={bot} disabled={readOnly} />
+                    <PlatformsPanel
+                      rid={rid}
+                      commissions={platforms.commissions}
+                      hasKey={platforms.hasKey}
+                      endpoint={`${env().APP_URL}/api/v1/restaurants/${rid}/platform-orders`}
+                      disabled={readOnly}
+                    />
+                  </>
+                );
+              })()}
+            </div>
+          </Card>
           <Card id="security" className="scroll-mt-24">
             <CardHeader
               title={<SectionTitle icon={<ShieldCheck />}>{t("security")}</SectionTitle>}
@@ -382,6 +431,7 @@ const SECTIONS = [
   { key: "service", icon: <Clock aria-hidden="true" /> },
   { key: "goals", icon: <Target aria-hidden="true" /> },
   { key: "online", icon: <Globe aria-hidden="true" /> },
+  { key: "channels", icon: <Megaphone aria-hidden="true" /> },
   { key: "security", icon: <ShieldCheck aria-hidden="true" /> },
   { key: "payments", icon: <CreditCard aria-hidden="true" /> },
   { key: "bank", icon: <Landmark aria-hidden="true" /> },

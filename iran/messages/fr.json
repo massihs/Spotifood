@@ -914,7 +914,15 @@
     "not_enough_stock": "Stock insuffisant.",
     "same_venue": "Choisissez un autre établissement.",
     "end_before_start": "La fin doit être après le début.",
-    "too_long": "Plus de 24 heures : vérifiez les horaires."
+    "too_long": "Plus de 24 heures : vérifiez les horaires.",
+    "invalid_domain": "Domaine invalide.",
+    "domain_taken": "Ce domaine est déjà utilisé.",
+    "bot_token_rejected": "Jeton refusé par la messagerie : vérifiez-le.",
+    "invalid_token": "Jeton invalide.",
+    "unknown_products": "Certains plats ne sont pas dans votre menu.",
+    "too_late": "Trop tard pour cette commande.",
+    "invalid_ref": "Numéro de commande invalide.",
+    "product_required": "Choisissez un plat."
   },
   "tables": {
     "title": "Tables & QR codes",
@@ -1458,7 +1466,9 @@
       "ownHint": "L'argent arrive directement sur votre compte Zarinpal (il vous faut un identifiant marchand).",
       "merchant": "Identifiant marchand Zarinpal",
       "merchantHint": "Dans votre panneau Zarinpal : Passerelle de paiement → identifiant marchand (36 caractères)."
-    }
+    },
+    "channels": "Canaux de vente",
+    "channelsHint": "Votre domaine, le bot Bale / Telegram et les plateformes de livraison."
   },
   "guest": {
     "table": "Table {label}",
@@ -2740,7 +2750,8 @@
       "customers": "Clients",
       "coupons": "Codes promo",
       "campaigns": "Campagnes SMS",
-      "loyalty": "Fidélité"
+      "loyalty": "Fidélité",
+      "automations": "Relances automatiques"
     },
     "newCustomer": "Nouveau client",
     "phone": "Mobile",
@@ -2846,7 +2857,9 @@
       "new": "Nouveau",
       "inactive": "Inactif",
       "owes": "Doit {amount}"
-    }
+    },
+    "birthDate": "Date d'anniversaire",
+    "birthDateHint": "Pour le SMS d'anniversaire (l'année n'est pas obligatoire : mettez-en une au hasard)."
   },
   "reports": {
     "title": "Rapports & comptabilité",
@@ -3211,7 +3224,8 @@
     "tabs": {
       "board": "Dispatch",
       "settlement": "Règlement coursiers",
-      "settings": "Zones & coursiers"
+      "settings": "Zones & coursiers",
+      "platforms": "Plateformes"
     },
     "cols": {
       "toAssign": "À expédier",
@@ -4421,7 +4435,12 @@
       "paidShort": "Payée en ligne"
     },
     "pausedBanner": "Ce restaurant ne prend pas de commandes en ligne pour le moment. Retour à {time}.",
-    "pausedButton": "Commandes en pause"
+    "pausedButton": "Commandes en pause",
+    "kioskPayCard": "Payer par carte ici",
+    "kioskCardWaiting": "Présentez votre carte sur le terminal…",
+    "kioskCardFailed": "Paiement refusé ou annulé : réessayez ou payez au comptoir.",
+    "kioskOrPayCounter": "Ou payez au comptoir.",
+    "kioskPaid": "Payé, merci ! Votre commande est en préparation."
   },
   "kpi": {
     "title": "Objectifs du jour",
@@ -5080,6 +5099,113 @@
       "cancelled": "{n} annulation(s)",
       "lowStock": "{n} article(s) presque épuisé(s)",
       "staff": "{n} signal(aux) de fraude à regarder"
+    }
+  },
+  "automations": {
+    "defaults": {
+      "birthday": "Joyeux anniversaire '{name}' ! '{restaurant}' vous offre une surprise à votre prochaine visite. Commandez : '{link}'",
+      "winback": "'{name}', vous nous manquez ! Revenez chez '{restaurant}', on vous attend. Commander : '{link}'",
+      "newDish": "Nouveau chez '{restaurant}' : '{dish}' ! À découvrir dès aujourd'hui : '{link}'"
+    },
+    "birthday": {
+      "title": "SMS d'anniversaire",
+      "hint": "Le jour de leur anniversaire, les clients dont la date est connue reçoivent un message (entre 10 h et 20 h)."
+    },
+    "winback": {
+      "title": "Clients qui ne viennent plus",
+      "hint": "Un message quand un client n'a pas commandé depuis un moment, une seule fois par absence.",
+      "after": "Après",
+      "days": "jours sans commande"
+    },
+    "variables": "Laissez vide pour le texte proposé. Variables : '{name}', '{restaurant}', '{link}'. « لغو11 » (désabonnement) est ajouté à la fin.",
+    "save": "Enregistrer",
+    "newDish": {
+      "title": "Annoncer un nouveau plat",
+      "hint": "Un SMS aux clients venus dans les 90 derniers jours, une seule fois par plat. Variable en plus : '{dish}'.",
+      "send": "Envoyer l'annonce",
+      "done": "{sent} SMS envoyés sur {total} clients."
+    },
+    "results": {
+      "birthday": "Anniversaires (30 j)",
+      "winback": "Clients relancés (30 j)",
+      "new_dish": "Nouveaux plats (30 j)",
+      "line": "{sent} SMS · {guests} clients revenus · {orders} commandes dans les 7 jours"
+    },
+    "hint": "Montants = commandes passées dans les 7 jours suivant un SMS. {known} clients ont une date d'anniversaire."
+  },
+  "bot": {
+    "welcome": "Bienvenue chez {name} ! Choisissez une catégorie, ajoutez vos plats, puis commandez.",
+    "category": "{name} : touchez un plat pour l'ajouter.",
+    "cartButton": "🛒 Mon panier",
+    "openSite": "🌐 Le site de commande",
+    "onSite": "à choisir sur le site",
+    "soldOut": "épuisé",
+    "back": "‹ Menu",
+    "added": "✓ {name} ajouté ({count} au panier)",
+    "more": "Ajouter d'autres plats",
+    "empty": "Votre panier est vide.",
+    "cartTitle": "🛒 Votre panier :",
+    "total": "Total : {amount}",
+    "checkout": "✅ Commander et payer",
+    "clear": "Vider"
+  },
+  "channels": {
+    "domain": {
+      "title": "Votre propre site de commande",
+      "hint": "Vos clients commandent sur votre domaine, à votre nom, sans commission.",
+      "savings": "30 derniers jours : {orders} commandes directes ({total}), soit environ {saved} de commission évitée ({pct} % sur une plateforme).",
+      "save": "Enregistrer",
+      "step1": "Choisissez un sous-domaine (ex. order.monrestaurant.ir) et saisissez-le ici.",
+      "step2": "Chez votre registraire, ajoutez un enregistrement CNAME vers {host}.",
+      "step3": "Ajoutez le domaine dans le panneau Liara de Spotifood (ou demandez-le au support) : le certificat HTTPS est créé automatiquement."
+    },
+    "bot": {
+      "title": "Bot de commande Bale / Telegram",
+      "hint": "Vos clients parcourent le menu et remplissent leur panier dans la messagerie, puis paient sur votre site.",
+      "connected": "Connecté à {provider}",
+      "providers": {
+        "bale": "Bale",
+        "telegram": "Telegram"
+      },
+      "disconnect": "Déconnecter",
+      "step1": {
+        "bale": "Dans Bale, ouvrez @botfather, créez un bot et copiez son jeton.",
+        "telegram": "Dans Telegram, ouvrez @BotFather, envoyez /newbot et copiez le jeton."
+      },
+      "step2": "Collez le jeton ci-dessous : le bot répond aussitôt à vos clients.",
+      "connect": "Connecter"
+    },
+    "platforms": {
+      "title": "Snappfood, Tapsi Food et autres plateformes",
+      "hint": "Leurs commandes arrivent en cuisine comme les autres, payées par la plateforme. Indiquez leur commission pour voir ce qu'elles vous coûtent.",
+      "names": {
+        "snappfood": "Snappfood",
+        "tapsifood": "Tapsi Food",
+        "other": "Autre"
+      },
+      "saveCommissions": "Enregistrer les commissions",
+      "integration": "Intégration automatique",
+      "integrationHint": "Un intégrateur ou un logiciel relié à la plateforme peut envoyer les commandes à cette adresse avec la clé (en-tête x-api-key).",
+      "keyOnce": "Copiez la clé maintenant : elle ne sera plus affichée.",
+      "newKey": "Nouvelle clé (l'ancienne cesse de marcher)",
+      "createKey": "Créer une clé"
+    },
+    "entry": {
+      "button": "Commande Snappfood / Tapsi",
+      "title": "Commande d'une plateforme",
+      "ref": "N° de commande",
+      "customer": "Client (facultatif)",
+      "addLine": "Ajouter un plat",
+      "done": "Commande {number} envoyée en cuisine.",
+      "send": "Envoyer en cuisine"
+    },
+    "report": {
+      "hint": "30 derniers jours : ce que chaque plateforme rapporte, sa commission, et vos commandes directes (site, bot) sans commission.",
+      "orders": "{n} commandes",
+      "commission": "Commission : {amount} ({pct} %)",
+      "net": "Net : {amount}",
+      "direct": "Direct (site, bot)",
+      "noCommission": "Aucune commission"
     }
   }
 }

@@ -3,6 +3,7 @@
 import { MessageSquareText, Minus, Plus, Send, Ticket, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import { DateInput } from "@/components/ui/date-input";
 import { Sheet, field, num, useRun } from "@/components/ui/sheet-kit";
 import { useMoney } from "@/components/ui/use-money";
 import { useRouter } from "@/i18n/navigation";
@@ -107,7 +108,14 @@ export function CustomerEditor({
   canManage,
 }: {
   rid: string;
-  customer: { id: string; name: string | null; note: string | null; smsOptOut: boolean; points: number };
+  customer: {
+    id: string;
+    name: string | null;
+    note: string | null;
+    smsOptOut: boolean;
+    points: number;
+    birthDate?: string | null;
+  };
   canManage: boolean;
 }) {
   const t = useTranslations("customers");
@@ -115,6 +123,7 @@ export function CustomerEditor({
   const [name, setName] = useState(customer.name ?? "");
   const [note, setNote] = useState(customer.note ?? "");
   const [optOut, setOptOut] = useState(customer.smsOptOut);
+  const [birth, setBirth] = useState(customer.birthDate ?? "");
   const [delta, setDelta] = useState("");
   const [saved, setSaved] = useState(false);
   const d = Math.trunc(num(delta));
@@ -141,6 +150,16 @@ export function CustomerEditor({
             className={cn(field, "mt-1 h-auto py-2")}
           />
         </label>
+        <label className="block text-sm font-medium">
+          {t("birthDate")}
+          <DateInput
+            className="mt-1"
+            value={birth}
+            disabled={!canManage}
+            onChange={(d) => (setBirth(d), setSaved(false))}
+          />
+          <span className="mt-1 block text-xs font-normal text-fg-muted">{t("birthDateHint")}</span>
+        </label>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -158,7 +177,8 @@ export function CustomerEditor({
             className={primary}
             onClick={() =>
               run(
-                () => updateCustomerAction(rid, customer.id, { name, note, smsOptOut: optOut }),
+                () =>
+                  updateCustomerAction(rid, customer.id, { name, note, smsOptOut: optOut, birthDate: birth }),
                 () => setSaved(true),
               )
             }

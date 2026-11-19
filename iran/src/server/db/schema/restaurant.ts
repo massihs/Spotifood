@@ -58,6 +58,8 @@ export const restaurants = pgTable(
       .notNull()
       .references(() => organizations.id),
     slug: varchar({ length: 64 }).notNull(),
+    /** The restaurant's own domain for its ordering site (order.myrestaurant.ir), when set. */
+    customDomain: varchar({ length: 253 }),
     name: varchar({ length: 160 }).notNull(),
     kind: restaurantKind().notNull().default("restaurant"),
     logoKey: text(),
@@ -98,6 +100,9 @@ export const restaurants = pgTable(
   },
   (t) => [
     uniqueIndex("restaurants_slug_uq").on(t.slug),
+    uniqueIndex("restaurants_custom_domain_uq")
+      .on(t.customDomain)
+      .where(sql`${t.customDomain} is not null`),
     index("restaurants_org_idx").on(t.organizationId),
     index("restaurants_status_idx").on(t.status),
     index("restaurants_listed_city_idx").on(t.listed, t.city),
@@ -107,6 +112,11 @@ export const restaurants = pgTable(
 export type OpeningHours = Partial<
   Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", { open: string; close: string }[]>
 >;
+
+export type SmsAutomations = {
+  birthday?: { enabled: boolean; text?: string };
+  winback?: { enabled: boolean; days: number; text?: string };
+};
 
 export const restaurantSettings = pgTable("restaurant_settings", {
   restaurantId: uuid()
@@ -149,6 +159,17 @@ export const restaurantSettings = pgTable("restaurant_settings", {
     dayStartHour?: number;
     defaultPreset?: "today" | "7d" | "30d" | "month";
   }>(),
+  /** Automatic texts: birthday, guests who stopped coming, a new dish (settings and wording). */
+  smsAutomations: jsonb().$type<SmsAutomations>(),
+  /** The ordering bot on Bale or Telegram: provider, token (sealed), webhook secret, bot name. */
+  bot: jsonb().$type<{
+    provider: "bale" | "telegram";
+    tokenSealed: string;
+    secret: string;
+    username?: string | null;
+  }>(),
+  /** Delivery platforms: commission of each, and the hash of the key their orders come in with. */
+  platforms: jsonb().$type<{ commissions?: Record<string, number>; apiKeyHash?: string | null }>(),
   /** The evening report sent to the owner's phone (push, and SMS if asked): when, and the last day sent. */
   dailyReport: jsonb().$type<{ enabled?: boolean; hour?: number; sms?: boolean; lastDay?: string }>(),
   /** The restaurant's own Zarinpal merchant id: online payments land on its account. */

@@ -1,3 +1,4 @@
+import { daysAgo } from "@/lib/days";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -17,9 +18,11 @@ import {
   listZones,
 } from "@/server/modules/delivery/service";
 import { can } from "@/server/tenancy";
+import { PlatformOrderButton } from "@/components/channels/channels-ui";
+import { menuDishes, platformReport } from "@/server/modules/channels/platforms";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/delivery">;
-const TABS = ["board", "settlement", "settings"] as const;
+const TABS = ["board", "platforms", "settlement", "settings"] as const;
 
 export default function DeliveryPage({ params, searchParams }: Props) {
   return (
@@ -47,7 +50,15 @@ async function Delivery({ params, searchParams }: Pick<Props, "params" | "search
   return (
     <>
       <LiveRefresh types={["order.created", "order.updated", "payment.updated"]} />
-      <PageHeader title={t("title")} description={t("subtitle")} />
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          can(ctx, "orders.create") ? (
+            <PlatformOrderButton rid={rid} dishes={await menuDishes(db, rid)} />
+          ) : null
+        }
+      />
       <nav
         className="-mx-4 mb-5 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
         aria-label={t("title")}
@@ -131,6 +142,38 @@ async function Delivery({ params, searchParams }: Pick<Props, "params" | "search
           })()
         : null}
 
+      {tab === "platforms"
+        ? await (async () => {
+            const tc = await getTranslations("channels.report");
+            const tp = await getTranslations("channels.platforms.names");
+            const rep = await platformReport(db, ctx, daysAgo(30));
+            const money = (c: number) => formatMoney(c, cur, "fa");
+            return (
+              <div className="space-y-4">
+                <p className="text-sm text-fg-muted">{tc("hint")}</p>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {rep.platforms.map((p) => (
+                    <Card key={p.platform} className="p-4">
+                      <p className="font-semibold">{tp(p.platform)}</p>
+                      <p className="mt-1 text-xl font-bold tabular-nums">{money(p.totalCents)}</p>
+                      <p className="text-xs text-fg-muted">{tc("orders", { n: p.orders })}</p>
+                      <p className="mt-2 text-xs text-danger">
+                        {tc("commission", { amount: money(p.commissionCents), pct: p.commissionBps / 100 })}
+                      </p>
+                      <p className="text-xs font-semibold">{tc("net", { amount: money(p.netCents) })}</p>
+                    </Card>
+                  ))}
+                  <Card className="bg-success-soft/40 p-4">
+                    <p className="font-semibold">{tc("direct")}</p>
+                    <p className="mt-1 text-xl font-bold tabular-nums">{money(rep.direct.totalCents)}</p>
+                    <p className="text-xs text-fg-muted">{tc("orders", { n: rep.direct.orders })}</p>
+                    <p className="mt-2 text-xs text-success">{tc("noCommission")}</p>
+                  </Card>
+                </div>
+              </div>
+            );
+          })()
+        : null}
       {tab === "settings" ? (
         <DeliverySettings
           rid={rid}

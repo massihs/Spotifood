@@ -66,11 +66,13 @@ export const CLIENT_NAMESPACES = {
   dashboard: [
     "alerts",
     "allergens",
+    "automations",
     "b2b",
     "billing",
     "branches",
     "brandColors",
     "categoryTemplates",
+    "channels",
     "common",
     "customers",
     "dailyReport",

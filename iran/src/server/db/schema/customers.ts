@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  date,
   boolean,
   check,
   index,
@@ -36,6 +37,8 @@ export const customers = pgTable(
     totalSpentCents: money().notNull().default(0),
     lastOrderAt: tstz(),
     smsOptOut: boolean().notNull().default(false),
+    /** Birthday ("YYYY-MM-DD"; the year may be a placeholder): the birthday text message. */
+    birthDate: date({ mode: "string" }),
     /** House account (حساب اعتباری / نسیه): null = not allowed; balance is what the customer owes. */
     creditLimitCents: money(),
     balanceCents: money().notNull().default(0),

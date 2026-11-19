@@ -19,7 +19,13 @@ import type { MenuTheme } from "@/lib/menu-themes";
 import { formatThousandTomans, isToman } from "@/lib/money";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
 import { priceLine } from "@/server/modules/pricing";
-import { payOnlineOrderAction, placeKioskOrderAction, placeOnlineOrderAction } from "./actions";
+import {
+  payKioskByTerminalAction,
+  payOnlineOrderAction,
+  placeKioskOrderAction,
+  placeOnlineOrderAction,
+} from "./actions";
+import { terminalBridge, useCardTerminal } from "@/lib/card-terminal";
 
 type Channel = "dine_in" | "takeaway" | "delivery";
 type Line = { key: string; productId: string; optionValueIds: string[]; quantity: number; note: string };
@@ -84,6 +90,24 @@ export function OrderApp({
   const [payment, setPayment] = useState<"online" | "on_site">(canPayOnline ? "online" : "on_site");
   const [phone, setPhone] = useState("");
   const [placed, setPlaced] = useState<string | null>(null);
+  // Kiosk with a card terminal (Spotifood PC app): the guest pays right after ordering.
+  const terminal = useCardTerminal();
+  const [kioskPay, setKioskPay] = useState<{
+    orderId: string;
+    totalCents: number;
+    state: "idle" | "waiting" | "paid" | "failed";
+  } | null>(null);
+  const payOnTerminal = async () => {
+    const bridge = terminalBridge();
+    if (!bridge || !kioskPay || !kioskToken) return;
+    setKioskPay({ ...kioskPay, state: "waiting" });
+    const r = await bridge
+      .pay({ amountCents: kioskPay.totalCents, currency, reference: placed ?? undefined })
+      .catch(() => ({ status: "error" as const }));
+    if (r.status !== "approved") return setKioskPay({ ...kioskPay, state: "failed" });
+    const res = await payKioskByTerminalAction(kioskToken, kioskPay.orderId, r.rrn || "TERMINAL");
+    setKioskPay({ ...kioskPay, state: res?.ok ? "paid" : "failed" });
+  };
   const [lines, setLines] = useState<Line[]>([]);
   const [open, setOpen] = useState<string | null>(null);
   const [checkout, setCheckout] = useState(false);
@@ -114,11 +138,33 @@ export function OrderApp({
   useEffect(() => {
     if (kiosk) return;
     try {
+      // A basket sent from the restaurant's bot (Bale, Telegram): "?cart=id*2,id*1".
+      const shared = new URLSearchParams(window.location.search).get("cart");
+      if (shared) {
+        const fromBot = shared
+          .split(",")
+          .map((part) => part.split("*"))
+          .filter(([id, q]) => id && menu.products[id]?.isAvailable && Number(q) > 0)
+          .map(([id, q], i) => ({
+            key: `${id}:bot${i}`,
+            productId: id!,
+            optionValueIds: [],
+            quantity: Math.min(99, Math.trunc(Number(q))),
+            note: "",
+          }));
+        const url = new URL(window.location.href);
+        url.searchParams.delete("cart");
+        window.history.replaceState(null, "", url);
+        if (fromBot.length) {
+          queueMicrotask(() => setLines(fromBot));
+          return;
+        }
+      }
       const raw = localStorage.getItem(storageKey(slug));
       // After the first paint, so the server and client renders match.
       if (raw) queueMicrotask(() => setLines(JSON.parse(raw) as Line[]));
     } catch {}
-  }, [slug, kiosk]);
+  }, [slug, kiosk, menu]);
   useEffect(() => {
     if (kiosk) return;
     try {
@@ -126,18 +172,24 @@ export function OrderApp({
     } catch {}
   }, [slug, lines, kiosk]);
   // Kiosk: the number stays on screen, then the tablet is ready for the next customer.
+  const payState = kioskPay?.state;
   useEffect(() => {
-    if (!placed) return;
-    const id = setTimeout(() => {
-      setPlaced(null);
-      setCheckout(false);
-      setName("");
-      setPhone("");
-      setNote("");
-      setCoupon("");
-    }, 15_000);
+    // Never while the terminal waits for the card; a little longer when the guest may pay by card.
+    if (!placed || payState === "waiting") return;
+    const id = setTimeout(
+      () => {
+        setPlaced(null);
+        setKioskPay(null);
+        setCheckout(false);
+        setName("");
+        setPhone("");
+        setNote("");
+        setCoupon("");
+      },
+      payState === "idle" ? 45_000 : 15_000,
+    );
     return () => clearTimeout(id);
-  }, [placed]);
+  }, [placed, payState]);
 
   const productFor = (id: string): PublicProduct | undefined => {
     const p = menu.products[id];
@@ -236,6 +288,7 @@ export function OrderApp({
         if (res?.ok && res.data) {
           setLines([]);
           setPlaced(res.data.number);
+          setKioskPay({ orderId: res.data.orderId, totalCents: res.data.totalCents, state: "idle" });
           return;
         }
         const code = res?.ok === false ? res.error : "internal";
@@ -597,12 +650,33 @@ export function OrderApp({
             <p className="mt-4 text-8xl font-black tabular-nums" dir="ltr">
               {placed}
             </p>
-            <p className="mt-6 max-w-sm text-base text-fg-muted">{t("kioskHint")}</p>
+            {terminal && kioskPay && kioskPay.totalCents > 0 && kioskPay.state !== "paid" ? (
+              <div className="mx-auto mt-6 max-w-sm space-y-3">
+                <p className="text-2xl font-bold tabular-nums">{money(kioskPay.totalCents)}</p>
+                <Button
+                  size="lg"
+                  className="w-full"
+                  disabled={kioskPay.state === "waiting"}
+                  onClick={payOnTerminal}
+                >
+                  {kioskPay.state === "waiting" ? t("kioskCardWaiting") : t("kioskPayCard")}
+                </Button>
+                {kioskPay.state === "failed" ? (
+                  <p className="text-sm text-danger">{t("kioskCardFailed")}</p>
+                ) : null}
+                <p className="text-sm text-fg-muted">{t("kioskOrPayCounter")}</p>
+              </div>
+            ) : kioskPay?.state === "paid" ? (
+              <p className="mt-6 text-lg font-semibold text-success">{t("kioskPaid")}</p>
+            ) : (
+              <p className="mt-6 max-w-sm text-base text-fg-muted">{t("kioskHint")}</p>
+            )}
             <Button
               size="lg"
               className="mt-8"
               onClick={() => {
                 setPlaced(null);
+                setKioskPay(null);
                 setCheckout(false);
                 setName("");
                 setPhone("");

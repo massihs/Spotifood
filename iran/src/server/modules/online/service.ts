@@ -8,6 +8,8 @@ import {
   orders,
   restaurantSettings,
   restaurants,
+  payments,
+  paymentAllocations,
 } from "@/server/db/schema";
 import { AppError, conflict, forbidden, notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
@@ -25,7 +27,13 @@ import { getZone, rememberAddress } from "@/server/modules/delivery/service";
 import { recordAudit } from "@/server/audit";
 import { notifyNewOrder } from "@/server/modules/push/service";
 import { onOrderCancelled } from "@/server/modules/customers/service";
-import { paymentConfig, releaseOpenCheckouts } from "@/server/modules/payments/service";
+import {
+  emitPaymentUpdate,
+  paymentConfig,
+  releaseOpenCheckouts,
+  settleAllocations,
+} from "@/server/modules/payments/service";
+import { issueInvoiceInTx } from "@/server/modules/invoices/service";
 import { announceOrder } from "@/server/modules/orders/announce";
 
 /**
@@ -656,4 +664,57 @@ export async function updateKiosk(
     metadata: { kiosk: opts.enabled, regenerated: Boolean(opts.regenerate) },
   });
   return { enabled: opts.enabled, token };
+}
+
+/**
+ * The kiosk's card terminal (PC-POS through the Spotifood PC app) approved the payment of the
+ * order just placed on it: the order is paid, with the terminal's reference and its invoice.
+ */
+export async function payKioskOrderByTerminal(
+  db: Database,
+  token: string,
+  orderId: string,
+  terminalRef: string,
+) {
+  const store = await storeByKiosk(db, token);
+  if (!store || !isUuid(orderId)) throw notFound();
+  const ref = z
+    .string()
+    .trim()
+    .regex(/^[\w-]{1,32}$/)
+    .parse(terminalRef);
+  return db.transaction(async (tx) => {
+    const [order] = await tx
+      .select()
+      .from(orders)
+      .where(and(eq(orders.id, orderId), eq(orders.restaurantId, store.id)))
+      .for("update");
+    if (!order) throw notFound();
+    if (order.paymentStatus === "paid") return { paid: true };
+    // Only an order placed on the kiosk a moment ago (the guest is still at the screen).
+    if (Date.now() - order.placedAt.getTime() > 30 * 60_000) throw conflict("too_late");
+    const [payment] = await tx
+      .insert(payments)
+      .values({
+        restaurantId: store.id,
+        provider: "on_site_terminal",
+        status: "succeeded",
+        succeededAt: new Date(),
+        amountCents: order.totalCents,
+        currency: order.currency,
+        idempotencyKey: `kiosk_${order.id.replace(/-/g, "")}`,
+        metadata: { kiosk: true, terminalRef: ref },
+      })
+      .returning();
+    await tx.insert(paymentAllocations).values({
+      restaurantId: store.id,
+      paymentId: payment!.id,
+      orderId: order.id,
+      amountCents: order.totalCents,
+    });
+    await settleAllocations(tx, payment!, null);
+    await emitPaymentUpdate(tx, payment!);
+    await issueInvoiceInTx(tx, store.id, payment!.id, null);
+    return { paid: true };
+  });
 }
