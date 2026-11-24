@@ -149,12 +149,24 @@ async function Plans({ searchParams }: { searchParams: Props["searchParams"] }) 
                   <span className="text-3xl font-bold">{t("free")}</span>
                 ) : (
                   <>
-                    <span className="text-3xl font-bold tabular-nums">
-                      {money(yearly ? Math.round((p.priceMonthlyCents * 10) / 12) : p.priceMonthlyCents)}
-                    </span>{" "}
-                    <span className={cn("text-sm", hot ? "text-white/60" : "text-fg-muted")}>
-                      {tb("perMonth")}
-                    </span>
+                    {(() => {
+                      // The figure big and on one line; its unit and "/ month" small beneath.
+                      const full = money(
+                        yearly ? Math.round((p.priceMonthlyCents * 10) / 12) : p.priceMonthlyCents,
+                      );
+                      const cut = full.lastIndexOf(" ");
+                      return (
+                        <>
+                          <span className="block text-3xl leading-tight font-black whitespace-nowrap tabular-nums">
+                            {cut > 0 ? full.slice(0, cut) : full}
+                          </span>
+                          <span className={cn("text-sm", hot ? "text-white/60" : "text-fg-muted")}>
+                            {cut > 0 ? `${full.slice(cut + 1)} ` : ""}
+                            {tb("perMonth")}
+                          </span>
+                        </>
+                      );
+                    })()}
                     {yearly ? (
                       <span className={cn("mt-1 block text-xs", hot ? "text-white/60" : "text-fg-muted")}>
                         {t("billedYearly", { amount: money(p.priceMonthlyCents * 10) })}

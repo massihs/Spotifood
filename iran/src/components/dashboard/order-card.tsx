@@ -128,7 +128,15 @@ export function OrderCard({
     const m = Math.floor((total % 3600) / 60);
     const sec = total % 60;
     const pad = (n: number) => String(n).padStart(2, "0");
-    if (h >= 10) return `${h}h`;
+    // Long waits in words of the language ("۱۲ ساعت", "۳ روز"), not a Latin "h".
+    if (h >= 10) {
+      const days = Math.floor(h / 24);
+      return new Intl.NumberFormat(locale, {
+        style: "unit",
+        unit: days >= 2 ? "day" : "hour",
+        unitDisplay: "long",
+      }).format(days >= 2 ? days : h);
+    }
     return h ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
   })();
   const timer = kitchen ? (

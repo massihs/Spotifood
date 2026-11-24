@@ -11,7 +11,7 @@ export default async function SignupPage({ params }: PageProps<"/[locale]/signup
   const t = await getTranslations("auth");
   return (
     <div>
-      <h1 className="text-2xl font-semibold tracking-tight">{t("signupTitle")}</h1>
+      <h1 className="text-[1.75rem] leading-tight font-black">{t("signupTitle")}</h1>
       <p className="mt-1.5 text-fg-muted">{t("signupSubtitle")}</p>
       <div className="mt-8">
         <SignupForm />

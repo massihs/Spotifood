@@ -149,7 +149,7 @@ export function SidebarNav({ items, label }: { items: NavItem[]; label: string }
                 onClick={() => !hasActive && toggleCollapsed(section.key)}
                 aria-expanded={open}
                 aria-controls={id}
-                className="group/h flex w-full items-center gap-2 rounded-lg px-3 pt-4 pb-1.5 text-start text-[11px] font-semibold tracking-wide text-sidebar-muted/70 uppercase hover:text-sidebar-fg"
+                className="group/h flex w-full items-center gap-2 rounded-lg px-3 pt-4 pb-1.5 text-start text-xs font-semibold tracking-wide text-sidebar-muted uppercase hover:text-sidebar-fg"
               >
                 <span className="flex-1">{section.label}</span>
                 {!open && badge ? <Badge n={badge} /> : null}

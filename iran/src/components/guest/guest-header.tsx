@@ -136,7 +136,7 @@ export async function GuestHeader({
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-3">
                 {logoTile("size-11 rounded-xl")}
-                <h1 className="min-w-0 truncate font-menu-display text-[32px] leading-tight font-medium">
+                <h1 className="line-clamp-2 min-w-0 font-menu-display text-[28px] leading-tight font-medium text-balance break-words sm:text-[32px]">
                   {name}
                 </h1>
               </div>
@@ -176,7 +176,7 @@ export async function GuestHeader({
         <div className="flex items-center gap-3 rounded-3xl border border-border bg-surface p-3 shadow-[var(--shadow-float)]">
           {logoTile("size-14 rounded-2xl ring-1 ring-border")}
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-lg leading-tight font-bold tracking-tight">{name}</h1>
+            <h1 className="line-clamp-2 text-lg leading-snug font-bold text-balance break-words">{name}</h1>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px]">{guestLine}</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
