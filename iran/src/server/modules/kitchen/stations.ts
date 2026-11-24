@@ -1,7 +1,15 @@
 import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Database, DbOrTx } from "@/server/db/client";
-import { categories, kitchenStations, orderItems, orders, printers, products } from "@/server/db/schema";
+import {
+  categories,
+  kitchenStations,
+  orderItems,
+  orders,
+  printers,
+  products,
+  restaurantSettings,
+} from "@/server/db/schema";
 import { recordAudit } from "@/server/audit";
 import { notFound } from "@/server/errors";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
@@ -32,7 +40,41 @@ export async function stationsOf(db: DbOrTx, rid: string, productIds: string[]) 
     .from(products)
     .innerJoin(categories, eq(categories.id, products.categoryId))
     .where(and(eq(products.restaurantId, rid), inArray(products.id, [...new Set(productIds)])));
-  return new Map(rows.map((r) => [r.id, r.stationId]));
+  // Dishes without a station go to the restaurant's default one, if it still exists.
+  const fallback = rows.some((r) => !r.stationId) ? await defaultStationOf(db, rid) : null;
+  return new Map(rows.map((r) => [r.id, r.stationId ?? fallback]));
+}
+
+/** The station of the dishes no category routes (null: every screen shows them). */
+export async function defaultStationOf(db: DbOrTx, rid: string) {
+  const [row] = await db
+    .select({ id: kitchenStations.id })
+    .from(restaurantSettings)
+    .innerJoin(kitchenStations, eq(kitchenStations.id, restaurantSettings.defaultStationId))
+    .where(
+      and(
+        eq(restaurantSettings.restaurantId, rid),
+        eq(kitchenStations.restaurantId, rid),
+        isNull(kitchenStations.deletedAt),
+      ),
+    );
+  return row?.id ?? null;
+}
+
+export async function setDefaultStation(db: Database, ctx: RestaurantContext, stationId: string | null) {
+  assertCan(ctx, "menu.manage");
+  if (stationId != null) {
+    if (!isUuid(stationId)) throw notFound();
+    const [st] = await db
+      .select({ id: kitchenStations.id })
+      .from(kitchenStations)
+      .where(and(eq(kitchenStations.id, stationId), live(ctx.restaurant.id)));
+    if (!st) throw notFound();
+  }
+  await db
+    .update(restaurantSettings)
+    .set({ defaultStationId: stationId })
+    .where(eq(restaurantSettings.restaurantId, ctx.restaurant.id));
 }
 
 const live = (rid: string) => and(eq(kitchenStations.restaurantId, rid), isNull(kitchenStations.deletedAt));
@@ -52,7 +94,7 @@ export async function listStations(db: DbOrTx, ctx: RestaurantContext) {
       .where(and(eq(categories.restaurantId, ctx.restaurant.id), isNull(categories.deletedAt)))
       .orderBy(asc(categories.sortOrder)),
   ]);
-  return { stations, categories: cats };
+  return { stations, categories: cats, defaultStationId: await defaultStationOf(db, ctx.restaurant.id) };
 }
 
 export const stationSchema = z.object({

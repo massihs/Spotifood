@@ -2054,7 +2054,10 @@
       "deleteConfirm": "Supprimer ce poste ?",
       "delete": "Supprimer",
       "back": "Retour",
-      "save": "Enregistrer"
+      "save": "Enregistrer",
+      "fallback": "Poste par défaut",
+      "fallbackNone": "Aucun (visible seulement dans « Tous »)",
+      "fallbackHint": "Reçoit les plats des catégories qu’aucun poste ne prépare."
     },
     "ticket": {
       "delivery": "Livraison",
@@ -2082,6 +2085,16 @@
       "startAll": "Tout lancer ({n})",
       "confirm": "Confirmer ({n}) ?",
       "done": "{n, plural, one {# commande} other {# commandes}} OK"
+    },
+    "stationState": {
+      "waiting": "En attente",
+      "preparing": "En cours",
+      "ready": "Prêt"
+    },
+    "partDone": "Votre partie est prête — en attente des autres postes",
+    "stationNext": {
+      "preparing": "Commencer · {station}",
+      "ready": "{station} prêt"
     }
   },
   "floor": {
@@ -2166,6 +2179,10 @@
       },
       "marketplace": {
         "order": "Nouvelle commande pro de {name} · {amount} (n° {number})"
+      },
+      "station": {
+        "ready": "{name} prêt · commande {number} · table {table}",
+        "readyRoom": "{name} prêt · commande {number} · chambre {table}"
       }
     }
   },

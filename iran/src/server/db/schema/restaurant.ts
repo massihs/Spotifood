@@ -185,6 +185,8 @@ export const restaurantSettings = pgTable("restaurant_settings", {
   }>(),
   /** Delivery platforms: commission of each, and the hash of the key their orders come in with. */
   platforms: jsonb().$type<{ commissions?: Record<string, number>; apiKeyHash?: string | null }>(),
+  /** Station of the dishes whose category has none (null: they show on every screen). */
+  defaultStationId: uuid(),
   /** The B2B marketplace: listed as a supplier for other venues, with a pitch and a minimum order. */
   marketplace: jsonb().$type<{ listed: boolean; pitch?: string; minOrderCents?: number }>(),
   /** The tax system (سامانه مؤدیان): identifiers, sealed key and certificate, mode, codes. */

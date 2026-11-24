@@ -36,6 +36,7 @@ async function Kitchen({ params }: { params: Params }) {
       canCancel={can(ctx, "orders.cancel")}
       stations={setup.stations.map((s) => ({ id: s.id, name: s.name, color: s.color }))}
       categories={setup.categories}
+      fallbackStationId={setup.defaultStationId}
       canManage={can(ctx, "menu.manage")}
       acceptAtTill={acceptAtTill}
       defaultStation={ctx.stationId ?? null}

@@ -379,6 +379,13 @@
       "when": 1795074529975,
       "tag": "0053_marketplace",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1795515354600,
+      "tag": "0054_station_progress",
+      "breakpoints": true
     }
   ]
 }

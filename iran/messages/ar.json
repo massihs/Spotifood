@@ -2054,7 +2054,10 @@
       "deleteConfirm": "حذف هذه المحطة؟",
       "delete": "حذف",
       "back": "رجوع",
-      "save": "حفظ"
+      "save": "حفظ",
+      "fallback": "القسم الافتراضي",
+      "fallbackNone": "لا شيء (يظهر فقط في «الكل»)",
+      "fallbackHint": "يستقبل أطباق الفئات التي لا يحضّرها أي قسم."
     },
     "ticket": {
       "delivery": "توصيل",
@@ -2082,6 +2085,16 @@
       "startAll": "بدء الكل ({n})",
       "confirm": "تأكيد ({n})؟",
       "done": "تم {n} طلب"
+    },
+    "stationState": {
+      "waiting": "بالانتظار",
+      "preparing": "قيد التحضير",
+      "ready": "جاهز"
+    },
+    "partDone": "جزؤك جاهز — بانتظار الأقسام الأخرى",
+    "stationNext": {
+      "preparing": "ابدأ · {station}",
+      "ready": "{station} جاهز"
     }
   },
   "floor": {
@@ -2166,6 +2179,10 @@
       },
       "marketplace": {
         "order": "New trade order from {name} · {amount} (no. {number})"
+      },
+      "station": {
+        "ready": "{name} جاهز · الطلب {number} · الطاولة {table}",
+        "readyRoom": "{name} جاهز · الطلب {number} · الغرفة {table}"
       }
     }
   },

@@ -2054,7 +2054,10 @@
       "deleteConfirm": "Delete this station?",
       "delete": "Delete",
       "back": "Back",
-      "save": "Save"
+      "save": "Save",
+      "fallback": "Default station",
+      "fallbackNone": "None (shown only under “All”)",
+      "fallbackHint": "Takes the dishes of categories no station prepares."
     },
     "ticket": {
       "delivery": "Delivery",
@@ -2082,6 +2085,16 @@
       "startAll": "Start all ({n})",
       "confirm": "Confirm ({n})?",
       "done": "{n, plural, one {# order} other {# orders}} done"
+    },
+    "stationState": {
+      "waiting": "Waiting",
+      "preparing": "In progress",
+      "ready": "Ready"
+    },
+    "partDone": "Your part is ready — waiting for the other stations",
+    "stationNext": {
+      "preparing": "Start · {station}",
+      "ready": "{station} ready"
     }
   },
   "floor": {
@@ -2166,6 +2179,10 @@
       },
       "marketplace": {
         "order": "New trade order from {name} · {amount} (no. {number})"
+      },
+      "station": {
+        "ready": "{name} ready · order {number} · table {table}",
+        "readyRoom": "{name} ready · order {number} · room {table}"
       }
     }
   },

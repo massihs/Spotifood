@@ -452,6 +452,15 @@ export async function updateOrderStatus(
       toStatus: to,
       actorUserId: ctx.user.id,
     });
+    // The whole order moved: every station's part follows (started, and ready once ready).
+    if (to === "preparing" || to === "ready" || to === "served")
+      await tx
+        .update(orderItems)
+        .set({
+          startedAt: sql`coalesce(${orderItems.startedAt}, ${now})`,
+          ...(to === "preparing" ? {} : { readyAt: sql`coalesce(${orderItems.readyAt}, ${now})` }),
+        })
+        .where(eq(orderItems.orderId, orderId));
     await emit(tx, {
       topic: topics.restaurant(ctx.restaurant.id),
       type: "order.updated",

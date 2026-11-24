@@ -2054,7 +2054,10 @@
       "deleteConfirm": "این ایستگاه حذف شود؟",
       "delete": "حذف",
       "back": "بازگشت",
-      "save": "ذخیره"
+      "save": "ذخیره",
+      "fallback": "بخش پیش‌فرض",
+      "fallbackNone": "هیچ‌کدام (فقط در «همه» دیده می‌شود)",
+      "fallbackHint": "غذاهای دسته‌هایی که هیچ بخشی آن‌ها را آماده نمی‌کند به این بخش می‌رود."
     },
     "ticket": {
       "delivery": "ارسال با پیک",
@@ -2082,6 +2085,16 @@
       "startAll": "شروع همه ({n})",
       "confirm": "تأیید ({n})؟",
       "done": "{n} سفارش انجام شد"
+    },
+    "stationState": {
+      "waiting": "در انتظار",
+      "preparing": "در حال آماده‌سازی",
+      "ready": "آماده"
+    },
+    "partDone": "سهم شما آماده است — در انتظار بخش‌های دیگر",
+    "stationNext": {
+      "preparing": "شروع · {station}",
+      "ready": "{station} آماده شد"
     }
   },
   "floor": {
@@ -2166,6 +2179,10 @@
       },
       "marketplace": {
         "order": "سفارش عمدهٔ جدید از {name} · {amount} (شماره {number})"
+      },
+      "station": {
+        "ready": "{name} آماده · سفارش {number} · میز {table}",
+        "readyRoom": "{name} آماده · سفارش {number} · اتاق {table}"
       }
     }
   },

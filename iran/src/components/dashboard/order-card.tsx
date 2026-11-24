@@ -12,6 +12,9 @@ import { CollectPaymentDialog } from "@/components/dashboard/payment-dialogs";
 import { cn } from "@/lib/cn";
 import { nextStatus, type OrderStatus } from "@/server/modules/orders/status";
 import { updateOrderStatusAction } from "@/app/[locale]/dashboard/[restaurantId]/orders/actions";
+import { advanceStationAction } from "@/app/[locale]/dashboard/[restaurantId]/kitchen/actions";
+import { stationState, type StationState } from "@/lib/station-state";
+import { STATION_TONE } from "@/components/kitchen/stations";
 import { blockGuestAction } from "@/app/[locale]/dashboard/[restaurantId]/security-actions";
 
 export type OrderCardData = {
@@ -42,8 +45,14 @@ export type OrderCardData = {
     productName: string;
     options: { valueName: string }[];
     note: string | null;
+    /** This line's station started it / finished it. */
+    startedAt?: Date | string | null;
+    readyAt?: Date | string | null;
   }[];
 };
+
+/** Each station's part of the order (chips), when it goes to several stations. */
+export type StationProgress = { id: string; name: string; color: string; state: StationState }[];
 
 /** Status → dot colour + soft chip background. */
 const TONE: Record<OrderStatus, { dot: string; chip: string }> = {
@@ -64,7 +73,13 @@ export function OrderCard({
   timeZone,
   compact = false,
   collectMethods,
+  station,
+  progress,
 }: {
+  /** The station this screen shows (kitchen): its buttons move only that station's part. */
+  station?: { id: string; name: string } | null;
+  /** Where each station stands on this order (chips under the header). */
+  progress?: StationProgress;
   restaurantId: string;
   order: OrderCardData;
   canUpdate: boolean;
@@ -82,6 +97,25 @@ export function OrderCard({
   const [error, setError] = useState<string | null>(null);
   const next = nextStatus(o.status);
   const who = o.participantName ?? (o.participantSeq ? t("orders.client", { n: o.participantSeq }) : null);
+
+  // A station's own part: the bar marks the drinks ready, the order waits for the kitchen.
+  const ownState = station ? stationState(o.items) : null;
+  const ownNext: "preparing" | "ready" | null =
+    !station || !["received", "accepted", "preparing"].includes(o.status)
+      ? null
+      : ownState === "waiting"
+        ? "preparing"
+        : ownState === "preparing"
+          ? "ready"
+          : null;
+  const advance = (to: "preparing" | "ready") =>
+    startTransition(async () => {
+      const res = await advanceStationAction(restaurantId, o.id, station!.id, to);
+      if (res && !res.ok) {
+        setError(t.has(`errorCodes.${res.error}`) ? t(`errorCodes.${res.error}`) : t("errorCodes.internal"));
+        router.refresh();
+      } else setError(null);
+    });
 
   const move = (to: OrderStatus, reason?: string) =>
     startTransition(async () => {
@@ -258,6 +292,26 @@ export function OrderCard({
         </div>
       </div>
       {kitchen && timer ? <div className="flex items-center gap-2 px-4 pb-3">{timer}</div> : null}
+      {progress && progress.length > 1 && !["ready", "served", "cancelled"].includes(o.status) ? (
+        <div className="flex flex-wrap gap-1.5 px-4 pb-3">
+          {progress.map((p) => (
+            <span
+              key={p.id}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold",
+                p.state === "ready"
+                  ? "bg-success-soft text-success"
+                  : p.state === "preparing"
+                    ? "bg-warning-soft text-fg"
+                    : "bg-surface-2 text-fg-muted",
+              )}
+            >
+              <span className={cn("size-2 rounded-full", STATION_TONE[p.color]?.dot)} aria-hidden="true" />
+              {p.name} · {t(`kitchen.stationState.${p.state}`)}
+            </span>
+          ))}
+        </div>
+      ) : null}
       <ul
         className={cn(
           "mx-4 divide-y divide-border rounded-2xl bg-surface-2/70",
@@ -376,7 +430,26 @@ export function OrderCard({
             <Ban className="size-4" aria-hidden="true" />
           </Button>
         ) : null}
-        {canUpdate && next ? (
+        {canUpdate && station && ownState === "ready" && o.status !== "ready" && o.status !== "served" ? (
+          <p className="flex flex-1 items-center justify-center rounded-2xl bg-success-soft px-3 text-sm font-bold text-success">
+            {t("kitchen.partDone")}
+          </p>
+        ) : null}
+        {canUpdate && ownNext ? (
+          <Button
+            size="lg"
+            variant={ownNext === "ready" ? "accent" : "primary"}
+            disabled={pending}
+            className="min-w-0 flex-1"
+            onClick={() => advance(ownNext)}
+          >
+            <span className="truncate">
+              {t(`kitchen.stationNext.${ownNext}`, { station: station!.name })}
+            </span>
+            <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+          </Button>
+        ) : null}
+        {canUpdate && next && !(station && ["received", "accepted", "preparing"].includes(o.status)) ? (
           <Button
             size={kitchen ? "lg" : "md"}
             variant={next === "ready" ? "accent" : "primary"}

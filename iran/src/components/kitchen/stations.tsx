@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import {
   deleteStationAction,
   saveStationAction,
+  setDefaultStationAction,
 } from "@/app/[locale]/dashboard/[restaurantId]/kitchen/actions";
 
 export type StationView = { id: string; name: string; color: string };
@@ -28,11 +29,13 @@ export function StationManager({
   restaurantId,
   stations,
   categories,
+  fallbackStationId,
   onClose,
 }: {
   restaurantId: string;
   stations: StationView[];
   categories: { id: string; name: string; stationId: string | null }[];
+  fallbackStationId: string | null;
   onClose: () => void;
 }) {
   const t = useTranslations("kitchen.stations");
@@ -69,6 +72,25 @@ export function StationManager({
               </span>
             </button>
           ))}
+          {stations.length ? (
+            <label className="block rounded-xl bg-surface-2 p-3 text-sm font-medium">
+              {t("fallback")}
+              <select
+                value={fallbackStationId ?? ""}
+                disabled={pending}
+                onChange={(e) => run(() => setDefaultStationAction(restaurantId, e.target.value || null))}
+                className={cn(field, "mt-1")}
+              >
+                <option value="">{t("fallbackNone")}</option>
+                {stations.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs font-normal text-fg-muted">{t("fallbackHint")}</span>
+            </label>
+          ) : null}
           <button
             type="button"
             onClick={() => open("new")}

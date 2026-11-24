@@ -181,6 +181,9 @@ export const orderItems = pgTable(
     nutrition: jsonb().$type<Nutrition>(),
     /** Station the line was sent to, fixed when ordered (dish's station, else its category's). */
     stationId: uuid(),
+    /** Its station started it / finished it: each station moves its own part of the order. */
+    startedAt: tstz(),
+    readyAt: tstz(),
     unitPriceCents: money().notNull(),
     optionsTotalCents: money().notNull().default(0),
     quantity: integer().notNull(),

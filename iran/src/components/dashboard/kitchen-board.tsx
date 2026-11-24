@@ -10,6 +10,7 @@ import { LiveIndicator, LiveRefresh, useLiveEvent } from "@/components/realtime/
 import { StationManager, STATION_TONE, type StationView } from "@/components/kitchen/stations";
 import { AcceptAllButton } from "./accept-all-button";
 import { OrderCard, type OrderCardData } from "./order-card";
+import { stationProgress, stationState } from "@/lib/station-state";
 
 const COLUMNS = ["received", "accepted", "preparing", "ready", "served"] as const;
 
@@ -33,11 +34,14 @@ export function KitchenBoard({
   canManage,
   acceptAtTill,
   defaultStation,
+  fallbackStationId,
 }: {
   /** Guest orders reach this screen only once the till accepted them. */
   acceptAtTill: boolean;
   /** Station of the bar / kitchen member signed in (their screen opens on it). */
   defaultStation: string | null;
+  /** The station that takes the dishes of categories no station prepares. */
+  fallbackStationId: string | null;
   restaurantId: string;
   orders: OrderCardData[];
   timeZone: string;
@@ -60,10 +64,29 @@ export function KitchenBoard({
   const frame = useRef<HTMLIFrameElement>(null);
 
   const columns = acceptAtTill ? COLUMNS.filter((c) => c !== "received") : COLUMNS;
+  const current = station === "all" ? null : (stations.find((s) => s.id === station) ?? null);
   const visible = orders
     .filter((o) => !acceptAtTill || (o.status !== "received" && o.status !== "pending_payment"))
-    .map((o) => (station === "all" ? o : { ...o, items: o.items.filter((i) => i.stationId === station) }))
+    .map((o) => ({
+      ...o,
+      // Each station's part, for the chips (from all the lines of the order).
+      progress: stationProgress(o.items, stations),
+      items: current ? o.items.filter((i) => i.stationId === current.id) : o.items,
+    }))
     .filter((o) => o.items.length > 0);
+
+  /**
+   * The column of an order on this screen: the order's status on "All"; on a station, where that
+   * station's part stands (the bar's drinks can be ready while the kitchen cooks).
+   */
+  const columnOf = (o: (typeof visible)[number]): (typeof COLUMNS)[number] | "pending_payment" => {
+    if (!current || o.status === "ready" || o.status === "served" || o.status === "pending_payment")
+      return o.status as (typeof COLUMNS)[number];
+    const st = stationState(o.items);
+    if (st === "ready") return "ready";
+    if (st === "preparing") return "preparing";
+    return o.status === "received" ? "received" : "accepted";
+  };
 
   const ticketUrl = (orderId: string, auto = false) =>
     `/print/kitchen/${restaurantId}/${orderId}?${station === "all" ? "" : `station=${station}&`}${auto ? "auto=1" : ""}`;
@@ -75,9 +98,10 @@ export function KitchenBoard({
   });
 
   const byStatus = (s: (typeof COLUMNS)[number]) =>
-    visible.filter((o) =>
-      s === "received" ? o.status === "received" || o.status === "pending_payment" : o.status === s,
-    );
+    visible.filter((o) => {
+      const c = columnOf(o);
+      return s === "received" ? c === "received" || c === "pending_payment" : c === s;
+    });
 
   return (
     <div
@@ -223,6 +247,8 @@ export function KitchenBoard({
                       canCancel={canCancel}
                       timeZone={timeZone}
                       compact
+                      station={current}
+                      progress={o.progress}
                     />
                     <a
                       href={ticketUrl(o.id)}
@@ -253,6 +279,7 @@ export function KitchenBoard({
           restaurantId={restaurantId}
           stations={stations}
           categories={categories}
+          fallbackStationId={fallbackStationId}
           onClose={() => setManaging(false)}
         />
       ) : null}
