@@ -43,7 +43,8 @@
       "restaurants": "Restaurants",
       "account": "Mon compte",
       "contact": "Nous contacter",
-      "pricing": "Tarifs"
+      "pricing": "Tarifs",
+      "help": "Aide"
     },
     "trust": {
       "noApp": "Aucune appli à installer",
@@ -388,7 +389,9 @@
     "adminPayouts": "Versements",
     "accounting": "Comptabilité",
     "b2b": "Ventes pro (B2B)",
-    "staff": "Équipe : temps et paie"
+    "staff": "Équipe : temps et paie",
+    "adminSupport": "Support",
+    "adminHelp": "Centre d’aide"
   },
   "dashboard": {
     "welcome": "Bonjour {name}",
@@ -2195,6 +2198,9 @@
       "station": {
         "ready": "{name} prêt · commande {number} · table {table}",
         "readyRoom": "{name} prêt · commande {number} · chambre {table}"
+      },
+      "support": {
+        "reply": "Le support a répondu : {name}"
       }
     }
   },
@@ -5341,5 +5347,91 @@
       "cancelled": "Annulée",
       "pending_payment": "En attente"
     }
+  },
+  "support": {
+    "title": "Aide et support",
+    "subtitle": "Lisez un guide ou discutez avec l’équipe Spotifood",
+    "open": "Aide et support{count, plural, =0 {} other { (# nouvelles réponses)}}",
+    "close": "Fermer",
+    "back": "Retour",
+    "team": "Équipe Spotifood",
+    "send": "Envoyer",
+    "tabs": {
+      "help": "Aide",
+      "chats": "Conversations"
+    },
+    "searchHelp": "Votre question… (ex. imprimer les QR)",
+    "noResults": "Aucun guide trouvé. Écrivez-nous.",
+    "notFound": "Pas trouvé la réponse ?",
+    "notFoundHint": "L’équipe Spotifood répond ici même.",
+    "talkToUs": "Écrire au support",
+    "newChat": "Nouvelle conversation",
+    "noChats": "Aucune conversation.",
+    "newChatTitle": "Quelle est votre question ?",
+    "newChatHint": "Décrivez le problème en détail (quelle page, ce qui s’est passé). La réponse arrive ici, et la cloche vous prévient aussi.",
+    "maybeThis": "Ceci peut aider :",
+    "questionPlaceholder": "Votre question ou problème…",
+    "replyPlaceholder": "Votre message…",
+    "waitingAnswer": "Message reçu. L’équipe Spotifood répond ici très vite.",
+    "stillStuck": "Toujours bloqué ?",
+    "status": {
+      "open": "En attente de réponse",
+      "pending": "Répondu",
+      "resolved": "Résolu"
+    },
+    "errors": {
+      "generic": "Non envoyé. Réessayez.",
+      "rate_limited": "Trop de messages d’affilée. Patientez un peu."
+    },
+    "inbox": "Boîte de réception",
+    "inboxTitle": "Support",
+    "inboxSubtitle": "Les questions des restaurants, en direct. Votre réponse s’affiche dans leur tableau de bord et leur cloche.",
+    "counts": "{open} ouvertes · {unread} non lues",
+    "filters": {
+      "open": "Ouvertes",
+      "pending": "En attente",
+      "resolved": "Résolues",
+      "all": "Toutes"
+    },
+    "inboxEmpty": "Aucun message.",
+    "pickConversation": "Choisissez une conversation.",
+    "resolve": "Résolu",
+    "reopen": "Rouvrir",
+    "history": "Conversations précédentes de ce restaurant",
+    "teamReplyPlaceholder": "Répondre au restaurant…",
+    "helpAdminTitle": "Centre d’aide",
+    "helpAdminSubtitle": "Articles d’aide (proposés aux restaurants et clients avant une conversation) et réponses toutes faites.",
+    "articles": "Articles",
+    "newArticle": "Nouvel article",
+    "editArticle": "Modifier l’article",
+    "noArticles": "Aucun article dans cette langue.",
+    "cannedTitle": "Réponses toutes faites",
+    "newCanned": "Nouvelle réponse",
+    "cannedHint": "Insérées dans une réponse en un clic.",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer ?",
+    "save": "Enregistrer",
+    "fields": {
+      "locale": "Langue",
+      "audience": "Pour",
+      "order": "Ordre",
+      "slug": "Adresse (latin)",
+      "title": "Titre",
+      "body": "Texte",
+      "keywords": "Mots de recherche",
+      "published": "Publié"
+    },
+    "audience": {
+      "restaurant": "Restaurants",
+      "guest": "Clients",
+      "all": "Tous"
+    },
+    "helpCenter": "Centre d’aide",
+    "helpCenterSubtitle": "Réponses aux questions fréquentes des clients et des restaurants",
+    "resultsFor": "Résultats pour « {q} »",
+    "forGuests": "Pour les clients",
+    "forRestaurants": "Pour les restaurants",
+    "restaurantsChatHint": "Les restaurants écrivent à l’équipe Spotifood depuis leur tableau de bord (bouton Aide et support en haut)."
   }
 }

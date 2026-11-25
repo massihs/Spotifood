@@ -32,6 +32,7 @@ export const AREA_ROUTES = {
     "invoice",
     "print",
     "display",
+    "help",
   ],
   table: ["table"],
   online: ["r", "d"],

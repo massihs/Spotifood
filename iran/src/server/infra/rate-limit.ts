@@ -56,6 +56,8 @@ export const RATE_LIMITS = {
   game: { limit: 150, windowMs: 60_000 },
   /** Bank account changes: a handful per hour is plenty, more looks like an attack. */
   payoutAccount: { limit: 5, windowMs: 60 * 60_000 },
+  /** Support chat: a person writing to the team (a real conversation stays far below). */
+  supportMessage: { limit: 30, windowMs: 10 * 60_000 },
   /** Online orders paid online: starting checkouts. */
   onlinePayment: { limit: 10, windowMs: 10 * 60_000 },
 } as const;

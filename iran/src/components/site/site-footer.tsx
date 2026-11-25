@@ -27,6 +27,7 @@ export async function SiteFooter() {
       title: t("footer.explore"),
       links: [
         { href: "/restaurants", label: t("nav.restaurants") },
+        { href: "/help", label: t("nav.help") },
         { href: "/demo", label: t("ctaDemo") },
         { href: "/radio", label: t("nav.radio") },
         { href: "/#contact", label: t("nav.contact") },

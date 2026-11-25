@@ -43,6 +43,8 @@ import { isScreen, screenAllowed } from "@/lib/screens";
 import type { NavItem } from "@/components/dashboard/sidebar-nav";
 import type { SearchEntry } from "@/components/dashboard/command-palette";
 import { can } from "@/server/tenancy";
+import { SupportPanel } from "@/components/support/support-panel";
+import { unreadSupportCount } from "@/server/modules/support/service";
 import { requireRestaurant } from "@/server/auth/current";
 import { Link } from "@/i18n/navigation";
 import { desktopDownloads } from "@/lib/desktop";
@@ -487,7 +489,10 @@ async function RestaurantShell({
   ];
 
   const desktop = desktopDownloads();
-  const clock = await clockStatus(db, ctx);
+  const [clock, supportUnread] = await Promise.all([
+    clockStatus(db, ctx),
+    unreadSupportCount(db, ctx.restaurant.id),
+  ]);
 
   return (
     <LiveProvider url={`/api/v1/realtime/restaurant/${ctx.restaurant.id}`}>
@@ -523,6 +528,11 @@ async function RestaurantShell({
               kitchen={ctx.job === "kitchen" || ctx.job === "bar"}
               sections={sectionFilterOf(ctx)}
               canAccept={can(ctx, "orders.update_status")}
+            />
+            <SupportPanel
+              restaurantId={ctx.restaurant.id}
+              initialUnread={supportUnread}
+              timeZone={ctx.restaurant.timezone}
             />
             <NotificationBell
               restaurantId={ctx.restaurant.id}

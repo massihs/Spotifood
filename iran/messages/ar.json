@@ -39,7 +39,8 @@
       "restaurants": "المطاعم",
       "account": "حسابي",
       "contact": "اتصل بنا",
-      "pricing": "الأسعار"
+      "pricing": "الأسعار",
+      "help": "المساعدة"
     },
     "badge": "المنصة الكاملة للمطاعم والمقاهي في إيران",
     "subtitle": "تجمع سبوتيفود قائمة QR على الطاولة والكاشير والمطبخ والتوصيل والحجوزات ونادي الزبائن والمخزون في منصة واحدة — دون أي تطبيق يثبّته الزبون.",
@@ -388,7 +389,9 @@
     "adminPayouts": "التحويلات",
     "accounting": "المحاسبة",
     "b2b": "مبيعات الجملة (B2B)",
-    "staff": "دوام الفريق والرواتب"
+    "staff": "دوام الفريق والرواتب",
+    "adminSupport": "الدعم",
+    "adminHelp": "مركز المساعدة"
   },
   "dashboard": {
     "welcome": "مرحبًا {name}",
@@ -2195,6 +2198,9 @@
       "station": {
         "ready": "{name} جاهز · الطلب {number} · الطاولة {table}",
         "readyRoom": "{name} جاهز · الطلب {number} · الغرفة {table}"
+      },
+      "support": {
+        "reply": "رد الدعم: {name}"
       }
     }
   },
@@ -5333,5 +5339,91 @@
       "cancelled": "Cancelled",
       "pending_payment": "Waiting"
     }
+  },
+  "support": {
+    "title": "المساعدة والدعم",
+    "subtitle": "اقرأ دليلاً أو تحدث مع فريق سبوتيفود",
+    "open": "المساعدة والدعم{count, plural, =0 {} other { (# ردود جديدة)}}",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "team": "فريق سبوتيفود",
+    "send": "إرسال",
+    "tabs": {
+      "help": "المساعدة",
+      "chats": "المحادثات"
+    },
+    "searchHelp": "اكتب سؤالك… (مثلاً طباعة QR)",
+    "noResults": "لم يُعثر على دليل. تحدث معنا.",
+    "notFound": "لم تجد الإجابة؟",
+    "notFoundHint": "يرد فريق سبوتيفود هنا مباشرة.",
+    "talkToUs": "تحدث مع الدعم",
+    "newChat": "محادثة جديدة",
+    "noChats": "لا توجد محادثات بعد.",
+    "newChatTitle": "ما سؤالك؟",
+    "newChatHint": "صف المشكلة بالتفصيل (أي صفحة، ماذا حدث). يصل الرد هنا وتنبهك الإشعارات أيضاً.",
+    "maybeThis": "قد يساعدك هذا:",
+    "questionPlaceholder": "اكتب سؤالك أو مشكلتك…",
+    "replyPlaceholder": "اكتب رسالتك…",
+    "waitingAnswer": "وصلت رسالتك. سيرد فريق سبوتيفود هنا قريباً.",
+    "stillStuck": "ما زالت المشكلة قائمة؟",
+    "status": {
+      "open": "بانتظار الرد",
+      "pending": "تم الرد",
+      "resolved": "تم الحل"
+    },
+    "errors": {
+      "generic": "لم تُرسل. حاول مجدداً.",
+      "rate_limited": "رسائل كثيرة متتالية. انتظر قليلاً."
+    },
+    "inbox": "صندوق الرسائل",
+    "inboxTitle": "الدعم",
+    "inboxSubtitle": "أسئلة المطاعم مباشرة. يظهر ردك في لوحة المطعم وإشعاراته.",
+    "counts": "{open} مفتوحة · {unread} غير مقروءة",
+    "filters": {
+      "open": "مفتوحة",
+      "pending": "بانتظار المطعم",
+      "resolved": "محلولة",
+      "all": "الكل"
+    },
+    "inboxEmpty": "لا رسائل.",
+    "pickConversation": "اختر محادثة.",
+    "resolve": "تم الحل",
+    "reopen": "إعادة فتح",
+    "history": "محادثات سابقة لهذا المطعم",
+    "teamReplyPlaceholder": "الرد على المطعم…",
+    "helpAdminTitle": "مركز المساعدة",
+    "helpAdminSubtitle": "مقالات المساعدة (تُقترح على المطاعم والزبائن قبل المحادثة) والردود الجاهزة.",
+    "articles": "المقالات",
+    "newArticle": "مقالة جديدة",
+    "editArticle": "تعديل المقالة",
+    "noArticles": "لا مقالات بهذه اللغة.",
+    "cannedTitle": "ردود جاهزة",
+    "newCanned": "رد جديد",
+    "cannedHint": "تُدرج في الرد بنقرة.",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "deleteConfirm": "حذف؟",
+    "save": "حفظ",
+    "fields": {
+      "locale": "اللغة",
+      "audience": "لـ",
+      "order": "الترتيب",
+      "slug": "العنوان (لاتيني)",
+      "title": "العنوان",
+      "body": "النص",
+      "keywords": "كلمات البحث",
+      "published": "منشور"
+    },
+    "audience": {
+      "restaurant": "المطاعم",
+      "guest": "الزبائن",
+      "all": "الجميع"
+    },
+    "helpCenter": "مركز المساعدة",
+    "helpCenterSubtitle": "إجابات الأسئلة الشائعة للزبائن والمطاعم",
+    "resultsFor": "نتائج «{q}»",
+    "forGuests": "للزبائن",
+    "forRestaurants": "للمطاعم",
+    "restaurantsChatHint": "تتحدث المطاعم مع فريق سبوتيفود من لوحة التحكم مباشرة (زر المساعدة والدعم في الأعلى)."
   }
 }

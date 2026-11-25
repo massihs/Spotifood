@@ -17,6 +17,7 @@ const EVENT_TYPES = [
   "payment.updated",
   "waiter.called",
   "game.updated",
+  "support.message",
 ] as const;
 export type LiveEventType = (typeof EVENT_TYPES)[number] | "ready";
 
