@@ -4479,7 +4479,13 @@
     "kioskCardWaiting": "Présentez votre carte sur le terminal…",
     "kioskCardFailed": "Paiement refusé ou annulé : réessayez ou payez au comptoir.",
     "kioskOrPayCounter": "Ou payez au comptoir.",
-    "kioskPaid": "Payé, merci ! Votre commande est en préparation."
+    "kioskPaid": "Payé, merci ! Votre commande est en préparation.",
+    "kioskChoose": "Sur place ou à emporter ?",
+    "kioskEatIn": "Sur place",
+    "kioskTakeAway": "À emporter",
+    "kioskCartEmpty": "Choisissez vos plats dans le menu : ils s’affichent ici.",
+    "kioskContinue": "Continuer et commander",
+    "kioskStartOver": "Recommencer"
   },
   "kpi": {
     "title": "Objectifs du jour",

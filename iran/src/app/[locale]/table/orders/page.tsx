@@ -8,7 +8,9 @@ import {
   Salad,
   Smartphone,
   Utensils,
+  XCircle,
 } from "lucide-react";
+import { Amount } from "@/components/ui/amount";
 import { Suspense } from "react";
 import { menuThemeOf } from "@/lib/menu-themes";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -111,17 +113,55 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
               <ul className="space-y-4">
                 {orders.map((o) => {
                   const stepIndex = STEPS.findIndex((s) => s.key === o.status);
+                  const done = o.status === "ready" || o.status === "served";
+                  const cancelled = o.status === "cancelled";
+                  const StatusIcon = cancelled ? XCircle : (STEPS[stepIndex]?.Icon ?? ReceiptText);
                   return (
                     <li
                       key={o.id}
                       className={cn(
-                        "rounded-2xl border bg-surface p-4 shadow-[var(--shadow-soft)]",
-                        o.status === "ready" ? "border-accent ring-4 ring-accent/15" : "border-border",
+                        "overflow-hidden rounded-3xl border bg-surface shadow-[var(--shadow-soft)]",
+                        o.status === "ready" ? "border-success ring-4 ring-success/15" : "border-border/80",
                       )}
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-lg font-semibold">
+                      {/* Where the order stands, first and big: the step's icon, its name, what happens next. */}
+                      <div
+                        className={cn(
+                          "flex items-center gap-4 px-4 py-4",
+                          cancelled ? "bg-danger-soft" : done ? "bg-success-soft" : "bg-accent-soft",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "relative grid size-14 shrink-0 place-items-center rounded-2xl text-white shadow-[var(--shadow-float-sm)]",
+                            cancelled ? "bg-danger" : done ? "bg-success" : "bg-accent",
+                          )}
+                        >
+                          {o.status === "preparing" ? (
+                            <span
+                              className="absolute inset-0 animate-ping rounded-2xl bg-accent opacity-30"
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                          <StatusIcon className="relative size-7" aria-hidden="true" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className={cn(
+                              "text-xl leading-tight font-black tracking-tight",
+                              cancelled ? "text-danger" : done ? "text-success" : "text-accent-text",
+                            )}
+                          >
+                            {t(`orderStatus.${o.status}`)}
+                          </p>
+                          <p className="mt-1 text-sm leading-6 text-fg-muted">
+                            {t(`guest.statusHint.${o.status}`)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <p className="text-base font-extrabold">
                             {t("guest.orderNumber", { number: o.number })}
                           </p>
                           <p className="text-sm text-fg-muted">
@@ -133,120 +173,101 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                             })}
                           </p>
                         </div>
-                        <span
-                          className={cn(
-                            "shrink-0 rounded-full px-3 py-1.5 text-sm font-bold",
-                            o.status === "ready" || o.status === "served"
-                              ? "bg-accent text-accent-fg"
-                              : o.status === "cancelled"
-                                ? "bg-danger-soft text-danger"
-                                : "bg-accent-soft text-accent-text",
-                          )}
-                        >
-                          {t(`orderStatus.${o.status}`)}
-                        </span>
-                      </div>
 
-                      {stepIndex >= 0 ? (
-                        <ol className="mt-5 flex items-start" aria-label={t("guest.trackTitle")}>
-                          {STEPS.map(({ key, Icon }, i) => {
-                            const done = i < stepIndex;
-                            const current = i === stepIndex;
-                            return (
-                              <li
-                                key={key}
-                                aria-current={current ? "step" : undefined}
-                                className="relative flex flex-1 flex-col items-center text-center"
-                              >
-                                {i > 0 ? (
+                        {stepIndex >= 0 ? (
+                          <ol className="mt-4 flex items-start" aria-label={t("guest.trackTitle")}>
+                            {STEPS.map(({ key, Icon }, i) => {
+                              const done = i < stepIndex;
+                              const current = i === stepIndex;
+                              return (
+                                <li
+                                  key={key}
+                                  aria-current={current ? "step" : undefined}
+                                  className="relative flex flex-1 flex-col items-center text-center"
+                                >
+                                  {i > 0 ? (
+                                    <span
+                                      aria-hidden="true"
+                                      className={cn(
+                                        "absolute end-1/2 top-[18px] h-1 w-full -translate-y-1/2 rounded-full",
+                                        i <= stepIndex ? "bg-accent" : "bg-surface-2",
+                                      )}
+                                    />
+                                  ) : null}
                                   <span
-                                    aria-hidden="true"
                                     className={cn(
-                                      "absolute end-1/2 top-[18px] h-1 w-full -translate-y-1/2 rounded-full",
-                                      i <= stepIndex ? "bg-accent" : "bg-surface-2",
+                                      "relative z-10 grid size-9 place-items-center rounded-full",
+                                      current
+                                        ? "bg-accent text-accent-fg ring-4 ring-accent/20"
+                                        : done
+                                          ? "bg-accent text-accent-fg"
+                                          : "bg-surface-2 text-fg-subtle",
                                     )}
-                                  />
-                                ) : null}
-                                <span
-                                  className={cn(
-                                    "relative z-10 grid size-9 place-items-center rounded-full",
-                                    current
-                                      ? "bg-accent text-accent-fg ring-4 ring-accent/20"
-                                      : done
-                                        ? "bg-accent text-accent-fg"
-                                        : "bg-surface-2 text-fg-subtle",
-                                  )}
-                                >
-                                  <Icon className="size-[18px]" aria-hidden="true" />
-                                </span>
-                                <span
-                                  className={cn(
-                                    "mt-1.5 text-[11px] leading-tight",
-                                    current ? "font-bold text-fg" : "text-fg-muted",
-                                  )}
-                                >
-                                  {t(`guest.stepShort.${key}`)}
-                                </span>
-                              </li>
-                            );
-                          })}
-                        </ol>
-                      ) : null}
-                      <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-sm font-medium">
-                        {t(`guest.statusHint.${o.status}`)}
-                      </p>
-                      {guest.restaurant.kind === "food_court" &&
-                      o.customerPhone &&
-                      !["ready", "served", "cancelled"].includes(o.status) ? (
-                        <p className="mt-2 flex items-center gap-2 px-1 text-xs text-fg-muted">
-                          <Smartphone className="size-3.5 shrink-0 text-accent-text" aria-hidden="true" />
-                          {t("guest.smsSent", {
-                            phone: `${o.customerPhone.slice(0, 4)}•••${o.customerPhone.slice(-3)}`,
-                          })}
-                        </p>
-                      ) : null}
-
-                      <ul className="mt-4 space-y-2.5 text-[15px]">
-                        {o.items.map((i) => (
-                          <li key={i.id} className="flex justify-between gap-3">
-                            <span className="flex gap-2">
-                              <span className="grid h-6 min-w-6 place-items-center rounded-md bg-surface-2 px-1 text-xs font-bold tabular-nums">
-                                {i.quantity}
-                              </span>
-                              <span>
-                                <span className="font-medium">{i.productName}</span>
-                                {i.options.length ? (
-                                  <span className="block text-sm text-fg-muted">
-                                    {i.options.map((x) => x.valueName).join("، ")}
+                                  >
+                                    <Icon className="size-[18px]" aria-hidden="true" />
                                   </span>
-                                ) : null}
-                                {i.note ? (
-                                  <span className="block text-xs text-fg-subtle">« {i.note} »</span>
-                                ) : null}
+                                  <span
+                                    className={cn(
+                                      "mt-1.5 text-[11px] leading-tight",
+                                      current ? "font-bold text-fg" : "text-fg-muted",
+                                    )}
+                                  >
+                                    {t(`guest.stepShort.${key}`)}
+                                  </span>
+                                </li>
+                              );
+                            })}
+                          </ol>
+                        ) : null}
+                        {guest.restaurant.kind === "food_court" &&
+                        o.customerPhone &&
+                        !["ready", "served", "cancelled"].includes(o.status) ? (
+                          <p className="mt-2 flex items-center gap-2 px-1 text-xs text-fg-muted">
+                            <Smartphone className="size-3.5 shrink-0 text-accent-text" aria-hidden="true" />
+                            {t("guest.smsSent", {
+                              phone: `${o.customerPhone.slice(0, 4)}•••${o.customerPhone.slice(-3)}`,
+                            })}
+                          </p>
+                        ) : null}
+
+                        <ul className="mt-4 space-y-2.5 text-[15px]">
+                          {o.items.map((i) => (
+                            <li key={i.id} className="flex justify-between gap-3">
+                              <span className="flex gap-2">
+                                <span className="grid h-6 min-w-6 place-items-center rounded-md bg-surface-2 px-1 text-xs font-bold tabular-nums">
+                                  {i.quantity}
+                                </span>
+                                <span>
+                                  <span className="font-medium">{i.productName}</span>
+                                  {i.options.length ? (
+                                    <span className="block text-sm text-fg-muted">
+                                      {i.options.map((x) => x.valueName).join("، ")}
+                                    </span>
+                                  ) : null}
+                                  {i.note ? (
+                                    <span className="block text-xs text-fg-subtle">« {i.note} »</span>
+                                  ) : null}
+                                </span>
                               </span>
-                            </span>
-                            <span className="shrink-0 tabular-nums">{money(i.lineTotalCents)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <p className="mt-4 flex items-center justify-between border-t border-border pt-3 font-semibold">
-                        <span className="flex items-center gap-2">
-                          {t("guest.total")}
-                          {o.paymentStatus !== "unpaid" && o.status !== "cancelled" ? (
-                            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text">
-                              {t(`paymentStatus.${o.paymentStatus}`)}
-                            </span>
-                          ) : null}
-                        </span>
-                        <span
-                          className={cn(
-                            "tabular-nums",
-                            o.status === "cancelled" && "line-through opacity-60",
-                          )}
-                        >
-                          {money(o.totalCents)}
-                        </span>
-                      </p>
+                              <Amount text={money(i.lineTotalCents)} className="shrink-0 font-semibold" />
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="mt-4 flex items-center justify-between border-t border-border pt-3 font-extrabold">
+                          <span className="flex items-center gap-2">
+                            {t("guest.total")}
+                            {o.paymentStatus !== "unpaid" && o.status !== "cancelled" ? (
+                              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text">
+                                {t(`paymentStatus.${o.paymentStatus}`)}
+                              </span>
+                            ) : null}
+                          </span>
+                          <Amount
+                            text={money(o.totalCents)}
+                            className={cn("text-lg", o.status === "cancelled" && "line-through opacity-60")}
+                          />
+                        </p>
+                      </div>
                     </li>
                   );
                 })}
@@ -256,9 +277,9 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
             {orders.length > 0 ? (
               // Desktop: the bill and payment stay in view beside the orders.
               <aside className="lg:sticky lg:top-24 lg:col-start-2">
-                <div className="mt-4 flex items-center justify-between rounded-2xl bg-surface-2 px-5 py-4 lg:mt-0">
-                  <span className="font-semibold">{t("guest.yourTotal")}</span>
-                  <span className="text-lg font-semibold tabular-nums">{money(total)}</span>
+                <div className="mt-4 flex items-center justify-between rounded-3xl bg-ink px-5 py-5 text-ink-fg shadow-[var(--shadow-float-sm)] lg:mt-0">
+                  <span className="font-bold opacity-85">{t("guest.yourTotal")}</span>
+                  <Amount text={money(total)} className="text-2xl font-black" />
                 </div>
                 <PaymentPanel
                   state={payState}
@@ -284,7 +305,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                 <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl border-t border-border bg-bg/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:static lg:mt-4 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
                   <Link
                     href="/table"
-                    className="flex h-14 items-center justify-center gap-2 rounded-full bg-surface-2 text-base font-bold active:bg-surface-3 lg:border lg:border-border lg:bg-surface lg:hover:bg-surface-2"
+                    className="flex h-14 items-center justify-center gap-2 rounded-full bg-accent text-base font-bold text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.22),var(--shadow-accent)] transition-transform active:scale-[0.98]"
                   >
                     <Plus className="size-5" strokeWidth={2.5} aria-hidden="true" />
                     {t("guest.orderMore")}

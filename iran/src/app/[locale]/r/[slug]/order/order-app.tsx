@@ -3,7 +3,7 @@
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
-import { Bike, Minus, Pause, Plus, Store, UtensilsCrossed } from "lucide-react";
+import { Bike, Minus, Pause, Plus, Store } from "lucide-react";
 import { DinerLogin } from "@/components/account/diner-login";
 import { CartBar } from "@/components/guest/cart-bar";
 import { MenuBrowser } from "@/components/guest/menu-browser";
@@ -11,6 +11,7 @@ import { canQuickAdd, initialSelection } from "@/components/guest/parts";
 import { ProductSheet } from "@/components/guest/product-sheet";
 import { Toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
+import { Amount } from "@/components/ui/amount";
 import { useMoney } from "@/components/ui/use-money";
 import { getPathname } from "@/i18n/navigation";
 import { forChannel } from "@/lib/channel-price";
@@ -26,6 +27,17 @@ import {
   placeOnlineOrderAction,
 } from "./actions";
 import { terminalBridge, useCardTerminal } from "@/lib/card-terminal";
+import {
+  KioskCart,
+  KioskDone,
+  KioskPayCard,
+  KioskTopBar,
+  KioskWelcome,
+  type KioskBrand,
+} from "./kiosk-parts";
+
+/** A kiosk left untouched this long goes back to its welcome screen, cart emptied. */
+const KIOSK_IDLE_MS = 120_000;
 
 type Channel = "dine_in" | "takeaway" | "delivery";
 type Line = { key: string; productId: string; optionValueIds: string[]; quantity: number; note: string };
@@ -46,6 +58,7 @@ export function OrderApp({
   hasPhone,
   defaultName,
   kioskToken,
+  kioskBrand,
   paymentProvider = null,
   payOnSite = true,
   popularIds = [],
@@ -69,6 +82,8 @@ export function OrderApp({
   payOnSite?: boolean;
   /** Kiosk mode: eat in / take away, no sign-in, the order number shown big, then a new customer. */
   kioskToken?: string;
+  /** Kiosk: the restaurant's name and logo for its welcome screen and top bar. */
+  kioskBrand?: KioskBrand;
   slug: string;
   menu: PublicMenu;
   currency: string;
@@ -171,25 +186,45 @@ export function OrderApp({
       localStorage.setItem(storageKey(slug), JSON.stringify(lines));
     } catch {}
   }, [slug, lines, kiosk]);
-  // Kiosk: the number stays on screen, then the tablet is ready for the next customer.
+  // Kiosk: welcome screen first; back to it for the next customer, everything cleared.
+  const [started, setStarted] = useState(false);
+  const resetKiosk = useCallback(() => {
+    setLines([]);
+    setPlaced(null);
+    setKioskPay(null);
+    setCheckout(false);
+    setOpen(null);
+    setName("");
+    setPhone("");
+    setNote("");
+    setCoupon("");
+    setError(null);
+    setStarted(false);
+    window.scrollTo({ top: 0 });
+  }, []);
+  // The number stays on screen, then the tablet is ready for the next customer.
   const payState = kioskPay?.state;
   useEffect(() => {
     // Never while the terminal waits for the card; a little longer when the guest may pay by card.
     if (!placed || payState === "waiting") return;
-    const id = setTimeout(
-      () => {
-        setPlaced(null);
-        setKioskPay(null);
-        setCheckout(false);
-        setName("");
-        setPhone("");
-        setNote("");
-        setCoupon("");
-      },
-      payState === "idle" ? 45_000 : 15_000,
-    );
+    const id = setTimeout(resetKiosk, payState === "idle" ? 45_000 : 15_000);
     return () => clearTimeout(id);
-  }, [placed, payState]);
+  }, [placed, payState, resetKiosk]);
+  // A customer who walks away: after two quiet minutes the next one starts from the welcome screen.
+  useEffect(() => {
+    if (!kiosk || !started || placed) return;
+    let id = setTimeout(resetKiosk, KIOSK_IDLE_MS);
+    const touch = () => {
+      clearTimeout(id);
+      id = setTimeout(resetKiosk, KIOSK_IDLE_MS);
+    };
+    const events = ["pointerdown", "keydown", "scroll", "touchmove"] as const;
+    for (const e of events) window.addEventListener(e, touch, { passive: true });
+    return () => {
+      clearTimeout(id);
+      for (const e of events) window.removeEventListener(e, touch);
+    };
+  }, [kiosk, started, placed, resetKiosk]);
 
   const productFor = (id: string): PublicProduct | undefined => {
     const p = menu.products[id];
@@ -348,17 +383,13 @@ export function OrderApp({
           })}
         </p>
       ) : null}
-      {kiosk || (takeaway && delivery) ? (
+      {kiosk ? null : takeaway && delivery ? (
         <div className="mx-4 mt-4 grid grid-cols-2 gap-1 rounded-2xl bg-surface-2 p-1" role="tablist">
-          {(kiosk
-            ? ([
-                ["dine_in", UtensilsCrossed, t("dineIn")],
-                ["takeaway", Store, t("takeaway")],
-              ] as const)
-            : ([
-                ["takeaway", Store, t("takeaway")],
-                ["delivery", Bike, t("delivery")],
-              ] as const)
+          {(
+            [
+              ["takeaway", Store, t("takeaway")],
+              ["delivery", Bike, t("delivery")],
+            ] as const
           ).map(([id, Icon, label]) => (
             <button
               key={id}
@@ -382,18 +413,66 @@ export function OrderApp({
         </p>
       )}
 
-      <MenuBrowser
-        menu={channelMenu}
-        money={listMoney}
-        shortPrices={short}
-        popular={popular}
-        counts={counts}
-        theme={theme}
-        defaultView={kiosk ? "grid" : "list"}
-        onOpen={setOpen}
-        onAdd={quickAdd}
-        onRemove={removeOne}
-      />
+      {kiosk ? (
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_26rem]">
+          <div className="min-w-0">
+            {kioskBrand ? (
+              <KioskTopBar
+                brand={kioskBrand}
+                channel={channel === "takeaway" ? "takeaway" : "dine_in"}
+                onChannel={setChannel}
+              />
+            ) : null}
+            <MenuBrowser
+              menu={channelMenu}
+              money={listMoney}
+              shortPrices={short}
+              popular={popular}
+              counts={counts}
+              theme={theme}
+              defaultView={kiosk ? "grid" : "list"}
+              onOpen={setOpen}
+              onAdd={quickAdd}
+              onRemove={removeOne}
+            />
+          </div>
+          <KioskCart
+            className="hidden lg:flex"
+            lines={priced}
+            money={money}
+            total={subtotal}
+            count={count}
+            channel={channel === "takeaway" ? "takeaway" : "dine_in"}
+            onChannel={setChannel}
+            onQty={setQty}
+            onCheckout={() => setCheckout(true)}
+            onStartOver={resetKiosk}
+          />
+        </div>
+      ) : (
+        <MenuBrowser
+          menu={channelMenu}
+          money={listMoney}
+          shortPrices={short}
+          popular={popular}
+          counts={counts}
+          theme={theme}
+          defaultView={kiosk ? "grid" : "list"}
+          onOpen={setOpen}
+          onAdd={quickAdd}
+          onRemove={removeOne}
+        />
+      )}
+
+      {kiosk && kioskBrand && !started && !placed ? (
+        <KioskWelcome
+          brand={kioskBrand}
+          onStart={(c) => {
+            setChannel(c);
+            setStarted(true);
+          }}
+        />
+      ) : null}
 
       {opened ? (
         <ProductSheet
@@ -418,6 +497,7 @@ export function OrderApp({
           total={money(subtotal)}
           label={te("guest.viewCart")}
           onClick={() => setCheckout(true)}
+          className={kiosk ? "lg:hidden" : undefined}
         />
       ) : null}
       <Toast
@@ -429,14 +509,17 @@ export function OrderApp({
 
       {checkout ? (
         <div
-          className="fixed inset-0 z-40 flex items-end justify-center bg-black/40"
+          className="fixed inset-0 z-40 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center sm:p-6"
           onClick={() => setCheckout(false)}
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-label={t("checkout")}
-            className="max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-t-3xl bg-bg p-5"
+            className={cn(
+              "animate-sheet-up max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-t-[1.75rem] bg-bg p-5 shadow-[var(--shadow-float)] sm:rounded-[1.75rem] sm:p-6",
+              kiosk && "max-w-2xl [&_input]:h-14 [&_input]:text-base",
+            )}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -558,9 +641,11 @@ export function OrderApp({
                       <dd className="tabular-nums">{money(fee)}</dd>
                     </div>
                   ) : null}
-                  <div className="flex justify-between text-base font-bold">
+                  <div className="flex items-baseline justify-between text-base font-extrabold">
                     <dt>{t("total")}</dt>
-                    <dd className="tabular-nums">{money(subtotal + fee)}</dd>
+                    <dd>
+                      <Amount text={money(subtotal + fee)} className="text-xl" />
+                    </dd>
                   </div>
                   {!canPayOnline ? (
                     <p className="pt-1 text-xs text-fg-muted">
@@ -644,50 +729,28 @@ export function OrderApp({
       ) : null}
 
       {placed ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-bg p-6 text-center" role="status">
-          <div>
-            <p className="text-lg text-fg-muted">{t("kioskThanks")}</p>
-            <p className="mt-4 text-8xl font-black tabular-nums" dir="ltr">
-              {placed}
-            </p>
-            {terminal && kioskPay && kioskPay.totalCents > 0 && kioskPay.state !== "paid" ? (
-              <div className="mx-auto mt-6 max-w-sm space-y-3">
-                <p className="text-2xl font-bold tabular-nums">{money(kioskPay.totalCents)}</p>
-                <Button
-                  size="lg"
-                  className="w-full"
-                  disabled={kioskPay.state === "waiting"}
-                  onClick={payOnTerminal}
-                >
-                  {kioskPay.state === "waiting" ? t("kioskCardWaiting") : t("kioskPayCard")}
-                </Button>
-                {kioskPay.state === "failed" ? (
-                  <p className="text-sm text-danger">{t("kioskCardFailed")}</p>
-                ) : null}
-                <p className="text-sm text-fg-muted">{t("kioskOrPayCounter")}</p>
-              </div>
+        <KioskDone
+          number={placed}
+          onNext={resetKiosk}
+          hint={
+            (terminal && kioskPay && kioskPay.totalCents > 0) || kioskPay?.state === "paid"
+              ? undefined
+              : t("kioskHint")
+          }
+          payment={
+            terminal && kioskPay && kioskPay.totalCents > 0 && kioskPay.state !== "paid" ? (
+              <KioskPayCard
+                amount={money(kioskPay.totalCents)}
+                state={kioskPay.state}
+                onPay={payOnTerminal}
+              />
             ) : kioskPay?.state === "paid" ? (
-              <p className="mt-6 text-lg font-semibold text-success">{t("kioskPaid")}</p>
-            ) : (
-              <p className="mt-6 max-w-sm text-base text-fg-muted">{t("kioskHint")}</p>
-            )}
-            <Button
-              size="lg"
-              className="mt-8"
-              onClick={() => {
-                setPlaced(null);
-                setKioskPay(null);
-                setCheckout(false);
-                setName("");
-                setPhone("");
-                setNote("");
-                setCoupon("");
-              }}
-            >
-              {t("kioskNext")}
-            </Button>
-          </div>
-        </div>
+              <p className="rounded-2xl bg-white/15 px-5 py-4 text-lg font-bold backdrop-blur">
+                {t("kioskPaid")}
+              </p>
+            ) : null
+          }
+        />
       ) : null}
     </div>
   );

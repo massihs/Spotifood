@@ -1,6 +1,7 @@
 "use client";
 
 import { formatMoney } from "@/lib/money";
+import { Amount } from "@/components/ui/amount";
 import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
@@ -228,7 +229,7 @@ export function OrderCard({
   return (
     <Card
       className={cn(
-        "flex flex-col overflow-hidden transition-opacity",
+        "flex flex-col overflow-hidden rounded-3xl transition-[opacity,box-shadow] hover:shadow-[var(--shadow-float-sm)]",
         isNew && "border-accent ring-4 ring-accent/15",
         pending && "opacity-60",
       )}
@@ -246,7 +247,7 @@ export function OrderCard({
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={cn(
-              "grid shrink-0 place-items-center overflow-hidden rounded-xl bg-accent-soft px-1 font-bold text-accent-text tabular-nums",
+              "grid shrink-0 place-items-center overflow-hidden rounded-2xl bg-accent-soft px-1 font-black text-accent-text tabular-nums ring-1 ring-accent/10",
               kitchen ? "size-14" : "size-12",
               (o.tableLabel?.length ?? 0) > 3
                 ? "text-[10px] leading-tight break-all"
@@ -259,7 +260,7 @@ export function OrderCard({
             {o.tableLabel ?? "—"}
           </span>
           <div className="min-w-0">
-            <p className="text-lg leading-tight font-bold whitespace-nowrap tabular-nums">
+            <p className="text-lg leading-tight font-black tracking-tight whitespace-nowrap tabular-nums">
               <bdi dir="ltr">#{o.number}</bdi>
             </p>
             <p className="truncate text-xs text-fg-muted">
@@ -371,32 +372,37 @@ export function OrderCard({
         </p>
       ) : null}
       {!kitchen ? (
+        // The bill on one line: the total, then "collect" for an unpaid order (or its paid state).
         <div className="mt-auto flex items-center justify-between gap-2 px-4 pt-3">
-          <p className="font-bold tabular-nums">{formatMoney(o.totalCents, o.currency, locale)}</p>
-          <span
-            className={cn(
-              "rounded-full px-2.5 py-0.5 text-xs font-bold",
-              paid ? "bg-success-soft text-success" : "bg-surface-2 text-fg-muted",
-            )}
-          >
-            {paid ? t("orders.paid") : t("orders.unpaid")}
-          </span>
-        </div>
-      ) : null}
-      {!kitchen && !paid && o.status !== "cancelled" && collectMethods?.length && o.totalCents > 0 ? (
-        <div className="px-4 pt-3">
-          <CollectPaymentDialog
-            restaurantId={restaurantId}
-            tableSessionId={null}
-            participantId={null}
-            orderId={o.id}
-            amountCents={o.totalCents}
-            currency={o.currency}
-            methods={collectMethods}
-            title={t("payments.collectOrder", { number: o.number })}
-            variant="secondary"
-            size="md"
-          />
+          <div className="flex min-w-0 items-baseline gap-2">
+            <Amount
+              text={formatMoney(o.totalCents, o.currency, locale)}
+              className="text-lg font-black tracking-tight"
+            />
+          </div>
+          {!paid && o.status !== "cancelled" && collectMethods?.length && o.totalCents > 0 ? (
+            <CollectPaymentDialog
+              restaurantId={restaurantId}
+              tableSessionId={null}
+              participantId={null}
+              orderId={o.id}
+              amountCents={o.totalCents}
+              currency={o.currency}
+              methods={collectMethods}
+              title={t("payments.collectOrder", { number: o.number })}
+              variant="secondary"
+              size="sm"
+            />
+          ) : (
+            <span
+              className={cn(
+                "shrink-0 rounded-full px-2.5 py-1 text-xs font-bold",
+                paid ? "bg-success-soft text-success" : "bg-surface-2 text-fg-muted",
+              )}
+            >
+              {paid ? t("orders.paid") : t("orders.unpaid")}
+            </span>
+          )}
         </div>
       ) : null}
       <div className={cn("flex gap-2 p-4 pt-3", kitchen && "mt-auto")}>

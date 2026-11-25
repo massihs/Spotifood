@@ -4471,7 +4471,13 @@
     "kioskCardWaiting": "Present your card on the terminal…",
     "kioskCardFailed": "Payment declined or cancelled: try again or pay at the counter.",
     "kioskOrPayCounter": "Or pay at the counter.",
-    "kioskPaid": "Paid, thank you! Your order is being prepared."
+    "kioskPaid": "Paid, thank you! Your order is being prepared.",
+    "kioskChoose": "هنا أم سفري؟",
+    "kioskEatIn": "تناول هنا",
+    "kioskTakeAway": "سفري",
+    "kioskCartEmpty": "اختر أطباقك من القائمة: ستظهر هنا.",
+    "kioskContinue": "متابعة وتأكيد الطلب",
+    "kioskStartOver": "البدء من جديد"
   },
   "kpi": {
     "title": "أهداف اليوم",

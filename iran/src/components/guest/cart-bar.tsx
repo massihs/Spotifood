@@ -14,7 +14,9 @@ export function CartBar({
   label,
   href,
   onClick,
+  className: wrapperClass,
 }: {
+  className?: string;
   count: number;
   total: string;
   label: string;
@@ -37,7 +39,12 @@ export function CartBar({
     "animate-pop-in flex h-14 w-full items-center gap-3 rounded-full bg-accent ps-2 pe-5 font-semibold text-accent-fg shadow-[var(--shadow-float)] transition-transform active:scale-[0.98] atelier:rounded-2xl",
   );
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-30 mx-auto max-w-2xl px-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
+        wrapperClass,
+      )}
+    >
       {href ? (
         <Link key={count} href={href} className={className}>
           {body}

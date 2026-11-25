@@ -4471,7 +4471,13 @@
     "kioskCardWaiting": "Present your card on the terminal…",
     "kioskCardFailed": "Payment declined or cancelled: try again or pay at the counter.",
     "kioskOrPayCounter": "Or pay at the counter.",
-    "kioskPaid": "Paid, thank you! Your order is being prepared."
+    "kioskPaid": "Paid, thank you! Your order is being prepared.",
+    "kioskChoose": "Eat in or take away?",
+    "kioskEatIn": "Eat in",
+    "kioskTakeAway": "Take away",
+    "kioskCartEmpty": "Pick your dishes from the menu: they show up here.",
+    "kioskContinue": "Continue to order",
+    "kioskStartOver": "Start over"
   },
   "kpi": {
     "title": "Today’s targets",
