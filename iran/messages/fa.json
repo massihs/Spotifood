@@ -2027,7 +2027,8 @@
       "accepted": "پذیرفته",
       "preparing": "در حال آماده‌سازی",
       "ready": "آماده",
-      "served": "سرو شده (۳۰ دقیقه)"
+      "served": "سرو شده (۳۰ دقیقه)",
+      "queue": "در صف"
     },
     "soundOn": "صدا روشن",
     "soundOff": "فعال‌سازی صدا",
@@ -2096,7 +2097,17 @@
     "stationNext": {
       "preparing": "شروع · {station}",
       "ready": "{station} آماده شد"
-    }
+    },
+    "focusOn": "حالت آشپزخانه",
+    "focusOff": "حالت عادی",
+    "summary": "خلاصه",
+    "toCook": "برای پخت",
+    "toCookEmpty": "چیزی در صف پخت نیست",
+    "textBigger": "متن بزرگ‌تر",
+    "textSmaller": "متن کوچک‌تر",
+    "undo": "برگرداندن",
+    "movedTo": "← {status}",
+    "tickHint": "با زدن روی هر غذا، آن را تیک بزنید"
   },
   "floor": {
     "title": "سالن",
@@ -2384,7 +2395,9 @@
     },
     "kitchenTitle": "سفارش {number} برای آماده‌سازی",
     "bodyRoom": "اتاق {table}",
-    "roomOrder": "سرویس اتاق"
+    "roomOrder": "سرویس اتاق",
+    "accept": "پذیرش",
+    "accepted": "پذیرفته شد"
   },
   "music": {
     "title": "موسیقی",

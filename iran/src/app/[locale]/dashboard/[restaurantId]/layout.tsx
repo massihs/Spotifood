@@ -522,6 +522,7 @@ async function RestaurantShell({
               newOrders={newOrders}
               kitchen={ctx.job === "kitchen" || ctx.job === "bar"}
               sections={sectionFilterOf(ctx)}
+              canAccept={can(ctx, "orders.update_status")}
             />
             <NotificationBell
               restaurantId={ctx.restaurant.id}

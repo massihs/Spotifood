@@ -1,9 +1,10 @@
 "use client";
 
-import { BellOff, BellRing, X } from "lucide-react";
+import { BellOff, BellRing, Check, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { updateOrderStatusAction } from "@/app/[locale]/dashboard/[restaurantId]/orders/actions";
 import { useLiveEvent } from "@/components/realtime/live";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
@@ -51,7 +52,18 @@ export function chime(ctx: AudioContext) {
   });
 }
 
-type Alert = { id: string; title: string; body: string; href: string; waiter?: boolean };
+type Alert = {
+  id: string;
+  title: string;
+  body: string;
+  href: string;
+  waiter?: boolean;
+  /** A new guest order: accepted straight from the alert, which stays until someone does. */
+  orderId?: string;
+};
+
+/** While orders wait for acceptance, the chime comes back this often (nobody misses one). */
+const REMIND_MS = 60_000;
 
 /**
  * Team-wide new-order alerts on every dashboard page: a sound, a card linking to the orders,
@@ -62,7 +74,10 @@ export function OrderAlerts({
   newOrders,
   kitchen = false,
   sections = null,
+  canAccept = false,
 }: {
+  /** The member can accept orders: new-order alerts get an "Accept" button. */
+  canAccept?: boolean;
   restaurantId: string;
   newOrders: number;
   /** The member's team sections: alerts meant for other sections stay silent (null = all). */
@@ -103,9 +118,37 @@ export function OrderAlerts({
   }, [router]);
 
   const dismiss = useCallback((id: string) => setAlerts((a) => a.filter((x) => x.id !== id)), []);
+  const [accepting, startAccept] = useTransition();
+  const [acceptedId, setAcceptedId] = useState<string | null>(null);
+  const accept = (a: Alert) =>
+    startAccept(async () => {
+      const res = await updateOrderStatusAction(restaurantId, a.orderId!, "accepted");
+      // Accepted here, or already handled elsewhere (another screen, the kitchen): either way done.
+      if (res?.ok || res?.error === "status_changed" || res?.error === "invalid_transition") {
+        setAcceptedId(a.id);
+        setTimeout(() => {
+          setAcceptedId(null);
+          dismiss(a.id);
+        }, 1200);
+        refreshSoon();
+      }
+    });
+
+  // Orders still waiting: the chime again every minute, on the screens that accept them.
+  useEffect(() => {
+    if (kitchen || !enabled || newOrders <= 0) return;
+    const id = setInterval(() => {
+      if (audio.current) chime(audio.current);
+    }, REMIND_MS);
+    return () => clearInterval(id);
+  }, [kitchen, enabled, newOrders]);
 
   useLiveEvent((type, data) => {
-    if (type === "order.updated") return refreshSoon();
+    if (type === "order.updated") {
+      // Accepted or moved on elsewhere: its alert has nothing left to ask.
+      if (data.orderId && data.status && data.status !== "received") dismiss(String(data.orderId));
+      return refreshSoon();
+    }
     let alert: Alert;
     const room = data.place === "room";
     const target = data.sections;
@@ -164,6 +207,7 @@ export function OrderAlerts({
       if (data.source === "pos") return; // rung up by the team itself
       alert = {
         id: String(data.orderId ?? Date.now()),
+        orderId: canAccept && data.orderId ? String(data.orderId) : undefined,
         title: t("title", { number: String(data.number ?? "") }),
         body: room
           ? `${t("roomOrder")} · ${t("bodyRoom", { table: String(data.tableLabel ?? "") })}`
@@ -172,7 +216,8 @@ export function OrderAlerts({
       };
     }
     setAlerts((a) => [alert, ...a.filter((x) => x.id !== alert.id)].slice(0, 3));
-    setTimeout(() => dismiss(alert.id), 8000);
+    // New orders to accept stay on screen until handled; the others go away on their own.
+    if (!alert.orderId) setTimeout(() => dismiss(alert.id), 8000);
     if (!enabled) return;
     if (audio.current) chime(audio.current);
     navigator.vibrate?.([120, 60, 120]);
@@ -219,7 +264,7 @@ export function OrderAlerts({
 
       <div
         aria-live="assertive"
-        className="pointer-events-none fixed inset-x-0 top-3 z-[60] mx-auto flex max-w-sm flex-col gap-2 px-4"
+        className="pointer-events-none fixed inset-x-0 top-3 z-[60] mx-auto flex max-w-md flex-col gap-2 px-4"
       >
         {alerts.map((a) => (
           <div
@@ -235,6 +280,22 @@ export function OrderAlerts({
               <p className="truncate font-bold">{a.title}</p>
               <p className="truncate text-sm text-fg-muted">{a.body}</p>
             </Link>
+            {a.orderId ? (
+              <button
+                type="button"
+                disabled={accepting || acceptedId === a.id}
+                onClick={() => accept(a)}
+                className={cn(
+                  "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-bold transition-colors disabled:opacity-80",
+                  acceptedId === a.id
+                    ? "bg-success text-white"
+                    : "bg-accent text-accent-fg hover:bg-accent-hover",
+                )}
+              >
+                <Check className="size-4" strokeWidth={3} aria-hidden="true" />
+                {acceptedId === a.id ? t("accepted") : t("accept")}
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() => dismiss(a.id)}

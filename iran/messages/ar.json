@@ -2027,7 +2027,8 @@
       "accepted": "مقبولة",
       "preparing": "قيد التحضير",
       "ready": "جاهزة",
-      "served": "مقدَّمة (30 دقيقة)"
+      "served": "مقدَّمة (30 دقيقة)",
+      "queue": "بالانتظار"
     },
     "soundOn": "الصوت مفعّل",
     "soundOff": "تفعيل الصوت",
@@ -2096,7 +2097,17 @@
     "stationNext": {
       "preparing": "ابدأ · {station}",
       "ready": "{station} جاهز"
-    }
+    },
+    "focusOn": "وضع المطبخ",
+    "focusOff": "الوضع العادي",
+    "summary": "ملخص",
+    "toCook": "للتحضير",
+    "toCookEmpty": "لا شيء للتحضير",
+    "textBigger": "نص أكبر",
+    "textSmaller": "نص أصغر",
+    "undo": "تراجع",
+    "movedTo": "← {status}",
+    "tickHint": "اضغط على الطبق لتأشيره"
   },
   "floor": {
     "title": "الصالة",
@@ -2384,7 +2395,9 @@
     },
     "kitchenTitle": "الطلب {number} للتحضير",
     "bodyRoom": "الغرفة {table}",
-    "roomOrder": "خدمة الغرف"
+    "roomOrder": "خدمة الغرف",
+    "accept": "قبول",
+    "accepted": "تم القبول"
   },
   "music": {
     "title": "الموسيقى",

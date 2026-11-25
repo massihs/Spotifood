@@ -5,8 +5,9 @@ import { Amount } from "@/components/ui/amount";
 import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
-import { ArrowRight, Ban, Clock, MessageSquareText, Phone, Timer, X } from "lucide-react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { ArrowRight, Ban, Check, Clock, MessageSquareText, Phone, Timer, Undo2, X } from "lucide-react";
+import { useTicks } from "@/lib/kds-ticks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CollectPaymentDialog } from "@/components/dashboard/payment-dialogs";
@@ -30,6 +31,8 @@ export type OrderCardData = {
   currency: string;
   note: string | null;
   placedAt: Date;
+  /** When the till sent it to the kitchen (a fresh ticket is lit up for a minute and a half). */
+  acceptedAt?: Date | null;
   /** When it was ready / served: the kitchen time is frozen at that moment. */
   readyAt?: Date | null;
   servedAt?: Date | null;
@@ -65,6 +68,9 @@ const TONE: Record<OrderStatus, { dot: string; chip: string }> = {
   served: { dot: "bg-fg-subtle", chip: "bg-surface-2 text-fg-muted" },
   cancelled: { dot: "bg-danger", chip: "bg-danger-soft text-danger" },
 };
+
+/** How long a kitchen tap can be undone before it is sent. */
+const UNDO_MS = 5000;
 
 export function OrderCard({
   restaurantId,
@@ -127,6 +133,39 @@ export function OrderCard({
       } else setError(null);
     });
 
+  /**
+   * The kitchen screen moves an order after a short grace period: a mistaken tap is undone with
+   * one more tap, before anything reaches the other screens. If the card goes away meanwhile (the
+   * board refreshed), the move is sent at once rather than lost.
+   */
+  const [queued, setQueued] = useState<{ to: OrderStatus; run: () => void } | null>(null);
+  const queuedRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    if (!queued) return;
+    queuedRef.current = queued.run;
+    const id = setTimeout(() => {
+      queuedRef.current = null;
+      queued.run();
+      setQueued(null);
+    }, UNDO_MS);
+    return () => clearTimeout(id);
+  }, [queued]);
+  useEffect(
+    () => () => {
+      queuedRef.current?.();
+    },
+    [],
+  );
+  const later = (to: OrderStatus, run: () => void) => {
+    if (!compact) return run();
+    navigator.vibrate?.(15);
+    setQueued({ to, run });
+  };
+  const undo = () => {
+    queuedRef.current = null;
+    setQueued(null);
+  };
+
   const block = () => {
     if (!window.confirm(t("orders.blockConfirm", { number: o.number }))) return;
     const reason = window.prompt(t("orders.blockReason")) ?? "";
@@ -157,6 +196,10 @@ export function OrderCard({
   const paid = o.paymentStatus === "paid";
   // The kitchen reads the card from a distance and does not care about money.
   const kitchen = compact;
+  const { ticked, toggle } = useTicks();
+  // Just reached this screen: lit up for a minute and a half so nobody misses it.
+  const arrived = new Date(o.acceptedAt ?? o.placedAt).getTime();
+  const fresh = kitchen && active && now - arrived < 90_000;
   const clock = (() => {
     const total = Math.floor(elapsed / 1000);
     const h = Math.floor(total / 3600);
@@ -230,7 +273,8 @@ export function OrderCard({
     <Card
       className={cn(
         "flex flex-col overflow-hidden rounded-3xl transition-[opacity,box-shadow] hover:shadow-[var(--shadow-float-sm)]",
-        isNew && "border-accent ring-4 ring-accent/15",
+        (isNew || fresh) && "border-accent ring-4 ring-accent/15",
+        fresh && "animate-pop-in",
         pending && "opacity-60",
       )}
     >
@@ -283,7 +327,7 @@ export function OrderCard({
               {t(`orderStatus.${o.status}`)}
             </span>
           )}
-          {isNew ? (
+          {isNew || fresh ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-danger px-2.5 py-0.5 text-[11px] font-bold text-white">
               <span className="size-1.5 animate-ping rounded-full bg-white" aria-hidden="true" />
               {t("orders.new")}
@@ -319,37 +363,62 @@ export function OrderCard({
           kitchen ? "text-base" : "text-sm",
         )}
       >
-        {o.items.map((i) => (
-          <li key={i.id} className={cn("flex gap-3 px-3", kitchen ? "py-3" : "py-2.5")}>
-            <span
-              className={cn(
-                "grid shrink-0 place-items-center rounded-lg bg-surface px-1 font-black tabular-nums shadow-[var(--shadow-soft)]",
-                kitchen ? "h-8 min-w-8 text-base" : "h-6 min-w-6 text-xs",
-                i.quantity > 1 && "bg-fg text-bg",
-              )}
-            >
-              {i.quantity}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className={kitchen ? "font-bold" : "font-semibold"}>{i.productName}</span>
-              {i.options.length ? (
-                <span className={cn("block text-fg-muted", kitchen ? "text-sm" : "text-xs")}>
-                  {i.options.map((x) => x.valueName).join(" · ")}
-                </span>
-              ) : null}
-              {i.note ? (
+        {o.items.map((i) => {
+          // The kitchen ticks each dish off as it is plated (a tap on the line).
+          const done = kitchen && (ticked.has(i.id) || Boolean(i.readyAt));
+          const Line = kitchen ? "button" : "div";
+          return (
+            <li key={i.id}>
+              <Line
+                {...(kitchen
+                  ? {
+                      type: "button" as const,
+                      "aria-pressed": done,
+                      title: t("kitchen.tickHint"),
+                      onClick: () => !i.readyAt && toggle(i.id),
+                    }
+                  : {})}
+                className={cn(
+                  "flex w-full gap-3 px-3 text-start",
+                  kitchen ? "py-3 transition-opacity active:bg-surface/60" : "py-2.5",
+                  done && "opacity-45",
+                )}
+              >
                 <span
                   className={cn(
-                    "mt-1 block w-fit rounded-md bg-warning-soft px-1.5 font-bold text-warning",
-                    kitchen ? "text-sm" : "text-xs",
+                    "grid shrink-0 place-items-center rounded-lg bg-surface px-1 font-black tabular-nums shadow-[var(--shadow-soft)]",
+                    kitchen ? "h-8 min-w-8 text-base" : "h-6 min-w-6 text-xs",
+                    i.quantity > 1 && "bg-fg text-bg",
+                    done && "bg-success text-white",
                   )}
                 >
-                  ↳ {i.note}
+                  {done ? <Check className="size-4" strokeWidth={3} aria-hidden="true" /> : i.quantity}
                 </span>
-              ) : null}
-            </span>
-          </li>
-        ))}
+                <span className={cn("min-w-0 flex-1", done && "line-through decoration-2")}>
+                  <span className={kitchen ? "font-bold" : "font-semibold"}>{i.productName}</span>
+                  {i.options.length ? (
+                    <span className={cn("block text-fg-muted", kitchen ? "text-sm" : "text-xs")}>
+                      {i.options.map((x) => x.valueName).join(" · ")}
+                    </span>
+                  ) : null}
+                  {i.note ? (
+                    <span
+                      className={cn(
+                        "mt-1 block w-fit rounded-md bg-warning-soft px-1.5 font-bold text-warning",
+                        kitchen ? "text-sm" : "text-xs",
+                      )}
+                    >
+                      ↳ {i.note}
+                    </span>
+                  ) : null}
+                </span>
+                {done && i.quantity > 1 ? (
+                  <span className="self-center text-sm font-black tabular-nums">×{i.quantity}</span>
+                ) : null}
+              </Line>
+            </li>
+          );
+        })}
       </ul>
       {o.customerPhone && !kitchen ? (
         <a
@@ -405,69 +474,93 @@ export function OrderCard({
           )}
         </div>
       ) : null}
-      <div className={cn("flex gap-2 p-4 pt-3", kitchen && "mt-auto")}>
-        {canCancel && o.status !== "served" && o.status !== "cancelled" ? (
-          <Button
-            variant="secondary"
-            size="md"
-            disabled={pending}
-            aria-label={t("orders.cancel")}
-            title={t("orders.cancel")}
-            className="shrink-0 px-3.5"
-            onClick={() => {
-              if (!window.confirm(t("orders.cancelConfirm", { number: o.number }))) return;
-              const reason = window.prompt(t("orders.cancelReason")) ?? undefined;
-              move("cancelled", reason || undefined);
-            }}
-          >
-            <X className="size-4" aria-hidden="true" />
-          </Button>
-        ) : null}
-        {canCancel && !kitchen && o.participantSeq != null && isNew ? (
-          <Button
-            variant="secondary"
-            size="md"
-            disabled={pending}
-            aria-label={t("orders.block")}
-            title={t("orders.block")}
-            className="shrink-0 px-3.5 text-danger"
-            onClick={block}
-          >
-            <Ban className="size-4" aria-hidden="true" />
-          </Button>
-        ) : null}
-        {canUpdate && station && ownState === "ready" && o.status !== "ready" && o.status !== "served" ? (
-          <p className="flex flex-1 items-center justify-center rounded-2xl bg-success-soft px-3 text-sm font-bold text-success">
-            {t("kitchen.partDone")}
-          </p>
-        ) : null}
-        {canUpdate && ownNext ? (
-          <Button
-            size="lg"
-            variant={ownNext === "ready" ? "accent" : "primary"}
-            disabled={pending}
-            className="min-w-0 flex-1"
-            onClick={() => advance(ownNext)}
-          >
-            <span className="truncate">
-              {t(`kitchen.stationNext.${ownNext}`, { station: station!.name })}
+      {queued ? (
+        // Grace period: where the order is going, a shrinking bar, and "undo".
+        <div className={cn("p-4 pt-3", kitchen && "mt-auto")}>
+          <div className="relative flex h-12 items-center gap-3 overflow-hidden rounded-full bg-fg ps-5 pe-1.5 text-bg">
+            <span
+              className="undo-bar absolute inset-y-0 start-0 bg-accent/35"
+              style={{ animationDuration: `${UNDO_MS}ms` }}
+              aria-hidden="true"
+            />
+            <span className="relative min-w-0 flex-1 truncate font-bold">
+              {t("kitchen.movedTo", { status: t(`orderStatus.${queued.to}`) })}
             </span>
-            <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-          </Button>
-        ) : null}
-        {canUpdate && next && !(station && ["received", "accepted", "preparing"].includes(o.status)) ? (
-          <Button
-            size={kitchen ? "lg" : "md"}
-            variant={next === "ready" ? "accent" : "primary"}
-            disabled={pending}
-            className="flex-1"
-            onClick={() => move(next)}
-          >
-            {t(`orders.next.${next}`)}
-            <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-          </Button>
-        ) : null}
-      </div>
+            <button
+              type="button"
+              onClick={undo}
+              className="relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-bg px-4 text-sm font-bold text-fg"
+            >
+              <Undo2 className="size-4" aria-hidden="true" />
+              {t("kitchen.undo")}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className={cn("flex gap-2 p-4 pt-3", kitchen && "mt-auto")}>
+          {canCancel && o.status !== "served" && o.status !== "cancelled" ? (
+            <Button
+              variant="secondary"
+              size="md"
+              disabled={pending}
+              aria-label={t("orders.cancel")}
+              title={t("orders.cancel")}
+              className="shrink-0 px-3.5"
+              onClick={() => {
+                if (!window.confirm(t("orders.cancelConfirm", { number: o.number }))) return;
+                const reason = window.prompt(t("orders.cancelReason")) ?? undefined;
+                move("cancelled", reason || undefined);
+              }}
+            >
+              <X className="size-4" aria-hidden="true" />
+            </Button>
+          ) : null}
+          {canCancel && !kitchen && o.participantSeq != null && isNew ? (
+            <Button
+              variant="secondary"
+              size="md"
+              disabled={pending}
+              aria-label={t("orders.block")}
+              title={t("orders.block")}
+              className="shrink-0 px-3.5 text-danger"
+              onClick={block}
+            >
+              <Ban className="size-4" aria-hidden="true" />
+            </Button>
+          ) : null}
+          {canUpdate && station && ownState === "ready" && o.status !== "ready" && o.status !== "served" ? (
+            <p className="flex flex-1 items-center justify-center rounded-2xl bg-success-soft px-3 text-sm font-bold text-success">
+              {t("kitchen.partDone")}
+            </p>
+          ) : null}
+          {canUpdate && ownNext ? (
+            <Button
+              size="lg"
+              variant={ownNext === "ready" ? "accent" : "primary"}
+              disabled={pending}
+              className="min-w-0 flex-1"
+              onClick={() => later(ownNext === "ready" ? "ready" : "preparing", () => advance(ownNext))}
+            >
+              <span className="truncate">
+                {t(`kitchen.stationNext.${ownNext}`, { station: station!.name })}
+              </span>
+              <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+            </Button>
+          ) : null}
+          {canUpdate && next && !(station && ["received", "accepted", "preparing"].includes(o.status)) ? (
+            <Button
+              size={kitchen ? "lg" : "md"}
+              variant={next === "ready" ? "accent" : "primary"}
+              disabled={pending}
+              className="flex-1"
+              onClick={() => later(next, () => move(next))}
+            >
+              {t(`orders.next.${next}`)}
+              <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+            </Button>
+          ) : null}
+        </div>
+      )}
       {error ? (
         <p role="alert" className="px-4 pb-3 text-sm text-danger">
           {error}

@@ -2027,7 +2027,8 @@
       "accepted": "Accepted",
       "preparing": "Preparing",
       "ready": "Ready",
-      "served": "Served (30 min)"
+      "served": "Served (30 min)",
+      "queue": "To start"
     },
     "soundOn": "Sound on",
     "soundOff": "Enable sound",
@@ -2096,7 +2097,17 @@
     "stationNext": {
       "preparing": "Start · {station}",
       "ready": "{station} ready"
-    }
+    },
+    "focusOn": "Kitchen mode",
+    "focusOff": "Normal view",
+    "summary": "Summary",
+    "toCook": "To cook",
+    "toCookEmpty": "Nothing to cook",
+    "textBigger": "Bigger text",
+    "textSmaller": "Smaller text",
+    "undo": "Undo",
+    "movedTo": "→ {status}",
+    "tickHint": "Tap a dish to tick it off"
   },
   "floor": {
     "title": "Floor",
@@ -2384,7 +2395,9 @@
     },
     "kitchenTitle": "Order {number} to prepare",
     "bodyRoom": "Room {table}",
-    "roomOrder": "Room service"
+    "roomOrder": "Room service",
+    "accept": "Accept",
+    "accepted": "Accepted"
   },
   "music": {
     "title": "Music",

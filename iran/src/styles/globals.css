@@ -414,6 +414,27 @@ html {
     opacity: 0;
   }
 }
+/* Kitchen "undo" window: a bar that empties over the grace period. */
+@keyframes undo-bar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+.undo-bar {
+  animation-name: undo-bar;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .undo-bar {
+    animation: none;
+    width: 100%;
+  }
+}
+
 @keyframes pop-in {
   from {
     opacity: 0;
