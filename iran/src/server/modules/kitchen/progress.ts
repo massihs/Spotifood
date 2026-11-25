@@ -1,7 +1,7 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { Database } from "@/server/db/client";
 import { kitchenStations, orderItems, orders } from "@/server/db/schema";
-import { conflict, notFound } from "@/server/errors";
+import { conflict, isAppError, notFound } from "@/server/errors";
 import { emit, topics } from "@/server/infra/realtime";
 import { isUuid } from "@/lib/ids";
 import { assertCan, type RestaurantContext } from "@/server/tenancy";
@@ -56,14 +56,22 @@ export async function advanceStation(
     .from(orderItems)
     .where(and(eq(orderItems.orderId, orderId), isNull(orderItems.readyAt)));
   const allReady = (left?.n ?? 0) === 0;
+  // Two stations finishing at the same moment both try to move the order: the second one finds
+  // it already moved, which is fine, not an error.
+  const moveOrder = async (to: "preparing" | "ready") => {
+    try {
+      await updateOrderStatus(db, ctx, orderId, to);
+    } catch (e) {
+      if (!(isAppError(e) && e.code === "CONFLICT")) throw e;
+    }
+  };
 
   if (allReady) {
     // The last station finished: the order is ready (the usual "ready" notifications go out).
-    await updateOrderStatus(db, ctx, orderId, "ready");
+    await moveOrder("ready");
     return { orderReady: true };
   }
-  if (order.status === "received" || order.status === "accepted")
-    await updateOrderStatus(db, ctx, orderId, "preparing");
+  if (order.status === "received" || order.status === "accepted") await moveOrder("preparing");
   else
     await emit(db, {
       topic: topics.restaurant(rid),

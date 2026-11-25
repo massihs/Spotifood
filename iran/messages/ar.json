@@ -2622,7 +2622,7 @@
     "tendered": "Cash received",
     "confirmPayment": "Confirm payment",
     "shift": {
-      "closed": "The till is closed. Open it to record cash sales.",
+      "closed": "الصندوق مغلق: تُسجَّل المبيعات النقدية لكنها لا تدخل في أي جرد للصندوق. افتح الصندوق لمتابعة النقد.",
       "closedResult": "Till closed — expected {expected}, counted {counted}, difference {diff}",
       "open": "Open till",
       "float": "Opening float",

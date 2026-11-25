@@ -2622,7 +2622,7 @@
     "tendered": "Cash received",
     "confirmPayment": "Confirm payment",
     "shift": {
-      "closed": "The till is closed. Open it to record cash sales.",
+      "closed": "Register closed: cash sales are recorded but not included in any drawer count. Open the register to keep track of the cash.",
       "closedResult": "Till closed — expected {expected}, counted {counted}, difference {diff}",
       "open": "Open till",
       "float": "Opening float",

@@ -2630,7 +2630,7 @@
     "tendered": "Montant reçu",
     "confirmPayment": "Valider le paiement",
     "shift": {
-      "closed": "La caisse est fermée. Ouvrez-la pour encaisser en espèces.",
+      "closed": "Caisse fermée : les ventes en espèces sont enregistrées mais n’entrent dans aucun comptage de caisse. Ouvrez la caisse pour suivre l’argent du tiroir.",
       "closedResult": "Caisse clôturée — attendu {expected}, compté {counted}, écart {diff}",
       "open": "Ouvrir la caisse",
       "float": "Fond de caisse",
