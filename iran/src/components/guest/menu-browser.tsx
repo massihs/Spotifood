@@ -21,6 +21,7 @@ import type { MenuTheme } from "@/lib/menu-themes";
 import type { PublicMenu, PublicProduct } from "@/server/modules/menu/public";
 import {
   AddButton,
+  Amount,
   DishPlaceholder,
   InCartBadge,
   PopularBadge,
@@ -390,53 +391,68 @@ export function MenuBrowser({
         {featured.length > 0 ? (
           <section className="pt-4" aria-labelledby="featured-title">
             <div className="flex items-center gap-2 px-4 atelier:px-5">
-              <Sparkles className="size-[18px] text-accent atelier:hidden" aria-hidden="true" />
+              <span className="grid size-8 place-items-center rounded-full bg-accent text-accent-fg shadow-accent atelier:hidden nuit:size-auto nuit:bg-transparent nuit:text-accent nuit:shadow-none">
+                <Sparkles className="size-4" aria-hidden="true" />
+              </span>
               <h2
                 id="featured-title"
-                className="font-menu-display text-base font-bold tracking-tight atelier:text-[22px] atelier:font-medium nuit:text-lg nuit:font-medium nuit:text-accent-text"
+                className="font-menu-display text-lg font-extrabold tracking-tight atelier:text-[22px] atelier:font-medium nuit:text-lg nuit:font-medium nuit:text-accent-text"
               >
                 {t("guest.featured")}
               </h2>
             </div>
-            <ul className="no-scrollbar mt-2.5 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 atelier:px-5">
-              {featured.map((p) => (
-                <li key={p.id} className="w-[44%] max-w-52 shrink-0 snap-start">
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onOpen(p.id)}
-                    onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onOpen(p.id)}
-                    className="block h-full w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.985] atelier:overflow-visible atelier:rounded-none atelier:border-0 atelier:bg-transparent nuit:overflow-visible nuit:border-0 nuit:bg-transparent"
-                  >
-                    <div className="relative">
-                      {p.images[0] ? (
-                        <ProductImage
-                          product={p}
-                          size="md"
-                          className={cn(
-                            "aspect-[4/3] w-full atelier:rounded-xl nuit:rounded-2xl",
-                            !p.isAvailable && "grayscale",
-                          )}
-                          eager
-                        />
-                      ) : (
-                        <DishPlaceholder
-                          icon={categoryIcon.get(p.id) ?? ""}
-                          className="aspect-[4/3] w-full atelier:rounded-xl nuit:rounded-2xl"
-                        />
-                      )}
-                      {popular.has(p.id) ? <PopularBadge className="absolute start-2 top-2" /> : null}
-                      <InCartBadge n={counts[p.id] ?? 0} className="absolute end-2 top-2" />
+            <ul className="no-scrollbar mt-3 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-3 atelier:px-5">
+              {featured.map((p) =>
+                theme === "doux" ? (
+                  <li key={p.id} className="w-[68%] max-w-72 shrink-0 snap-start sm:w-64">
+                    <FeaturedCard
+                      p={p}
+                      money={money}
+                      popular={popular.has(p.id)}
+                      n={counts[p.id] ?? 0}
+                      icon={categoryIcon.get(p.id) ?? ""}
+                      onOpen={onOpen}
+                    />
+                  </li>
+                ) : (
+                  <li key={p.id} className="w-[44%] max-w-52 shrink-0 snap-start">
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => onOpen(p.id)}
+                      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onOpen(p.id)}
+                      className="block h-full w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.985] atelier:overflow-visible atelier:rounded-none atelier:border-0 atelier:bg-transparent nuit:overflow-visible nuit:border-0 nuit:bg-transparent"
+                    >
+                      <div className="relative">
+                        {p.images[0] ? (
+                          <ProductImage
+                            product={p}
+                            size="md"
+                            className={cn(
+                              "aspect-[4/3] w-full atelier:rounded-xl nuit:rounded-2xl",
+                              !p.isAvailable && "grayscale",
+                            )}
+                            eager
+                          />
+                        ) : (
+                          <DishPlaceholder
+                            icon={categoryIcon.get(p.id) ?? ""}
+                            className="aspect-[4/3] w-full atelier:rounded-xl nuit:rounded-2xl"
+                          />
+                        )}
+                        {popular.has(p.id) ? <PopularBadge className="absolute start-2 top-2" /> : null}
+                        <InCartBadge n={counts[p.id] ?? 0} className="absolute end-2 top-2" />
+                      </div>
+                      <div className="p-2.5 atelier:px-0.5 nuit:px-0.5">
+                        <p className="truncate font-menu-display text-[15px] font-bold atelier:text-lg atelier:font-medium nuit:[font-family:var(--app-font)]">
+                          {p.name}
+                        </p>
+                        <Price product={p} money={money} className="mt-0.5 text-sm" />
+                      </div>
                     </div>
-                    <div className="p-2.5 atelier:px-0.5 nuit:px-0.5">
-                      <p className="truncate font-menu-display text-[15px] font-bold atelier:text-lg atelier:font-medium nuit:[font-family:var(--app-font)]">
-                        {p.name}
-                      </p>
-                      <Price product={p} money={money} className="mt-0.5 text-sm" />
-                    </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                ),
+              )}
             </ul>
           </section>
         ) : null}
@@ -469,17 +485,21 @@ export function MenuBrowser({
               className="scroll-mt-44 pt-6"
               aria-labelledby={`h-${c.id}`}
             >
-              <div className="flex items-end gap-3 px-4 atelier:px-5">
-                <span className="grid size-9 shrink-0 place-items-center self-center rounded-xl bg-accent-soft text-accent-text atelier:hidden nuit:hidden">
-                  <CategoryIcon icon={c.icon} className="size-[18px]" />
+              <div className="flex items-center gap-3 px-4 atelier:items-end atelier:px-5">
+                <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-text ring-1 ring-accent/10 atelier:hidden nuit:hidden">
+                  <CategoryIcon icon={c.icon} className="size-5" />
                 </span>
                 <h2
                   id={`h-${c.id}`}
-                  className="min-w-0 flex-1 font-menu-display text-lg leading-tight font-bold tracking-tight atelier:text-[28px] atelier:font-medium nuit:text-xl nuit:font-medium nuit:text-accent-text"
+                  className="min-w-0 font-menu-display text-xl leading-tight font-extrabold tracking-tight atelier:flex-1 atelier:text-[28px] atelier:font-medium nuit:flex-1 nuit:font-medium nuit:text-accent-text"
                 >
                   {c.name}
                 </h2>
-                <span className="shrink-0 pb-0.5 text-xs text-fg-subtle">
+                <span
+                  className="h-px min-w-4 flex-1 bg-border atelier:hidden nuit:hidden"
+                  aria-hidden="true"
+                />
+                <span className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-fg-muted atelier:bg-transparent atelier:px-0 atelier:pb-1 atelier:font-normal atelier:text-fg-subtle nuit:bg-transparent nuit:px-0">
                   {shortPrices ? t("guest.priceUnit") : t("guest.items", { count: c.items.length })}
                 </span>
               </div>
@@ -769,15 +789,15 @@ function ListCard({
       onClick={() => onOpen(p.id)}
       onKeyDown={(e) => e.target === e.currentTarget && (e.key === "Enter" || e.key === " ") && onOpen(p.id)}
       className={cn(
-        "flex h-full w-full cursor-pointer gap-3.5 rounded-2xl border border-border bg-surface p-3 text-start shadow-[var(--shadow-soft)] transition-[transform,border-color] hover:border-border-strong active:scale-[0.99]",
-        "atelier:gap-4 atelier:rounded-none atelier:border-0 atelier:border-b atelier:bg-transparent atelier:px-0 atelier:py-5 atelier:hover:border-border",
-        "nuit:border-0 nuit:bg-transparent nuit:px-0 nuit:py-3",
+        "group flex h-full w-full cursor-pointer gap-3.5 rounded-3xl border border-border/80 bg-surface p-3 text-start shadow-[var(--shadow-soft)] transition-[transform,border-color,box-shadow] hover:border-border-strong hover:shadow-[var(--shadow-float-sm)] active:scale-[0.99]",
+        "atelier:gap-4 atelier:rounded-none atelier:border-0 atelier:border-b atelier:border-border atelier:bg-transparent atelier:px-0 atelier:py-5 atelier:shadow-none atelier:hover:border-border atelier:hover:shadow-none",
+        "nuit:border-0 nuit:bg-transparent nuit:px-0 nuit:py-3 nuit:shadow-none nuit:hover:shadow-none",
         !p.isAvailable && "opacity-60",
       )}
     >
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col py-0.5">
         {popular.has(p.id) ? <PopularBadge className="mb-1.5 self-start" /> : null}
-        <p className="line-clamp-2 font-menu-display text-[17px] leading-snug font-bold atelier:text-[22px] atelier:leading-tight atelier:font-medium nuit:[font-family:var(--app-font)] nuit:font-semibold">
+        <p className="line-clamp-2 font-menu-display text-[17px] leading-snug font-extrabold atelier:text-[22px] atelier:leading-tight atelier:font-medium nuit:[font-family:var(--app-font)] nuit:font-semibold">
           {p.name}
         </p>
         {latin ? (
@@ -789,7 +809,7 @@ function ListCard({
             {latin}
           </p>
         ) : null}
-        {text ? <p className="mt-1 line-clamp-2 text-sm leading-6 text-fg-muted">{text}</p> : null}
+        {text ? <p className="mt-1 line-clamp-2 text-[13.5px] leading-6 text-fg-muted">{text}</p> : null}
         {tags.length ? (
           <div className="mt-1.5 flex flex-wrap items-center gap-1">
             {tags.map((tag) => (
@@ -797,32 +817,114 @@ function ListCard({
             ))}
           </div>
         ) : null}
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
-          <Price product={p} money={money} />
+        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+          <Price product={p} money={money} className="text-base" />
           {p.isAvailable && !photo ? add() : null}
         </div>
       </div>
       {photo ? (
-        <div className="relative shrink-0 self-start pb-1">
-          {p.images[0] ? (
-            <ProductImage
-              product={p}
-              size="sm"
-              className={cn("size-[6.75rem] rounded-2xl atelier:rounded-xl", !p.isAvailable && "grayscale")}
-              eager={eager}
-            />
-          ) : (
-            <DishPlaceholder icon={categoryIcon.get(p.id) ?? ""} className="size-[6.75rem] rounded-2xl" />
-          )}
-          {p.isAvailable
-            ? n > 0
-              ? add("absolute inset-x-0 -bottom-1.5")
-              : add(
-                  "absolute -end-1.5 bottom-0.5 size-10 ring-[3px] ring-surface atelier:bg-surface nuit:ring-[var(--bg)]",
-                )
-            : null}
+        // The photo stays clear; its button sits under it ("Add", then "− n +").
+        <div className="flex w-28 shrink-0 flex-col gap-2 self-start">
+          <div className="relative overflow-hidden rounded-[1.15rem] ring-1 ring-black/5">
+            {p.images[0] ? (
+              <ProductImage
+                product={p}
+                size="sm"
+                className={cn(
+                  "size-28 transition-transform duration-500 group-hover:scale-[1.04]",
+                  !p.isAvailable && "grayscale",
+                )}
+                eager={eager}
+              />
+            ) : (
+              <DishPlaceholder icon={categoryIcon.get(p.id) ?? ""} className="size-28" />
+            )}
+          </div>
+          {p.isAvailable ? (
+            n > 0 ? (
+              add("w-full shadow-none")
+            ) : (
+              <button
+                type="button"
+                aria-label={t("guest.quickAdd", { name: p.name })}
+                aria-busy={busy}
+                disabled={busy}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAdd(p);
+                }}
+                className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-accent-soft text-sm font-bold text-accent-text ring-1 ring-accent/20 transition-[transform,background-color,color] group-hover:bg-accent group-hover:text-accent-fg active:scale-95 disabled:opacity-60 atelier:bg-transparent atelier:text-fg atelier:ring-fg atelier:group-hover:bg-fg atelier:group-hover:text-bg nuit:bg-accent nuit:text-accent-fg"
+              >
+                <Plus
+                  className={cn("size-4", busy && "animate-spin")}
+                  strokeWidth={2.75}
+                  aria-hidden="true"
+                />
+                {t("guest.addShort")}
+              </button>
+            )
+          ) : null}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * A suggested dish, photo first: name and price set over the photo's dark edge, so the carousel
+ * reads like a magazine strip rather than a second list.
+ */
+function FeaturedCard({
+  p,
+  money,
+  popular,
+  n,
+  icon,
+  onOpen,
+}: {
+  p: PublicProduct;
+  money: (c: number) => string;
+  popular: boolean;
+  n: number;
+  icon: string;
+  onOpen: (id: string) => void;
+}) {
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(p.id)}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onOpen(p.id)}
+      className="group relative block cursor-pointer overflow-hidden rounded-3xl bg-surface-2 text-start shadow-[var(--shadow-float-sm)] ring-1 ring-black/5 transition-transform active:scale-[0.985]"
+    >
+      {p.images[0] ? (
+        <ProductImage
+          product={p}
+          size="md"
+          className={cn(
+            "aspect-[5/4] w-full transition-transform duration-500 group-hover:scale-[1.04]",
+            !p.isAvailable && "grayscale",
+          )}
+          eager
+        />
+      ) : (
+        <DishPlaceholder icon={icon} className="aspect-[5/4] w-full" />
+      )}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+        aria-hidden="true"
+      />
+      {popular ? <PopularBadge className="absolute start-3 top-3" /> : null}
+      <InCartBadge n={n} className="absolute end-3 top-3" />
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3.5 text-white">
+        <p className="line-clamp-2 min-w-0 font-menu-display text-[17px] leading-snug font-extrabold drop-shadow-sm">
+          {p.name}
+        </p>
+        <Amount
+          text={money(p.priceCents)}
+          className="shrink-0 rounded-full bg-white/95 px-2.5 py-1 text-[13px] font-extrabold text-neutral-900 shadow-sm [&>span]:text-neutral-500"
+        />
+      </div>
     </div>
   );
 }
@@ -851,7 +953,7 @@ function GridCard({
       onClick={() => onOpen(p.id)}
       onKeyDown={(e) => e.target === e.currentTarget && (e.key === "Enter" || e.key === " ") && onOpen(p.id)}
       className={cn(
-        "flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-surface text-start shadow-[var(--shadow-soft)] transition-transform active:scale-[0.985]",
+        "group flex h-full cursor-pointer flex-col overflow-hidden rounded-3xl border border-border/80 bg-surface text-start shadow-[var(--shadow-soft)] transition-[transform,box-shadow] hover:shadow-[var(--shadow-float-sm)] active:scale-[0.985]",
         "atelier:overflow-visible atelier:rounded-none atelier:border-0 atelier:bg-transparent nuit:overflow-visible nuit:border-0 nuit:bg-transparent",
         !p.isAvailable && "opacity-60",
       )}
@@ -892,7 +994,7 @@ function GridCard({
         ) : null}
       </div>
       <div className="flex flex-1 flex-col p-3 pt-2.5 atelier:px-0.5 nuit:px-0.5">
-        <p className="line-clamp-2 font-menu-display text-[15px] leading-snug font-bold atelier:text-lg atelier:leading-tight atelier:font-medium nuit:[font-family:var(--app-font)]">
+        <p className="line-clamp-2 font-menu-display text-[15px] leading-snug font-extrabold atelier:text-lg atelier:leading-tight atelier:font-medium nuit:[font-family:var(--app-font)]">
           {p.name}
         </p>
         <div className="mt-auto flex items-center justify-between gap-2 pt-2">

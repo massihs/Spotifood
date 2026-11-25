@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 import type { PublicProduct } from "@/server/modules/menu/public";
 import { priceLine, type PricedOptionGroup } from "@/server/modules/pricing";
 import {
+  Amount,
   discountPct,
   initialSelection,
   PopularBadge,
@@ -121,7 +122,13 @@ export function ProductSheet({
             className="absolute inset-x-0 top-2 z-10 mx-auto h-1.5 w-10 rounded-full bg-white/80 shadow sm:hidden"
           />
           {p.images[0] ? (
-            <ProductImage product={p} size="lg" className="aspect-[4/3] w-full" eager />
+            <div className="relative">
+              <ProductImage product={p} size="lg" className="aspect-[4/3] w-full" eager />
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-surface to-transparent"
+              />
+            </div>
           ) : (
             <div className="h-14" />
           )}
@@ -134,17 +141,20 @@ export function ProductSheet({
             <X className="size-5" aria-hidden="true" />
           </button>
 
-          <div className="px-5 pt-5 pb-6">
+          <div className={cn("relative px-5 pb-6", p.images[0] ? "-mt-6" : "pt-5")}>
             <header>
               {popular ? <PopularBadge className="mb-2" /> : null}
               <h2
                 id="sheet-title"
-                className="font-menu-display text-2xl leading-tight font-semibold tracking-tight atelier:text-[34px] atelier:font-medium"
+                className="font-menu-display text-[26px] leading-tight font-extrabold tracking-tight text-balance atelier:text-[34px] atelier:font-medium"
               >
                 {p.name}
               </h2>
               <p className="mt-2 flex flex-wrap items-center gap-2 text-lg">
-                <span className="font-bold tabular-nums">{money(p.priceCents)}</span>
+                <Amount
+                  text={money(p.priceCents)}
+                  className="text-xl font-extrabold text-accent-text atelier:font-medium atelier:text-fg"
+                />
                 {pct ? (
                   <>
                     <s className="text-base text-fg-subtle tabular-nums">{money(p.compareAtPriceCents!)}</s>
@@ -374,7 +384,7 @@ export function ProductSheet({
               onClick={add}
               disabled={!priced.ok || pending}
               aria-busy={pending}
-              className="flex h-12 min-w-0 flex-1 items-center justify-between gap-2 rounded-full bg-accent px-5 font-bold text-accent-fg transition-transform active:scale-[0.98] disabled:opacity-40"
+              className="flex h-12 min-w-0 flex-1 items-center justify-between gap-2 rounded-full bg-accent px-5 font-bold text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.22),var(--shadow-accent)] transition-transform active:scale-[0.98] disabled:opacity-40 disabled:shadow-none"
             >
               {!p.isAvailable ? (
                 <span className="mx-auto">{t("guest.soldOut")}</span>

@@ -29,6 +29,7 @@ import { defaultWishTime, slotsNear } from "@/server/modules/reservations/servic
 import { localDay } from "@/lib/period";
 import { db } from "@/server/db/client";
 import { PlaceInitials } from "@/components/ui/place-initials";
+import { Amount } from "@/components/guest/parts";
 import { JsonLd } from "@/components/site/json-ld";
 import { absoluteUrl, pageUrl } from "@/lib/site-url";
 import { env } from "@/server/env";
@@ -111,7 +112,7 @@ async function Place({ params }: Pick<Props, "params">) {
   // place's details in one block, without repeating those buttons.
   const bar = place.reservable || orderOnline;
   const bookCard = (
-    <div className="rounded-3xl bg-surface p-5 ring-1 ring-border">
+    <div className="rounded-3xl border border-border/80 bg-surface p-5 shadow-[var(--shadow-soft)]">
       {orderOnline ? (
         <Link
           href={`/r/${place.slug}/order`}
@@ -208,7 +209,7 @@ async function Place({ params }: Pick<Props, "params">) {
   );
 
   const hoursCard = place.openingHours ? (
-    <div className="rounded-3xl bg-surface p-5 ring-1 ring-border">
+    <div className="rounded-3xl border border-border/80 bg-surface p-5 shadow-[var(--shadow-soft)]">
       <h2 className="flex items-center gap-2 text-lg font-bold">
         <Clock className="size-5 text-fg-muted" aria-hidden="true" />
         {t("profile.hours")}
@@ -282,7 +283,10 @@ async function Place({ params }: Pick<Props, "params">) {
       <SiteHeader active="restaurants" />
 
       <header className="relative">
-        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-accent to-accent-hover sm:h-80">
+        <div
+          className="relative h-72 overflow-hidden sm:h-96"
+          style={{ background: "var(--brand-gradient)" }}
+        >
           {place.cover ? (
             <img
               src={place.cover.lg}
@@ -295,7 +299,7 @@ async function Place({ params }: Pick<Props, "params">) {
           ) : null}
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/10"
+            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/20"
           />
           <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-4 pb-6 text-white sm:px-6">
             <Link
@@ -306,7 +310,7 @@ async function Place({ params }: Pick<Props, "params">) {
               {t("profile.back")}
             </Link>
             <div className="flex items-end gap-4">
-              <span className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-3xl bg-white shadow-xl ring-4 ring-white/80">
+              <span className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-[1.6rem] bg-white shadow-2xl ring-4 ring-white/85 sm:size-24">
                 {place.logo ? (
                   <img src={place.logo} alt="" className="size-full object-contain p-1" />
                 ) : (
@@ -314,7 +318,9 @@ async function Place({ params }: Pick<Props, "params">) {
                 )}
               </span>
               <div className="min-w-0">
-                <h1 className="text-3xl leading-tight font-bold sm:text-4xl">{place.name}</h1>
+                <h1 className="text-3xl leading-tight font-black tracking-tight text-balance drop-shadow-sm sm:text-5xl">
+                  {place.name}
+                </h1>
                 <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm opacity-90">
                   {place.rating != null ? (
                     <span className="inline-flex items-center gap-1 font-bold tabular-nums">
@@ -383,12 +389,12 @@ async function Place({ params }: Pick<Props, "params">) {
               <p className="mt-4 rounded-2xl bg-surface-2 p-5 text-fg-muted">{t("profile.noMenu")}</p>
             ) : (
               <>
-                <nav className="-mx-4 mt-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
+                <nav className="sticky top-16 z-10 -mx-4 mt-4 flex [scrollbar-width:none] gap-2 overflow-x-auto bg-bg/90 px-4 py-2.5 backdrop-blur-xl sm:mx-0 sm:flex-wrap sm:px-0">
                   {categories.map((c) => (
                     <a
                       key={c.id}
                       href={`#cat-${c.id}`}
-                      className="inline-flex h-9 shrink-0 items-center rounded-full bg-surface-2 px-4 text-sm font-semibold whitespace-nowrap hover:bg-surface-3"
+                      className="inline-flex h-10 shrink-0 items-center rounded-full bg-surface px-4 text-sm font-semibold whitespace-nowrap shadow-[var(--shadow-soft)] ring-1 ring-border transition-colors hover:bg-fg hover:text-bg hover:ring-fg"
                     >
                       {c.name}
                     </a>
@@ -396,30 +402,38 @@ async function Place({ params }: Pick<Props, "params">) {
                 </nav>
                 <div className="mt-6 space-y-8">
                   {categories.map((c) => (
-                    <section key={c.id} id={`cat-${c.id}`} className="scroll-mt-24">
-                      <h3 className="mb-3 text-lg font-bold">{c.name}</h3>
+                    <section key={c.id} id={`cat-${c.id}`} className="scroll-mt-36">
+                      <div className="mb-3 flex items-center gap-3">
+                        <h3 className="text-xl font-extrabold tracking-tight">{c.name}</h3>
+                        <span className="h-px flex-1 bg-border" aria-hidden="true" />
+                        <span className="rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-fg-muted">
+                          {t("profile.items", { count: c.items.length })}
+                        </span>
+                      </div>
                       <ul className="grid gap-3 sm:grid-cols-2">
                         {c.items.map((p) => (
                           <li
                             key={p.id}
                             className={cn(
-                              "flex gap-3 rounded-2xl bg-surface p-3 ring-1 ring-border",
+                              "flex gap-3.5 rounded-3xl border border-border/80 bg-surface p-3 shadow-[var(--shadow-soft)] transition-shadow hover:shadow-[var(--shadow-float-sm)]",
                               !p.isAvailable && "opacity-60",
                             )}
                           >
-                            <div className="min-w-0 flex-1">
-                              <p className="leading-6 font-bold">{p.name}</p>
+                            <div className="flex min-w-0 flex-1 flex-col py-0.5">
+                              <p className="text-[16px] leading-6 font-extrabold">{p.name}</p>
                               {p.description ? (
-                                <p className="mt-0.5 line-clamp-2 text-xs leading-5 text-fg-muted">
+                                <p className="mt-1 line-clamp-2 text-[13px] leading-6 text-fg-muted">
                                   {p.description}
                                 </p>
                               ) : null}
                               {/* The owner may keep prices for the QR menu only. */}
                               {!p.isAvailable || place.showPrices ? (
-                                <p className="mt-1.5 text-sm font-bold text-accent-text tabular-nums">
-                                  {p.isAvailable
-                                    ? formatMoney(p.priceCents, place.currency, locale)
-                                    : t("profile.soldOut")}
+                                <p className="mt-auto pt-2 text-[15px] font-extrabold text-accent-text">
+                                  {p.isAvailable ? (
+                                    <Amount text={formatMoney(p.priceCents, place.currency, locale)} />
+                                  ) : (
+                                    t("profile.soldOut")
+                                  )}
                                 </p>
                               ) : null}
                             </div>
@@ -428,7 +442,7 @@ async function Place({ params }: Pick<Props, "params">) {
                                 src={p.images[0].sm}
                                 alt=""
                                 loading="lazy"
-                                className="size-20 shrink-0 rounded-xl bg-surface-2 object-cover"
+                                className="size-24 shrink-0 rounded-[1.1rem] bg-surface-2 object-cover ring-1 ring-black/5"
                               />
                             ) : null}
                           </li>

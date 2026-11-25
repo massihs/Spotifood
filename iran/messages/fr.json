@@ -1687,7 +1687,8 @@
     "seatOfRoom": "Chambre {table} · {who}",
     "tableBadgeRoom": "Chambre {table}",
     "roomService": "Room service",
-    "roomServiceHint": "Votre commande est livrée dans votre chambre."
+    "roomServiceHint": "Votre commande est livrée dans votre chambre.",
+    "addShort": "Ajouter"
   },
   "categoryTemplates": {
     "starters": "Entrées",

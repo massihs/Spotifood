@@ -20,6 +20,9 @@ import { useTranslations } from "next-intl";
 import type { PricedOptionGroup } from "@/server/modules/pricing";
 import type { PublicProduct } from "@/server/modules/menu/public";
 import { cn } from "@/lib/cn";
+import { Amount } from "@/components/ui/amount";
+
+export { Amount };
 
 export type CartSummary = {
   itemCount: number;
@@ -190,9 +193,10 @@ export function Price({
   const pct = discountPct(p);
   return (
     <span className={cn("flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px]", className)}>
-      <span className="font-bold text-fg tabular-nums atelier:font-medium nuit:text-accent-text">
-        {money(p.priceCents)}
-      </span>
+      <Amount
+        text={money(p.priceCents)}
+        className="font-extrabold text-fg atelier:font-medium nuit:text-accent-text"
+      />
       {pct ? (
         <>
           <s className="text-sm text-fg-subtle tabular-nums">{money(p.compareAtPriceCents!)}</s>

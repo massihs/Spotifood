@@ -151,9 +151,11 @@ export async function GuestHeader({
       </header>
     );
 
+  // Doux: a tall cover, the identity card lifted over it with the logo breaking its edge, the name
+  // on the full width, and the table's actions (call, games) on their own row, big for the thumb.
   return (
     <header className="relative">
-      <div className="relative h-32 overflow-hidden bg-gradient-to-br from-accent to-accent-hover sm:h-44">
+      <div className="relative h-44 overflow-hidden sm:h-60" style={{ background: "var(--brand-gradient)" }}>
         {cover ? (
           <img
             src={cover.lg}
@@ -163,25 +165,37 @@ export async function GuestHeader({
             fetchPriority="high"
             className="absolute inset-0 size-full scale-105 object-cover"
           />
-        ) : null}
+        ) : (
+          <div className="landing-grid absolute inset-0 opacity-30" aria-hidden="true" />
+        )}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/5 to-black/35"
+          className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/5 to-black/45"
         />
         <div className="relative mx-auto max-w-3xl px-4 pt-[max(0.75rem,env(safe-area-inset-top))] lg:max-w-6xl">
           {actions}
         </div>
       </div>
-      <div className="relative mx-auto -mt-10 max-w-3xl px-4 lg:max-w-6xl">
-        <div className="flex items-center gap-3 rounded-3xl border border-border bg-surface p-3 shadow-[var(--shadow-float)]">
-          {logoTile("size-14 rounded-2xl ring-1 ring-border")}
-          <div className="min-w-0 flex-1">
-            <h1 className="line-clamp-2 text-lg leading-snug font-bold text-balance break-words">{name}</h1>
-            <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px]">{guestLine}</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <GamesButton />
-            {bell}
+      <div className="relative mx-auto -mt-14 max-w-3xl px-4 lg:max-w-6xl">
+        <div className="relative rounded-[1.75rem] border border-border/80 bg-surface px-4 pt-12 pb-4 text-center shadow-[var(--shadow-float)]">
+          {logoTile(
+            "absolute inset-x-0 -top-10 mx-auto size-20 rounded-[1.5rem] shadow-[var(--shadow-float-sm)] ring-4 ring-surface",
+          )}
+          <h1 className="line-clamp-2 font-menu-display text-[22px] leading-tight font-black tracking-tight text-balance break-words sm:text-[26px]">
+            {name}
+          </h1>
+          <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5 text-[13px]">
+            {guestLine}
+          </p>
+          <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
+            {calls.length ? (
+              <WaiterCall
+                options={calls}
+                room={guest.table.kind === "room"}
+                className="h-12 flex-1 justify-center text-[15px]"
+              />
+            ) : null}
+            <GamesButton className="size-12" />
           </div>
         </div>
       </div>

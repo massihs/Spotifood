@@ -1687,7 +1687,8 @@
     "seatOfRoom": "الغرفة {table} · {who}",
     "tableBadgeRoom": "الغرفة {table}",
     "roomService": "خدمة الغرف",
-    "roomServiceHint": "يُوصَل طلبك إلى غرفتك."
+    "roomServiceHint": "يُوصَل طلبك إلى غرفتك.",
+    "addShort": "إضافة"
   },
   "categoryTemplates": {
     "starters": "المقبلات",

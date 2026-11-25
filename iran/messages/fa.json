@@ -1687,7 +1687,8 @@
     "seatOfRoom": "اتاق {table}، {who}",
     "tableBadgeRoom": "اتاق {table}",
     "roomService": "سرویس اتاق",
-    "roomServiceHint": "سفارش شما به اتاقتان آورده می‌شود."
+    "roomServiceHint": "سفارش شما به اتاقتان آورده می‌شود.",
+    "addShort": "افزودن"
   },
   "categoryTemplates": {
     "starters": "پیش‌غذا",

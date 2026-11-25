@@ -1,5 +1,6 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { Amount } from "@/components/ui/amount";
 
 /** Building blocks of the report pages (server-rendered, no state). */
 
@@ -15,20 +16,20 @@ export function Kpi({
   tone?: "good" | "bad";
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-surface px-4 py-3">
-      <p className="flex items-center gap-1 text-xs text-fg-muted">
+    <div className="rounded-2xl border border-border bg-surface px-4 py-3 shadow-[var(--shadow-soft)]">
+      <p className="flex items-center gap-1 text-xs font-medium text-fg-muted">
         {tone === "good" ? <TrendingUp className="size-3.5 text-success" /> : null}
         {tone === "bad" ? <TrendingDown className="size-3.5 text-danger" /> : null}
         {label}
       </p>
       <p
         className={cn(
-          "text-lg font-bold tabular-nums",
+          "mt-0.5 text-base font-extrabold tracking-tight sm:text-lg",
           tone === "good" && "text-success",
           tone === "bad" && "text-danger",
         )}
       >
-        {value}
+        <Amount text={value} />
       </p>
       {hint ? <p className="text-xs text-fg-subtle">{hint}</p> : null}
     </div>

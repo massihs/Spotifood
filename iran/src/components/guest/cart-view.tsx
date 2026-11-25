@@ -31,7 +31,7 @@ import { cn } from "@/lib/cn";
 import { couponDiscount } from "@/lib/coupon";
 import type { CartLineView } from "@/server/modules/cart/service";
 import type { Totals } from "@/server/modules/pricing";
-import { QuantityStepper } from "./parts";
+import { Amount, QuantityStepper } from "./parts";
 
 export function GuestTopBar({
   title,
@@ -185,9 +185,11 @@ export function CartView({
                       <dd className="tabular-nums">−{money(couponCents)}</dd>
                     </div>
                   ) : null}
-                  <div className="flex justify-between border-t border-border pt-3 text-lg font-bold">
+                  <div className="flex items-baseline justify-between border-t border-border pt-3 text-lg font-extrabold">
                     <dt>{t("guest.total")}</dt>
-                    <dd className="tabular-nums">{money(totals.totalCents - couponCents)}</dd>
+                    <dd className="text-xl">
+                      <Amount text={money(totals.totalCents - couponCents)} />
+                    </dd>
                   </div>
                 </dl>
               )}
@@ -616,8 +618,8 @@ function CartLine({ line: l, money }: { line: CartLineView; money: (c: number) =
             </button>
           )}
           <div className="mt-2 flex items-center justify-between gap-3">
-            <p className="font-bold text-accent-text tabular-nums">
-              {l.line ? money(l.line.lineTotalCents) : ""}
+            <p className="font-extrabold text-accent-text">
+              {l.line ? <Amount text={money(l.line.lineTotalCents)} /> : ""}
             </p>
             <QuantityStepper
               size="md"

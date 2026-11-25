@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { Amount } from "./amount";
 import type { HTMLAttributes, ReactNode } from "react";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
@@ -25,7 +26,7 @@ export function CardHeader({
   return (
     <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border px-5 py-4">
       <div className="min-w-0">
-        <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
+        <h2 className="text-[15px] font-bold text-fg">{title}</h2>
         {description ? <p className="mt-0.5 text-sm text-fg-muted">{description}</p> : null}
       </div>
       {action}
@@ -109,7 +110,9 @@ export function StatCard({
           </span>
         ) : null}
       </div>
-      <p className="relative mt-2 text-[28px] leading-tight font-bold tracking-tight tabular-nums">{value}</p>
+      <p className="relative mt-2 text-2xl leading-tight font-extrabold tracking-tight tabular-nums sm:text-[28px]">
+        {typeof value === "string" ? <Amount text={value} /> : value}
+      </p>
       {hint ? (
         <p className={cn("relative mt-1 text-xs", solid ? "opacity-75" : "text-fg-subtle")}>{hint}</p>
       ) : null}
