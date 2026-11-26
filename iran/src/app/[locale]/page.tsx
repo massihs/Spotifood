@@ -31,7 +31,7 @@ import {
   Store,
   UtensilsCrossed,
   WifiOff,
-} from "lucide-react";
+} from "@/components/icons";
 import type { Metadata } from "next";
 import { Suspense, type ReactNode } from "react";
 import { connection } from "next/server";
@@ -114,7 +114,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
           <div aria-hidden="true" className="landing-grid pointer-events-none absolute inset-0 -z-10" />
           <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24 lg:pb-28">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/85 ring-1 ring-white/15 backdrop-blur">
+              <span className="kashi-btn inline-flex items-center gap-2 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/85 ring-1 ring-white/15 ring-white/20 backdrop-blur [--cut:5px]">
                 <span className="relative flex size-2">
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60" />
                   <span className="relative inline-flex size-2 rounded-full bg-accent" />
@@ -137,7 +137,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                 </Link>
                 <a
                   href={getPathname({ href: "/demo", locale })}
-                  className="inline-flex h-12 items-center rounded-full bg-white/10 px-7 font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15"
+                  className="kashi-btn inline-flex h-12 items-center bg-white/10 px-7 font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15"
                 >
                   {t("ctaDemo")}
                 </a>
@@ -206,7 +206,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                       className="aspect-square w-full object-cover transition duration-500 hover:scale-105 lg:aspect-auto lg:h-full"
                     />
                     {i === 0 ? (
-                      <span className="absolute start-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
+                      <span className="kashi-btn absolute start-2 top-2 bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur [--cut:5px]">
                         {t("mock.featured")}
                       </span>
                     ) : null}
@@ -217,7 +217,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                 {(["noApp", "zarinpal", "invoice"] as const).map((k) => (
                   <span
                     key={k}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent-text"
+                    className="kashi-btn inline-flex items-center gap-1.5 bg-accent-soft px-3 py-1 text-xs font-semibold text-accent-text [--cut:5px]"
                   >
                     <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
                     {t(`trust.${k}`)}
@@ -239,7 +239,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                 key={key}
                 className="group w-48 shrink-0 snap-start rounded-3xl bg-surface p-4 ring-1 ring-border transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-float)] sm:w-auto sm:p-5"
               >
-                <span className="grid size-11 place-items-center rounded-2xl bg-accent-soft text-accent-text transition group-hover:bg-accent group-hover:text-accent-fg">
+                <span className="kashi-tile grid size-11 place-items-center bg-accent-soft text-accent-text transition group-hover:bg-accent group-hover:text-accent-fg">
                   <Icon className="size-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-4 font-bold">{t(`platform.modules.${key}.title`)}</h3>
@@ -256,7 +256,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                 style={{ background: "var(--brand-gradient)" }}
               >
                 <span>
-                  <span className="grid size-11 place-items-center rounded-2xl bg-white/18">
+                  <span className="kashi-tile grid size-11 place-items-center bg-white/18">
                     <Sparkles className="size-5" aria-hidden="true" />
                   </span>
                   <span className="mt-4 block font-bold">{t("platform.moreTitle")}</span>
@@ -287,7 +287,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
               />
               {STEPS.map(({ key, Icon }, i) => (
                 <li key={key} className="relative text-center">
-                  <span className="relative mx-auto grid size-14 place-items-center rounded-2xl bg-accent text-accent-fg shadow-[0_10px_24px_-10px_var(--accent)]">
+                  <span className="relative mx-auto grid size-14 place-items-center rounded-[32%] bg-accent text-accent-fg shadow-[0_10px_24px_-10px_var(--accent)]">
                     <Icon className="size-6" aria-hidden="true" />
                     <span className="absolute -end-2 -top-2 grid size-6 place-items-center rounded-full bg-ink text-xs font-bold text-ink-fg tabular-nums">
                       {i + 1}
@@ -312,7 +312,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                   key={key}
                   className="flex gap-4 rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/10 sm:p-5"
                 >
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent text-accent-fg">
+                  <span className="kashi-tile grid size-11 shrink-0 place-items-center bg-accent text-accent-fg">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
                   <span>
@@ -354,7 +354,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
                   {t(`faq.${k}.q`)}
-                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 transition group-open:rotate-180 group-open:bg-accent group-open:text-accent-fg">
+                  <span className="kashi-tile grid size-8 shrink-0 place-items-center bg-surface-2 transition group-open:rotate-180 group-open:bg-accent group-open:text-accent-fg">
                     <ChevronDown className="size-4" aria-hidden="true" />
                   </span>
                 </summary>
@@ -383,7 +383,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
                 key={key}
                 className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-5 shadow-[var(--shadow-soft)]"
               >
-                <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                <span className="kashi-tile grid size-11 shrink-0 place-items-center bg-accent-soft text-accent-text">
                   <Icon className="size-5" aria-hidden="true" />
                 </span>
                 <span className="min-w-0">
@@ -419,7 +419,7 @@ export default async function LandingPage({ params }: PageProps<"/[locale]">) {
               </Link>
               <Link
                 href="/restaurants"
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-white/10 px-7 font-semibold text-white ring-1 ring-white/20 hover:bg-white/15"
+                className="kashi-btn inline-flex h-12 items-center gap-2 bg-white/10 px-7 font-semibold text-white ring-1 ring-white/20 hover:bg-white/15"
               >
                 <MapPin className="size-4" aria-hidden="true" />
                 {t("ctaGuide")}
@@ -464,7 +464,7 @@ async function RestaurantsStrip({ locale }: { locale: string }) {
                 tabIndex={i >= places.length ? -1 : undefined}
                 className="flex items-center gap-3 rounded-2xl bg-bg py-2 ps-2 pe-4 ring-1 ring-border transition hover:ring-border-strong"
               >
-                <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-black/5">
+                <span className="kashi-tile grid size-10 shrink-0 place-items-center overflow-hidden bg-white ring-1 ring-black/5 ring-white/20">
                   {r.logo ? (
                     <img src={r.logo} alt="" loading="lazy" className="size-full object-contain p-0.5" />
                   ) : (
@@ -534,7 +534,7 @@ function BentoCard({
 }) {
   return (
     <div className={cn("flex flex-col rounded-3xl bg-surface p-6 ring-1 ring-border sm:p-7", className)}>
-      <span className="grid size-12 place-items-center rounded-2xl bg-accent text-accent-fg">
+      <span className="kashi-tile grid size-12 place-items-center bg-accent text-accent-fg">
         <Icon className="size-6" aria-hidden="true" />
       </span>
       <h3 className="mt-5 text-xl font-bold">{title}</h3>
@@ -557,7 +557,7 @@ function BenefitCard({
 }) {
   return (
     <div className={cn("rounded-3xl p-8", className)}>
-      <span className="grid size-12 place-items-center rounded-2xl bg-accent text-accent-fg">
+      <span className="kashi-tile grid size-12 place-items-center bg-accent text-accent-fg">
         <Icon className="size-6" aria-hidden="true" />
       </span>
       <h3 className="mt-5 text-2xl font-bold">{title}</h3>
@@ -590,7 +590,7 @@ function HeroVisual({ t }: { t: T }) {
         <KitchenTicket t={t} />
       </div>
       <div className="landing-float-slow absolute -end-1 top-24 flex items-center gap-2.5 rounded-2xl bg-white/95 px-3.5 py-2.5 text-[#141414] shadow-xl ring-1 ring-black/5 lg:-end-8">
-        <span className="grid size-8 place-items-center rounded-full bg-emerald-500 text-white">
+        <span className="kashi-tile grid size-8 place-items-center bg-emerald-500 text-white">
           <Check className="size-4" strokeWidth={3} />
         </span>
         <span className="text-sm leading-tight font-bold">
@@ -598,7 +598,7 @@ function HeroVisual({ t }: { t: T }) {
           <span className="block text-xs font-medium text-neutral-500">۳٬۶۰۰٬۰۰۰ تومان</span>
         </span>
       </div>
-      <div className="landing-float absolute -end-2 bottom-24 flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-fg shadow-xl lg:-end-10">
+      <div className="landing-float kashi-btn absolute -end-2 bottom-24 flex items-center gap-2 bg-accent px-4 py-2 text-sm font-bold text-accent-fg shadow-xl lg:-end-10">
         <ChefHat className="size-4" />
         {t("float.ready")} · {t("float.table")}
       </div>
@@ -614,7 +614,7 @@ function KitchenTicket({ t, className }: { t: T; className?: string }) {
         <span className="text-[13px] font-black whitespace-nowrap">
           #A-1042 <span className="font-semibold text-neutral-500">· {t("float.table")}</span>
         </span>
-        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white tabular-nums">
+        <span className="kashi-btn inline-flex items-center gap-1 bg-amber-500 px-2 py-0.5 text-xs font-bold text-white tabular-nums [--cut:5px]">
           <Clock className="size-3" />
           {t("float.minutes")}
         </span>
@@ -700,12 +700,12 @@ function PhoneMock({
             </div>
             <div className="bg-gradient-to-b from-accent-soft to-white px-4 pt-5 pb-7">
               <div className="flex items-center gap-3">
-                <div className="grid size-11 place-items-center rounded-xl bg-accent text-accent-fg">
+                <div className="kashi-tile grid size-11 place-items-center bg-accent text-accent-fg">
                   <UtensilsCrossed className="size-5" />
                 </div>
                 <div>
                   <p className="text-base font-bold">{menu}</p>
-                  <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold ring-1 ring-black/5">
+                  <span className="kashi-btn bg-white px-2 py-0.5 text-[11px] font-semibold ring-1 ring-black/5 ring-white/20 [--cut:5px]">
                     {table}
                   </span>
                 </div>
@@ -730,8 +730,8 @@ function PhoneMock({
                   </div>
                 ))}
               </div>
-              <div className="mt-auto flex h-11 items-center gap-2 rounded-full bg-accent ps-1.5 pe-4 text-[13px] font-bold text-white">
-                <span className="grid size-8 place-items-center rounded-full bg-white/20">
+              <div className="kashi-btn mt-auto flex h-11 items-center gap-2 bg-accent ps-1.5 pe-4 text-[13px] font-bold text-white">
+                <span className="kashi-tile grid size-8 place-items-center bg-white/20">
                   <ShoppingBag className="size-4" />
                 </span>
                 <span className="flex-1">{cart}</span>

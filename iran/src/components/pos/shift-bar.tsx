@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDownToLine, ArrowUpFromLine, Lock, LockOpen, Wallet } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, Lock, LockOpen, Wallet } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { useMoney } from "@/components/ui/use-money";
@@ -94,7 +94,7 @@ export function ShiftBar({
           <button
             type="button"
             onClick={() => setDialog("open")}
-            className="h-9 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg"
+            className="kashi-btn h-9 bg-accent px-4 text-sm font-semibold text-accent-fg"
           >
             {t("open")}
           </button>
@@ -127,7 +127,7 @@ export function ShiftBar({
 
   return (
     <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-surface p-3 shadow-[var(--shadow-soft)]">
-      <span className="grid size-10 place-items-center rounded-xl bg-accent-soft text-accent-text">
+      <span className="kashi-tile grid size-10 place-items-center bg-accent-soft text-accent-text">
         <LockOpen className="size-5" aria-hidden="true" />
       </span>
       <div className="min-w-[12rem] flex-1 text-sm">
@@ -143,7 +143,7 @@ export function ShiftBar({
           <button
             type="button"
             onClick={() => setDialog("in")}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm ring-1 ring-border"
+            className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3 text-sm"
             title={t("payIn")}
           >
             <ArrowDownToLine className="size-4" />
@@ -152,7 +152,7 @@ export function ShiftBar({
           <button
             type="button"
             onClick={() => setDialog("out")}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm ring-1 ring-border"
+            className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3 text-sm"
             title={t("payOut")}
           >
             <ArrowUpFromLine className="size-4" />
@@ -161,7 +161,7 @@ export function ShiftBar({
           <button
             type="button"
             onClick={() => setDialog("close")}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-fg px-4 text-sm font-semibold text-bg"
+            className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-fg px-4 text-sm font-semibold text-bg"
           >
             <Wallet className="size-4" />
             {t("close")}

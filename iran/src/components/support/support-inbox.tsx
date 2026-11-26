@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Check, MessageSquareText, RotateCcw, Store, Zap } from "lucide-react";
+import { ArrowRight, Check, MessageSquareText, RotateCcw, Store, Zap } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useLiveEvent } from "@/components/realtime/live";
@@ -252,7 +252,7 @@ export function SupportInbox() {
                       loadDetail(detail.conv.id);
                     })
                   }
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface-2 px-3 text-sm font-bold"
+                  className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-surface-2 px-3 text-sm font-bold"
                 >
                   <RotateCcw className="size-4" aria-hidden="true" />
                   {t("reopen")}
@@ -267,7 +267,7 @@ export function SupportInbox() {
                       loadDetail(detail.conv.id);
                     })
                   }
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-success px-3 text-sm font-bold text-white"
+                  className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-success px-3 text-sm font-bold text-white"
                 >
                   <Check className="size-4" aria-hidden="true" />
                   {t("resolve")}
@@ -304,7 +304,7 @@ export function SupportInbox() {
                       key={c.id}
                       type="button"
                       onClick={() => setDraft((d) => (d ? `${d}\n${c.body}` : c.body))}
-                      className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full bg-surface-2 px-3 text-xs font-semibold hover:bg-surface-3"
+                      className="kashi-btn inline-flex h-8 shrink-0 items-center gap-1 bg-surface-2 px-3 text-xs font-semibold [--cut:5px] hover:bg-surface-3"
                     >
                       <Zap className="size-3.5 text-accent-text" aria-hidden="true" />
                       {c.title}

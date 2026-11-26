@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Check, Layers, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { Bell, Check, Layers, Plus, ShieldCheck, Trash2 } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
@@ -59,7 +59,7 @@ export function SectionsPanel({
         <button
           type="button"
           onClick={() => setEdit("new")}
-          className="inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg"
+          className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-accent px-4 text-sm font-semibold text-accent-fg"
         >
           <Plus className="size-4" aria-hidden="true" />
           {t("new")}
@@ -157,7 +157,7 @@ function SectionSheet({
   };
   const chip = (on: boolean) =>
     cn(
-      "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm",
+      "inline-flex items-center gap-1.5 kashi-btn px-3 py-1.5 text-sm",
       on ? tone(color).soft + " font-semibold ring-1 ring-current" : "ring-1 ring-border",
     );
 
@@ -219,7 +219,7 @@ function SectionSheet({
                     key={k}
                     type="button"
                     onClick={() => setPerms(new Set(list.filter((p) => assignable.includes(p))))}
-                    className="rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold hover:bg-surface-3"
+                    className="kashi-btn bg-surface-2 px-3 py-1 text-xs font-semibold [--cut:5px] hover:bg-surface-3"
                   >
                     {t(`team.jobs.${k as "waiter"}.name`)}
                   </button>
@@ -297,7 +297,7 @@ function SectionSheet({
                 window.confirm(ts("deleteConfirm", { name: section.name })) &&
                 run(() => deleteSectionAction(restaurantId, section.id), onClose)
               }
-              className="grid size-11 place-items-center rounded-full text-danger ring-1 ring-danger/30"
+              className="kashi-tile kashi-frame grid size-11 place-items-center text-danger [--kashi-frame-color:color-mix(in_oklab,var(--danger)_35%,transparent)]"
               aria-label={ts("delete")}
             >
               <Trash2 className="size-4" />
@@ -357,7 +357,7 @@ export function MemberSections({
       {mine.map((s) => (
         <span
           key={s.id}
-          className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", tone(s.color).soft)}
+          className={cn("kashi-btn px-2.5 py-0.5 text-xs font-semibold [--cut:5px]", tone(s.color).soft)}
         >
           {s.name}
         </span>

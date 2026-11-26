@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { ArrowLeft, Briefcase, LogOut } from "lucide-react";
+import { ArrowLeft, Briefcase, LogOut } from "@/components/icons";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
@@ -37,7 +37,7 @@ async function Pro() {
   if (!user)
     return (
       <div>
-        <p className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-xs font-bold text-accent-text">
+        <p className="kashi-btn inline-flex items-center gap-1.5 bg-accent-soft px-3 py-1 text-xs font-bold text-accent-text [--cut:5px]">
           <Briefcase className="size-3.5" aria-hidden="true" />
           Spotifood Pro
         </p>
@@ -84,7 +84,7 @@ async function Pro() {
                       className="size-12 shrink-0 rounded-xl bg-surface object-contain p-1 ring-1 ring-border"
                     />
                   ) : (
-                    <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-lg font-bold text-accent-text">
+                    <span className="kashi-tile grid size-12 shrink-0 place-items-center bg-accent-soft text-lg font-bold text-accent-text">
                       {[...s.name][0]}
                     </span>
                   )}

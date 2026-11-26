@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Sheet, field, useRun } from "@/components/ui/sheet-kit";
@@ -140,7 +140,7 @@ export function StationManager({
                     type="button"
                     onClick={() => setCats((x) => (on ? x.filter((y) => y !== c.id) : [...x, c.id]))}
                     className={cn(
-                      "rounded-full px-3 py-1.5 text-sm",
+                      "kashi-btn px-3 py-1.5 text-sm",
                       on
                         ? STATION_TONE[color]!.soft + " font-semibold ring-1 ring-current"
                         : "ring-1 ring-border",
@@ -166,7 +166,7 @@ export function StationManager({
                     () => setEdit(null),
                   )
                 }
-                className="grid size-11 place-items-center rounded-full text-danger ring-1 ring-danger/30"
+                className="kashi-tile kashi-frame grid size-11 place-items-center text-danger [--kashi-frame-color:color-mix(in_oklab,var(--danger)_35%,transparent)]"
                 aria-label={t("delete")}
               >
                 <Trash2 className="size-4" />
@@ -175,7 +175,7 @@ export function StationManager({
             <button
               type="button"
               onClick={() => setEdit(null)}
-              className="h-11 rounded-full px-4 text-sm font-semibold ring-1 ring-border"
+              className="kashi-btn kashi-frame h-11 px-4 text-sm font-semibold"
             >
               {t("back")}
             </button>

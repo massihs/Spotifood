@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Home, RotateCcw, SearchX, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, Home, RotateCcw, SearchX, UtensilsCrossed } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { buttonClasses } from "@/components/ui/button";

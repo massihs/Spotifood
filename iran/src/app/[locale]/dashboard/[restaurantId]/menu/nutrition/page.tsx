@@ -1,4 +1,4 @@
-import { CheckCircle2, Database, PenLine, Search, TriangleAlert } from "lucide-react";
+import { CheckCircle2, Database, PenLine, Search, TriangleAlert } from "@/components/icons";
 import { Suspense } from "react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -83,7 +83,7 @@ async function NutritionDatabase({ params, searchParams }: Props) {
                 <li key={c.id}>
                   <Link
                     href={`${base}/menu/products/${c.id}`}
-                    className="inline-flex rounded-full bg-warning-soft px-3 py-1.5 text-sm font-medium hover:underline"
+                    className="kashi-btn inline-flex bg-warning-soft px-3 py-1.5 text-sm font-medium hover:underline"
                   >
                     {c.name}
                   </Link>
@@ -147,7 +147,7 @@ async function NutritionDatabase({ params, searchParams }: Props) {
                       </p>
                       <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
                         {src ? (
-                          <span className={cn("rounded-full px-2 py-0.5 font-bold", src.cls)}>
+                          <span className={cn("kashi-btn px-2 py-0.5 font-bold [--cut:5px]", src.cls)}>
                             {src.label}
                           </span>
                         ) : null}

@@ -1,4 +1,14 @@
-import { Coffee, Cookie, Flame, Moon, Salad, Settings, Sparkles, Sun, UtensilsCrossed } from "lucide-react";
+import {
+  Coffee,
+  Cookie,
+  Flame,
+  Moon,
+  Salad,
+  Settings,
+  Sparkles,
+  Sun,
+  UtensilsCrossed,
+} from "@/components/icons";
 import { Suspense } from "react";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import {
@@ -83,7 +93,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
     return (
       <div className="mx-auto max-w-md">
         <div className="mb-6 text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-accent-soft text-accent-text">
+          <span className="kashi-tile mx-auto grid size-14 place-items-center bg-accent-soft text-accent-text">
             <Salad className="size-7" aria-hidden="true" />
           </span>
           <h1 className="mt-4 text-2xl font-bold tracking-tight">{t("loginTitle")}</h1>
@@ -212,7 +222,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
     <div className="space-y-5">
       {/* Greeting */}
       <div className="flex items-center gap-3">
-        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent text-lg font-bold text-accent-fg">
+        <span className="kashi-tile grid size-12 shrink-0 place-items-center bg-accent text-lg font-bold text-accent-fg">
           {(diner.name ?? diner.email ?? "★").trim().charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0 flex-1">
@@ -227,7 +237,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
         <Link
           href="/account/settings"
           aria-label={t("settings")}
-          className="grid size-11 place-items-center rounded-2xl bg-surface text-fg-muted shadow-[var(--shadow-soft)] hover:text-fg"
+          className="kashi-tile grid size-11 place-items-center bg-surface text-fg-muted shadow-[var(--shadow-soft)] hover:text-fg"
         >
           <Settings className="size-5" aria-hidden="true" />
         </Link>
@@ -365,7 +375,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                   const kcal = meals.reduce((s, m) => s + m.total.kcal, 0);
                   return (
                     <li key={key} className="relative">
-                      <span className="absolute -start-[45px] -top-1 grid size-8 place-items-center rounded-full bg-surface text-accent-text shadow-[var(--shadow-soft)] ring-4 ring-bg">
+                      <span className="kashi-tile absolute -start-[45px] -top-1 grid size-8 place-items-center bg-surface text-accent-text shadow-[var(--shadow-soft)] ring-4 ring-bg">
                         <Icon className="size-4" aria-hidden="true" />
                       </span>
                       <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -388,7 +398,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                                   })}
                                 </span>
                               </p>
-                              <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-xs font-bold text-accent-text tabular-nums">
+                              <span className="kashi-btn shrink-0 bg-accent-soft px-2.5 py-1 text-xs font-bold text-accent-text tabular-nums [--cut:5px]">
                                 {tn("kcal", { n: n(m.total.kcal) })}
                               </span>
                             </div>
@@ -473,14 +483,14 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
               </ol>
             ) : (
               <Card className="px-5 py-12 text-center">
-                <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-surface-2">
+                <span className="kashi-tile mx-auto grid size-14 place-items-center bg-surface-2">
                   <UtensilsCrossed className="size-7 text-fg-muted" aria-hidden="true" />
                 </span>
                 <p className="mt-4 font-semibold">{t("noMeals")}</p>
                 <p className="mx-auto mt-1 max-w-sm text-sm text-fg-muted">{t("noMealsHint")}</p>
                 <Link
                   href="/restaurants"
-                  className="mt-5 inline-flex h-10 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-fg"
+                  className="kashi-btn mt-5 inline-flex h-10 items-center bg-accent px-5 text-sm font-semibold text-accent-fg"
                 >
                   {t("findRestaurant")}
                 </Link>
@@ -500,7 +510,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                     key={p}
                     href={href(date, { p })}
                     className={cn(
-                      "rounded-full px-3 py-1",
+                      "kashi-btn px-3 py-1 [--cut:5px]",
                       period === p ? "bg-surface shadow-[var(--shadow-soft)]" : "text-fg-muted",
                     )}
                   >
@@ -517,7 +527,7 @@ async function Account({ searchParams }: Pick<Props, "searchParams">) {
                   role="tab"
                   aria-selected={metric === m}
                   className={cn(
-                    "shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset",
+                    "kashi-btn kashi-frame shrink-0 px-3 py-1.5 text-xs font-semibold [--cut:5px]",
                     metric === m
                       ? "bg-accent text-accent-fg ring-accent"
                       : "text-fg-muted ring-border hover:text-fg",

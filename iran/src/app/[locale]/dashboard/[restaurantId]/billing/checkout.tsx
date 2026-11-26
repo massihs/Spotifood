@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
-import { Check } from "lucide-react";
+import { Check } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
@@ -89,7 +89,7 @@ export function Checkout({
               onClick={() => setMonths(m)}
               aria-pressed={months === m}
               className={cn(
-                "rounded-full border px-4 py-2 text-sm font-semibold",
+                "kashi-btn border px-4 py-2 text-sm font-semibold",
                 months === m ? "border-fg bg-fg text-bg" : "border-border bg-surface hover:border-fg-subtle",
               )}
             >

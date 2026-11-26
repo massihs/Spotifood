@@ -1,6 +1,6 @@
 "use client";
 
-import { CreditCard } from "lucide-react";
+import { CreditCard } from "@/components/icons";
 import { useEffect, useState } from "react";
 import { useMoney } from "@/components/ui/use-money";
 import { cn } from "@/lib/cn";

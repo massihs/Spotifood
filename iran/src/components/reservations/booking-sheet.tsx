@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Minus, Phone, Plus, UserCheck } from "lucide-react";
+import { AlertTriangle, Minus, Phone, Plus, UserCheck } from "@/components/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Sheet, field, useRun } from "@/components/ui/sheet-kit";
@@ -190,12 +190,17 @@ export function BookingSheet({
       <div className="space-y-4">
         {booking ? (
           <div className="flex flex-wrap items-center gap-2">
-            <span className={cn("rounded-full px-2.5 py-1 text-xs font-bold", STATUS_TONE[booking.status])}>
+            <span
+              className={cn(
+                "kashi-btn px-2.5 py-1 text-xs font-bold [--cut:5px]",
+                STATUS_TONE[booking.status],
+              )}
+            >
               {t(`status.${booking.status}`)}
             </span>
             <a
               href={`tel:${booking.phone}`}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface-2 px-3 text-xs font-semibold"
+              className="kashi-btn inline-flex h-8 items-center gap-1.5 bg-surface-2 px-3 text-xs font-semibold [--cut:5px]"
             >
               <Phone className="size-3.5" aria-hidden="true" />
               {t("agenda.call")}
@@ -208,7 +213,7 @@ export function BookingSheet({
                   disabled={pending}
                   onClick={() => run(() => setReservationStatusAction(rid, booking.id, to), onClose)}
                   className={cn(
-                    "h-8 rounded-full px-3 text-xs font-semibold",
+                    "kashi-btn h-8 px-3 text-xs font-semibold [--cut:5px]",
                     to === "seated" || to === "confirmed"
                       ? "bg-accent text-accent-fg"
                       : to === "completed"

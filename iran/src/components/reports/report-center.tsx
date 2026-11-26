@@ -1,5 +1,5 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import { Inbox } from "lucide-react";
+import { Inbox } from "@/components/icons";
 import { Card } from "@/components/ui/card";
 import { PrintButton } from "@/components/ui/print-button";
 import { Link } from "@/i18n/navigation";

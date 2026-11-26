@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronLeft, LayoutGrid, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, LayoutGrid, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { Fragment, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -328,7 +328,7 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={t("close")}
-                className="grid size-9 place-items-center rounded-full bg-surface-2 text-fg-muted"
+                className="kashi-tile grid size-9 place-items-center bg-surface-2 text-fg-muted"
               >
                 <X className="size-5" aria-hidden="true" />
               </button>

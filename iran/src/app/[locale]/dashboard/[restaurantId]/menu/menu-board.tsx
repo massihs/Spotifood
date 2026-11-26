@@ -21,7 +21,7 @@ import {
   Star,
   UtensilsCrossed,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -369,7 +369,7 @@ export function MenuBoard({
                 }}
                 aria-current={!wide && selected?.id === c.id ? "true" : undefined}
                 className={cn(
-                  "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium whitespace-nowrap",
+                  "kashi-btn inline-flex shrink-0 items-center gap-1.5 px-3.5 py-2 text-sm font-medium whitespace-nowrap",
                   !wide && selected?.id === c.id
                     ? "bg-accent text-accent-fg"
                     : "bg-surface text-fg-muted shadow-[var(--shadow-soft)]",
@@ -599,7 +599,7 @@ export function MenuBoard({
             <p className="px-5 py-10 text-center text-sm text-fg-muted">{t("menu.selectCategory")}</p>
           ) : shown.length === 0 ? (
             <div className="px-5 py-12 text-center">
-              <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-surface-2 text-fg-subtle">
+              <span className="kashi-tile mx-auto grid size-12 place-items-center bg-surface-2 text-fg-subtle">
                 <UtensilsCrossed className="size-6" aria-hidden="true" />
               </span>
               <p className="mt-3 font-semibold">{wide ? t("menu.noResults") : t("menu.noProducts")}</p>
@@ -751,7 +751,7 @@ function ProductCard(props: ItemProps) {
           {!p.isActive ? <Badge>{t("hidden")}</Badge> : null}
         </span>
         {p.isFeatured ? (
-          <span className="absolute end-2 top-2 grid size-7 place-items-center rounded-full bg-accent text-accent-fg shadow">
+          <span className="kashi-tile absolute end-2 top-2 grid size-7 place-items-center bg-accent text-accent-fg shadow">
             <Star className="size-4 fill-current" aria-hidden="true" />
           </span>
         ) : null}
@@ -865,7 +865,7 @@ function QuickToggles({ restaurantId, product: p, canManage, canFlag, onError }:
           render={(on) => (
             <span
               className={cn(
-                "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-bold whitespace-nowrap",
+                "kashi-btn inline-flex h-8 items-center gap-1.5 px-3 text-xs font-bold whitespace-nowrap [--cut:5px]",
                 on ? "bg-success-soft text-success" : "bg-warning-soft text-warning",
               )}
             >
@@ -1052,7 +1052,7 @@ function BulkPriceBody({ restaurantId, currency, category, products, onDone }: B
               onClick={() => setRound(s)}
               aria-pressed={round === s}
               className={cn(
-                "h-9 rounded-full px-3 text-sm ring-1",
+                "kashi-btn kashi-frame h-9 px-3 text-sm",
                 round === s ? "bg-fg font-semibold text-bg ring-fg" : "ring-border",
               )}
             >

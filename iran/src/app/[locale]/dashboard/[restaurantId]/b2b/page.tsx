@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Briefcase, FileText, ShoppingBasket, Store, UsersRound } from "lucide-react";
+import { Briefcase, FileText, ShoppingBasket, Store, UsersRound } from "@/components/icons";
 import { ListingForm } from "@/components/inventory/marketplace-ui";
 import { getListing } from "@/server/modules/b2b/marketplace";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -165,7 +165,7 @@ async function B2b({ params, searchParams }: Props) {
                       return (
                         <span
                           className={cn(
-                            "rounded-full px-2 py-0.5 text-xs font-semibold",
+                            "kashi-btn px-2 py-0.5 text-xs font-semibold [--cut:5px]",
                             k === "paid"
                               ? "bg-success-soft text-success"
                               : k === "account"

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { centsToInput, formatMoney, parseMoneyInput } from "@/lib/money";
 import { MoneyField } from "@/components/ui/money-field";
-import { ImageIcon, Star } from "lucide-react";
+import { ImageIcon, Star } from "@/components/icons";
 import { cn } from "@/lib/cn";
 import type { Nutrition } from "@/lib/nutrition";
 import { NutritionFields } from "./nutrition-fields";
@@ -347,7 +347,7 @@ export function ProductForm({
                     defaultChecked={values.tags.includes(tag)}
                     className="peer sr-only"
                   />
-                  <span className="inline-flex h-8 items-center rounded-full border border-border px-3 text-sm peer-checked:border-accent peer-checked:bg-accent-soft peer-checked:text-accent-text peer-focus-visible:ring-4 peer-focus-visible:ring-[var(--ring)]">
+                  <span className="kashi-btn inline-flex h-8 items-center border border-border px-3 text-sm [--cut:5px] peer-checked:border-accent peer-checked:bg-accent-soft peer-checked:text-accent-text peer-focus-visible:ring-4 peer-focus-visible:ring-[var(--ring)]">
                     {t(`tags.${tag}`)}
                   </span>
                 </label>
@@ -405,7 +405,7 @@ function GuestPreview({
       <div className="flex gap-3">
         <div className="min-w-0 flex-1">
           {p.isFeatured ? (
-            <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-accent-fg">
+            <span className="kashi-btn mb-1 inline-flex items-center gap-1 bg-accent px-2 py-0.5 text-[11px] font-bold text-accent-fg [--cut:5px]">
               <Star className="size-3 fill-current" aria-hidden="true" />
               {t("menu.featured")}
             </span>
@@ -417,7 +417,7 @@ function GuestPreview({
           {p.tags.length ? (
             <p className="mt-1 flex flex-wrap gap-1">
               {p.tags.slice(0, 3).map((tag) => (
-                <span key={tag} className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px]">
+                <span key={tag} className="kashi-btn bg-surface-2 px-2 py-0.5 text-[11px] [--cut:5px]">
                   {t(`tags.${tag}`)}
                 </span>
               ))}
@@ -438,7 +438,7 @@ function GuestPreview({
         </div>
         <span
           className={cn(
-            "grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl bg-surface-2 text-fg-subtle",
+            "kashi-tile grid size-20 shrink-0 place-items-center overflow-hidden bg-surface-2 text-fg-subtle",
             !p.isAvailable && "grayscale",
           )}
         >

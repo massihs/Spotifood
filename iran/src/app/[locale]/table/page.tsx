@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { BedDouble } from "lucide-react";
+import { BedDouble } from "@/components/icons";
 import { menuThemeOf } from "@/lib/menu-themes";
 import { NowPlaying } from "@/components/guest/now-playing";
 import { hasActiveMusic, restaurantNowPlaying } from "@/server/modules/music/service";
@@ -91,7 +91,7 @@ async function GuestMenu() {
                 <GuestHeader guest={guest} orderCount={orders.length} cover={cover} store={store} />
                 {guest.table.kind === "room" ? (
                   <div className="mx-4 mt-3 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent-soft px-4 py-3">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-fg">
+                    <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent text-accent-fg">
                       <BedDouble className="size-5" aria-hidden="true" />
                     </span>
                     <div className="min-w-0">

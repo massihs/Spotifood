@@ -17,7 +17,7 @@ import {
   UtensilsCrossed,
   Users,
   XCircle,
-} from "lucide-react";
+} from "@/components/icons";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { AutoRefresh, CancelBooking } from "@/components/reservations/public-ui";
 import { PlaceHeader } from "@/components/reservations/place-header";
@@ -128,7 +128,7 @@ async function Status({ params }: Pick<Props, "params">) {
           </div>
 
           <div className="flex items-center gap-3 border-t border-border bg-surface-2/60 px-5 py-4">
-            <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white ring-1 ring-border">
+            <span className="kashi-tile grid size-12 shrink-0 place-items-center overflow-hidden bg-white ring-1 ring-white/20">
               {listing?.logo ? (
                 <img src={listing.logo} alt="" className="size-full object-contain p-1" />
               ) : (
@@ -258,7 +258,7 @@ function StatusPill({ status, label }: { status: string; label: string }) {
   return (
     <span
       className={cn(
-        "inline-block rounded-full px-3 py-1 text-xs font-bold",
+        "kashi-btn inline-block px-3 py-1 text-xs font-bold [--cut:5px]",
         status === "cancelled" || status === "no_show"
           ? "bg-danger-soft text-danger"
           : status === "pending"

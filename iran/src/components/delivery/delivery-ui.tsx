@@ -1,6 +1,6 @@
 "use client";
 
-import { Bike, Check, Clock, HandCoins, MapPin, Phone, Plus, Trash2, Wallet } from "lucide-react";
+import { Bike, Check, Clock, HandCoins, MapPin, Phone, Plus, Trash2, Wallet } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Sheet, field, num, useRun } from "@/components/ui/sheet-kit";
@@ -107,7 +107,7 @@ export function DispatchBoard({
                         <p className="font-bold tabular-nums">{money(o.totalCents)}</p>
                         <span
                           className={cn(
-                            "rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                            "kashi-btn px-2 py-0.5 text-[11px] font-semibold [--cut:5px]",
                             o.paymentStatus === "paid"
                               ? "bg-success-soft text-success"
                               : "bg-warning-soft text-warning",
@@ -231,7 +231,7 @@ export function CourierSettlement({
       <ul className="divide-y divide-border">
         {balances.map((b) => (
           <li key={b.courierId} className="flex items-center gap-3 px-4 py-3">
-            <span className="grid size-10 place-items-center rounded-full bg-tone-sky/15 text-tone-sky">
+            <span className="kashi-tile grid size-10 place-items-center bg-tone-sky/15 text-tone-sky">
               <Bike className="size-5" />
             </span>
             <div className="min-w-0 flex-1">
@@ -256,7 +256,7 @@ export function CourierSettlement({
                   return res;
                 })
               }
-              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-3 text-sm font-semibold text-accent-fg disabled:opacity-40"
+              className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-accent px-3 text-sm font-semibold text-accent-fg disabled:opacity-40"
             >
               <Wallet className="size-4" />
               {t("settle")}
@@ -309,7 +309,7 @@ export function DeliverySettings({
             <button
               type="button"
               onClick={() => setZoneEdit("new")}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-3 text-sm font-semibold text-accent-fg"
+              className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-accent px-3 text-sm font-semibold text-accent-fg"
             >
               <Plus className="size-4" />
               {t("newZone")}
@@ -374,7 +374,7 @@ export function DeliverySettings({
                   () => (setCName(""), setCPhone("")),
                 )
               }
-              className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-accent-fg disabled:opacity-50"
+              className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent text-accent-fg disabled:opacity-50"
               aria-label={t("addCourier")}
             >
               <Plus className="size-5" />
@@ -520,7 +520,7 @@ function ZoneForm({
               onClick={() =>
                 window.confirm(t("deleteZone")) && run(() => deleteZoneAction(rid, zone.id), onClose)
               }
-              className="inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-danger ring-1 ring-danger/30"
+              className="kashi-btn kashi-frame inline-flex h-11 items-center gap-1.5 px-4 text-sm font-semibold text-danger [--kashi-frame-color:color-mix(in_oklab,var(--danger)_35%,transparent)]"
             >
               <Trash2 className="size-4" />
             </button>

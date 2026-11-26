@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { AlertTriangle, ArrowLeft, LayoutGrid, ReceiptText, Store } from "lucide-react";
+import { AlertTriangle, ArrowLeft, LayoutGrid, ReceiptText, Store } from "@/components/icons";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { ImportMenu, NewBranchButton } from "@/components/branches/branches-ui";
@@ -81,7 +81,7 @@ async function Branches({ params }: Pick<Props, "params">) {
                     className="size-11 shrink-0 rounded-xl border border-border object-cover"
                   />
                 ) : (
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+                  <span className="kashi-tile grid size-11 shrink-0 place-items-center bg-accent-soft text-accent">
                     <Store className="size-5" />
                   </span>
                 )}
@@ -96,7 +96,7 @@ async function Branches({ params }: Pick<Props, "params">) {
                 {!r.isCurrent ? (
                   <Link
                     href={`/dashboard/${r.id}`}
-                    className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full px-3 text-xs font-semibold ring-1 ring-border hover:bg-surface-2"
+                    className="kashi-btn kashi-frame inline-flex h-8 shrink-0 items-center gap-1 px-3 text-xs font-semibold [--cut:5px] [--kashi-fill-hover:var(--surface-2)]"
                   >
                     {t("open")}
                     <ArrowLeft className="size-3.5 ltr:rotate-180" />
@@ -119,24 +119,24 @@ async function Branches({ params }: Pick<Props, "params">) {
                 />
               </div>
               <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                <span className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-2 py-1">
+                <span className="kashi-btn inline-flex items-center gap-1 bg-surface-2 px-2 py-1 [--cut:5px]">
                   <ReceiptText className="size-3.5" />
                   {t("ordersToday", { count: r.todayOrders })}
                 </span>
                 <span
                   className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2 py-1",
+                    "kashi-btn inline-flex items-center gap-1 px-2 py-1 [--cut:5px]",
                     r.activeOrders ? "bg-accent-soft text-accent" : "bg-surface-2",
                   )}
                 >
                   {t("inProgress", { count: r.activeOrders })}
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-2 py-1">
+                <span className="kashi-btn inline-flex items-center gap-1 bg-surface-2 px-2 py-1 [--cut:5px]">
                   <LayoutGrid className="size-3.5" />
                   {t("openTables", { count: r.openTables })}
                 </span>
                 {r.lowStock ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-danger-soft px-2 py-1 text-danger">
+                  <span className="kashi-btn inline-flex items-center gap-1 bg-danger-soft px-2 py-1 text-danger [--cut:5px]">
                     <AlertTriangle className="size-3.5" />
                     {t("lowStock", { count: r.lowStock })}
                   </span>

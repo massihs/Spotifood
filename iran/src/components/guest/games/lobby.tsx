@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown, Dices, Play, Plus, Trophy, Users, X } from "lucide-react";
+import { Crown, Dices, Play, Plus, Trophy, Users, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { cancelGameAction, createGameAction, joinGameAction } from "@/app/[locale]/table/games/actions";
@@ -30,7 +30,7 @@ export function PlayerTag({ p, className }: { p: Player; className?: string }) {
         <span className="shrink-0 text-xs text-fg-muted">· {t("table", { table: p.table })}</span>
       ) : null}
       <span
-        className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-tone-amber/15 px-1.5 py-0.5 text-[11px] font-bold text-tone-amber"
+        className="kashi-btn inline-flex shrink-0 items-center gap-0.5 bg-tone-amber/15 px-1.5 py-0.5 text-[11px] font-bold text-tone-amber [--cut:5px]"
         title={t("winsTitle", { n: p.wins })}
       >
         <Trophy className="size-3" aria-hidden="true" />
@@ -84,7 +84,7 @@ export function GamesLobby({
         <p className="text-sm font-semibold opacity-90">{t("backgammon")}</p>
         <h2 className="mt-1 text-2xl font-extrabold">{t("heroTitle")}</h2>
         <p className="mt-1 max-w-sm text-sm opacity-90">{t("heroBody")}</p>
-        <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
+        <p className="kashi-btn mt-3 inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 text-xs font-semibold [--cut:5px]">
           <Trophy className="size-3.5" aria-hidden="true" />
           {t("myWins", { n: lobby.myWins })}
         </p>
@@ -109,7 +109,7 @@ export function GamesLobby({
                     c.myTurn ? "border-accent ring-2 ring-accent/30" : "border-border",
                   )}
                 >
-                  <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                  <span className="kashi-tile grid size-11 place-items-center bg-accent-soft text-accent-text">
                     <Play className="size-5" aria-hidden="true" />
                   </span>
                   <span className="min-w-0 flex-1 text-sm">
@@ -150,7 +150,7 @@ export function GamesLobby({
               type="button"
               disabled={pending}
               onClick={() => go(() => cancelGameAction(myOpen.id))}
-              className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-fg-muted ring-1 ring-border"
+              className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1 px-3 text-sm font-semibold text-fg-muted"
             >
               <X className="size-4" aria-hidden="true" />
               {t("cancel")}
@@ -219,7 +219,7 @@ export function GamesLobby({
                   type="button"
                   disabled={pending}
                   onClick={() => go(() => joinGameAction(c.id))}
-                  className="h-10 shrink-0 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg disabled:opacity-60"
+                  className="kashi-btn h-10 shrink-0 bg-accent px-4 text-sm font-bold text-accent-fg disabled:opacity-60"
                 >
                   {t("join")}
                 </button>

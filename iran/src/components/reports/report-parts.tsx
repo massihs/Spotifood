@@ -1,4 +1,4 @@
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "@/components/icons";
 import { cn } from "@/lib/cn";
 import { Amount } from "@/components/ui/amount";
 

@@ -23,7 +23,7 @@ import {
   ZoomIn,
   ZoomOut,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -321,7 +321,7 @@ export function HostView({
                   type="button"
                   onClick={() => setZone(z)}
                   className={cn(
-                    "h-9 rounded-full px-4 text-sm font-semibold",
+                    "kashi-btn h-9 px-4 text-sm font-semibold",
                     zone === z ? "bg-ink text-ink-fg" : "bg-surface ring-1 ring-border",
                   )}
                 >
@@ -329,7 +329,7 @@ export function HostView({
                 </button>
               ))
             : null}
-          <span className="ms-auto inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.5 text-sm font-semibold ring-1 ring-border">
+          <span className="kashi-btn kashi-frame ms-auto inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold [--kashi-fill:var(--surface)]">
             <Users className="size-4 text-accent-text" aria-hidden="true" />
             {th("coversAt", { count: covers })}
           </span>
@@ -339,7 +339,7 @@ export function HostView({
                 <button
                   type="button"
                   onClick={tidy}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface px-3.5 text-sm font-semibold ring-1 ring-border"
+                  className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3.5 text-sm font-semibold [--kashi-fill:var(--surface)]"
                 >
                   <Wand2 className="size-4" aria-hidden="true" />
                   {th("tidy")}
@@ -347,7 +347,7 @@ export function HostView({
                 <button
                   type="button"
                   onClick={() => (setEditing(false), setLayout({}), setSelected(null))}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface px-3.5 text-sm font-semibold ring-1 ring-border"
+                  className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3.5 text-sm font-semibold [--kashi-fill:var(--surface)]"
                 >
                   <RotateCcw className="size-4" aria-hidden="true" />
                   {th("cancelEdit")}
@@ -356,7 +356,7 @@ export function HostView({
                   type="button"
                   disabled={pending}
                   onClick={saveLayout}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg disabled:opacity-50"
+                  className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-accent px-4 text-sm font-bold text-accent-fg disabled:opacity-50"
                 >
                   <Save className="size-4" aria-hidden="true" />
                   {th("savePlan")}
@@ -366,7 +366,7 @@ export function HostView({
               <button
                 type="button"
                 onClick={() => (setEditing(true), setPick(null))}
-                className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface px-3.5 text-sm font-semibold ring-1 ring-border"
+                className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3.5 text-sm font-semibold [--kashi-fill:var(--surface)]"
               >
                 <LayoutGrid className="size-4" aria-hidden="true" />
                 {th("editPlan")}
@@ -397,7 +397,7 @@ export function HostView({
                 type="button"
                 onClick={() => setAt(null)}
                 className={cn(
-                  "shrink-0 rounded-full px-3 py-1 text-xs font-bold",
+                  "kashi-btn shrink-0 px-3 py-1 text-xs font-bold [--cut:5px]",
                   live ? "bg-success-soft text-success" : "bg-surface-2",
                 )}
               >
@@ -422,7 +422,7 @@ export function HostView({
             <button
               type="button"
               onClick={() => setPick(null)}
-              className="grid size-8 place-items-center rounded-full bg-white/15"
+              className="kashi-tile grid size-8 place-items-center bg-white/15"
               aria-label={th("close")}
             >
               <X className="size-4" />
@@ -438,7 +438,7 @@ export function HostView({
               onClick={() => setZoom(!zoom)}
               aria-pressed={zoom}
               aria-label={zoom ? th("zoomFit") : th("zoomIn")}
-              className="sticky start-0 z-10 mb-2 inline-flex h-8 items-center gap-1.5 rounded-full bg-surface px-3 text-xs font-bold ring-1 ring-border sm:hidden"
+              className="kashi-btn kashi-frame sticky start-0 z-10 mb-2 inline-flex h-8 items-center gap-1.5 px-3 text-xs font-bold [--cut:5px] [--kashi-fill:var(--surface)] sm:hidden"
             >
               {zoom ? (
                 <ZoomOut className="size-4" aria-hidden="true" />
@@ -562,7 +562,7 @@ export function HostView({
                   })
                 }
                 className={cn(
-                  "h-8 rounded-full px-3 text-xs font-bold",
+                  "kashi-btn h-8 px-3 text-xs font-bold [--cut:5px]",
                   pos(tableById.get(selected)!).shape === sh ? "bg-ink text-ink-fg" : "bg-surface-2",
                 )}
               >
@@ -757,7 +757,7 @@ function BookingRow({
               type="button"
               disabled={busy}
               onClick={() => onStatus("confirmed")}
-              className="inline-flex h-8 items-center gap-1 rounded-full bg-success px-3 text-xs font-bold text-white"
+              className="kashi-btn inline-flex h-8 items-center gap-1 bg-success px-3 text-xs font-bold text-white [--cut:5px]"
             >
               <Check className="size-3.5" aria-hidden="true" />
               {th("confirm")}
@@ -767,7 +767,7 @@ function BookingRow({
               type="button"
               disabled={busy}
               onClick={() => onStatus("completed")}
-              className="inline-flex h-8 items-center gap-1 rounded-full bg-ink px-3 text-xs font-bold text-ink-fg"
+              className="kashi-btn inline-flex h-8 items-center gap-1 bg-ink px-3 text-xs font-bold text-ink-fg [--cut:5px]"
             >
               {th("finish")}
             </button>
@@ -776,7 +776,7 @@ function BookingRow({
               type="button"
               disabled={busy}
               onClick={onSeat}
-              className="inline-flex h-8 items-center gap-1 rounded-full bg-accent px-3 text-xs font-bold text-accent-fg"
+              className="kashi-btn inline-flex h-8 items-center gap-1 bg-accent px-3 text-xs font-bold text-accent-fg [--cut:5px]"
             >
               <Armchair className="size-3.5" aria-hidden="true" />
               {th("seat")}
@@ -786,7 +786,7 @@ function BookingRow({
             <button
               type="button"
               onClick={onAssign}
-              className="inline-flex h-8 items-center gap-1 rounded-full bg-surface-2 px-3 text-xs font-bold"
+              className="kashi-btn inline-flex h-8 items-center gap-1 bg-surface-2 px-3 text-xs font-bold [--cut:5px]"
             >
               {table ? th("moveTable") : th("giveTable")}
             </button>
@@ -798,7 +798,7 @@ function BookingRow({
                   type="button"
                   disabled={busy}
                   onClick={() => onStatus("no_show")}
-                  className="inline-flex h-8 items-center rounded-full bg-danger-soft px-3 text-xs font-bold text-danger"
+                  className="kashi-btn inline-flex h-8 items-center bg-danger-soft px-3 text-xs font-bold text-danger [--cut:5px]"
                 >
                   {th("noShow")}
                 </button>
@@ -808,7 +808,7 @@ function BookingRow({
                   type="button"
                   disabled={busy}
                   onClick={() => window.confirm(th("cancelConfirm")) && onStatus("cancelled")}
-                  className="inline-flex h-8 items-center rounded-full bg-surface-2 px-3 text-xs font-bold text-danger"
+                  className="kashi-btn inline-flex h-8 items-center bg-surface-2 px-3 text-xs font-bold text-danger [--cut:5px]"
                 >
                   {th("cancel")}
                 </button>
@@ -872,7 +872,7 @@ function TablePanel({
             type="button"
             disabled={busy}
             onClick={() => onFinish(seated.id)}
-            className="h-9 rounded-full bg-ink px-4 text-sm font-bold text-ink-fg"
+            className="kashi-btn h-9 bg-ink px-4 text-sm font-bold text-ink-fg"
           >
             {th("free")}
           </button>
@@ -888,7 +888,7 @@ function TablePanel({
               <button
                 type="button"
                 onClick={() => setSize((n) => Math.max(1, n - 1))}
-                className="grid size-8 place-items-center rounded-full bg-surface"
+                className="kashi-tile grid size-8 place-items-center bg-surface"
                 aria-label="-"
               >
                 <Minus className="size-4" />
@@ -897,7 +897,7 @@ function TablePanel({
               <button
                 type="button"
                 onClick={() => setSize((n) => Math.min(maxParty, n + 1))}
-                className="grid size-8 place-items-center rounded-full bg-surface"
+                className="kashi-tile grid size-8 place-items-center bg-surface"
                 aria-label="+"
               >
                 <Plus className="size-4" />
@@ -914,7 +914,7 @@ function TablePanel({
               type="button"
               disabled={busy}
               onClick={() => onWalkIn(size, name)}
-              className="h-10 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg disabled:opacity-50"
+              className="kashi-btn h-10 bg-accent px-4 text-sm font-bold text-accent-fg disabled:opacity-50"
             >
               {th("seatNow")}
             </button>
@@ -937,7 +937,7 @@ function TablePanel({
                   type="button"
                   disabled={busy}
                   onClick={() => onSeat(b.id)}
-                  className="h-8 rounded-full bg-accent px-3 text-xs font-bold text-accent-fg"
+                  className="kashi-btn h-8 bg-accent px-3 text-xs font-bold text-accent-fg [--cut:5px]"
                 >
                   {th("seat")}
                 </button>

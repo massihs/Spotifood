@@ -7,7 +7,7 @@ import {
   ReceiptText,
   SprayCan,
   Timer,
-} from "lucide-react";
+} from "@/components/icons";
 import { getTranslations } from "next-intl/server";
 import { Card, CardHeader, StatCard } from "@/components/ui/card";
 import { CALL_ICON } from "@/components/guest/call-icons";
@@ -76,7 +76,7 @@ export async function HotelOverview({
               </p>
             </div>
             <span
-              className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/12"
+              className="kashi-tile grid size-11 shrink-0 place-items-center bg-white/12"
               aria-hidden="true"
             >
               <BedDouble className="size-5" />
@@ -229,7 +229,7 @@ export async function HotelOverview({
                       href={`${base}/requests`}
                       className="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-surface-2"
                     >
-                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-ink text-sm font-black text-ink-fg tabular-nums">
+                      <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-ink text-sm font-black text-ink-fg tabular-nums">
                         {r.placeLabel}
                       </span>
                       <span className="min-w-0 flex-1">

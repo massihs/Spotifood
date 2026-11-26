@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarRange, Plus, Trash2 } from "lucide-react";
+import { CalendarRange, Plus, Trash2 } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Sheet, field, useRun } from "@/components/ui/sheet-kit";
@@ -38,7 +38,7 @@ export function CustomPeriod({ base, from, to }: { base: string; from: string; t
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-surface px-3 py-1.5 text-sm text-fg-muted ring-1 ring-border"
+        className="kashi-btn kashi-frame inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm text-fg-muted [--kashi-fill:var(--surface)]"
       >
         <CalendarRange className="size-4" />
         {t("custom")}
@@ -101,7 +101,7 @@ export function NewExpenseButton({ rid, currency, today }: { rid: string; curren
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg"
+        className="kashi-btn inline-flex h-10 items-center gap-2 bg-accent px-4 text-sm font-semibold text-accent-fg"
       >
         <Plus className="size-4" />
         {t("newExpense")}

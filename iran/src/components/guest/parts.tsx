@@ -14,7 +14,7 @@ import {
   TrendingUp,
   WheatOff,
   type LucideIcon,
-} from "lucide-react";
+} from "@/components/icons";
 import { CategoryIcon } from "@/components/category-icon";
 import { useTranslations } from "next-intl";
 import type { PricedOptionGroup } from "@/server/modules/pricing";
@@ -100,7 +100,7 @@ export function TagChip({ tag, compact, className }: { tag: string; compact?: bo
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
+        "kashi-btn inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold [--cut:5px]",
         meta?.tone ?? "bg-surface-2 text-fg-muted",
         className,
       )}
@@ -116,7 +116,7 @@ export function PopularBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full bg-tone-orange px-2 py-0.5 text-[11px] font-bold text-white shadow-sm atelier:bg-fg atelier:text-bg atelier:shadow-none nuit:bg-accent nuit:text-accent-fg",
+        "kashi-btn inline-flex items-center gap-1 bg-tone-orange px-2 py-0.5 text-[11px] font-bold text-white shadow-sm [--cut:5px] atelier:bg-fg atelier:text-bg atelier:shadow-none nuit:bg-accent nuit:text-accent-fg",
         className,
       )}
     >
@@ -237,7 +237,7 @@ export function AddButton({
         onClick();
       }}
       className={cn(
-        "grid size-11 shrink-0 place-items-center rounded-full bg-accent text-accent-fg shadow-accent",
+        "kashi-tile grid size-11 shrink-0 place-items-center bg-accent text-accent-fg shadow-accent",
         "atelier:bg-transparent atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-fg nuit:shadow-none",
         "transition-transform active:scale-90 disabled:opacity-60",
         className,

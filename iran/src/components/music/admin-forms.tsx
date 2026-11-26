@@ -1,6 +1,18 @@
 "use client";
 
-import { Check, ImagePlus, Loader2, Pause, Play, Plus, Power, Radio, Trash2, Upload, X } from "lucide-react";
+import {
+  Check,
+  ImagePlus,
+  Loader2,
+  Pause,
+  Play,
+  Plus,
+  Power,
+  Radio,
+  Trash2,
+  Upload,
+  X,
+} from "@/components/icons";
 import { Cover } from "@/components/music/cover";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslations } from "next-intl";
@@ -99,7 +111,7 @@ export function ThemeFlags({
   const [error, setError] = useState<string | null>(null);
   const btn = (on: boolean) =>
     cn(
-      "inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium ring-1 transition-colors disabled:opacity-50",
+      "inline-flex h-9 items-center gap-1.5 kashi-btn px-3.5 text-sm font-medium transition-colors disabled:opacity-50 kashi-frame",
       on ? "bg-accent-soft text-accent-text ring-accent/30" : "bg-surface text-fg-muted ring-border",
     );
   return (
@@ -125,7 +137,7 @@ export function ThemeFlags({
       <button
         type="button"
         disabled={pending}
-        className="inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium text-danger ring-1 ring-border hover:bg-danger-soft"
+        className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3.5 text-sm font-medium text-danger hover:bg-danger-soft"
         onClick={() => {
           if (!window.confirm(t("deleteThemeConfirm"))) return;
           start(async () => {
@@ -244,7 +256,7 @@ export function TrackUploader({ themeId }: { themeId: string }) {
             : "border-border-strong hover:border-accent hover:bg-accent-soft/40",
         )}
       >
-        <span className="grid size-12 place-items-center rounded-2xl bg-accent text-accent-fg">
+        <span className="kashi-tile grid size-12 place-items-center bg-accent text-accent-fg">
           <Upload className="size-6" aria-hidden="true" />
         </span>
         <span className="font-semibold">{t("uploadTitle")}</span>
@@ -327,7 +339,7 @@ export function TrackRow({
           else a.pause();
         }}
         aria-label={playing ? t("pause") : t("preview")}
-        className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent-text"
+        className="kashi-tile grid size-9 shrink-0 place-items-center bg-accent-soft text-accent-text"
       >
         {playing ? (
           <Pause className="size-4" aria-hidden="true" />

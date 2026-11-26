@@ -1,6 +1,6 @@
 "use client";
 
-import { RotateCcw, TriangleAlert } from "lucide-react";
+import { RotateCcw, TriangleAlert } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
@@ -22,7 +22,7 @@ export default function DashboardError({
   }, [error]);
   return (
     <div className="mx-auto mt-10 max-w-md rounded-3xl border border-border bg-surface p-8 text-center shadow-[var(--shadow-soft)]">
-      <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-danger-soft text-danger">
+      <span className="kashi-tile mx-auto grid size-14 place-items-center bg-danger-soft text-danger">
         <TriangleAlert className="size-7" aria-hidden="true" />
       </span>
       <h1 className="mt-5 text-xl font-bold">{t("errorTitle")}</h1>

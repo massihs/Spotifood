@@ -1,4 +1,4 @@
-import { BookOpen, ChevronLeft, Search, Store, Utensils } from "lucide-react";
+import { BookOpen, ChevronLeft, Search, Store, Utensils } from "@/components/icons";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -26,7 +26,7 @@ export default async function HelpPage({ params, searchParams }: Props) {
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <div className="text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-accent text-accent-fg shadow-accent">
+          <span className="kashi-tile mx-auto grid size-14 place-items-center bg-accent text-accent-fg shadow-accent">
             <BookOpen className="size-7" aria-hidden="true" />
           </span>
           <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">{t("helpCenter")}</h1>
@@ -78,7 +78,7 @@ async function Articles({ searchParams }: Pick<Props, "searchParams">) {
           defaultValue={q}
           placeholder={t("searchHelp")}
           aria-label={t("searchHelp")}
-          className="h-14 w-full rounded-full border border-border bg-surface ps-12 pe-5 text-base shadow-[var(--shadow-soft)] outline-none focus:border-accent focus:ring-4 focus:ring-[var(--ring)]"
+          className="kashi-btn h-14 w-full border border-border bg-surface ps-12 pe-5 text-base shadow-[var(--shadow-soft)] outline-none focus:border-accent focus:ring-4 focus:ring-[var(--ring)]"
         />
       </form>
       {results ? (

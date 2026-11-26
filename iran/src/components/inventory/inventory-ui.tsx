@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Boxes, ClipboardCheck, Pencil, Plus, Trash2, Truck, X } from "lucide-react";
+import { AlertTriangle, Boxes, ClipboardCheck, Pencil, Plus, Trash2, Truck, X } from "@/components/icons";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useMoney } from "@/components/ui/use-money";
@@ -69,7 +69,7 @@ export function StockTable({
           <button
             type="button"
             onClick={() => setEdit("new")}
-            className="ms-auto inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg"
+            className="kashi-btn ms-auto inline-flex h-10 items-center gap-2 bg-accent px-4 text-sm font-semibold text-accent-fg"
           >
             <Plus className="size-4" />
             {t("newItem")}
@@ -113,7 +113,7 @@ export function StockTable({
                     <button
                       type="button"
                       onClick={() => setAdjust({ item: i, kind: "count" })}
-                      className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm ring-1 ring-border"
+                      className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1 px-3 text-sm"
                       title={t("count")}
                     >
                       <ClipboardCheck className="size-4" />
@@ -122,7 +122,7 @@ export function StockTable({
                     <button
                       type="button"
                       onClick={() => setAdjust({ item: i, kind: "waste" })}
-                      className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm ring-1 ring-border"
+                      className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1 px-3 text-sm"
                       title={t("waste")}
                     >
                       <Trash2 className="size-4" />
@@ -375,7 +375,7 @@ export function PurchaseForm({
         type="button"
         onClick={() => setOpen(true)}
         disabled={!items.length}
-        className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg disabled:opacity-40"
+        className="kashi-btn inline-flex h-10 items-center gap-2 bg-accent px-4 text-sm font-semibold text-accent-fg disabled:opacity-40"
       >
         <Truck className="size-4" />
         {t("newPurchase")}
@@ -555,7 +555,7 @@ export function SupplierList({
         <ul className="divide-y divide-border rounded-2xl border border-border bg-surface">
           {suppliers.map((s) => (
             <li key={s.id} className="flex items-center gap-3 px-4 py-3">
-              <span className="grid size-9 place-items-center rounded-xl bg-accent-soft text-accent-text">
+              <span className="kashi-tile grid size-9 place-items-center bg-accent-soft text-accent-text">
                 <Truck className="size-4" />
               </span>
               <div className="min-w-0 flex-1">
@@ -630,7 +630,7 @@ export function RecipeList({
                 {margin != null ? (
                   <span
                     className={cn(
-                      "rounded-full px-2.5 py-0.5 text-xs font-bold",
+                      "kashi-btn px-2.5 py-0.5 text-xs font-bold [--cut:5px]",
                       margin >= 60
                         ? "bg-success-soft text-success"
                         : margin >= 30

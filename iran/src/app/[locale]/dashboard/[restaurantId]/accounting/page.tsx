@@ -14,7 +14,7 @@ import {
   TrendingUp,
   UsersRound,
   Wallet,
-} from "lucide-react";
+} from "@/components/icons";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { MoadianForm, MoadianRetryButton, MoadianSyncButton } from "@/components/ledger/moadian-ui";
 import { moadianStatus, moadianView } from "@/server/modules/moadian/service";
@@ -615,7 +615,7 @@ async function Ledger({ params, searchParams }: Props) {
                     {a.name}
                   </Link>
                   {a.isBusiness ? (
-                    <span className="ms-2 rounded-full bg-accent-soft px-1.5 py-0.5 text-[10px] font-bold text-accent-text">
+                    <span className="kashi-btn ms-2 bg-accent-soft px-1.5 py-0.5 text-[10px] font-bold text-accent-text [--cut:5px]">
                       B2B
                     </span>
                   ) : null}
@@ -1044,7 +1044,7 @@ async function Ledger({ params, searchParams }: Props) {
                     <td className={td}>
                       <span
                         className={cn(
-                          "rounded-full px-2 py-0.5 text-xs font-semibold",
+                          "kashi-btn px-2 py-0.5 text-xs font-semibold [--cut:5px]",
                           r.status === "accepted"
                             ? "bg-success-soft text-success"
                             : r.status === "failed"

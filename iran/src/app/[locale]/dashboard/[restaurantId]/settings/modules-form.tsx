@@ -12,7 +12,7 @@ import {
   LayoutGrid,
   Music,
   Network,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useOptimistic, useState, useTransition, type ReactNode } from "react";
 import { cn } from "@/lib/cn";

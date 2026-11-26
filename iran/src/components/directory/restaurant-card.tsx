@@ -1,4 +1,4 @@
-import { CalendarCheck, MapPin, Star, UtensilsCrossed } from "lucide-react";
+import { CalendarCheck, MapPin, Star, UtensilsCrossed } from "@/components/icons";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/config";
@@ -49,11 +49,11 @@ export async function RestaurantCard({
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent" />
         <OpenPill r={r} t={t} />
         {r.distanceKm != null ? (
-          <span className="absolute end-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-xs font-bold text-white tabular-nums backdrop-blur">
+          <span className="kashi-btn absolute end-3 top-3 bg-black/55 px-2.5 py-1 text-xs font-bold text-white tabular-nums backdrop-blur [--cut:5px]">
             {distanceLabel(r.distanceKm, t, format)}
           </span>
         ) : null}
-        <span className="absolute start-3 bottom-3 grid size-12 place-items-center overflow-hidden rounded-2xl bg-white shadow-lg ring-2 ring-white">
+        <span className="kashi-tile absolute start-3 bottom-3 grid size-12 place-items-center overflow-hidden bg-white shadow-lg ring-2 ring-white">
           {r.logo ? (
             <img src={r.logo} alt="" className="size-full object-contain p-0.5" />
           ) : (
@@ -70,7 +70,7 @@ export async function RestaurantCard({
             </Link>
           </h3>
           {r.rating != null ? (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-warning-soft px-2 py-0.5 text-sm font-bold tabular-nums">
+            <span className="kashi-btn inline-flex shrink-0 items-center gap-1 bg-warning-soft px-2 py-0.5 text-sm font-bold tabular-nums [--cut:5px]">
               <Star className="size-3.5 fill-warning text-warning" aria-hidden="true" />
               {format.number(r.rating, { maximumFractionDigits: 1, minimumFractionDigits: 1 })}
               <span className="sr-only">{t("reviews", { count: r.reviewCount })}</span>
@@ -97,7 +97,7 @@ export async function RestaurantCard({
               return (
                 <li
                   key={c}
-                  className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold"
+                  className="kashi-btn inline-flex items-center gap-1 bg-surface-2 px-2.5 py-1 text-xs font-semibold [--cut:5px]"
                 >
                   <Icon className="size-3.5 text-accent-text" aria-hidden="true" />
                   {t(`cuisine.${c}`)}
@@ -134,14 +134,14 @@ export async function RestaurantCard({
         <div className="relative z-10 mt-auto flex gap-2 pt-2">
           <Link
             href={`/r/${r.slug}`}
-            className="inline-flex h-10 flex-1 items-center justify-center rounded-full bg-surface-2 px-4 text-sm font-bold hover:bg-surface-3"
+            className="kashi-btn inline-flex h-10 flex-1 items-center justify-center bg-surface-2 px-4 text-sm font-bold hover:bg-surface-3"
           >
             {t("view")}
           </Link>
           {r.reservable ? (
             <Link
               href={bookHref}
-              className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg hover:bg-accent-hover"
+              className="kashi-btn inline-flex h-10 flex-1 items-center justify-center gap-1.5 bg-accent px-4 text-sm font-bold text-accent-fg hover:bg-accent-hover"
             >
               <CalendarCheck className="size-4" aria-hidden="true" />
               {t("book")}
@@ -159,7 +159,7 @@ function OpenPill({ r, t }: { r: DirectoryResult; t: T }) {
   if (r.open.status === "unknown") return null;
   const open = r.open.status === "open";
   return (
-    <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-neutral-900 shadow-sm">
+    <span className="kashi-btn absolute start-3 top-3 inline-flex items-center gap-1.5 bg-white/95 px-2.5 py-1 text-xs font-bold text-neutral-900 shadow-sm [--cut:5px]">
       <span className={open ? "size-2 rounded-full bg-success" : "size-2 rounded-full bg-danger"} />
       {open ? t("open") : t("closed")}
       <span className="font-medium text-neutral-500 tabular-nums">

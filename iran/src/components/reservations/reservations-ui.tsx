@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, CalendarPlus, Check, Clock, Copy, Phone, UserPlus, Users, X } from "lucide-react";
+import { Bell, CalendarPlus, Check, Clock, Copy, Phone, UserPlus, Users, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { field, num, useRun } from "@/components/ui/sheet-kit";
@@ -84,7 +84,7 @@ export function BookingList({
         <section key={k}>
           <h3 className="mb-2 flex items-center gap-2 px-1 text-sm font-bold text-fg-muted">
             {t(k)}
-            <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs tabular-nums">
+            <span className="kashi-btn bg-surface-2 px-2 py-0.5 text-xs tabular-nums [--cut:5px]">
               {t("covers", {
                 count: list
                   .filter((r) => !["cancelled", "no_show"].includes(r.status))
@@ -134,7 +134,7 @@ export function BookingList({
                 <div className="flex w-full items-center gap-1 ps-[4.75rem] sm:w-auto sm:ps-0">
                   <span
                     className={cn(
-                      "me-auto rounded-full px-2.5 py-0.5 text-xs font-semibold sm:me-2",
+                      "kashi-btn me-auto px-2.5 py-0.5 text-xs font-semibold [--cut:5px] sm:me-2",
                       STATUS_TONE[r.status],
                     )}
                   >
@@ -147,12 +147,12 @@ export function BookingList({
                       disabled={pending}
                       onClick={() => run(() => setReservationStatusAction(rid, r.id, to))}
                       className={cn(
-                        "h-8 rounded-full px-3 text-xs font-semibold",
+                        "kashi-btn h-8 px-3 text-xs font-semibold [--cut:5px]",
                         to === "seated" || to === "confirmed"
                           ? "bg-accent text-accent-fg"
                           : to === "completed"
                             ? "bg-surface-2"
-                            : "text-danger ring-1 ring-danger/30",
+                            : "text-danger ring-1 [--kashi-frame-color:color-mix(in_oklab,var(--danger)_35%,transparent)]",
                       )}
                     >
                       {t(`actions.${to}`)}
@@ -217,12 +217,12 @@ export function QueueBoard({ rid, rows }: { rid: string; rows: ReservationRow[] 
                     disabled={pending}
                     onClick={() => run(() => setReservationStatusAction(rid, r.id, to))}
                     className={cn(
-                      "inline-flex h-9 items-center gap-1 rounded-full px-3 text-xs font-semibold",
+                      "kashi-btn inline-flex h-9 items-center gap-1 px-3 text-xs font-semibold",
                       to === "notified"
                         ? "bg-tone-fuchsia text-white"
                         : to === "seated"
                           ? "bg-accent text-accent-fg"
-                          : "text-danger ring-1 ring-danger/30",
+                          : "text-danger ring-1 [--kashi-frame-color:color-mix(in_oklab,var(--danger)_35%,transparent)]",
                     )}
                   >
                     {to === "notified" ? (
@@ -316,7 +316,7 @@ export function NewBookingButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg"
+        className="kashi-btn inline-flex h-10 items-center gap-2 bg-accent px-4 text-sm font-semibold text-accent-fg"
       >
         <CalendarPlus className="size-4" />
         {t("newBooking")}
@@ -405,7 +405,7 @@ export function ReservationSettings({
               () => setSaved(true),
             )
           }
-          className="inline-flex h-10 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-fg"
+          className="kashi-btn inline-flex h-10 items-center bg-accent px-5 text-sm font-semibold text-accent-fg"
         >
           {saved ? t("saved") : t("save")}
         </button>
@@ -420,7 +420,7 @@ export function ReservationSettings({
               <button
                 type="button"
                 onClick={() => void navigator.clipboard.writeText(links[k]).then(() => setCopied(k))}
-                className="grid size-10 shrink-0 place-items-center rounded-full ring-1 ring-border"
+                className="kashi-tile kashi-frame grid size-10 shrink-0 place-items-center"
                 aria-label={t("copy")}
               >
                 {copied === k ? <Check className="size-4 text-success" /> : <Copy className="size-4" />}

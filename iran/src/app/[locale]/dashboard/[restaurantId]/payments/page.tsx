@@ -14,7 +14,7 @@ import { db } from "@/server/db/client";
 import { can } from "@/server/tenancy";
 import { listPayments, paymentConfig, type PAYMENT_STATUSES } from "@/server/modules/payments/service";
 import { getRestaurantPayouts } from "@/server/modules/payouts/service";
-import { Landmark } from "lucide-react";
+import { Landmark } from "@/components/icons";
 
 type Props = PageProps<"/[locale]/dashboard/[restaurantId]/payments">;
 type Status = (typeof PAYMENT_STATUSES)[number];
@@ -81,7 +81,7 @@ async function Payments({ params, searchParams }: Pick<Props, "params" | "search
         <Card className="mb-5 p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex min-w-0 items-start gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+              <span className="kashi-tile grid size-11 shrink-0 place-items-center bg-accent-soft text-accent-text">
                 <Landmark className="size-5" aria-hidden="true" />
               </span>
               <div className="min-w-0">
@@ -148,7 +148,7 @@ async function Payments({ params, searchParams }: Pick<Props, "params" | "search
             href={key === "all" ? base : `${base}?view=${key}`}
             aria-current={view === key ? "page" : undefined}
             className={cn(
-              "rounded-full px-4 py-2 text-sm font-medium",
+              "kashi-btn px-4 py-2 text-sm font-medium",
               view === key ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
             )}
           >

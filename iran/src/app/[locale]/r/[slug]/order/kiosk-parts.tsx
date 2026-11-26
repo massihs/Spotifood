@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, CreditCard, RotateCcw, ShoppingBag, Store, UtensilsCrossed } from "lucide-react";
+import { Check, CreditCard, RotateCcw, ShoppingBag, Store, UtensilsCrossed } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { QuantityStepper } from "@/components/guest/parts";
@@ -80,7 +80,7 @@ function ChannelSwitch({
           aria-selected={channel === id}
           onClick={() => onChannel(id)}
           className={cn(
-            "flex h-10 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-bold whitespace-nowrap transition-colors",
+            "kashi-btn flex h-10 items-center justify-center gap-1.5 px-3.5 text-sm font-bold whitespace-nowrap transition-colors",
             channel === id ? "bg-surface text-fg shadow-[var(--shadow-soft)]" : "text-fg-muted",
           )}
         >
@@ -171,7 +171,7 @@ export function KioskCart({
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-xl font-black tracking-tight">{t("checkout")}</h2>
           {count ? (
-            <span className="grid h-7 min-w-7 place-items-center rounded-full bg-accent px-2 text-sm font-bold text-accent-fg tabular-nums">
+            <span className="kashi-btn grid h-7 min-w-7 place-items-center bg-accent px-2 text-sm font-bold text-accent-fg tabular-nums [--cut:5px]">
               {count}
             </span>
           ) : null}
@@ -182,7 +182,7 @@ export function KioskCart({
         {lines.length === 0 ? (
           <div className="grid h-full place-items-center px-6 text-center">
             <div>
-              <span className="mx-auto grid size-20 place-items-center rounded-full bg-accent-soft text-accent-text">
+              <span className="kashi-tile mx-auto grid size-20 place-items-center bg-accent-soft text-accent-text">
                 <ShoppingBag className="size-9" strokeWidth={1.75} aria-hidden="true" />
               </span>
               <p className="mt-4 text-[15px] leading-7 text-fg-muted">{t("kioskCartEmpty")}</p>
@@ -268,7 +268,7 @@ export function KioskDone({
     >
       <div className="landing-grid pointer-events-none absolute inset-0 opacity-20" aria-hidden="true" />
       <div className="relative w-full max-w-lg">
-        <span className="animate-pop-in mx-auto grid size-20 place-items-center rounded-full bg-white text-success shadow-2xl">
+        <span className="animate-pop-in kashi-tile mx-auto grid size-20 place-items-center bg-white text-success shadow-2xl">
           <Check className="size-10" strokeWidth={3} aria-hidden="true" />
         </span>
         <p className="mt-6 text-xl font-bold opacity-95 sm:text-2xl">{t("kioskThanks")}</p>
@@ -285,7 +285,7 @@ export function KioskDone({
         <button
           type="button"
           onClick={onNext}
-          className="mt-10 inline-flex h-14 items-center gap-2 rounded-full bg-black/25 px-8 text-lg font-bold backdrop-blur transition-colors hover:bg-black/35"
+          className="kashi-btn mt-10 inline-flex h-14 items-center gap-2 bg-black/25 px-8 text-lg font-bold backdrop-blur transition-colors hover:bg-black/35"
         >
           <RotateCcw className="size-5" aria-hidden="true" />
           {t("kioskNext")}

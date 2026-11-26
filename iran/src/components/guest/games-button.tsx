@@ -1,6 +1,6 @@
 "use client";
 
-import { Dices } from "lucide-react";
+import { Dices } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { gamesBadgeAction } from "@/app/[locale]/table/games/actions";
@@ -35,7 +35,7 @@ export function GamesButton({ className }: { className?: string }) {
       aria-label={label}
       title={label}
       className={cn(
-        "relative inline-grid size-11 shrink-0 place-items-center rounded-full bg-surface text-fg shadow-[var(--shadow-soft)] ring-1 ring-border",
+        "relative inline-grid size-11 shrink-0 place-items-center rounded-[32%] bg-surface text-fg shadow-[var(--shadow-soft)] ring-1 ring-border",
         className,
       )}
     >

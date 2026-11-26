@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Copy, LogIn, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
+import { Clock, Copy, LogIn, LogOut, Pencil, Plus, Trash2 } from "@/components/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { DateInput } from "@/components/ui/date-input";
@@ -45,7 +45,7 @@ export function ClockButton({ rid, since }: { rid: string; since: string | null 
       onClick={() => run(() => clockAction(rid, on ? "out" : "in"))}
       title={on ? t("out") : t("in")}
       className={cn(
-        "inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-semibold transition-colors disabled:opacity-60",
+        "kashi-btn inline-flex h-10 items-center gap-1.5 px-3 text-sm font-semibold transition-colors disabled:opacity-60",
         on
           ? "bg-success-soft text-success ring-1 ring-success/30"
           : "bg-surface-2 text-fg-muted hover:text-fg",
@@ -163,7 +163,7 @@ export function EntryButton({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg"
+          className="kashi-btn inline-flex h-10 items-center gap-2 bg-accent px-4 text-sm font-bold text-accent-fg"
         >
           <Plus className="size-4" />
           {t("add")}
@@ -186,7 +186,7 @@ export function EntryButton({
                     () => setOpen(false),
                   )
                 }
-                className="h-11 rounded-xl px-4 font-semibold text-danger ring-1 ring-danger/30"
+                className="h-11 rounded-xl px-4 font-semibold text-danger ring-1 [--kashi-frame-color:color-mix(in_oklab,var(--danger)_35%,transparent)]"
               >
                 <Trash2 className="size-4" />
               </button>
@@ -276,7 +276,7 @@ export function AddShiftButton({
         className={
           compact
             ? "grid h-7 w-full place-items-center rounded-lg text-fg-subtle hover:bg-surface-2 hover:text-fg"
-            : "inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg"
+            : "kashi-btn inline-flex h-10 items-center gap-2 bg-accent px-4 text-sm font-bold text-accent-fg"
         }
       >
         <Plus className="size-4" />
@@ -316,7 +316,7 @@ export function CopyWeekButton({ rid, weekStart }: { rid: string; weekStart: str
         type="button"
         disabled={pending}
         onClick={() => run(() => copyWeekAction(rid, weekStart))}
-        className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold ring-1 ring-border disabled:opacity-50"
+        className="kashi-btn kashi-frame inline-flex h-10 items-center gap-2 px-4 text-sm font-semibold disabled:opacity-50"
       >
         <Copy className="size-4" />
         {t("copyWeek")}

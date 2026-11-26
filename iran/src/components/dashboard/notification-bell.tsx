@@ -103,7 +103,7 @@ export function NotificationBell({
           setOpen((v) => !v);
           if (!open) load();
         }}
-        className="relative grid size-11 place-items-center rounded-full bg-surface-2 text-fg hover:bg-surface-3"
+        className="relative grid size-11 place-items-center rounded-[32%] bg-surface-2 text-fg hover:bg-surface-3"
       >
         <svg
           viewBox="0 0 24 24"

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { Star } from "lucide-react";
+import { Star } from "@/components/icons";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { Card, CardHeader, StatCard } from "@/components/ui/card";
 import { cn } from "@/lib/cn";

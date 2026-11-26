@@ -1,6 +1,6 @@
 "use client";
 
-import { Columns3, LayoutGrid } from "lucide-react";
+import { Columns3, LayoutGrid } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
@@ -40,7 +40,7 @@ export function OrdersLayoutToggle({
           aria-pressed={layout === key}
           onClick={() => pick(key)}
           className={cn(
-            "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold whitespace-nowrap",
+            "kashi-btn inline-flex h-8 items-center gap-1.5 px-3 text-xs font-semibold whitespace-nowrap [--cut:5px]",
             layout === key ? "bg-surface text-fg shadow-sm" : "text-fg-muted hover:text-fg",
           )}
         >

@@ -22,7 +22,7 @@ export function PlaceHeader({
         aria-hidden="true"
       />
       <div className="relative mx-auto flex max-w-md items-center gap-3">
-        <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white">
+        <span className="kashi-tile grid size-14 shrink-0 place-items-center overflow-hidden bg-white">
           {logo ? (
             <img src={logo} alt="" className="size-full object-contain p-1" />
           ) : (

@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, RotateCcw } from "lucide-react";
+import { RefreshCw, RotateCcw } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { field, useRun } from "@/components/ui/sheet-kit";
@@ -146,7 +146,7 @@ export function MoadianSyncButton({ rid }: { rid: string }) {
         type="button"
         disabled={pending}
         onClick={() => run(() => syncMoadianAction(rid))}
-        className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold ring-1 ring-border disabled:opacity-50"
+        className="kashi-btn kashi-frame inline-flex h-10 items-center gap-2 px-4 text-sm font-semibold disabled:opacity-50"
       >
         <RefreshCw className={cn("size-4", pending && "animate-spin")} />
         {t("syncNow")}

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { BedDouble } from "lucide-react";
+import { BedDouble } from "@/components/icons";
 import { formatMoney } from "@/lib/money";
 import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -107,7 +107,7 @@ async function Floor({ params }: { params: Params }) {
                   </div>
                   <p className="mt-1 text-xs font-medium text-fg-muted">{t(tbl.state)}</p>
                   {tbl.waiting ? (
-                    <p className="mt-1.5 inline-flex w-fit rounded-full bg-warning-soft px-2 py-0.5 text-xs font-semibold text-warning">
+                    <p className="kashi-btn mt-1.5 inline-flex w-fit bg-warning-soft px-2 py-0.5 text-xs font-semibold text-warning [--cut:5px]">
                       {t("waitingConfirm")}
                     </p>
                   ) : null}

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Pause, Play } from "lucide-react";
+import { ChevronDown, Pause, Play } from "@/components/icons";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { pauseOnlineAction } from "@/app/[locale]/dashboard/[restaurantId]/live-actions";
@@ -60,7 +60,7 @@ export function OnlinePause({
             type="button"
             disabled={pending}
             onClick={() => run(0)}
-            className="ms-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-surface px-3 text-fg shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
+            className="kashi-btn ms-1 inline-flex h-8 items-center gap-1.5 bg-surface px-3 text-fg shadow-sm transition-opacity [--cut:5px] hover:opacity-90 disabled:opacity-60"
           >
             <Play className="size-3.5" aria-hidden="true" />
             {t("resume")}
@@ -82,7 +82,7 @@ export function OnlinePause({
   );
   if (!canPause)
     return (
-      <span className="inline-flex h-10 items-center gap-2 rounded-full bg-success-soft px-3.5 text-sm font-semibold text-success">
+      <span className="kashi-btn inline-flex h-10 items-center gap-2 bg-success-soft px-3.5 text-sm font-semibold text-success">
         {pill}
       </span>
     );
@@ -95,7 +95,7 @@ export function OnlinePause({
           type="button"
           onClick={open}
           aria-haspopup="dialog"
-          className="inline-flex h-10 items-center gap-2 rounded-full bg-success-soft px-3.5 text-sm font-semibold text-success transition-opacity hover:opacity-90"
+          className="kashi-btn inline-flex h-10 items-center gap-2 bg-success-soft px-3.5 text-sm font-semibold text-success transition-opacity hover:opacity-90"
         >
           {pill}
           <ChevronDown className="size-4 opacity-70" aria-hidden="true" />

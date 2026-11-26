@@ -9,7 +9,7 @@ import {
   Smartphone,
   Utensils,
   XCircle,
-} from "lucide-react";
+} from "@/components/icons";
 import { Amount } from "@/components/ui/amount";
 import { Suspense } from "react";
 import { menuThemeOf } from "@/lib/menu-themes";
@@ -72,7 +72,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
           <GuestTopBar
             title={t("guest.myOrders")}
             subtitle={`${guest.restaurant.name} · ${t(guest.table.kind === "room" ? "guest.tableBadgeRoom" : "guest.tableBadge", { table: guest.table.label })}`}
-            extra={<LiveIndicator className="rounded-full bg-surface-2 px-3 py-1.5" />}
+            extra={<LiveIndicator className="kashi-btn bg-surface-2 px-3 py-1.5" />}
           />
           <main className="mx-auto max-w-2xl px-4 pt-4 pb-32 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-x-6 lg:pt-6 lg:pb-12">
             {orders.length > 0 ? <ReadyWatcher /> : null}
@@ -86,7 +86,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                 role="status"
                 className="animate-pop-in mb-4 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent-soft p-4 lg:col-span-2"
               >
-                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-accent text-accent-fg">
+                <span className="kashi-tile grid size-12 shrink-0 place-items-center bg-accent text-accent-fg">
                   <CircleCheck className="size-7" aria-hidden="true" />
                 </span>
                 <div>
@@ -98,13 +98,13 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
 
             {orders.length === 0 ? (
               <div className="py-16 text-center lg:col-span-2">
-                <div className="mx-auto grid size-20 place-items-center rounded-full bg-surface-2">
+                <div className="kashi-tile mx-auto grid size-20 place-items-center bg-surface-2">
                   <ReceiptText className="size-9 text-fg-muted" aria-hidden="true" />
                 </div>
                 <p className="mt-5 text-lg font-bold">{t("guest.noOrders")}</p>
                 <Link
                   href="/table"
-                  className="mt-7 inline-flex h-12 items-center rounded-full bg-accent px-7 font-bold text-accent-fg"
+                  className="kashi-btn mt-7 inline-flex h-12 items-center bg-accent px-7 font-bold text-accent-fg"
                 >
                   {t("guest.backToMenu")}
                 </Link>
@@ -257,7 +257,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                           <span className="flex items-center gap-2">
                             {t("guest.total")}
                             {o.paymentStatus !== "unpaid" && o.status !== "cancelled" ? (
-                              <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text">
+                              <span className="kashi-btn bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text [--cut:5px]">
                                 {t(`paymentStatus.${o.paymentStatus}`)}
                               </span>
                             ) : null}
@@ -290,7 +290,7 @@ async function GuestOrders({ searchParams }: Pick<PageProps<"/[locale]/table/ord
                   href="/account"
                   className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 hover:bg-surface-2"
                 >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+                  <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent-soft text-accent-text">
                     <Salad className="size-5" aria-hidden="true" />
                   </span>
                   <span className="min-w-0 flex-1">

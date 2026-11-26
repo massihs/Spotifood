@@ -56,7 +56,7 @@ async function Requests({ params, searchParams }: Pick<Props, "params" | "search
             href={k === "board" ? base : `${base}?tab=${k}`}
             aria-current={tab === k ? "page" : undefined}
             className={cn(
-              "shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+              "kashi-btn shrink-0 px-4 py-2 text-sm font-medium whitespace-nowrap",
               tab === k ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
             )}
           >

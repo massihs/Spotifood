@@ -1,6 +1,6 @@
 "use client";
 
-import { Headset, SendHorizontal } from "lucide-react";
+import { Headset, SendHorizontal } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { TimeAgo } from "@/components/ui/time-ago";
@@ -120,7 +120,7 @@ export function ChatComposer({
         disabled={!value.trim() || pending}
         aria-label={t("send")}
         title={t("send")}
-        className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-accent-fg transition-transform active:scale-90 disabled:opacity-40"
+        className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent text-accent-fg transition-transform active:scale-90 disabled:opacity-40"
       >
         <SendHorizontal className="size-[18px] rtl:-scale-x-100" aria-hidden="true" />
       </button>
@@ -134,7 +134,7 @@ export function StatusChip({ status }: { status: string }) {
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold",
+        "kashi-btn inline-flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 text-xs font-bold [--cut:5px]",
         status === "resolved"
           ? "bg-success-soft text-success"
           : status === "pending"

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { Card } from "@/components/ui/card";
-import { BedDouble, ChevronDown, ExternalLink, Printer, QrCode } from "lucide-react";
+import { BedDouble, ChevronDown, ExternalLink, Printer, QrCode } from "@/components/icons";
 import { cn } from "@/lib/cn";
 import { buttonClasses } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -82,11 +82,11 @@ async function Tables({ params }: { params: Params }) {
       ) : (
         <>
           <div className="mb-5 flex flex-wrap gap-2 text-sm font-bold">
-            <span className="inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 shadow-[var(--shadow-soft)]">
+            <span className="kashi-btn inline-flex items-center gap-2 bg-surface px-4 py-2 shadow-[var(--shadow-soft)]">
               <span className="size-2 rounded-full bg-success" aria-hidden="true" />
               {t("tables.free")} <span className="tabular-nums">{tables.length - occupied}</span>
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 shadow-[var(--shadow-soft)]">
+            <span className="kashi-btn inline-flex items-center gap-2 bg-surface px-4 py-2 shadow-[var(--shadow-soft)]">
               <span className="size-2 rounded-full bg-warning" aria-hidden="true" />
               {t("tables.occupied")} <span className="tabular-nums">{occupied}</span>
             </span>
@@ -142,18 +142,18 @@ async function Tables({ params }: { params: Params }) {
                       </div>
                       <div className="flex flex-wrap gap-1.5 px-4 pb-4">
                         {table.openSessionId ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-soft px-2.5 py-1 text-xs font-bold">
+                          <span className="kashi-btn inline-flex items-center gap-1.5 bg-warning-soft px-2.5 py-1 text-xs font-bold [--cut:5px]">
                             <span className="size-1.5 rounded-full bg-warning" aria-hidden="true" />
                             {t("tables.occupied")} · {format.relativeTime(table.openSessionSince!)}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-1 text-xs font-bold text-success">
+                          <span className="kashi-btn inline-flex items-center gap-1.5 bg-success-soft px-2.5 py-1 text-xs font-bold text-success [--cut:5px]">
                             <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
                             {t("tables.free")}
                           </span>
                         )}
                         {!table.qrEnabled ? (
-                          <span className="rounded-full bg-danger-soft px-2.5 py-1 text-xs font-bold text-danger">
+                          <span className="kashi-btn bg-danger-soft px-2.5 py-1 text-xs font-bold text-danger [--cut:5px]">
                             {t("tables.qrDisabled")}
                           </span>
                         ) : null}
@@ -165,7 +165,7 @@ async function Tables({ params }: { params: Params }) {
                           <span />
                         )}
                         <details name="table-actions" className="relative">
-                          <summary className="flex h-9 cursor-pointer list-none items-center gap-1.5 rounded-full bg-surface-2 px-3.5 text-sm font-bold hover:bg-surface-3 [&::-webkit-details-marker]:hidden">
+                          <summary className="kashi-btn flex h-9 cursor-pointer list-none items-center gap-1.5 bg-surface-2 px-3.5 text-sm font-bold hover:bg-surface-3 [&::-webkit-details-marker]:hidden">
                             <QrCode className="size-4" aria-hidden="true" />
                             QR
                             <ChevronDown className="size-3.5 opacity-60" aria-hidden="true" />

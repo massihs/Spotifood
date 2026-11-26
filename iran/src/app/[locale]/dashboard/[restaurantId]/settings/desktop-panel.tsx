@@ -1,6 +1,6 @@
 "use client";
 
-import { Apple, Download, Laptop, MonitorSmartphone, Trash2, WifiOff } from "lucide-react";
+import { Apple, Download, Laptop, MonitorSmartphone, Trash2, WifiOff } from "@/components/icons";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
@@ -43,7 +43,7 @@ export function DesktopPanel({
       <div className="grid gap-3 sm:grid-cols-3">
         {(["online", "offline", "sync"] as const).map((k, i) => (
           <div key={k} className="rounded-2xl bg-surface-2 p-4">
-            <span className="grid size-9 place-items-center rounded-xl bg-surface text-accent-text shadow-[var(--shadow-soft)] [&_svg]:size-4">
+            <span className="kashi-tile grid size-9 place-items-center bg-surface text-accent-text shadow-[var(--shadow-soft)] [&_svg]:size-4">
               {[<Laptop key="a" />, <WifiOff key="b" />, <MonitorSmartphone key="c" />][i]}
             </span>
             <p className="mt-2 text-sm font-bold">{t(`${k}Title`)}</p>
@@ -56,7 +56,7 @@ export function DesktopPanel({
         {downloads.windows ? (
           <a
             href={downloads.windows}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-fg px-5 text-sm font-semibold text-bg"
+            className="kashi-btn inline-flex h-11 items-center gap-2 bg-fg px-5 text-sm font-semibold text-bg"
           >
             <Download className="size-4" aria-hidden="true" />
             {t("windows")}
@@ -65,7 +65,7 @@ export function DesktopPanel({
         {downloads.mac ? (
           <a
             href={downloads.mac}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-surface-2 px-5 text-sm font-semibold ring-1 ring-border"
+            className="kashi-btn kashi-frame inline-flex h-11 items-center gap-2 px-5 text-sm font-semibold [--kashi-fill:var(--surface-2)]"
           >
             <Apple className="size-4" aria-hidden="true" />
             {t("mac")}

@@ -20,7 +20,7 @@ import { foodCosts, purchasePlan } from "@/server/modules/insights/service";
 import { listTransfers, transferTargets } from "@/server/modules/inventory/transfers";
 import { TransferButton } from "@/components/inventory/transfer-ui";
 import { EmptyState } from "@/components/ui/empty-state";
-import { ArrowLeftRight, Store } from "lucide-react";
+import { ArrowLeftRight, Store } from "@/components/icons";
 import { SupplierOrder } from "@/components/inventory/marketplace-ui";
 import {
   listSuppliers as listMarketSuppliers,
@@ -103,7 +103,7 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
             href={k === "stock" ? base : `${base}?tab=${k}`}
             aria-current={tab === k ? "page" : undefined}
             className={cn(
-              "shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+              "kashi-btn shrink-0 px-4 py-2 text-sm font-medium whitespace-nowrap",
               tab === k ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
             )}
           >
@@ -231,7 +231,7 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
                           <span className="text-fg-muted" dir="ltr">
                             {o.number}
                           </span>
-                          <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs">
+                          <span className="kashi-btn bg-surface-2 px-2 py-0.5 text-xs [--cut:5px]">
                             {tm(`status.${o.status}`)}
                           </span>
                           <span className="font-semibold tabular-nums">{money(o.totalCents)}</span>
@@ -262,7 +262,7 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
                     <li key={r.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm">
                       <span
                         className={cn(
-                          "w-24 shrink-0 rounded-full px-2 py-0.5 text-center text-xs font-semibold",
+                          "kashi-btn w-24 shrink-0 px-2 py-0.5 text-center text-xs font-semibold [--cut:5px]",
                           r.out ? "bg-warning-soft text-warning" : "bg-success-soft text-success",
                         )}
                       >
@@ -296,7 +296,7 @@ async function Inventory({ params, searchParams }: Pick<Props, "params" | "searc
               <li key={m.id} className="flex items-center gap-3 px-4 py-2.5 text-sm">
                 <span
                   className={cn(
-                    "w-24 shrink-0 rounded-full px-2 py-0.5 text-center text-xs font-semibold",
+                    "kashi-btn w-24 shrink-0 px-2 py-0.5 text-center text-xs font-semibold [--cut:5px]",
                     m.quantity >= 0 ? "bg-success-soft text-success" : "bg-danger-soft text-danger",
                   )}
                 >

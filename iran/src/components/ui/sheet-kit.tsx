@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { normalizeDigits } from "@/lib/money";
@@ -34,7 +34,7 @@ export function Sheet({
           <button
             type="button"
             onClick={onClose}
-            className="grid size-9 place-items-center rounded-full bg-surface-2"
+            className="kashi-tile grid size-9 place-items-center bg-surface-2"
             aria-label="×"
           >
             <X className="size-4" />

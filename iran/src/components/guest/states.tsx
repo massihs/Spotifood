@@ -1,4 +1,4 @@
-import { QrCode } from "lucide-react";
+import { QrCode } from "@/components/icons";
 import { getTranslations } from "next-intl/server";
 
 export function GuestSkeleton() {
@@ -40,7 +40,7 @@ export async function SessionExpired() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
       <div
-        className="grid size-20 place-items-center rounded-full bg-accent-soft text-accent-text"
+        className="kashi-tile grid size-20 place-items-center bg-accent-soft text-accent-text"
         aria-hidden="true"
       >
         <QrCode className="size-9" />

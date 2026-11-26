@@ -23,7 +23,7 @@ import {
   TrendingUp,
   UtensilsCrossed,
   Wallet,
-} from "lucide-react";
+} from "@/components/icons";
 import { Suspense, type ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -378,7 +378,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
           <Link
             key={href}
             href={href}
-            className="group inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-border bg-surface ps-1.5 pe-3.5 text-sm font-semibold whitespace-nowrap shadow-[var(--shadow-soft)] transition-[border-color,background-color,transform] hover:border-accent/40 hover:bg-accent-soft/40 active:scale-[0.97]"
+            className="group kashi-btn inline-flex h-10 shrink-0 items-center gap-2 border border-border bg-surface ps-1.5 pe-3.5 text-sm font-semibold whitespace-nowrap shadow-[var(--shadow-soft)] transition-[border-color,background-color,transform] hover:border-accent/40 hover:bg-accent-soft/40 active:scale-[0.97]"
           >
             <span className={cn("grid size-7 place-items-center rounded-full", TONE_TILE[tone])}>
               <Icon className="size-4" aria-hidden="true" />
@@ -468,7 +468,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
             </ul>
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5 py-10 text-center">
-              <span className="grid size-12 place-items-center rounded-2xl bg-success-soft text-success">
+              <span className="kashi-tile grid size-12 place-items-center bg-success-soft text-success">
                 <Check className="size-6" strokeWidth={3} aria-hidden="true" />
               </span>
               <p className="font-bold">{t("attention.clear")}</p>
@@ -596,7 +596,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
             title={t("setupTitle")}
             description={t("setupSubtitle")}
             action={
-              <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-text tabular-nums">
+              <span className="kashi-btn bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-text tabular-nums [--cut:5px]">
                 {doneCount}/{steps.length}
               </span>
             }
@@ -653,7 +653,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
                       >
                         <span
                           className={cn(
-                            "grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-accent-soft px-1 font-bold text-accent-text tabular-nums",
+                            "kashi-tile grid size-10 shrink-0 place-items-center overflow-hidden bg-accent-soft px-1 font-bold text-accent-text tabular-nums",
                             (o.tableLabel?.length ?? 0) > 3 ? "text-[10px] break-all" : "text-sm",
                           )}
                           aria-hidden="true"
@@ -667,7 +667,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
                             </bdi>
                             <span
                               className={cn(
-                                "rounded-full px-2 py-0.5 text-[11px] font-bold",
+                                "kashi-btn px-2 py-0.5 text-[11px] font-bold [--cut:5px]",
                                 STATUS_CHIP[o.status],
                               )}
                             >
@@ -680,7 +680,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
                         </span>
                         <span
                           className={cn(
-                            "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold tabular-nums",
+                            "kashi-btn inline-flex shrink-0 items-center gap-1 px-2 py-0.5 text-xs font-bold tabular-nums [--cut:5px]",
                             late
                               ? "bg-danger text-white"
                               : warn
@@ -718,7 +718,7 @@ async function Overview({ params }: { params: PageProps<"/[locale]/dashboard/[re
                     </span>
                     <span
                       className={cn(
-                        "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold",
+                        "kashi-btn shrink-0 px-2 py-0.5 text-[11px] font-bold [--cut:5px]",
                         b.status === "pending"
                           ? "bg-warning-soft text-warning"
                           : "bg-tone-fuchsia/12 text-tone-fuchsia",
@@ -785,7 +785,7 @@ function Trend({ delta, label }: { delta: number | null; label: string }) {
   return (
     <p
       className={cn(
-        "mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
+        "kashi-btn mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold [--cut:5px]",
         up ? "bg-success-soft text-success" : "bg-danger-soft text-danger",
       )}
     >
@@ -826,7 +826,7 @@ function Mini({ label, delta, children }: { label: string; delta?: number | null
 function Empty({ icon, text }: { icon: ReactNode; text: string }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5 py-10 text-center text-sm text-fg-muted">
-      <span className="grid size-11 place-items-center rounded-2xl bg-surface-2 text-fg-subtle [&_svg]:size-5">
+      <span className="kashi-tile grid size-11 place-items-center bg-surface-2 text-fg-subtle [&_svg]:size-5">
         {icon}
       </span>
       {text}

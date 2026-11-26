@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowDownRight, Check, CheckCircle2, Info, Utensils } from "lucide-react";
+import { AlertTriangle, ArrowDownRight, Check, CheckCircle2, Info, Utensils } from "@/components/icons";
 import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
@@ -201,7 +201,7 @@ export function LimitTile({
         {Icon ? (
           <span
             className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold",
+              "kashi-btn inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold [--cut:5px]",
               status === "good" && "bg-success-soft text-success",
               status === "high" && "bg-warning-soft text-fg",
               status === "low" && "bg-surface-2 text-fg-muted",

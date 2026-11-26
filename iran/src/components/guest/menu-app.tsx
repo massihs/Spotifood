@@ -161,7 +161,7 @@ export function MenuApp({
           <p className="min-w-0 flex-1 truncate font-menu-display text-[17px] font-semibold">
             {restaurantName}
           </p>
-          <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-text">
+          <span className="kashi-btn shrink-0 bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-text [--cut:5px]">
             {t(room ? "guest.tableBadgeRoom" : "guest.tableBadge", { table: tableLabel })}
           </span>
         </div>

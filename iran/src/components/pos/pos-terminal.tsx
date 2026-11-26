@@ -25,7 +25,7 @@ import {
   X,
   Zap,
   MonitorSmartphone,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePref, writePref } from "@/components/ui/use-pref";
@@ -400,7 +400,7 @@ export function PosTerminal({
                     if (a.zoneId) setZoneId(a.zoneId);
                   }}
                   className={cn(
-                    "inline-flex max-w-48 shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs",
+                    "kashi-btn inline-flex max-w-48 shrink-0 items-center gap-1 px-2.5 py-1 text-xs [--cut:5px]",
                     address === a.address ? "bg-tone-sky text-white" : "bg-surface ring-1 ring-border",
                   )}
                 >
@@ -543,7 +543,7 @@ export function PosTerminal({
                 type="button"
                 onClick={() => setUsePoints((u) => !u)}
                 className={cn(
-                  "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
+                  "kashi-btn shrink-0 px-2.5 py-1 text-xs font-semibold [--cut:5px]",
                   usePoints ? "bg-warning text-white" : "bg-surface ring-1 ring-warning/40",
                 )}
               >
@@ -735,7 +735,7 @@ export function PosTerminal({
             target="sf-customer-display"
             title={t("customerDisplay")}
             aria-label={t("customerDisplay")}
-            className="hidden size-11 shrink-0 place-items-center rounded-xl border border-border bg-surface text-fg-muted hover:text-fg lg:grid"
+            className="kashi-tile hidden size-11 shrink-0 place-items-center border border-border bg-surface text-fg-muted hover:text-fg lg:grid"
           >
             <MonitorSmartphone className="size-5" aria-hidden="true" />
           </a>
@@ -767,7 +767,7 @@ export function PosTerminal({
             type="button"
             onClick={() => setCategory("all")}
             className={cn(
-              "shrink-0 rounded-full px-4 py-2 text-sm font-semibold",
+              "kashi-btn shrink-0 px-4 py-2 text-sm font-semibold",
               category === "all" ? "bg-accent text-accent-fg" : "bg-surface ring-1 ring-border",
             )}
           >
@@ -779,7 +779,7 @@ export function PosTerminal({
               type="button"
               onClick={() => setCategory(c.id)}
               className={cn(
-                "inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap",
+                "kashi-btn inline-flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm font-semibold whitespace-nowrap",
                 category === c.id ? "bg-accent text-accent-fg" : "bg-surface ring-1 ring-border",
               )}
             >
@@ -884,7 +884,7 @@ export function PosTerminal({
               <button
                 type="button"
                 onClick={() => setTicketOpen(false)}
-                className="grid size-9 place-items-center rounded-full bg-surface-2"
+                className="kashi-tile grid size-9 place-items-center bg-surface-2"
                 aria-label={t("close")}
               >
                 <X className="size-4" />
@@ -1130,7 +1130,7 @@ function PayDialog({
                   key={v}
                   type="button"
                   onClick={() => setTendered(String(v / unit))}
-                  className="rounded-full bg-surface-2 px-3 py-1.5 text-sm font-medium tabular-nums"
+                  className="kashi-btn bg-surface-2 px-3 py-1.5 text-sm font-medium tabular-nums"
                 >
                   {money(v)}
                 </button>

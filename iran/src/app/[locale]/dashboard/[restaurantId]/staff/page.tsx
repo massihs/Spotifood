@@ -7,7 +7,7 @@ import {
   HandCoins,
   UsersRound,
   Wallet,
-} from "lucide-react";
+} from "@/components/icons";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { Kpi } from "@/components/reports/report-parts";
@@ -92,7 +92,7 @@ async function Staff({ params, searchParams }: Pick<Props, "params" | "searchPar
               href={k === "now" ? base : `${base}?tab=${k}`}
               aria-current={tab === k ? "page" : undefined}
               className={cn(
-                "inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+                "kashi-btn inline-flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm font-medium whitespace-nowrap",
                 tab === k ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
               )}
             >
@@ -156,7 +156,7 @@ async function Staff({ params, searchParams }: Pick<Props, "params" | "searchPar
                             </span>
                             <span
                               className={cn(
-                                "rounded-full px-2 py-0.5 text-xs font-semibold",
+                                "kashi-btn px-2 py-0.5 text-xs font-semibold [--cut:5px]",
                                 here
                                   ? "bg-success-soft text-success"
                                   : late
@@ -214,7 +214,7 @@ async function Staff({ params, searchParams }: Pick<Props, "params" | "searchPar
                 <div className="flex flex-wrap items-center gap-2">
                   <Link
                     href={`${base}?tab=planning&week=${addDays(weekStart, -7)}`}
-                    className="grid size-10 place-items-center rounded-full ring-1 ring-border"
+                    className="kashi-tile kashi-frame grid size-10 place-items-center"
                     aria-label="‹"
                   >
                     <ChevronRight className="size-4 ltr:rotate-180" />
@@ -224,7 +224,7 @@ async function Staff({ params, searchParams }: Pick<Props, "params" | "searchPar
                   </p>
                   <Link
                     href={`${base}?tab=planning&week=${addDays(weekStart, 7)}`}
-                    className="grid size-10 place-items-center rounded-full ring-1 ring-border"
+                    className="kashi-tile kashi-frame grid size-10 place-items-center"
                     aria-label="›"
                   >
                     <ChevronLeft className="size-4 ltr:rotate-180" />
@@ -318,7 +318,7 @@ async function Staff({ params, searchParams }: Pick<Props, "params" | "searchPar
                     key={p}
                     href={qs(p)}
                     className={cn(
-                      "shrink-0 rounded-full px-3 py-1.5 text-sm whitespace-nowrap",
+                      "kashi-btn shrink-0 px-3 py-1.5 text-sm whitespace-nowrap",
                       period.preset === p ? "bg-fg text-bg" : "bg-surface text-fg-muted ring-1 ring-border",
                     )}
                   >
@@ -357,7 +357,7 @@ async function Staff({ params, searchParams }: Pick<Props, "params" | "searchPar
                                 {n(h, 1)} {t("h")}
                               </span>
                               {e.edited ? (
-                                <span className="rounded-full bg-warning-soft px-2 py-0.5 text-xs text-warning">
+                                <span className="kashi-btn bg-warning-soft px-2 py-0.5 text-xs text-warning [--cut:5px]">
                                   {t("clock.edited")}
                                 </span>
                               ) : null}
@@ -435,12 +435,12 @@ async function Staff({ params, searchParams }: Pick<Props, "params" | "searchPar
                           <td className="px-4 py-2 text-end font-bold tabular-nums">{money(r.totalCents)}</td>
                           <td className="px-4 py-2 text-xs">
                             {r.late.count ? (
-                              <span className="me-1 rounded-full bg-warning-soft px-2 py-0.5 font-semibold text-warning">
+                              <span className="kashi-btn me-1 bg-warning-soft px-2 py-0.5 font-semibold text-warning [--cut:5px]">
                                 {t("payroll.late", { n: n(r.late.count), min: n(r.late.minutes) })}
                               </span>
                             ) : null}
                             {r.missed ? (
-                              <span className="rounded-full bg-danger-soft px-2 py-0.5 font-semibold text-danger">
+                              <span className="kashi-btn bg-danger-soft px-2 py-0.5 font-semibold text-danger [--cut:5px]">
                                 {t("payroll.missed", { n: n(r.missed) })}
                               </span>
                             ) : null}
@@ -470,7 +470,7 @@ async function Staff({ params, searchParams }: Pick<Props, "params" | "searchPar
                           <span className="w-28 text-fg-muted">{dayLabel(p.day)}</span>
                           <span className="flex-1 truncate text-fg-muted">{p.note}</span>
                           {pay.undistributedDays.includes(p.day) ? (
-                            <span className="rounded-full bg-warning-soft px-2 py-0.5 text-xs text-warning">
+                            <span className="kashi-btn bg-warning-soft px-2 py-0.5 text-xs text-warning [--cut:5px]">
                               {t("tips.nobody")}
                             </span>
                           ) : null}

@@ -1,6 +1,6 @@
 import { daysAgo } from "@/lib/days";
 import { Suspense } from "react";
-import { Search, Star, TrendingUp, UserRound, Users, Wallet } from "lucide-react";
+import { Search, Star, TrendingUp, UserRound, Users, Wallet } from "@/components/icons";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import {
@@ -78,7 +78,7 @@ async function Customers({ params, searchParams }: Pick<Props, "params" | "searc
             href={k === "customers" ? base : `${base}?tab=${k}`}
             aria-current={tab === k ? "page" : undefined}
             className={cn(
-              "shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+              "kashi-btn shrink-0 px-4 py-2 text-sm font-medium whitespace-nowrap",
               tab === k ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
             )}
           >
@@ -224,7 +224,7 @@ async function CustomerTab({
             name="q"
             defaultValue={q}
             placeholder={t("search")}
-            className="h-10 w-full rounded-full border border-border-strong bg-surface ps-9 pe-3 text-sm"
+            className="kashi-btn h-10 w-full border border-border-strong bg-surface ps-9 pe-3 text-sm"
           />
           {segment !== "all" ? <input type="hidden" name="s" value={segment} /> : null}
         </form>
@@ -233,7 +233,7 @@ async function CustomerTab({
             key={a}
             href={a === "all" ? base : `${base}?s=${a}`}
             className={cn(
-              "rounded-full px-3 py-1.5 text-sm",
+              "kashi-btn px-3 py-1.5 text-sm",
               segment === a ? "bg-fg text-bg" : "bg-surface text-fg-muted ring-1 ring-border",
             )}
           >
@@ -345,7 +345,7 @@ function initials(name: string) {
 
 function Chip({ tone, children }: { tone: string; children: React.ReactNode }) {
   return (
-    <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold whitespace-nowrap", tone)}>
+    <span className={cn("kashi-btn px-2 py-0.5 text-[11px] font-bold whitespace-nowrap [--cut:5px]", tone)}>
       {children}
     </span>
   );

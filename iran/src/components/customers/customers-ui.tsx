@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquareText, Minus, Plus, Send, Ticket, Trash2 } from "lucide-react";
+import { MessageSquareText, Minus, Plus, Send, Ticket, Trash2 } from "@/components/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { DateInput } from "@/components/ui/date-input";
@@ -24,7 +24,7 @@ import {
 import { EmptyState } from "@/components/ui/empty-state";
 import { openSheet, useCreateParam } from "@/lib/use-create-param";
 
-const pill = "inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold";
+const pill = "inline-flex h-10 items-center gap-2 kashi-btn px-4 text-sm font-semibold";
 const primary = cn(pill, "bg-accent text-accent-fg disabled:opacity-50");
 const ghost = cn(pill, "ring-1 ring-border");
 
@@ -292,7 +292,7 @@ export function CouponList({
                 )}
               >
                 <div className="flex items-start gap-3">
-                  <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+                  <div className="kashi-tile grid size-12 shrink-0 place-items-center bg-accent-soft text-accent">
                     <Ticket className="size-6" />
                   </div>
                   <div className="min-w-0 flex-1">

@@ -6,7 +6,7 @@ import { MenuThemePicker } from "@/components/menu-theme-picker";
 import type { RestaurantKind } from "@/lib/restaurant-kind";
 import { useFormatter, useTranslations } from "next-intl";
 import { useRef, useState, type ReactNode } from "react";
-import { ImageUp } from "lucide-react";
+import { ImageUp } from "@/components/icons";
 import { cn } from "@/lib/cn";
 import { IMAGE_ACCEPT, prepareImage, setInputFile } from "@/lib/prepare-image";
 import { Button } from "@/components/ui/button";
@@ -250,7 +250,7 @@ export function LogoForm({
         {!disabled ? (
           <div className="flex flex-wrap gap-2">
             <ActionForm form={form}>
-              <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-4 text-sm font-medium focus-within:ring-4 focus-within:ring-[var(--ring)] hover:bg-surface-2">
+              <label className="kashi-btn inline-flex h-10 cursor-pointer items-center gap-2 border border-border bg-surface px-4 text-sm font-medium focus-within:ring-4 focus-within:ring-[var(--ring)] hover:bg-surface-2">
                 <ImageUp className="size-4" aria-hidden="true" />
                 {t("settings.logoUpload")}
                 <input
@@ -500,7 +500,7 @@ export function TaxRates({
               <span className="text-fg-muted tabular-nums">· {fmt(r.rateBps)}</span>
             </span>
             {r.isDefault ? (
-              <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent-text">
+              <span className="kashi-btn bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent-text [--cut:5px]">
                 {t("settings.default")}
               </span>
             ) : null}

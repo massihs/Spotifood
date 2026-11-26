@@ -12,7 +12,7 @@ import {
   Volume2,
   VolumeX,
   WifiOff,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
@@ -773,7 +773,7 @@ export function GameBoard({ initial, title }: { initial: GameView; title: string
               {p ? p.name : t("waitingOpponent")}
             </span>
             {p ? (
-              <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-yellow-400/20 px-1.5 py-0.5 text-[11px] font-bold text-yellow-300">
+              <span className="kashi-btn inline-flex shrink-0 items-center gap-0.5 bg-yellow-400/20 px-1.5 py-0.5 text-[11px] font-bold text-yellow-300 [--cut:5px]">
                 <Trophy className="size-3" aria-hidden="true" />
                 {p.wins}
               </span>
@@ -861,7 +861,7 @@ export function GameBoard({ initial, title }: { initial: GameView; title: string
           <Link
             href="/table/games"
             aria-label={t("backToRoom")}
-            className="grid size-10 place-items-center rounded-full bg-white/10 hover:bg-white/15"
+            className="kashi-tile grid size-10 place-items-center bg-white/10 hover:bg-white/15"
           >
             <ChevronLeft className="size-5 rtl:rotate-180" aria-hidden="true" />
           </Link>
@@ -874,7 +874,7 @@ export function GameBoard({ initial, title }: { initial: GameView; title: string
               type="button"
               onClick={() => setMenu((m) => !m)}
               aria-label={t("menu")}
-              className="grid size-10 place-items-center rounded-full bg-white/10 hover:bg-white/15"
+              className="kashi-tile grid size-10 place-items-center bg-white/10 hover:bg-white/15"
             >
               <MoreVertical className="size-5" aria-hidden="true" />
             </button>
@@ -971,7 +971,7 @@ export function GameBoard({ initial, title }: { initial: GameView; title: string
                               onClick={undo}
                               disabled={!canUndo}
                               aria-label={t("undo")}
-                              className="grid size-10 touch-manipulation place-items-center rounded-full bg-white/90 text-[#1d1446] shadow-lg transition active:scale-90 disabled:opacity-25"
+                              className="kashi-tile grid size-10 touch-manipulation place-items-center bg-white/90 text-[#1d1446] shadow-lg transition active:scale-90 disabled:opacity-25"
                             >
                               <Undo2 className="size-5" aria-hidden="true" />
                             </button>
@@ -979,7 +979,7 @@ export function GameBoard({ initial, title }: { initial: GameView; title: string
                               <button
                                 type="button"
                                 onClick={confirm}
-                                className="animate-pop-in inline-flex h-10 touch-manipulation items-center gap-1.5 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600 ps-3 pe-3.5 text-sm font-extrabold shadow-[0_6px_16px_rgba(16,185,129,.55)] ring-2 ring-white/30 active:scale-95"
+                                className="animate-pop-in kashi-btn inline-flex h-10 touch-manipulation items-center gap-1.5 bg-gradient-to-b from-emerald-400 to-emerald-600 ps-3 pe-3.5 text-sm font-extrabold shadow-[0_6px_16px_rgba(16,185,129,.55)] ring-2 ring-white/30 active:scale-95"
                               >
                                 <Check className="size-5" aria-hidden="true" />
                                 {t("done")}
@@ -1053,7 +1053,7 @@ export function GameBoard({ initial, title }: { initial: GameView; title: string
 
           {toast ? (
             <div className="pointer-events-none absolute inset-x-0 top-1/2 z-20 flex -translate-y-1/2 justify-center">
-              <span className="animate-pop-in rounded-full bg-black/75 px-4 py-2 text-sm font-semibold">
+              <span className="animate-pop-in kashi-btn bg-black/75 px-4 py-2 text-sm font-semibold">
                 {toast}
               </span>
             </div>

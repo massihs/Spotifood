@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRight, Plus, Trash2 } from "lucide-react";
+import { ArrowLeftRight, Plus, Trash2 } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { field, num, Sheet, useRun } from "@/components/ui/sheet-kit";
@@ -30,7 +30,7 @@ export function TransferButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold ring-1 ring-border"
+        className="kashi-btn kashi-frame inline-flex h-10 items-center gap-2 px-4 text-sm font-semibold"
       >
         <ArrowLeftRight className="size-4" />
         {t("button")}

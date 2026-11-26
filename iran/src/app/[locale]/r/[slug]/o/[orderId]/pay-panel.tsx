@@ -1,6 +1,6 @@
 "use client";
 
-import { CreditCard, Store, X } from "lucide-react";
+import { CreditCard, Store, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";

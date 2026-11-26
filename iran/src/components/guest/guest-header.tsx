@@ -1,4 +1,4 @@
-import { Clock, ReceiptText, UserRound } from "lucide-react";
+import { Clock, ReceiptText, UserRound } from "@/components/icons";
 import type { ReactNode } from "react";
 import type { OpenState } from "@/lib/opening";
 import { getTranslations } from "next-intl/server";
@@ -53,7 +53,7 @@ export async function GuestHeader({
       {orderCount > 0 ? (
         <Link
           href="/table/orders"
-          className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface/95 px-3.5 text-sm font-semibold text-fg shadow-sm backdrop-blur atelier:shadow-none atelier:ring-1 atelier:ring-border"
+          className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-surface/95 px-3.5 text-sm font-semibold text-fg shadow-sm backdrop-blur atelier:shadow-none atelier:ring-1 atelier:ring-border"
         >
           <ReceiptText className="size-4 text-accent-text" aria-hidden="true" />
           {t("ordersLink", { count: orderCount })}
@@ -80,7 +80,7 @@ export async function GuestHeader({
   );
   const guestLine = (
     <>
-      <span className="inline-flex items-center rounded-full bg-accent-soft px-2.5 py-0.5 font-semibold whitespace-nowrap text-accent-text">
+      <span className="kashi-btn inline-flex items-center bg-accent-soft px-2.5 py-0.5 font-semibold whitespace-nowrap text-accent-text [--cut:5px]">
         {t(guest.table.kind === "room" ? "tableBadgeRoom" : "tableBadge", { table: guest.table.label })}
       </span>
       <span className="inline-flex min-w-0 items-center gap-1 text-fg-muted">

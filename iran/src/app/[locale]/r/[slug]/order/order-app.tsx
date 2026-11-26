@@ -3,7 +3,7 @@
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
-import { Bike, Minus, Pause, Plus, Store } from "lucide-react";
+import { Bike, Minus, Pause, Plus, Store } from "@/components/icons";
 import { DinerLogin } from "@/components/account/diner-login";
 import { CartBar } from "@/components/guest/cart-bar";
 import { MenuBrowser } from "@/components/guest/menu-browser";
@@ -541,7 +541,7 @@ export function OrderApp({
                     <button
                       type="button"
                       aria-label={t("less")}
-                      className="grid size-8 place-items-center rounded-full bg-surface-2"
+                      className="kashi-tile grid size-8 place-items-center bg-surface-2"
                       onClick={() => setQty(line.key, line.quantity - 1)}
                     >
                       <Minus className="size-4" aria-hidden="true" />
@@ -550,7 +550,7 @@ export function OrderApp({
                     <button
                       type="button"
                       aria-label={t("more")}
-                      className="grid size-8 place-items-center rounded-full bg-surface-2"
+                      className="kashi-tile grid size-8 place-items-center bg-surface-2"
                       onClick={() => setQty(line.key, line.quantity + 1)}
                     >
                       <Plus className="size-4" aria-hidden="true" />

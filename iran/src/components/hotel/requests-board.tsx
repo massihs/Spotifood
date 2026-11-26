@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, Check, Clock, Hand, Inbox, RotateCcw } from "lucide-react";
+import { BellRing, Check, Clock, Hand, Inbox, RotateCcw } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { moveRequestAction } from "@/app/[locale]/dashboard/[restaurantId]/requests/actions";
@@ -77,7 +77,7 @@ export function RequestsBoard({
             onClick={() => setKind(null)}
             aria-pressed={kind === null}
             className={cn(
-              "h-9 shrink-0 rounded-full px-4 text-sm font-semibold",
+              "kashi-btn h-9 shrink-0 px-4 text-sm font-semibold",
               kind === null ? "bg-ink text-ink-fg" : "bg-surface text-fg-muted ring-1 ring-border",
             )}
           >
@@ -93,7 +93,7 @@ export function RequestsBoard({
                 onClick={() => setKind(kind === k ? null : k)}
                 aria-pressed={kind === k}
                 className={cn(
-                  "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold whitespace-nowrap",
+                  "kashi-btn inline-flex h-9 shrink-0 items-center gap-1.5 px-3.5 text-sm font-semibold whitespace-nowrap",
                   kind === k ? "bg-ink text-ink-fg" : "bg-surface text-fg-muted ring-1 ring-border",
                 )}
               >
@@ -138,7 +138,7 @@ export function RequestsBoard({
                   <Icon className="size-4" aria-hidden="true" />
                 </span>
                 {t(`status.${status}`)}
-                <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs tabular-nums">
+                <span className="kashi-btn bg-surface-2 px-2 py-0.5 text-xs tabular-nums [--cut:5px]">
                   {list.length}
                 </span>
               </h2>
@@ -160,7 +160,7 @@ export function RequestsBoard({
                         )}
                       >
                         <div className="flex items-start gap-3">
-                          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-ink text-lg font-black text-ink-fg tabular-nums">
+                          <span className="kashi-tile grid size-12 shrink-0 place-items-center bg-ink text-lg font-black text-ink-fg tabular-nums">
                             {r.room}
                           </span>
                           <div className="min-w-0 flex-1">

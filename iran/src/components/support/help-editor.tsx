@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Pencil, Plus, Trash2, Zap } from "lucide-react";
+import { BookOpen, Pencil, Plus, Trash2, Zap } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -76,7 +76,7 @@ export function HelpEditor({ articles, canned }: { articles: Article[]; canned: 
           <button
             type="button"
             onClick={() => setEditing({ locale, audience: "restaurant", published: true, sortOrder: 0 })}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg"
+            className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-accent px-4 text-sm font-bold text-accent-fg"
           >
             <Plus className="size-4" aria-hidden="true" />
             {t("newArticle")}
@@ -131,7 +131,7 @@ export function HelpEditor({ articles, canned }: { articles: Article[]; canned: 
           <button
             type="button"
             onClick={() => setCannedEdit({})}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface-2 px-3 text-sm font-bold"
+            className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-surface-2 px-3 text-sm font-bold"
           >
             <Plus className="size-4" aria-hidden="true" />
             {t("newCanned")}

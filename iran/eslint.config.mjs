@@ -16,6 +16,16 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // One look for the whole app: icons come from the Kashi set, which wraps the library.
+    ignores: ["src/components/icons/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { paths: [{ name: "lucide-react", message: "Import icons from @/components/icons (Kashi set)." }] },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

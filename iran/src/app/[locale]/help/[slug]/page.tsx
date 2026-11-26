@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/components/icons";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
@@ -45,7 +45,7 @@ async function Article({ params }: Pick<Props, "params">) {
       <main className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
         <Link
           href="/help"
-          className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-fg-muted hover:bg-surface-2 hover:text-fg"
+          className="kashi-btn inline-flex h-9 items-center gap-1.5 px-3 text-sm font-semibold text-fg-muted hover:bg-surface-2 hover:text-fg"
         >
           <ArrowRight className="size-4 ltr:rotate-180" aria-hidden="true" />
           {t("helpCenter")}

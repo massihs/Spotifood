@@ -36,7 +36,7 @@ import {
   UtensilsCrossed,
   Users,
   Wallet,
-} from "lucide-react";
+} from "@/components/icons";
 import { getDisabledModules, logoUrl } from "@/server/modules/restaurants/settings";
 import type { ModuleKey } from "@/lib/modules";
 import { isScreen, screenAllowed } from "@/lib/screens";
@@ -513,7 +513,7 @@ async function RestaurantShell({
                 href="/admin"
                 title={t("nav.admin")}
                 aria-label={t("nav.admin")}
-                className="grid size-10 place-items-center rounded-full bg-ink text-ink-fg hover:opacity-90 dark:bg-surface-2 dark:text-fg dark:ring-1 dark:ring-border"
+                className="kashi-tile grid size-10 place-items-center bg-ink text-ink-fg hover:opacity-90 dark:bg-surface-2 dark:text-fg dark:ring-1 dark:ring-border"
               >
                 <Shield className="size-4" aria-hidden="true" />
               </Link>

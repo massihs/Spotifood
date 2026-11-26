@@ -11,7 +11,7 @@ import {
   Plus,
   Search,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { usePathname } from "@/i18n/navigation";
@@ -171,7 +171,7 @@ export function SupportPanel({
         setError(null);
         loadOverview();
       }}
-      className="inline-flex h-9 items-center gap-1 rounded-full px-2.5 text-sm font-semibold text-fg-muted hover:bg-surface-2 hover:text-fg"
+      className="kashi-btn inline-flex h-9 items-center gap-1 px-2.5 text-sm font-semibold text-fg-muted hover:bg-surface-2 hover:text-fg"
     >
       <ArrowRight className="size-4 ltr:rotate-180" aria-hidden="true" />
       {t("back")}
@@ -189,7 +189,7 @@ export function SupportPanel({
         }}
         aria-label={t("open", { count: unread })}
         title={t("title")}
-        className="relative grid size-10 place-items-center rounded-full bg-surface-2 text-fg hover:bg-surface-3"
+        className="relative grid size-10 place-items-center rounded-[32%] bg-surface-2 text-fg hover:bg-surface-3"
       >
         <LifeBuoy className="size-5" aria-hidden="true" />
         {unread ? (
@@ -214,7 +214,7 @@ export function SupportPanel({
           />
           <div className="animate-sheet-up relative flex h-dvh w-full flex-col bg-bg shadow-[var(--shadow-float)] sm:w-[27rem] sm:animate-none">
             <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-3">
-              <span className="grid size-10 place-items-center rounded-2xl bg-accent text-accent-fg">
+              <span className="kashi-tile grid size-10 place-items-center bg-accent text-accent-fg">
                 <Headset className="size-5" aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
@@ -303,7 +303,7 @@ export function SupportPanel({
                             setSuggested([]);
                             setView({ kind: "new" });
                           }}
-                          className="mt-3 inline-flex h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-bold text-accent-fg"
+                          className="kashi-btn mt-3 inline-flex h-11 items-center gap-2 bg-accent px-5 text-sm font-bold text-accent-fg"
                         >
                           <Headset className="size-4" aria-hidden="true" />
                           {t("talkToUs")}
@@ -385,7 +385,7 @@ export function SupportPanel({
                       setSuggested([]);
                       setView({ kind: "new" });
                     }}
-                    className="mt-2 inline-flex h-10 items-center gap-2 rounded-full bg-surface px-4 font-bold ring-1 ring-border"
+                    className="kashi-btn kashi-frame mt-2 inline-flex h-10 items-center gap-2 px-4 font-bold [--kashi-fill:var(--surface)]"
                   >
                     <Headset className="size-4" aria-hidden="true" />
                     {t("talkToUs")}

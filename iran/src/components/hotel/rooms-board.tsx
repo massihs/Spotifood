@@ -14,7 +14,7 @@ import {
   Sparkles,
   SprayCan,
   Users,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
@@ -118,7 +118,7 @@ export function RoomsBoard({
         action={
           <Link
             href={`/dashboard/${restaurantId}/tables`}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-sm font-bold text-accent-fg"
+            className="kashi-btn inline-flex h-10 items-center gap-2 bg-accent px-5 text-sm font-bold text-accent-fg"
           >
             <QrCode className="size-4" aria-hidden="true" />
             {t("addRooms")}
@@ -159,7 +159,7 @@ export function RoomsBoard({
               onClick={() => setFilter(f)}
               aria-pressed={filter === f}
               className={cn(
-                "h-9 shrink-0 rounded-full px-4 text-sm font-semibold whitespace-nowrap transition-colors",
+                "kashi-btn h-9 shrink-0 px-4 text-sm font-semibold whitespace-nowrap transition-colors",
                 filter === f
                   ? "bg-ink text-ink-fg"
                   : "bg-surface text-fg-muted ring-1 ring-border hover:text-fg",
@@ -351,7 +351,7 @@ function RoomSheet({
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <span
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-semibold",
+              "kashi-btn inline-flex items-center gap-1.5 px-3 py-1 font-semibold [--cut:5px]",
               room.guests != null ? "bg-ink text-ink-fg" : "bg-surface-2 text-fg-muted",
             )}
           >

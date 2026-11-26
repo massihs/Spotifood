@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheck, Landmark, Lock, Pencil, Trash2 } from "lucide-react";
+import { BadgeCheck, Landmark, Lock, Pencil, Trash2 } from "@/components/icons";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
@@ -64,7 +64,7 @@ export function BankPanel({
         <div className="rounded-2xl border border-border p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+              <span className="kashi-tile grid size-11 shrink-0 place-items-center bg-accent-soft text-accent-text">
                 <Landmark className="size-5" aria-hidden="true" />
               </span>
               <div className="min-w-0 space-y-1">

@@ -1,4 +1,4 @@
-import { LogOut } from "lucide-react";
+import { LogOut } from "@/components/icons";
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { logoutAction } from "@/app/[locale]/(auth)/actions";
@@ -43,7 +43,7 @@ export async function AppShell({
   const t = await getTranslations();
   const identity = (
     <div className="flex min-w-0 items-center gap-3">
-      <span className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-white text-base font-bold text-accent-text ring-2 ring-accent/60">
+      <span className="kashi-tile grid size-11 shrink-0 place-items-center overflow-hidden bg-white text-base font-bold text-accent-text ring-2 ring-accent/60">
         {avatar ? (
           <img src={avatar} alt="" className="size-full object-contain p-0.5" />
         ) : (
@@ -87,7 +87,7 @@ export async function AppShell({
         <form action={logoutAction}>
           <button
             type="submit"
-            className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium whitespace-nowrap text-fg-muted ring-1 ring-border hover:bg-surface-2 hover:text-fg"
+            className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3 text-sm font-medium whitespace-nowrap text-fg-muted [--kashi-fill-hover:var(--surface-2)] hover:text-fg"
           >
             <LogOut className="size-4" aria-hidden="true" />
             {t("common.logout")}
@@ -116,7 +116,7 @@ export async function AppShell({
           type="submit"
           title={t("common.logout")}
           aria-label={t("common.logout")}
-          className="grid size-9 place-items-center rounded-full text-fg-muted ring-1 ring-border hover:bg-surface-2 hover:text-fg"
+          className="kashi-tile kashi-frame grid size-9 place-items-center text-fg-muted [--kashi-fill-hover:var(--surface-2)] hover:text-fg"
         >
           <LogOut className="size-4" aria-hidden="true" />
         </button>

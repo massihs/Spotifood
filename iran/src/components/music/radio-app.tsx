@@ -23,7 +23,7 @@ import {
   SkipForward,
   SquarePlay,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -484,7 +484,7 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
       onClick={onClick}
       aria-pressed={on}
       className={cn(
-        "h-8 shrink-0 rounded-full px-3 text-sm font-medium transition-colors",
+        "kashi-btn h-8 shrink-0 px-3 text-sm font-medium transition-colors [--cut:5px]",
         on ? "bg-white text-black" : "bg-white/10 text-white hover:bg-white/20",
       )}
     >
@@ -531,13 +531,13 @@ function TopBar({
           aria-label={t("home")}
           title={t("home")}
           className={cn(
-            "grid size-12 shrink-0 place-items-center rounded-full bg-[#1f1f1f] transition-transform hover:scale-105",
+            "kashi-tile grid size-12 shrink-0 place-items-center bg-[#1f1f1f] transition-transform hover:scale-105",
             view.kind === "home" ? "text-white" : "text-[#b3b3b3] hover:text-white",
           )}
         >
           <Home className={cn("size-6", view.kind === "home" && "fill-current")} aria-hidden="true" />
         </button>
-        <label className="group flex h-12 flex-1 items-center gap-3 rounded-full bg-[#1f1f1f] px-3 ring-white/80 transition-colors focus-within:ring-2 hover:bg-[#2a2a2a] hover:ring-1 hover:ring-white/20">
+        <label className="group kashi-btn flex h-12 flex-1 items-center gap-3 bg-[#1f1f1f] px-3 ring-white/80 transition-colors focus-within:ring-2 hover:bg-[#2a2a2a] hover:ring-1 hover:ring-white/20">
           <Search
             className="size-6 shrink-0 text-[#b3b3b3] group-focus-within:text-white"
             aria-hidden="true"
@@ -570,7 +570,7 @@ function TopBar({
       <div className="flex items-center gap-2">
         <Link
           href="/"
-          className="hidden h-8 items-center rounded-full px-3 text-sm font-bold text-[#b3b3b3] hover:scale-105 hover:text-white xl:inline-flex"
+          className="kashi-btn hidden h-8 items-center px-3 text-sm font-bold text-[#b3b3b3] [--cut:5px] hover:scale-105 hover:text-white xl:inline-flex"
         >
           {t("forRestaurants")}
         </Link>
@@ -600,7 +600,7 @@ function NavArrow({
       disabled={disabled}
       aria-label={label}
       title={label}
-      className="grid size-8 place-items-center rounded-full bg-black/70 text-white disabled:cursor-not-allowed disabled:opacity-40"
+      className="kashi-tile grid size-8 place-items-center bg-black/70 text-white disabled:cursor-not-allowed disabled:opacity-40"
     >
       <Icon className="size-5 rtl:rotate-180" aria-hidden="true" />
     </button>
@@ -647,7 +647,7 @@ function LibraryPanel({ ctx, view, mobile }: { ctx: Ctx; view: View; mobile?: bo
       <div className="flex items-center justify-between px-3 pt-3 pb-2">
         <h2 className={cn("flex items-center gap-3 font-bold", mobile ? "text-2xl" : "text-[#b3b3b3]")}>
           {mobile ? (
-            <span className="grid size-8 place-items-center rounded-full bg-[#1ed760] text-black">
+            <span className="kashi-tile grid size-8 place-items-center bg-[#1ed760] text-black">
               <Radio className="size-4" aria-hidden="true" />
             </span>
           ) : (
@@ -731,7 +731,7 @@ function HomeView({ ctx }: { ctx: Ctx }) {
           <Link
             href="/"
             aria-label="Spotifood"
-            className="grid size-8 place-items-center rounded-full bg-[#1ed760] lg:hidden"
+            className="kashi-tile grid size-8 place-items-center bg-[#1ed760] lg:hidden"
           >
             <LogoMark className="size-5" />
           </Link>
@@ -951,7 +951,7 @@ function SearchView({ ctx, query, setQuery }: { ctx: Ctx; query: string; setQuer
                     {top.name}
                   </p>
                   <p className="mt-1 text-sm text-[#b3b3b3]">
-                    <span className="me-2 rounded-full bg-black/40 px-3 py-1 text-xs font-bold text-white">
+                    <span className="kashi-btn me-2 bg-black/40 px-3 py-1 text-xs font-bold text-white [--cut:5px]">
                       {t("radioType")}
                     </span>
                     Spotifood
@@ -1138,13 +1138,13 @@ function StationView({
             onClick={() => lib.toggleFollow(s.slug)}
             aria-pressed={followed}
             className={cn(
-              "h-8 rounded-full border px-4 text-sm font-bold transition-transform hover:scale-105",
+              "kashi-btn h-8 border px-4 text-sm font-bold transition-transform [--cut:5px] hover:scale-105",
               followed ? "border-white text-white" : "border-white/50 text-white hover:border-white",
             )}
           >
             {followed ? t("following") : t("follow")}
           </button>
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-xs font-bold">
+          <span className="kashi-btn inline-flex items-center gap-2 border border-white/20 px-3 py-1 text-xs font-bold [--cut:5px]">
             <span className={cn("size-2 rounded-full bg-red-500", on && "animate-pulse")} />
             {t("live")}
           </span>
@@ -1310,7 +1310,7 @@ function LikedView({ ctx }: { ctx: Ctx }) {
             <button
               type="button"
               onClick={() => ctx.go({ kind: "search" })}
-              className="mt-8 h-12 rounded-full bg-white px-8 font-bold text-black hover:scale-105"
+              className="kashi-btn mt-8 h-12 bg-white px-8 font-bold text-black hover:scale-105"
             >
               {t("browseAll")}
             </button>
@@ -1390,7 +1390,7 @@ function NowPanel({ ctx, s, live, close }: { ctx: Ctx; s: Station; live: Live | 
             <button
               type="button"
               onClick={() => ctx.lib.toggleFollow(s.slug)}
-              className="mt-4 h-8 rounded-full border border-white/50 px-4 text-sm font-bold hover:scale-105 hover:border-white"
+              className="kashi-btn mt-4 h-8 border border-white/50 px-4 text-sm font-bold [--cut:5px] hover:scale-105 hover:border-white"
             >
               {ctx.lib.followed.includes(s.slug) ? t("following") : t("follow")}
             </button>
@@ -1623,7 +1623,7 @@ function PlayerBar({
         </div>
       </div>
       <div className="flex items-center justify-end gap-2">
-        <span className="me-1 inline-flex items-center gap-1.5 rounded-full border border-white/20 px-2 py-0.5 text-[11px] font-bold">
+        <span className="kashi-btn me-1 inline-flex items-center gap-1.5 border border-white/20 px-2 py-0.5 text-[11px] font-bold [--cut:5px]">
           <span className={cn("size-1.5 rounded-full bg-red-500", on && "animate-pulse")} />
           {t("live")}
         </span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Flame, Plus, Scale, ShoppingBag, X } from "lucide-react";
+import { Check, Flame, Plus, Scale, ShoppingBag, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { addToCartAction } from "@/app/[locale]/table/actions";
@@ -136,7 +136,7 @@ export function ProductSheet({
             type="button"
             onClick={() => ref.current?.close()}
             aria-label={t("guest.close")}
-            className="absolute end-3 top-3 z-10 grid size-10 place-items-center rounded-full bg-surface text-fg shadow-[var(--shadow-float)]"
+            className="kashi-tile absolute end-3 top-3 z-10 grid size-10 place-items-center bg-surface text-fg shadow-[var(--shadow-float)]"
           >
             <X className="size-5" aria-hidden="true" />
           </button>
@@ -175,7 +175,7 @@ export function ProductSheet({
               ) : null}
               {desc.text ? <p className="mt-2 leading-7 text-fg-muted">{desc.text}</p> : null}
               {inCart ? (
-                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-sm font-medium">
+                <p className="kashi-btn mt-3 inline-flex items-center gap-1.5 bg-surface-2 px-3 py-1 text-sm font-medium [--cut:5px]">
                   <ShoppingBag className="size-4 text-accent-text" aria-hidden="true" />
                   {t("guest.inCart", { n: inCart })}
                 </p>
@@ -188,13 +188,13 @@ export function ProductSheet({
                   <TagChip key={tag} tag={tag} />
                 ))}
                 {p.caloriesKcal ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium">
+                  <span className="kashi-btn inline-flex items-center gap-1 bg-surface-2 px-3 py-1 text-xs font-medium [--cut:5px]">
                     <Flame className="size-3.5" aria-hidden="true" />
                     {t("guest.kcal", { n: p.caloriesKcal })}
                   </span>
                 ) : null}
                 {p.weightGrams ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium">
+                  <span className="kashi-btn inline-flex items-center gap-1 bg-surface-2 px-3 py-1 text-xs font-medium [--cut:5px]">
                     <Scale className="size-3.5" aria-hidden="true" />
                     {t("guest.grams", { n: p.weightGrams })}
                   </span>
@@ -228,7 +228,10 @@ export function ProductSheet({
                   <p className="flex flex-wrap items-center gap-1.5">
                     <span className="font-semibold">{t("guest.allergens")}:</span>
                     {p.allergens.map((a) => (
-                      <span key={a} className="rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium">
+                      <span
+                        key={a}
+                        className="kashi-btn bg-warning-soft px-2 py-0.5 text-xs font-medium [--cut:5px]"
+                      >
                         {t(`allergens.${a}`)}
                       </span>
                     ))}
@@ -254,7 +257,7 @@ export function ProductSheet({
                   </div>
                   <span
                     className={cn(
-                      "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
+                      "kashi-btn shrink-0 px-2.5 py-1 text-xs font-semibold [--cut:5px]",
                       g.minSelect > 0
                         ? unmet
                           ? "bg-warning-soft text-fg"
@@ -353,7 +356,7 @@ export function ProductSheet({
                     >
                       <span className="relative block">
                         <ProductImage product={x} size="sm" className="aspect-square w-full" />
-                        <span className="absolute end-1.5 bottom-1.5 grid size-7 place-items-center rounded-full bg-accent text-accent-fg shadow-accent">
+                        <span className="kashi-tile absolute end-1.5 bottom-1.5 grid size-7 place-items-center bg-accent text-accent-fg shadow-accent">
                           <Plus className="size-4" strokeWidth={2.5} aria-hidden="true" />
                         </span>
                       </span>
@@ -384,7 +387,7 @@ export function ProductSheet({
               onClick={add}
               disabled={!priced.ok || pending}
               aria-busy={pending}
-              className="flex h-12 min-w-0 flex-1 items-center justify-between gap-2 rounded-full bg-accent px-5 font-bold text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.22),var(--shadow-accent)] transition-transform active:scale-[0.98] disabled:opacity-40 disabled:shadow-none"
+              className="kashi-btn flex h-12 min-w-0 flex-1 items-center justify-between gap-2 bg-accent px-5 font-bold text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.22),var(--shadow-accent)] transition-transform active:scale-[0.98] disabled:opacity-40 disabled:shadow-none"
             >
               {!p.isAvailable ? (
                 <span className="mx-auto">{t("guest.soldOut")}</span>

@@ -4,8 +4,8 @@ const base = {
   fill: "none",
   stroke: "currentColor",
   strokeWidth: 1.8,
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
+  strokeLinecap: "square" as const,
+  strokeLinejoin: "miter" as const,
   className: "size-full",
 };
 

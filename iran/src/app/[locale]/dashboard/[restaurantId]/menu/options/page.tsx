@@ -1,4 +1,4 @@
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "@/components/icons";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -47,7 +47,7 @@ async function Options({ params }: { params: Params }) {
       </div>
       {groups.length === 0 ? (
         <Card className="px-6 py-14 text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-accent-soft text-accent-text">
+          <span className="kashi-tile mx-auto grid size-14 place-items-center bg-accent-soft text-accent-text">
             <SlidersHorizontal className="size-7" aria-hidden="true" />
           </span>
           <h2 className="mt-4 text-lg font-semibold">{t("empty")}</h2>

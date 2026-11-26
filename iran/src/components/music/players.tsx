@@ -13,7 +13,7 @@ import {
   Volume1,
   Volume2,
   VolumeX,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { reportPlaybackAction } from "@/app/[locale]/dashboard/[restaurantId]/music/actions";
@@ -505,7 +505,7 @@ export function RadioPlayer({ slug, name, color }: { slug: string; name: string;
       >
         <Cover src={r.live?.track.cover ?? r.live?.station.cover} color={color} className="size-24" />
         <div className="min-w-0 flex-1">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-2.5 py-0.5 text-[11px] font-bold">
+          <span className="kashi-btn inline-flex items-center gap-1.5 bg-black/30 px-2.5 py-0.5 text-[11px] font-bold [--cut:5px]">
             <span className={cn("size-1.5 rounded-full bg-red-500", on && "animate-pulse")} />
             {t("live")}
           </span>

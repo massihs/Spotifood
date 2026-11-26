@@ -1,6 +1,6 @@
 "use client";
 
-import { BellOff, BellRing, Check, X } from "lucide-react";
+import { BellOff, BellRing, Check, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
@@ -272,7 +272,7 @@ export function OrderAlerts({
             role="alert"
             className="animate-pop-in pointer-events-auto flex items-center gap-3 rounded-2xl border border-accent/30 bg-surface p-3 shadow-[var(--shadow-float)]"
           >
-            <span className="relative grid size-11 shrink-0 place-items-center rounded-xl bg-accent text-accent-fg">
+            <span className="relative grid size-11 shrink-0 place-items-center rounded-[32%] bg-accent text-accent-fg">
               <BellRing className="size-5" aria-hidden="true" />
               <span className="absolute -end-1 -top-1 size-3 animate-ping rounded-full bg-danger" />
             </span>
@@ -286,7 +286,7 @@ export function OrderAlerts({
                 disabled={accepting || acceptedId === a.id}
                 onClick={() => accept(a)}
                 className={cn(
-                  "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-bold transition-colors disabled:opacity-80",
+                  "kashi-btn inline-flex h-10 shrink-0 items-center gap-1.5 px-4 text-sm font-bold transition-colors disabled:opacity-80",
                   acceptedId === a.id
                     ? "bg-success text-white"
                     : "bg-accent text-accent-fg hover:bg-accent-hover",

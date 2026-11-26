@@ -1,6 +1,6 @@
 "use client";
 
-import { Globe } from "lucide-react";
+import { Globe } from "@/components/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { LOCALE_LABELS, LOCALES, type AppLocale } from "@/i18n/config";
@@ -27,7 +27,7 @@ export function LanguageSwitcher({
   return (
     <label
       className={cn(
-        "relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm font-medium",
+        "kashi-btn relative inline-flex h-9 shrink-0 items-center gap-1.5 px-3 text-sm font-medium",
         tone === "inverted" ? "bg-white/15 text-white" : "bg-surface-2 text-fg",
         pending && "opacity-60",
         className,

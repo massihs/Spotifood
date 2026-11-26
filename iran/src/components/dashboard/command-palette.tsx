@@ -1,6 +1,6 @@
 "use client";
 
-import { CornerDownLeft, Search, X } from "lucide-react";
+import { CornerDownLeft, Search, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "@/i18n/navigation";
@@ -90,7 +90,7 @@ export function CommandPalette({ entries }: { entries: SearchEntry[] }) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t("search")}
-        className="flex h-10 items-center gap-2 rounded-full bg-surface-2 px-3 text-sm text-fg-subtle ring-1 ring-border transition-colors hover:text-fg max-sm:w-10 max-sm:justify-center max-sm:px-0 sm:w-56 lg:w-72"
+        className="kashi-btn kashi-frame flex h-10 items-center gap-2 px-3 text-sm text-fg-subtle transition-colors [--kashi-fill:var(--surface-2)] hover:text-fg max-sm:w-10 max-sm:justify-center max-sm:px-0 sm:w-56 lg:w-72"
       >
         <Search className="size-4 shrink-0" aria-hidden="true" />
         <span className="flex-1 truncate text-start max-sm:hidden">{t("searchPlaceholder")}</span>

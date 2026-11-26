@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ChefHat, ChevronDown, CupSoda, Monitor, Printer, Sparkles } from "lucide-react";
+import { AlertTriangle, ChefHat, ChevronDown, CupSoda, Monitor, Printer, Sparkles } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useOptimistic, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
@@ -64,10 +64,10 @@ export function RoutingBoard({
     return (
       <Card className="mx-auto max-w-2xl p-6 text-center sm:p-10">
         <div className="mx-auto flex w-fit gap-3">
-          <span className="grid size-14 place-items-center rounded-2xl bg-tone-orange/12 text-tone-orange">
+          <span className="kashi-tile grid size-14 place-items-center bg-tone-orange/12 text-tone-orange">
             <ChefHat className="size-7" aria-hidden="true" />
           </span>
-          <span className="grid size-14 place-items-center rounded-2xl bg-tone-sky/12 text-tone-sky">
+          <span className="kashi-tile grid size-14 place-items-center bg-tone-sky/12 text-tone-sky">
             <CupSoda className="size-7" aria-hidden="true" />
           </span>
         </div>
@@ -218,7 +218,7 @@ export function RoutingBoard({
                             {own ? (
                               <span
                                 className={cn(
-                                  "ms-2 rounded-full px-2 py-0.5 text-[11px] font-bold",
+                                  "kashi-btn ms-2 px-2 py-0.5 text-[11px] font-bold [--cut:5px]",
                                   STATION_TONE[own.color]?.soft,
                                 )}
                               >

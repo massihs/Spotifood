@@ -1,4 +1,4 @@
-import { Check, ChevronDown, CreditCard, FileText, Minus, Smartphone } from "lucide-react";
+import { Check, ChevronDown, CreditCard, FileText, Minus, Smartphone } from "@/components/icons";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -39,7 +39,7 @@ export default async function PricingPage({ params, searchParams }: Props) {
           className="pointer-events-none absolute start-1/2 -top-40 size-[36rem] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl"
         />
         <div className="relative mx-auto max-w-6xl px-4 pt-14 pb-20 sm:px-6 sm:pt-20">
-          <p className="mx-auto w-fit rounded-full bg-surface px-3.5 py-1 text-xs font-bold text-accent-text shadow-[var(--shadow-soft)] ring-1 ring-border">
+          <p className="kashi-btn kashi-frame mx-auto w-fit px-3.5 py-1 text-xs font-bold text-accent-text shadow-[var(--shadow-soft)] [--cut:5px] [--kashi-fill:var(--surface)]">
             {t("eyebrow")}
           </p>
           <h1 className="mt-4 text-center text-3xl font-black tracking-tight text-balance sm:text-5xl">
@@ -82,7 +82,7 @@ async function Plans({ searchParams }: { searchParams: Props["searchParams"] }) 
   return (
     <>
       {trial ? (
-        <p className="mx-auto mt-6 w-fit rounded-full bg-accent-soft px-4 py-1.5 text-sm font-semibold text-accent-text">
+        <p className="kashi-btn mx-auto mt-6 w-fit bg-accent-soft px-4 py-1.5 text-sm font-semibold text-accent-text">
           {t("trial", { days: TRIAL_DAYS })}
         </p>
       ) : null}
@@ -95,13 +95,13 @@ async function Plans({ searchParams }: { searchParams: Props["searchParams"] }) 
             scroll={false}
             aria-current={(k === "yearly") === yearly ? "true" : undefined}
             className={cn(
-              "inline-flex h-10 items-center gap-2 rounded-full px-5 text-sm font-bold transition-colors",
+              "kashi-btn inline-flex h-10 items-center gap-2 px-5 text-sm font-bold transition-colors",
               (k === "yearly") === yearly ? "bg-ink text-ink-fg" : "text-fg-muted hover:text-fg",
             )}
           >
             {t(`period.${k}`)}
             {k === "yearly" ? (
-              <span className="rounded-full bg-success-soft px-2 py-0.5 text-[11px] font-bold text-success">
+              <span className="kashi-btn bg-success-soft px-2 py-0.5 text-[11px] font-bold text-success [--cut:5px]">
                 {t("period.save")}
               </span>
             ) : null}
@@ -132,7 +132,7 @@ async function Plans({ searchParams }: { searchParams: Props["searchParams"] }) 
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-xl font-bold">{name(p)}</h2>
                 {hot ? (
-                  <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-accent-fg">
+                  <span className="kashi-btn bg-accent px-2.5 py-0.5 text-xs font-bold text-accent-fg [--cut:5px]">
                     {t("popular")}
                   </span>
                 ) : null}
@@ -339,7 +339,7 @@ async function TrustStrip() {
           key={text}
           className="flex items-center gap-3 rounded-2xl bg-surface p-4 text-sm font-semibold shadow-[var(--shadow-soft)] ring-1 ring-border"
         >
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+          <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent-soft text-accent-text">
             <Icon className="size-5" aria-hidden="true" />
           </span>
           {text}

@@ -1,4 +1,4 @@
-import { Clock, Radio, Sparkles } from "lucide-react";
+import { Clock, Radio, Sparkles } from "@/components/icons";
 import { Suspense } from "react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
@@ -115,7 +115,7 @@ async function MusicContent({ params }: { params: Params }) {
         <div className="space-y-6">
           {sub?.status === "pending" ? (
             <Card className="flex flex-wrap items-center gap-4 border-warning/40 bg-warning-soft/60 p-5">
-              <span className="grid size-12 place-items-center rounded-2xl bg-warning text-white">
+              <span className="kashi-tile grid size-12 place-items-center bg-warning text-white">
                 <Clock className="size-6" aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">

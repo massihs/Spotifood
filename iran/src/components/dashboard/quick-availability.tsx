@@ -1,6 +1,6 @@
 "use client";
 
-import { Ban, Search } from "lucide-react";
+import { Ban, Search } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -47,12 +47,12 @@ export function QuickAvailability({
           aria-haspopup="dialog"
           className={
             variant === "chip"
-              ? "inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-border bg-surface ps-1.5 pe-3.5 text-sm font-semibold whitespace-nowrap shadow-[var(--shadow-soft)] transition-[border-color,background-color,transform] hover:border-accent/40 hover:bg-accent-soft/40 active:scale-[0.97]"
+              ? "kashi-btn inline-flex h-10 shrink-0 items-center gap-2 border border-border bg-surface ps-1.5 pe-3.5 text-sm font-semibold whitespace-nowrap shadow-[var(--shadow-soft)] transition-[border-color,background-color,transform] hover:border-accent/40 hover:bg-accent-soft/40 active:scale-[0.97]"
               : buttonClasses("secondary")
           }
         >
           {variant === "chip" ? (
-            <span className="grid size-7 place-items-center rounded-full bg-danger-soft text-danger">
+            <span className="kashi-tile grid size-7 place-items-center bg-danger-soft text-danger">
               <Ban className="size-4" aria-hidden="true" />
             </span>
           ) : (
@@ -147,7 +147,7 @@ function AvailabilityList({ restaurantId }: { restaurantId: string }) {
                 className={cn("size-11 shrink-0 rounded-xl object-cover", !d.isAvailable && "grayscale")}
               />
             ) : (
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-fg-subtle">
+              <span className="kashi-tile grid size-11 shrink-0 place-items-center bg-surface-2 text-fg-subtle">
                 <Ban className="size-4" aria-hidden="true" />
               </span>
             )}
@@ -165,7 +165,7 @@ function AvailabilityList({ restaurantId }: { restaurantId: string }) {
               disabled={busy.has(d.id)}
               onClick={() => toggle(d)}
               className={cn(
-                "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold transition-colors disabled:opacity-60",
+                "kashi-btn inline-flex h-8 shrink-0 items-center gap-1.5 px-3 text-xs font-bold transition-colors [--cut:5px] disabled:opacity-60",
                 d.isAvailable ? "bg-success-soft text-success" : "bg-danger text-white",
               )}
             >

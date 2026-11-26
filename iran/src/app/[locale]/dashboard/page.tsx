@@ -9,7 +9,7 @@ import {
   Store,
   UtensilsCrossed,
   Wallet,
-} from "lucide-react";
+} from "@/components/icons";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -87,7 +87,7 @@ async function Workspace() {
           <form action={logoutAction}>
             <button
               type="submit"
-              className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-fg-muted ring-1 ring-border hover:bg-surface-2 hover:text-fg"
+              className="kashi-btn kashi-frame inline-flex h-10 items-center gap-2 px-3 text-sm font-semibold text-fg-muted [--kashi-fill-hover:var(--surface-2)] hover:text-fg"
             >
               <LogOut className="size-4" aria-hidden="true" />
               <span className="max-sm:sr-only">{tw("logout")}</span>
@@ -108,7 +108,7 @@ async function Workspace() {
         </div>
         <Link
           href="/pro"
-          className="inline-flex h-10 items-center gap-2 rounded-full bg-surface px-4 text-sm font-semibold ring-1 ring-border hover:bg-surface-2"
+          className="kashi-btn kashi-frame inline-flex h-10 items-center gap-2 px-4 text-sm font-semibold [--kashi-fill-hover:var(--surface-2)] [--kashi-fill:var(--surface)]"
         >
           <Briefcase className="size-4" aria-hidden="true" />
           {tw("teamSpace")}
@@ -120,7 +120,7 @@ async function Workspace() {
           href="/admin"
           className="group mt-8 flex items-center gap-4 overflow-hidden rounded-3xl bg-ink p-5 text-ink-fg shadow-[var(--shadow-float)] sm:p-6"
         >
-          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/10">
+          <span className="kashi-tile grid size-12 shrink-0 place-items-center bg-white/10">
             <Shield className="size-6" aria-hidden="true" />
           </span>
           <span className="min-w-0 flex-1">
@@ -148,7 +148,7 @@ async function Workspace() {
           action={
             <Link
               href="/pro"
-              className="inline-flex h-10 items-center rounded-full bg-accent px-5 text-sm font-bold text-accent-fg"
+              className="kashi-btn inline-flex h-10 items-center bg-accent px-5 text-sm font-bold text-accent-fg"
             >
               {tw("teamSpace")}
             </Link>
@@ -194,11 +194,11 @@ function VenueCard({ v, t, tw, locale }: { v: WorkspaceVenue; t: T; tw: TW; loca
       </div>
       <span className="absolute end-4 top-4 flex flex-wrap justify-end gap-1.5">
         {v.status === "suspended" ? (
-          <span className="rounded-full bg-danger px-2.5 py-1 text-xs font-bold text-white">
+          <span className="kashi-btn bg-danger px-2.5 py-1 text-xs font-bold text-white [--cut:5px]">
             {t("admin.status.suspended")}
           </span>
         ) : null}
-        <span className="rounded-full bg-black/25 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
+        <span className="kashi-btn bg-black/25 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur [--cut:5px]">
           {v.jobName ?? t(`roles.${v.role}`)}
         </span>
       </span>
@@ -210,7 +210,7 @@ function VenueCard({ v, t, tw, locale }: { v: WorkspaceVenue; t: T; tw: TW; loca
             className="size-16 rounded-2xl bg-surface object-contain p-1.5 shadow-[var(--shadow-soft)] ring-4 ring-surface"
           />
         ) : (
-          <span className="grid size-16 place-items-center rounded-2xl bg-surface text-2xl font-black text-accent-text shadow-[var(--shadow-soft)] ring-4 ring-surface">
+          <span className="kashi-tile grid size-16 place-items-center bg-surface text-2xl font-black text-accent-text shadow-[var(--shadow-soft)] ring-4 ring-surface">
             {[...v.name][0]}
           </span>
         )}

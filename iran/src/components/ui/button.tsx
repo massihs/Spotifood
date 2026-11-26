@@ -9,17 +9,17 @@ const variants: Record<ButtonVariant, string> = {
     "bg-accent text-accent-fg hover:bg-accent-hover shadow-[inset_0_1px_0_rgb(255_255_255/0.22),var(--shadow-accent-sm)]",
   accent:
     "bg-accent text-accent-fg hover:bg-accent-hover shadow-[inset_0_1px_0_rgb(255_255_255/0.22),var(--shadow-accent-sm)]",
-  secondary: "bg-surface text-fg ring-1 ring-inset ring-border hover:bg-surface-2",
-  outline: "bg-surface text-fg ring-1 ring-inset ring-border-strong hover:bg-surface-2",
+  secondary: "kashi-frame text-fg [--kashi-frame-color:var(--border)]",
+  outline: "kashi-frame text-fg",
   ghost: "text-fg-muted hover:text-fg hover:bg-surface-2",
   danger: "bg-danger text-white hover:opacity-90",
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-sm gap-1.5 rounded-full",
-  md: "h-10 px-4 text-sm gap-2 rounded-full",
-  lg: "h-12 px-6 text-base gap-2 rounded-full",
-  xl: "h-14 px-6 text-base gap-2 rounded-full",
+  sm: "h-8 px-3 text-sm gap-1.5 kashi-btn [--cut:6px]",
+  md: "h-10 px-4 text-sm gap-2 kashi-btn",
+  lg: "h-12 px-6 text-base gap-2 kashi-btn [--cut:9px]",
+  xl: "h-14 px-6 text-base gap-2 kashi-btn [--cut:10px]",
 };
 
 export function buttonClasses(

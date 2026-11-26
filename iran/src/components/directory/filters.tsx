@@ -1,6 +1,15 @@
 "use client";
 
-import { CalendarCheck, CalendarDays, Clock, LocateFixed, MapPin, Search, Users, X } from "lucide-react";
+import {
+  CalendarCheck,
+  CalendarDays,
+  Clock,
+  LocateFixed,
+  MapPin,
+  Search,
+  Users,
+  X,
+} from "@/components/icons";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
@@ -187,7 +196,7 @@ export function DirectoryFilters({
                 onClick={() => go({ r: String(r) })}
                 aria-pressed={current.r === String(r)}
                 className={cn(
-                  "h-7 min-w-8 rounded-full px-2.5 text-xs font-bold tabular-nums",
+                  "kashi-btn h-7 min-w-8 px-2.5 text-xs font-bold tabular-nums [--cut:5px]",
                   current.r === String(r) ? "bg-fg text-bg" : "text-fg-muted hover:text-fg",
                 )}
               >
@@ -314,7 +323,7 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
       onClick={onClick}
       aria-pressed={on}
       className={cn(
-        "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold whitespace-nowrap transition-colors",
+        "kashi-btn inline-flex h-10 shrink-0 items-center gap-1.5 px-4 text-sm font-semibold whitespace-nowrap transition-colors",
         on ? "bg-fg text-bg" : "bg-surface text-fg-muted ring-1 ring-border hover:text-fg",
       )}
     >
@@ -330,7 +339,7 @@ function Toggle({ on, onClick, children }: { on: boolean; onClick: () => void; c
       onClick={onClick}
       aria-pressed={on}
       className={cn(
-        "inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-xs font-bold transition-colors",
+        "kashi-btn inline-flex h-9 items-center gap-1.5 px-3.5 text-xs font-bold transition-colors",
         on
           ? "bg-accent-soft text-accent-text ring-1 ring-accent/40"
           : "bg-surface text-fg-muted ring-1 ring-border hover:text-fg",

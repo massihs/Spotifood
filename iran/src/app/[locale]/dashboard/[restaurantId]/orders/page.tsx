@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { getLocale, getTranslations } from "next-intl/server";
-import { BellRing, ReceiptText, Search, Timer, Wallet } from "lucide-react";
+import { BellRing, ReceiptText, Search, Timer, Wallet } from "@/components/icons";
 import { formatMoney, normalizeDigits } from "@/lib/money";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { AcceptAllButton } from "@/components/dashboard/accept-all-button";
@@ -156,7 +156,7 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <form
           action={base}
-          className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full bg-surface px-3 ring-1 ring-border focus-within:ring-2 focus-within:ring-[var(--ring)] sm:max-w-xs"
+          className="kashi-btn flex h-10 min-w-0 flex-1 items-center gap-2 bg-surface px-3 ring-1 ring-border focus-within:ring-2 focus-within:ring-[var(--ring)] sm:max-w-xs"
         >
           {view !== "active" ? <input type="hidden" name="view" value={view} /> : null}
           {channel ? <input type="hidden" name="channel" value={channel} /> : null}
@@ -177,7 +177,7 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
               href={href({ channel: c })}
               aria-current={channel === c ? "true" : undefined}
               className={cn(
-                "shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap",
+                "kashi-btn shrink-0 px-3 py-1.5 text-xs font-semibold whitespace-nowrap [--cut:5px]",
                 channel === c ? "bg-surface text-fg shadow-sm" : "text-fg-muted hover:text-fg",
               )}
             >
@@ -241,7 +241,7 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
                 href={href({ view: key === "active" ? null : key })}
                 aria-current={view === key ? "page" : undefined}
                 className={cn(
-                  "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+                  "kashi-btn inline-flex shrink-0 items-center gap-2 px-4 py-2 text-sm font-medium whitespace-nowrap",
                   view === key ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
                 )}
               >
@@ -280,7 +280,7 @@ async function Orders({ params, searchParams }: Pick<Props, "params" | "searchPa
         : null}
       {layout === "board" ? null : shown.length === 0 ? (
         <Card className="px-6 py-14 text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-surface-2 text-fg-subtle">
+          <span className="kashi-tile mx-auto grid size-14 place-items-center bg-surface-2 text-fg-subtle">
             <ReceiptText className="size-7" aria-hidden="true" />
           </span>
           <h2 className="mt-4 text-lg font-semibold">{q || channel ? t("noMatch") : t("empty")}</h2>

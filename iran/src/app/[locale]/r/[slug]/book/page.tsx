@@ -1,4 +1,4 @@
-import { ArrowRight, MapPin, Star } from "lucide-react";
+import { ArrowRight, MapPin, Star } from "@/components/icons";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -83,13 +83,13 @@ async function Book({ params, searchParams }: Pick<Props, "params" | "searchPara
         <div className="relative mx-auto flex h-full max-w-5xl flex-col justify-between px-4 pt-5 pb-12">
           <Link
             href={listing ? `/r/${place.slug}` : "/restaurants"}
-            className="inline-flex w-fit items-center gap-1.5 rounded-full bg-black/35 px-3 py-1.5 text-xs font-semibold backdrop-blur hover:bg-black/50"
+            className="kashi-btn inline-flex w-fit items-center gap-1.5 bg-black/35 px-3 py-1.5 text-xs font-semibold backdrop-blur [--cut:5px] hover:bg-black/50"
           >
             <ArrowRight className="size-3.5 ltr:rotate-180" aria-hidden="true" />
             {listing ? t("back") : td("profile.back")}
           </Link>
           <div className="flex items-end gap-3.5">
-            <span className="grid size-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white shadow-xl ring-4 ring-white/70">
+            <span className="kashi-tile grid size-16 shrink-0 place-items-center overflow-hidden bg-white shadow-xl ring-4 ring-white/70">
               {logo ? (
                 <img src={logo} alt="" className="size-full object-contain p-1" />
               ) : (

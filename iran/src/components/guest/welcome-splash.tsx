@@ -76,7 +76,7 @@ export function WelcomeSplash({
         <h1 className="splash-text mt-1 max-w-xs text-3xl leading-tight font-black [animation-delay:0.75s]">
           {name}
         </h1>
-        <p className="splash-text mt-3 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur [animation-delay:0.9s]">
+        <p className="splash-text kashi-btn mt-3 bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur [--cut:5px] [animation-delay:0.9s]">
           {table}
         </p>
       </div>

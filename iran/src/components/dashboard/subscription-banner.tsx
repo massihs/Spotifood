@@ -34,7 +34,7 @@ export async function SubscriptionBanner({
       <span>{text}</span>
       <Link
         href={`/dashboard/${restaurantId}/billing`}
-        className="rounded-full bg-fg px-4 py-1.5 text-xs font-bold text-bg"
+        className="kashi-btn bg-fg px-4 py-1.5 text-xs font-bold text-bg [--cut:5px]"
       >
         {expired ? t("renew") : t("choose")}
       </Link>

@@ -24,7 +24,7 @@ import {
   Package,
   CalendarDays,
   type LucideIcon,
-} from "lucide-react";
+} from "@/components/icons";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { CustomPeriod, DeleteExpense, NewExpenseButton } from "@/components/reports/reports-ui";
@@ -138,7 +138,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
           ) : !["overview", "sales", "products"].includes(tab) ? null : (
             <a
               href={exportHref(tab === "overview" ? "pnl" : tab)}
-              className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold ring-1 ring-border"
+              className="kashi-btn kashi-frame inline-flex h-10 items-center gap-2 px-4 text-sm font-semibold"
             >
               <Download className="size-4" />
               {t("exportCsv")}
@@ -153,7 +153,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
               key={p}
               href={presetHref(p)}
               className={cn(
-                "shrink-0 rounded-full px-3 py-1.5 text-sm whitespace-nowrap",
+                "kashi-btn shrink-0 px-3 py-1.5 text-sm whitespace-nowrap",
                 period.preset === p ? "bg-fg text-bg" : "bg-surface text-fg-muted ring-1 ring-border",
               )}
             >
@@ -180,7 +180,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
               href={tabHref(k)}
               aria-current={tab === k ? "page" : undefined}
               className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+                "kashi-btn shrink-0 px-4 py-2 text-sm font-medium whitespace-nowrap",
                 tab === k ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
               )}
             >
@@ -375,7 +375,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
                             {m != null ? (
                               <span
                                 className={cn(
-                                  "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
+                                  "kashi-btn px-2 py-0.5 text-xs font-semibold tabular-nums [--cut:5px]",
                                   m >= 0.6
                                     ? "bg-success-soft text-success"
                                     : m >= 0.4
@@ -439,7 +439,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
                           <li key={e.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm">
                             <span
                               className={cn(
-                                "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                                "kashi-btn shrink-0 px-2.5 py-0.5 text-xs font-semibold [--cut:5px]",
                                 /cancel|refund|deleted|removed/.test(e.action)
                                   ? "bg-danger-soft text-danger"
                                   : "bg-warning-soft text-warning",
@@ -498,7 +498,7 @@ async function Reports({ params, searchParams }: Pick<Props, "params" | "searchP
                   <ul className="divide-y divide-border">
                     {data.expenses.map((e) => (
                       <li key={e.id} className="flex items-center gap-3 px-4 py-3">
-                        <span className="w-24 shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-center text-xs font-semibold">
+                        <span className="kashi-btn w-24 shrink-0 bg-surface-2 px-2 py-0.5 text-center text-xs font-semibold [--cut:5px]">
                           {t(`categories.${e.category}`)}
                         </span>
                         <div className="min-w-0 flex-1">

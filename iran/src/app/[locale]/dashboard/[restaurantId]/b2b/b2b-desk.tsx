@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, Minus, Plus, Search, Truck, Wallet } from "lucide-react";
+import { Building2, Minus, Plus, Search, Truck, Wallet } from "@/components/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { Sheet, useRun } from "@/components/ui/sheet-kit";
@@ -131,7 +131,7 @@ export function TradeOrderDesk({
                 {p.image ? (
                   <img src={p.image} alt="" className="size-12 shrink-0 rounded-xl object-cover" />
                 ) : (
-                  <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-surface-2 text-fg-subtle">
+                  <span className="kashi-tile grid size-12 shrink-0 place-items-center bg-surface-2 text-fg-subtle">
                     <Building2 className="size-5" aria-hidden="true" />
                   </span>
                 )}
@@ -149,7 +149,7 @@ export function TradeOrderDesk({
                             type="button"
                             onClick={() => set(p.id, n - 1)}
                             aria-label={t("less", { name: p.name })}
-                            className="grid size-9 place-items-center rounded-full bg-surface-2"
+                            className="kashi-tile grid size-9 place-items-center bg-surface-2"
                           >
                             <Minus className="size-4" aria-hidden="true" />
                           </button>
@@ -167,7 +167,7 @@ export function TradeOrderDesk({
                         disabled={!p.isAvailable}
                         onClick={() => set(p.id, n + 1)}
                         aria-label={t("more", { name: p.name })}
-                        className="grid size-9 place-items-center rounded-full bg-accent text-accent-fg disabled:opacity-40"
+                        className="kashi-tile grid size-9 place-items-center bg-accent text-accent-fg disabled:opacity-40"
                       >
                         <Plus className="size-4" aria-hidden="true" />
                       </button>
@@ -401,7 +401,7 @@ export function TradeCustomerSheet({
                 window.confirm(t("removeConfirm")) &&
                 run(() => removeTradeCustomerAction(restaurantId, customer.id), onClose)
               }
-              className="h-11 rounded-xl px-3 text-sm font-semibold text-danger ring-1 ring-danger/30"
+              className="h-11 rounded-xl px-3 text-sm font-semibold text-danger ring-1 [--kashi-frame-color:color-mix(in_oklab,var(--danger)_35%,transparent)]"
             >
               {t("remove")}
             </button>
@@ -568,7 +568,7 @@ export function TradeCustomers({
           <button
             type="button"
             onClick={() => setEdit("new")}
-            className="inline-flex h-10 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg"
+            className="kashi-btn inline-flex h-10 items-center gap-1.5 bg-accent px-4 text-sm font-semibold text-accent-fg"
           >
             <Plus className="size-4" aria-hidden="true" />
             {t("newCustomer")}
@@ -592,7 +592,7 @@ export function TradeCustomers({
                 </p>
               </div>
               {c.tradeDiscountBps ? (
-                <span className="shrink-0 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-bold text-accent-text">
+                <span className="kashi-btn shrink-0 bg-accent-soft px-2 py-0.5 text-xs font-bold text-accent-text [--cut:5px]">
                   −{c.tradeDiscountBps / 100}%
                 </span>
               ) : null}
@@ -614,7 +614,7 @@ export function TradeCustomers({
                 <button
                   type="button"
                   onClick={() => setEdit(c)}
-                  className="h-9 rounded-full px-3 text-sm font-semibold ring-1 ring-border hover:bg-surface-2"
+                  className="kashi-btn kashi-frame h-9 px-3 text-sm font-semibold [--kashi-fill-hover:var(--surface-2)]"
                 >
                   {t("edit")}
                 </button>
@@ -623,7 +623,7 @@ export function TradeCustomers({
                 <button
                   type="button"
                   onClick={() => setPay(c)}
-                  className="h-9 rounded-full bg-ink px-3 text-sm font-semibold text-ink-fg"
+                  className="kashi-btn h-9 bg-ink px-3 text-sm font-semibold text-ink-fg"
                 >
                   {t("collect")}
                 </button>

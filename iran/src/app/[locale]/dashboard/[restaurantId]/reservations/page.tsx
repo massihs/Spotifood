@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { CalendarCheck, ChevronLeft, ChevronRight, Hourglass, Users, UserX } from "lucide-react";
+import { CalendarCheck, ChevronLeft, ChevronRight, Hourglass, Users, UserX } from "@/components/icons";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { LiveRefresh } from "@/components/realtime/live";
@@ -95,7 +95,7 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
             href={k === "plan" ? base : `${base}?tab=${k}`}
             aria-current={tab === k ? "page" : undefined}
             className={cn(
-              "shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap",
+              "kashi-btn shrink-0 px-4 py-2 text-sm font-medium whitespace-nowrap",
               tab === k ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
             )}
           >
@@ -114,7 +114,7 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
           <div className="mb-4 flex items-center gap-2">
             <Link
               href={`${base}?${tabQs}day=${shift(day, -7)}`}
-              className="grid size-10 shrink-0 place-items-center rounded-full bg-surface ring-1 ring-border"
+              className="kashi-tile kashi-frame grid size-10 shrink-0 place-items-center [--kashi-fill:var(--surface)]"
               aria-label={t("prevDay")}
             >
               <ChevronRight className="size-5 ltr:rotate-180" />
@@ -167,7 +167,7 @@ async function Reservations({ params, searchParams }: Pick<Props, "params" | "se
             </ol>
             <Link
               href={`${base}?${tabQs}day=${shift(day, 7)}`}
-              className="grid size-10 shrink-0 place-items-center rounded-full bg-surface ring-1 ring-border"
+              className="kashi-tile kashi-frame grid size-10 shrink-0 place-items-center [--kashi-fill:var(--surface)]"
               aria-label={t("nextDay")}
             >
               <ChevronLeft className="size-5 ltr:rotate-180" />

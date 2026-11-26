@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Plus, Ticket } from "lucide-react";
+import { Minus, Plus, Ticket } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
@@ -19,7 +19,7 @@ function Party({ value, onChange, max }: { value: number; onChange: (n: number) 
         <button
           type="button"
           onClick={() => onChange(Math.max(1, value - 1))}
-          className="grid size-10 place-items-center rounded-full bg-surface-2"
+          className="kashi-tile grid size-10 place-items-center bg-surface-2"
           aria-label="-"
         >
           <Minus className="size-4" />
@@ -28,7 +28,7 @@ function Party({ value, onChange, max }: { value: number; onChange: (n: number) 
         <button
           type="button"
           onClick={() => onChange(Math.min(max, value + 1))}
-          className="grid size-10 place-items-center rounded-full bg-surface-2"
+          className="kashi-tile grid size-10 place-items-center bg-surface-2"
           aria-label="+"
         >
           <Plus className="size-4" />

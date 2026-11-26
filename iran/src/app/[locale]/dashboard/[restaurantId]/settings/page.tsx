@@ -18,7 +18,7 @@ import {
   Scale,
   ShieldCheck,
   Store,
-} from "lucide-react";
+} from "@/components/icons";
 import type { ReactNode } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { requireRestaurant } from "@/server/auth/current";
@@ -130,7 +130,7 @@ async function Settings({ params }: { params: Params }) {
             <a
               key={key}
               href={`#${key === "desktopTitle" ? "desktop" : key}`}
-              className="flex shrink-0 items-center gap-2.5 rounded-full bg-surface px-4 py-2 text-sm font-bold whitespace-nowrap text-fg-muted shadow-[var(--shadow-soft)] hover:text-fg lg:rounded-2xl lg:bg-transparent lg:py-2.5 lg:shadow-none lg:hover:bg-surface [&_svg]:size-4 [&_svg]:shrink-0"
+              className="kashi-btn flex shrink-0 items-center gap-2.5 bg-surface px-4 py-2 text-sm font-bold whitespace-nowrap text-fg-muted shadow-[var(--shadow-soft)] hover:text-fg lg:rounded-2xl lg:bg-transparent lg:py-2.5 lg:shadow-none lg:hover:bg-surface [&_svg]:size-4 [&_svg]:shrink-0"
             >
               {icon}
               {t(key)}

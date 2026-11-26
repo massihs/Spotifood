@@ -12,7 +12,7 @@ import {
   Trash2,
   TrendingUp,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { CategoryIcon } from "@/components/category-icon";
@@ -226,7 +226,7 @@ export function MenuBrowser({
         : tagLabel(t, t.has, f.slice(4));
   const card = { money, popular, counts, busyId, onAdd, onRemove, onOpen, categoryIcon, t, theme };
   const iconButton =
-    "relative grid size-10 shrink-0 place-items-center rounded-full bg-surface text-fg ring-1 ring-border transition-colors active:bg-surface-2 atelier:bg-transparent";
+    "relative grid size-10 shrink-0 place-items-center rounded-[32%] bg-surface text-fg transition-colors active:bg-surface-2 atelier:bg-transparent ring-1 ring-border";
 
   return (
     <>
@@ -274,7 +274,7 @@ export function MenuBrowser({
                       searchRef.current?.focus();
                     }}
                     aria-label={t("common.clear")}
-                    className="absolute end-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-surface-2 text-fg"
+                    className="kashi-tile absolute end-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center bg-surface-2 text-fg"
                   >
                     <X className="size-4" aria-hidden="true" />
                   </button>
@@ -287,7 +287,7 @@ export function MenuBrowser({
                 aria-label={t("guest.filters")}
                 title={t("guest.filters")}
                 className={cn(
-                  "relative grid size-11 shrink-0 place-items-center rounded-2xl border border-border bg-surface text-fg atelier:rounded-full atelier:border-transparent atelier:bg-surface-2 nuit:rounded-full",
+                  "relative grid size-11 shrink-0 place-items-center rounded-[32%] border border-border bg-surface text-fg atelier:rounded-full atelier:border-transparent atelier:bg-surface-2 nuit:rounded-full",
                   filter !== "all" && "border-accent text-accent-text",
                 )}
               >
@@ -346,7 +346,7 @@ export function MenuBrowser({
                     aria-current={active === c.id ? "true" : undefined}
                     onClick={() => setActive(c.id)}
                     className={cn(
-                      "flex h-10 shrink-0 items-center gap-2 rounded-full ps-1.5 pe-4 text-sm font-semibold whitespace-nowrap transition-colors nuit:px-4",
+                      "kashi-btn flex h-10 shrink-0 items-center gap-2 ps-1.5 pe-4 text-sm font-semibold whitespace-nowrap transition-colors nuit:px-4",
                       "atelier:h-10 atelier:rounded-none atelier:border-b-2 atelier:px-0 atelier:text-[15px] atelier:font-medium atelier:shadow-none atelier:ring-0",
                       active === c.id
                         ? "bg-fg text-bg shadow-sm atelier:border-fg atelier:bg-transparent atelier:text-fg nuit:bg-accent nuit:text-accent-fg"
@@ -378,7 +378,7 @@ export function MenuBrowser({
           <button
             type="button"
             onClick={() => setFilter("all")}
-            className="inline-flex h-8 items-center gap-1.5 rounded-full bg-accent px-3 font-semibold text-accent-fg"
+            className="kashi-btn inline-flex h-8 items-center gap-1.5 bg-accent px-3 font-semibold text-accent-fg [--cut:5px]"
           >
             {filterLabel(filter)}
             <X className="size-3.5" aria-hidden="true" />
@@ -391,7 +391,7 @@ export function MenuBrowser({
         {featured.length > 0 ? (
           <section className="pt-4" aria-labelledby="featured-title">
             <div className="flex items-center gap-2 px-4 atelier:px-5">
-              <span className="grid size-8 place-items-center rounded-full bg-accent text-accent-fg shadow-accent atelier:hidden nuit:size-auto nuit:bg-transparent nuit:text-accent nuit:shadow-none">
+              <span className="kashi-tile grid size-8 place-items-center bg-accent text-accent-fg shadow-accent atelier:hidden nuit:size-auto nuit:bg-transparent nuit:text-accent nuit:shadow-none">
                 <Sparkles className="size-4" aria-hidden="true" />
               </span>
               <h2
@@ -459,7 +459,7 @@ export function MenuBrowser({
 
         {sections.length === 0 ? (
           <div className="px-6 py-20 text-center">
-            <div className="mx-auto grid size-14 place-items-center rounded-full bg-surface-2">
+            <div className="kashi-tile mx-auto grid size-14 place-items-center bg-surface-2">
               <Search className="size-6 text-fg-muted" aria-hidden="true" />
             </div>
             <p className="mt-4 font-semibold">
@@ -471,7 +471,7 @@ export function MenuBrowser({
                 setQuery("");
                 setFilter("all");
               }}
-              className="mt-4 h-11 rounded-full bg-surface-2 px-5 text-sm font-semibold"
+              className="kashi-btn mt-4 h-11 bg-surface-2 px-5 text-sm font-semibold"
             >
               {t("guest.showAll")}
             </button>
@@ -486,7 +486,7 @@ export function MenuBrowser({
               aria-labelledby={`h-${c.id}`}
             >
               <div className="flex items-center gap-3 px-4 atelier:items-end atelier:px-5">
-                <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-text ring-1 ring-accent/10 atelier:hidden nuit:hidden">
+                <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent-soft text-accent-text ring-1 ring-accent/10 atelier:hidden nuit:hidden">
                   <CategoryIcon icon={c.icon} className="size-5" />
                 </span>
                 <h2
@@ -499,7 +499,7 @@ export function MenuBrowser({
                   className="h-px min-w-4 flex-1 bg-border atelier:hidden nuit:hidden"
                   aria-hidden="true"
                 />
-                <span className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-fg-muted atelier:bg-transparent atelier:px-0 atelier:pb-1 atelier:font-normal atelier:text-fg-subtle nuit:bg-transparent nuit:px-0">
+                <span className="kashi-btn shrink-0 bg-surface-2 px-2.5 py-1 text-xs font-semibold text-fg-muted [--cut:5px] atelier:bg-transparent atelier:px-0 atelier:pb-1 atelier:font-normal atelier:text-fg-subtle nuit:bg-transparent nuit:px-0">
                   {shortPrices ? t("guest.priceUnit") : t("guest.items", { count: c.items.length })}
                 </span>
               </div>
@@ -582,7 +582,7 @@ export function MenuBrowser({
                     setFiltersOpen(false);
                   }}
                   className={cn(
-                    "inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors",
+                    "kashi-btn inline-flex h-11 items-center gap-2 px-4 text-sm font-semibold transition-colors",
                     on ? "bg-accent text-accent-fg" : "bg-surface-2 text-fg",
                   )}
                 >
@@ -661,7 +661,7 @@ function Sheet({
             type="button"
             onClick={onClose}
             aria-label={t("guest.close")}
-            className="grid size-10 place-items-center rounded-full bg-surface-2"
+            className="kashi-tile grid size-10 place-items-center bg-surface-2"
           >
             <X className="size-4" aria-hidden="true" />
           </button>
@@ -739,7 +739,7 @@ function CardStepper({
         type="button"
         aria-label={t("guest.quickAdd", { name: p.name })}
         onClick={stop(() => onAdd(p))}
-        className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-accent-fg transition-transform active:scale-90"
+        className="kashi-tile grid size-9 shrink-0 place-items-center bg-accent text-accent-fg transition-transform active:scale-90"
       >
         <Plus className="size-4" strokeWidth={2.5} aria-hidden="true" />
       </button>
@@ -922,7 +922,7 @@ function FeaturedCard({
         </p>
         <Amount
           text={money(p.priceCents)}
-          className="shrink-0 rounded-full bg-white/95 px-2.5 py-1 text-[13px] font-extrabold text-neutral-900 shadow-sm [&>span]:text-neutral-500"
+          className="kashi-btn shrink-0 bg-white/95 px-2.5 py-1 text-[13px] font-extrabold text-neutral-900 shadow-sm [--cut:5px] [&>span]:text-neutral-500"
         />
       </div>
     </div>

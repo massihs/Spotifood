@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, ConciergeBell, X } from "lucide-react";
+import { BellRing, ConciergeBell, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useLiveEvent } from "@/components/realtime/live";
@@ -54,7 +54,7 @@ export function ReadyWatcher() {
           }}
           className="mb-4 flex w-full items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 text-start text-sm font-semibold shadow-[var(--shadow-soft)] lg:col-span-2"
         >
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+          <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent-soft text-accent-text">
             <BellRing className="size-5" aria-hidden="true" />
           </span>
           {t("notifyMe")}
@@ -72,11 +72,11 @@ export function ReadyWatcher() {
               type="button"
               onClick={() => setReady(null)}
               aria-label={t("close")}
-              className="absolute end-3 top-3 grid size-9 place-items-center rounded-full bg-surface-2 text-fg-muted"
+              className="kashi-tile absolute end-3 top-3 grid size-9 place-items-center bg-surface-2 text-fg-muted"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
-            <span className="mx-auto grid size-20 place-items-center rounded-full bg-accent text-accent-fg shadow-accent">
+            <span className="kashi-tile mx-auto grid size-20 place-items-center bg-accent text-accent-fg shadow-accent">
               <ConciergeBell className="size-10" aria-hidden="true" />
             </span>
             <p id="ready-title" className="mt-5 text-2xl font-bold">

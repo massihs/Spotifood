@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { AlertTriangle, Landmark } from "lucide-react";
+import { AlertTriangle, Landmark } from "@/components/icons";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/dashboard/app-shell";
 import { Badge } from "@/components/ui/badge";

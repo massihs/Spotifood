@@ -65,7 +65,7 @@ export function Dialog({
                 type="button"
                 onClick={close}
                 aria-label="×"
-                className="-me-1 grid size-9 place-items-center rounded-full bg-surface-2 text-fg hover:bg-surface-3"
+                className="kashi-tile -me-1 grid size-9 place-items-center bg-surface-2 text-fg hover:bg-surface-3"
               >
                 <svg
                   viewBox="0 0 24 24"

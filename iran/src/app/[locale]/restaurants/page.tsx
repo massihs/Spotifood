@@ -1,4 +1,4 @@
-import { Store } from "lucide-react";
+import { Store } from "@/components/icons";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -46,7 +46,7 @@ export default async function RestaurantsPage({ params, searchParams }: Props) {
             className="pointer-events-none absolute -end-40 -top-40 size-[30rem] rounded-full bg-accent/15 blur-3xl"
           />
           <div className="relative mx-auto max-w-6xl px-4 pt-5 pb-1 sm:px-6 sm:pt-14 sm:pb-6">
-            <span className="hidden items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-medium text-fg-muted ring-1 ring-border sm:inline-flex">
+            <span className="kashi-btn kashi-frame hidden items-center gap-2 px-3 py-1 text-xs font-medium text-fg-muted [--cut:5px] [--kashi-fill:var(--surface)] sm:inline-flex">
               <span className="size-1.5 rounded-full bg-accent" />
               {t("eyebrow")}
             </span>
@@ -239,7 +239,7 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
                 <li key={c.key}>
                   <Link
                     href={directoryHref({ city: c.key })}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface px-4 text-sm font-semibold ring-1 ring-border hover:ring-border-strong"
+                    className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-4 text-sm font-semibold [--kashi-fill:var(--surface)] hover:ring-border-strong"
                   >
                     {c.label}
                     <span className="text-xs text-fg-subtle tabular-nums">{c.count}</span>

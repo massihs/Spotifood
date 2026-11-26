@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, X } from "@/components/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 import { EDITION } from "@/config/edition";
@@ -246,14 +246,14 @@ function JalaliPicker({
               type="button"
               disabled={!!((min && today < min) || (max && today > max))}
               onClick={() => pick(today)}
-              className="rounded-full px-3 py-1 text-sm font-semibold text-accent-text hover:bg-accent-soft disabled:opacity-40"
+              className="kashi-btn px-3 py-1 text-sm font-semibold text-accent-text [--cut:5px] hover:bg-accent-soft disabled:opacity-40"
             >
               {t("today")}
             </button>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-full px-3 py-1 text-sm text-fg-muted hover:bg-surface-2"
+              className="kashi-btn px-3 py-1 text-sm text-fg-muted [--cut:5px] hover:bg-surface-2"
             >
               {t("close")}
             </button>

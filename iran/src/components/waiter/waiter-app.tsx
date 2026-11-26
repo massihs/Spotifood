@@ -13,7 +13,7 @@ import {
   Trash2,
   Users,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState, useSyncExternalStore, useTransition } from "react";
 import { createPosOrderAction } from "@/app/[locale]/dashboard/[restaurantId]/pos/actions";
@@ -259,7 +259,7 @@ export function WaiterApp({
               onClick={() => setFilter(f)}
               aria-pressed={filter === f}
               className={cn(
-                "h-10 shrink-0 rounded-full px-4 text-sm font-bold whitespace-nowrap",
+                "kashi-btn h-10 shrink-0 px-4 text-sm font-bold whitespace-nowrap",
                 filter === f ? "bg-fg text-bg" : "bg-surface text-fg-muted ring-1 ring-border",
               )}
             >
@@ -349,7 +349,7 @@ export function WaiterApp({
           <button
             type="button"
             onClick={() => setTableId(null)}
-            className="inline-flex h-10 items-center gap-1.5 rounded-full bg-surface px-3 text-sm font-bold ring-1 ring-border"
+            className="kashi-btn kashi-frame inline-flex h-10 items-center gap-1.5 px-3 text-sm font-bold [--kashi-fill:var(--surface)]"
           >
             <ArrowRight className="size-4 ltr:rotate-180" aria-hidden="true" />
             {t("back")}
@@ -431,7 +431,7 @@ export function WaiterApp({
                       className="size-14 shrink-0 rounded-xl bg-surface-2 object-cover"
                     />
                   ) : (
-                    <span className="grid size-14 shrink-0 place-items-center rounded-xl bg-surface-2 text-fg-subtle">
+                    <span className="kashi-tile grid size-14 shrink-0 place-items-center bg-surface-2 text-fg-subtle">
                       <ChefHat className="size-5" aria-hidden="true" />
                     </span>
                   )}
@@ -469,7 +469,7 @@ export function WaiterApp({
           disabled={!count}
           className="flex h-14 w-full items-center gap-3 rounded-2xl bg-fg px-4 text-bg shadow-[var(--shadow-float)] disabled:opacity-40"
         >
-          <span className="grid size-8 place-items-center rounded-full bg-bg/15 text-sm font-black tabular-nums">
+          <span className="kashi-tile grid size-8 place-items-center bg-bg/15 text-sm font-black tabular-nums">
             {count}
           </span>
           <span className="flex-1 text-start font-bold">{count ? t("viewTicket") : t("emptyTicket")}</span>
@@ -504,7 +504,7 @@ export function WaiterApp({
                 type="button"
                 onClick={() => setTicketOpen(false)}
                 aria-label={t("close")}
-                className="grid size-9 place-items-center rounded-full bg-surface-2"
+                className="kashi-tile grid size-9 place-items-center bg-surface-2"
               >
                 <X className="size-4" aria-hidden="true" />
               </button>
@@ -532,7 +532,7 @@ export function WaiterApp({
                           type="button"
                           onClick={() => setQty(l.key, l.quantity - 1)}
                           aria-label={l.quantity === 1 ? t("remove") : t("decrease")}
-                          className="grid size-9 place-items-center rounded-full bg-surface"
+                          className="kashi-tile grid size-9 place-items-center bg-surface"
                         >
                           {l.quantity === 1 ? (
                             <Trash2 className="size-4 text-danger" aria-hidden="true" />
@@ -545,7 +545,7 @@ export function WaiterApp({
                           type="button"
                           onClick={() => setQty(l.key, l.quantity + 1)}
                           aria-label={t("increase")}
-                          className="grid size-9 place-items-center rounded-full bg-surface"
+                          className="kashi-tile grid size-9 place-items-center bg-surface"
                         >
                           <Plus className="size-4" aria-hidden="true" />
                         </button>
@@ -634,7 +634,7 @@ function CatChip({ on, onClick, children }: { on: boolean; onClick: () => void; 
       onClick={onClick}
       aria-pressed={on}
       className={cn(
-        "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold whitespace-nowrap",
+        "kashi-btn inline-flex h-9 shrink-0 items-center gap-1.5 px-3.5 text-sm font-semibold whitespace-nowrap",
         on ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
       )}
     >
@@ -664,7 +664,7 @@ function Rounds({
             <span className="font-black">#{r.number}</span>
             <span
               className={cn(
-                "rounded-full px-2.5 py-0.5 text-xs font-bold",
+                "kashi-btn px-2.5 py-0.5 text-xs font-bold [--cut:5px]",
                 r.status === "ready"
                   ? "bg-success-soft text-success"
                   : r.status === "served"

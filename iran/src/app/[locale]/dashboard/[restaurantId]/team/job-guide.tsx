@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, ExternalLink, Link2, Pencil, Plus, Printer, Trash2 } from "lucide-react";
+import { Check, Copy, ExternalLink, Link2, Pencil, Plus, Printer, Trash2 } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Sheet, field, useRun } from "@/components/ui/sheet-kit";
@@ -45,7 +45,7 @@ export function JobGuide({
         <button
           type="button"
           onClick={() => setEdit("new")}
-          className="inline-flex h-9 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg"
+          className="kashi-btn inline-flex h-9 items-center gap-1.5 bg-accent px-4 text-sm font-semibold text-accent-fg"
         >
           <Plus className="size-4" aria-hidden="true" />
           {t("new")}
@@ -71,7 +71,7 @@ export function JobGuide({
                 </span>
                 <span className="mt-3 flex items-center justify-between gap-2 font-semibold">
                   <span className="truncate">{j.name}</span>
-                  <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs font-bold text-fg-muted tabular-nums">
+                  <span className="kashi-btn bg-surface-2 px-2 py-0.5 text-xs font-bold text-fg-muted tabular-nums [--cut:5px]">
                     {counts[j.id] ?? 0}
                   </span>
                 </span>
@@ -83,7 +83,7 @@ export function JobGuide({
                 <button
                   type="button"
                   onClick={() => setShare(j)}
-                  className="mx-4 mb-3 inline-flex h-8 items-center gap-1.5 rounded-full bg-surface px-3 text-xs font-semibold text-fg-muted ring-1 ring-border hover:text-fg"
+                  className="kashi-btn kashi-frame mx-4 mb-3 inline-flex h-8 items-center gap-1.5 px-3 text-xs font-semibold text-fg-muted [--cut:5px] [--kashi-fill:var(--surface)] hover:text-fg"
                 >
                   <Link2 className="size-3.5" aria-hidden="true" />
                   {t("link")}
@@ -232,7 +232,7 @@ function JobSheet({
                 window.confirm(t("deleteConfirm", { name: job.name })) &&
                 run(() => deleteTeamJobAction(restaurantId, job.id), onClose)
               }
-              className="inline-flex h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold text-danger ring-1 ring-danger/30"
+              className="inline-flex h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold text-danger ring-1 [--kashi-frame-color:color-mix(in_oklab,var(--danger)_35%,transparent)]"
             >
               <Trash2 className="size-4" aria-hidden="true" />
               {tc("delete")}
@@ -319,7 +319,7 @@ function StaffLinkSheet({
           <button
             type="button"
             onClick={copy}
-            className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full bg-accent px-4 text-sm font-semibold text-accent-fg"
+            className="kashi-btn inline-flex h-10 flex-1 items-center justify-center gap-2 bg-accent px-4 text-sm font-semibold text-accent-fg"
           >
             {copied ? (
               <Check className="size-4" aria-hidden="true" />
@@ -332,7 +332,7 @@ function StaffLinkSheet({
             href={link.url}
             target="_blank"
             rel="noopener"
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-surface-2 px-4 text-sm font-semibold hover:bg-surface-3"
+            className="kashi-btn inline-flex h-10 items-center gap-2 bg-surface-2 px-4 text-sm font-semibold hover:bg-surface-3"
           >
             <ExternalLink className="size-4" aria-hidden="true" />
             {t("open")}
@@ -340,7 +340,7 @@ function StaffLinkSheet({
           <button
             type="button"
             onClick={print}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-surface-2 px-4 text-sm font-semibold hover:bg-surface-3"
+            className="kashi-btn inline-flex h-10 items-center gap-2 bg-surface-2 px-4 text-sm font-semibold hover:bg-surface-3"
           >
             <Printer className="size-4" aria-hidden="true" />
             {t("print")}

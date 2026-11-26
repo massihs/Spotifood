@@ -779,3 +779,76 @@ dialog[open]::backdrop {
 :root[data-theme="dark"] .dish-photo {
   filter: brightness(0.9) saturate(1.05);
 }
+
+/*
+ * Kashi (کاشی): Spotifood's shapes, from Persian tilework. Buttons and chips have their corners
+ * cut (an elongated octagon), icon tiles and avatars are octagons, and an outline follows the
+ * cut (`kashi-frame`: a frame-coloured shape with the fill inset over it). Library icons get the
+ * same square ends and sharp joins as the Kashi icons.
+ */
+.lucide {
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 6;
+}
+.kashi-btn {
+  --cut: 8px;
+  --kashi-shape: polygon(
+    var(--cut) 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut)),
+    0 var(--cut)
+  );
+  --kashi-inner: polygon(
+    calc(var(--cut) - 0.6px) 0,
+    calc(100% - var(--cut) + 0.6px) 0,
+    100% calc(var(--cut) - 0.6px),
+    100% calc(100% - var(--cut) + 0.6px),
+    calc(100% - var(--cut) + 0.6px) 100%,
+    calc(var(--cut) - 0.6px) 100%,
+    0 calc(100% - var(--cut) + 0.6px),
+    0 calc(var(--cut) - 0.6px)
+  );
+  clip-path: var(--kashi-shape);
+  border-radius: 0;
+}
+.kashi-tile {
+  --kashi-shape: polygon(29.3% 0, 70.7% 0, 100% 29.3%, 100% 70.7%, 70.7% 100%, 29.3% 100%, 0 70.7%, 0 29.3%);
+  --kashi-inner: var(--kashi-shape);
+  clip-path: var(--kashi-shape);
+  border-radius: 0;
+}
+.kashi-frame {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--kashi-frame-color, var(--border-strong));
+}
+.kashi-frame::before {
+  content: "";
+  position: absolute;
+  inset: 1.5px;
+  z-index: -1;
+  background: var(--kashi-fill, var(--surface));
+  clip-path: var(--kashi-inner);
+  transition: background-color 0.15s;
+}
+.kashi-frame:hover::before {
+  background: var(--kashi-fill-hover, var(--surface-2));
+}
+/* A cut shape clips outlines: keyboard focus shows as an inner ring instead. */
+.kashi-btn:focus-visible,
+.kashi-tile:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px color-mix(in oklab, var(--accent) 70%, transparent);
+}
+/* Icons inside a tile carry the saffron accent of the tilework. */
+.kashi-tile {
+  --kashi-dot-tile: oklch(0.8 0.16 78);
+}
+.kashi-tile .kashi-dot {
+  fill: var(--kashi-dot-tile, currentColor);
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
@@ -44,7 +44,7 @@ export function QuickCreate({ items }: { items: QuickCreateItem[] }) {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="inline-flex h-10 items-center gap-1.5 rounded-full bg-accent ps-3 pe-3 text-sm font-bold text-accent-fg shadow-[var(--shadow-soft)] transition-transform active:scale-95 sm:pe-4"
+        className="kashi-btn inline-flex h-10 items-center gap-1.5 bg-accent ps-3 pe-3 text-sm font-bold text-accent-fg shadow-[var(--shadow-soft)] transition-transform active:scale-95 sm:pe-4"
       >
         <Plus className={cn("size-5 transition-transform", open && "rotate-45")} aria-hidden="true" />
         <span className="max-sm:sr-only">{t("button")}</span>

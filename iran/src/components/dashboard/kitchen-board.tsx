@@ -12,7 +12,7 @@ import {
   Printer,
   Settings2,
   Sun,
-} from "lucide-react";
+} from "@/components/icons";
 import { useRef, useState } from "react";
 import { useTicks } from "@/lib/kds-ticks";
 import { Button } from "@/components/ui/button";
@@ -162,7 +162,7 @@ export function KitchenBoard({
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {focus ? (
-            <span className="grid size-10 place-items-center rounded-2xl bg-accent text-accent-fg">
+            <span className="kashi-tile grid size-10 place-items-center bg-accent text-accent-fg">
               <ChefHat className="size-5" aria-hidden="true" />
             </span>
           ) : null}
@@ -248,7 +248,7 @@ export function KitchenBoard({
               onClick={() => writePref(stationKey, s.id)}
               aria-pressed={station === s.id}
               className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap",
+                "kashi-btn inline-flex shrink-0 items-center gap-2 px-4 py-2 text-sm font-semibold whitespace-nowrap",
                 station === s.id ? "bg-fg text-bg" : "bg-surface text-fg-muted ring-1 ring-border",
               )}
             >
@@ -280,9 +280,9 @@ export function KitchenBoard({
               summary.map(([name, n]) => (
                 <li
                   key={name}
-                  className="flex shrink-0 items-center gap-1.5 rounded-full bg-surface-2 py-1 ps-1 pe-3 text-sm font-semibold whitespace-nowrap"
+                  className="kashi-btn flex shrink-0 items-center gap-1.5 bg-surface-2 py-1 ps-1 pe-3 text-sm font-semibold whitespace-nowrap [--cut:5px]"
                 >
-                  <span className="grid h-7 min-w-7 place-items-center rounded-full bg-fg px-1.5 text-sm font-black text-bg tabular-nums">
+                  <span className="kashi-btn grid h-7 min-w-7 place-items-center bg-fg px-1.5 text-sm font-black text-bg tabular-nums [--cut:5px]">
                     {n}
                   </span>
                   {name}
@@ -338,7 +338,7 @@ export function KitchenBoard({
                     {o.channel && o.channel !== "dine_in" ? (
                       <span
                         className={cn(
-                          "absolute start-3 -top-1 z-10 rounded-full px-2 py-0.5 text-[10px] font-bold text-white",
+                          "kashi-btn absolute start-3 -top-1 z-10 px-2 py-0.5 text-[10px] font-bold text-white [--cut:5px]",
                           o.channel === "delivery" ? "bg-tone-sky" : "bg-tone-amber",
                         )}
                       >
@@ -359,7 +359,7 @@ export function KitchenBoard({
                       href={ticketUrl(o.id)}
                       target="_blank"
                       rel="noreferrer"
-                      className="ms-auto mt-1 flex w-fit items-center gap-1 rounded-full px-2.5 py-1 text-xs text-fg-subtle hover:bg-surface hover:text-fg"
+                      className="kashi-btn ms-auto mt-1 flex w-fit items-center gap-1 px-2.5 py-1 text-xs text-fg-subtle [--cut:5px] hover:bg-surface hover:text-fg"
                       aria-label={t("printTicket")}
                       title={t("printTicket")}
                     >

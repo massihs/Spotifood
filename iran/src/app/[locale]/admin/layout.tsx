@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { AppShell, ShellSkeleton } from "@/components/dashboard/app-shell";
 import { IconChart, IconStore, IconUsers } from "@/components/ui/icons";
 import { requireSuperAdmin } from "@/server/auth/current";
-import { BookOpen, Bug, CreditCard, Eye, Headset, Landmark, LayoutGrid, Music } from "lucide-react";
+import { BookOpen, Bug, CreditCard, Eye, Headset, Landmark, LayoutGrid, Music } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
 import { AreaMessages } from "@/i18n/area-messages";
 

@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { TimeAgo } from "@/components/ui/time-ago";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { ArrowRight, Ban, Check, Clock, MessageSquareText, Phone, Timer, Undo2, X } from "lucide-react";
+import { ArrowRight, Ban, Check, Clock, MessageSquareText, Phone, Timer, Undo2, X } from "@/components/icons";
 import { useTicks } from "@/lib/kds-ticks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -221,7 +221,7 @@ export function OrderCard({
     active ? (
       <span
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-base font-black whitespace-nowrap tabular-nums",
+          "kashi-btn inline-flex items-center gap-1.5 px-3 py-1 text-base font-black whitespace-nowrap tabular-nums [--cut:5px]",
           urgency === "late"
             ? "animate-pulse bg-danger text-white"
             : urgency === "warn"
@@ -237,7 +237,7 @@ export function OrderCard({
       </span>
     ) : finishedAt && (o.status === "ready" || o.status === "served") ? (
       <span
-        className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-bold whitespace-nowrap text-fg-muted tabular-nums"
+        className="kashi-btn inline-flex items-center gap-1 bg-surface-2 px-2.5 py-1 text-xs font-bold whitespace-nowrap text-fg-muted tabular-nums [--cut:5px]"
         title={t("kitchen.totalTime")}
       >
         <Timer className="size-3.5" aria-hidden="true" />
@@ -250,7 +250,7 @@ export function OrderCard({
   ) : urgency && minutes < 100 ? (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold whitespace-nowrap tabular-nums",
+        "kashi-btn inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold whitespace-nowrap tabular-nums [--cut:5px]",
         urgency === "late"
           ? "bg-danger text-white"
           : urgency === "warn"
@@ -319,7 +319,7 @@ export function OrderCard({
           {compact ? null : (
             <span
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold",
+                "kashi-btn inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold [--cut:5px]",
                 tone.chip,
               )}
             >
@@ -328,7 +328,7 @@ export function OrderCard({
             </span>
           )}
           {isNew || fresh ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-danger px-2.5 py-0.5 text-[11px] font-bold text-white">
+            <span className="kashi-btn inline-flex items-center gap-1.5 bg-danger px-2.5 py-0.5 text-[11px] font-bold text-white [--cut:5px]">
               <span className="size-1.5 animate-ping rounded-full bg-white" aria-hidden="true" />
               {t("orders.new")}
             </span>
@@ -343,7 +343,7 @@ export function OrderCard({
             <span
               key={p.id}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold",
+                "kashi-btn inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold [--cut:5px]",
                 p.state === "ready"
                   ? "bg-success-soft text-success"
                   : p.state === "preparing"
@@ -425,7 +425,7 @@ export function OrderCard({
           href={`tel:${o.customerPhone}`}
           dir="ltr"
           onClick={(e) => e.stopPropagation()}
-          className="mx-4 mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium text-fg-muted"
+          className="kashi-btn mx-4 mt-2 inline-flex w-fit items-center gap-1.5 bg-surface-2 px-3 py-1 text-xs font-medium text-fg-muted [--cut:5px]"
         >
           <Phone className="size-3.5" aria-hidden="true" />
           {o.customerPhone}
@@ -465,7 +465,7 @@ export function OrderCard({
           ) : (
             <span
               className={cn(
-                "shrink-0 rounded-full px-2.5 py-1 text-xs font-bold",
+                "kashi-btn shrink-0 px-2.5 py-1 text-xs font-bold [--cut:5px]",
                 paid ? "bg-success-soft text-success" : "bg-surface-2 text-fg-muted",
               )}
             >
@@ -477,7 +477,7 @@ export function OrderCard({
       {queued ? (
         // Grace period: where the order is going, a shrinking bar, and "undo".
         <div className={cn("p-4 pt-3", kitchen && "mt-auto")}>
-          <div className="relative flex h-12 items-center gap-3 overflow-hidden rounded-full bg-fg ps-5 pe-1.5 text-bg">
+          <div className="kashi-btn relative flex h-12 items-center gap-3 overflow-hidden bg-fg ps-5 pe-1.5 text-bg">
             <span
               className="undo-bar absolute inset-y-0 start-0 bg-accent/35"
               style={{ animationDuration: `${UNDO_MS}ms` }}
@@ -489,7 +489,7 @@ export function OrderCard({
             <button
               type="button"
               onClick={undo}
-              className="relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-bg px-4 text-sm font-bold text-fg"
+              className="kashi-btn relative inline-flex h-9 shrink-0 items-center gap-1.5 bg-bg px-4 text-sm font-bold text-fg"
             >
               <Undo2 className="size-4" aria-hidden="true" />
               {t("kitchen.undo")}

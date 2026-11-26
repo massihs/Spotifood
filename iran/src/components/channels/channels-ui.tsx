@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Copy, Globe, KeyRound, Plus, Trash2, Truck } from "lucide-react";
+import { Bot, Copy, Globe, KeyRound, Plus, Trash2, Truck } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { field, Sheet, useRun } from "@/components/ui/sheet-kit";
@@ -21,7 +21,7 @@ const ghost = "h-11 rounded-xl px-4 font-semibold ring-1 ring-border disabled:op
 function Head({ icon, title, hint }: { icon: React.ReactNode; title: string; hint: string }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+      <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent-soft text-accent-text">
         {icon}
       </span>
       <div>
@@ -132,7 +132,7 @@ export function BotPanel({
       <Head icon={<Bot className="size-5" />} title={t("title")} hint={t("hint")} />
       {status ? (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-success-soft px-3 py-1 text-sm font-semibold text-success">
+          <span className="kashi-btn bg-success-soft px-3 py-1 text-sm font-semibold text-success [--cut:5px]">
             {t("connected", { provider: t(`providers.${status.provider}`) })}
           </span>
           {status.username ? (
@@ -158,7 +158,7 @@ export function BotPanel({
                 type="button"
                 onClick={() => setProvider(p)}
                 className={cn(
-                  "rounded-full px-3 py-1.5 text-sm font-semibold",
+                  "kashi-btn px-3 py-1.5 text-sm font-semibold",
                   provider === p ? "bg-fg text-bg" : "ring-1 ring-border",
                 )}
               >
@@ -317,7 +317,7 @@ export function PlatformOrderButton({ rid, dishes }: { rid: string; dishes: Dish
       <button
         type="button"
         onClick={() => (setOpen(true), setDone(null))}
-        className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg"
+        className="kashi-btn inline-flex h-10 items-center gap-2 bg-accent px-4 text-sm font-bold text-accent-fg"
       >
         <Truck className="size-4" />
         {t("button")}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Cake, HeartHandshake, Megaphone } from "lucide-react";
+import { Cake, HeartHandshake, Megaphone } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { field, useRun } from "@/components/ui/sheet-kit";
@@ -38,7 +38,7 @@ export function AutomationsForm({
   const block = (key: "birthday" | "winback", icon: React.ReactNode, extra?: React.ReactNode) => (
     <div className="space-y-3 rounded-2xl border border-border bg-surface p-4">
       <div className="flex items-start gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+        <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent-soft text-accent-text">
           {icon}
         </span>
         <div className="min-w-0 flex-1">
@@ -128,7 +128,7 @@ export function AnnounceDish({
   return (
     <div className="space-y-3 rounded-2xl border border-border bg-surface p-4">
       <div className="flex items-start gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+        <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent-soft text-accent-text">
           <Megaphone className="size-5" />
         </span>
         <div>

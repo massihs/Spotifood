@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, CalendarRange, Check, Loader2, Music } from "lucide-react";
+import { CalendarDays, CalendarRange, Check, Loader2, Music } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { cn } from "@/lib/cn";
@@ -51,7 +51,7 @@ export function SubscribeForm({
               )}
             >
               {p === "weekly" ? (
-                <span className="absolute end-4 top-4 rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-bold text-accent-fg">
+                <span className="kashi-btn absolute end-4 top-4 bg-accent px-2.5 py-0.5 text-[11px] font-bold text-accent-fg [--cut:5px]">
                   {t("popular")}
                 </span>
               ) : null}

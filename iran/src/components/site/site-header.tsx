@@ -1,4 +1,4 @@
-import { CircleUser, Store } from "lucide-react";
+import { CircleUser, Store } from "@/components/icons";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -57,7 +57,7 @@ export async function SiteHeader({
             href="/restaurants"
             aria-label={t("nav.restaurants")}
             className={cn(
-              "inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium whitespace-nowrap text-fg-muted ring-1 ring-border hover:text-fg lg:hidden",
+              "kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3 text-sm font-medium whitespace-nowrap text-fg-muted hover:text-fg lg:hidden",
               active === "restaurants" && "bg-accent-soft text-accent-text ring-0",
             )}
           >
@@ -69,14 +69,14 @@ export async function SiteHeader({
           <Link
             href="/account"
             aria-label={t("nav.account")}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium whitespace-nowrap text-fg-muted ring-1 ring-border hover:text-fg"
+            className="kashi-btn kashi-frame inline-flex h-9 items-center gap-1.5 px-3 text-sm font-medium whitespace-nowrap text-fg-muted hover:text-fg"
           >
             <CircleUser className="size-4" aria-hidden="true" />
             <span className="hidden 2xl:inline">{t("nav.account")}</span>
           </Link>
           <Link
             href="/login"
-            className="hidden h-9 items-center rounded-full px-4 text-sm font-medium whitespace-nowrap text-fg-muted hover:text-fg sm:inline-flex"
+            className="kashi-btn hidden h-9 items-center px-4 text-sm font-medium whitespace-nowrap text-fg-muted hover:text-fg sm:inline-flex"
           >
             {t("ctaSecondary")}
           </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Plus, ShoppingCart, Store } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Store } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { field, useRun } from "@/components/ui/sheet-kit";
@@ -58,7 +58,7 @@ export function SupplierOrder({
                       type="button"
                       aria-label="−"
                       onClick={() => set(i.id, (qty[i.id] ?? 0) - 1)}
-                      className="grid size-7 place-items-center rounded-full bg-surface"
+                      className="kashi-tile grid size-7 place-items-center bg-surface"
                     >
                       <Minus className="size-3.5" />
                     </button>
@@ -73,7 +73,7 @@ export function SupplierOrder({
                       type="button"
                       aria-label="+"
                       onClick={() => set(i.id, (qty[i.id] ?? 0) + 1)}
-                      className="grid size-7 place-items-center rounded-full bg-surface"
+                      className="kashi-tile grid size-7 place-items-center bg-surface"
                     >
                       <Plus className="size-3.5" />
                     </button>
@@ -154,7 +154,7 @@ export function ListingForm({
   return (
     <div className="max-w-2xl space-y-3 rounded-2xl border border-border bg-surface p-5">
       <div className="flex items-start gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+        <span className="kashi-tile grid size-10 shrink-0 place-items-center bg-accent-soft text-accent-text">
           <Store className="size-5" />
         </span>
         <div>

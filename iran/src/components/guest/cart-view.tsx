@@ -14,7 +14,7 @@ import {
   Ticket,
   UserRound,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { useFormatter, useTranslations } from "next-intl";
 import { useActionState, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import {
@@ -50,7 +50,7 @@ export function GuestTopBar({
       <div className="mx-auto flex max-w-2xl items-center gap-3 lg:max-w-6xl">
         <Link
           href={backHref}
-          className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-2 active:bg-surface-3"
+          className="kashi-tile grid size-10 shrink-0 place-items-center bg-surface-2 active:bg-surface-3"
           aria-label={t("backToMenu")}
         >
           <ChevronLeft className="size-5 ltr:rotate-0 rtl:rotate-180" aria-hidden="true" />
@@ -103,14 +103,14 @@ export function CartView({
       />
       {lines.length === 0 ? (
         <main className="px-6 py-20 text-center">
-          <div className="mx-auto grid size-20 place-items-center rounded-full bg-surface-2">
+          <div className="kashi-tile mx-auto grid size-20 place-items-center bg-surface-2">
             <ShoppingBag className="size-9 text-fg-muted" aria-hidden="true" />
           </div>
           <p className="mt-5 text-lg font-bold">{t("guest.cartEmpty")}</p>
           <p className="mt-1 text-fg-muted">{t("guest.cartEmptyBody")}</p>
           <Link
             href="/table"
-            className="mt-7 inline-flex h-12 items-center rounded-full bg-accent px-7 font-bold text-accent-fg"
+            className="kashi-btn mt-7 inline-flex h-12 items-center bg-accent px-7 font-bold text-accent-fg"
           >
             {t("guest.backToMenu")}
           </Link>
@@ -254,7 +254,7 @@ function Extra({
     <details open={defaultOpen || undefined} className="group">
       <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 select-none [&::-webkit-details-marker]:hidden">
         <span
-          className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text [&_svg]:size-[18px]"
+          className="kashi-tile grid size-9 shrink-0 place-items-center bg-accent-soft text-accent-text [&_svg]:size-[18px]"
           aria-hidden="true"
         >
           {icon}
@@ -599,11 +599,11 @@ function CartLine({ line: l, money }: { line: CartLineView; money: (c: number) =
                 autoFocus
                 aria-label={t("note")}
                 placeholder={t("notePlaceholder")}
-                className="h-10 min-w-0 flex-1 rounded-full bg-surface-2 px-4 text-[16px] focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
+                className="kashi-btn h-10 min-w-0 flex-1 bg-surface-2 px-4 text-[16px] focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
               />
               <button
                 type="submit"
-                className="h-10 rounded-full bg-accent px-4 text-sm font-bold text-accent-fg"
+                className="kashi-btn h-10 bg-accent px-4 text-sm font-bold text-accent-fg"
               >
                 {t("save")}
               </button>

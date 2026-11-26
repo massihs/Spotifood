@@ -8,7 +8,7 @@ import {
   Star,
   Tractor,
   Trash2,
-} from "lucide-react";
+} from "@/components/icons";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -35,7 +35,7 @@ function Chips({ items }: { items: { href: string; label: string; on: boolean }[
           key={i.href}
           href={i.href}
           className={cn(
-            "rounded-full px-3 py-1.5 text-sm font-medium",
+            "kashi-btn px-3 py-1.5 text-sm font-medium",
             i.on ? "bg-fg text-bg" : "bg-surface text-fg-muted ring-1 ring-border",
           )}
         >
@@ -144,7 +144,7 @@ export async function PurchasePlanView({
                   ) : (
                     <span
                       className={cn(
-                        "rounded-full px-2 py-0.5 text-xs font-semibold",
+                        "kashi-btn px-2 py-0.5 text-xs font-semibold [--cut:5px]",
                         r.daysLeft < 2
                           ? "bg-danger-soft text-danger"
                           : r.daysLeft < days
@@ -207,15 +207,12 @@ export async function FoodCostView({
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
           <p className="text-sm text-fg-muted">{t("hint")}</p>
           <div className="flex gap-2">
-            <Link
-              href={settingsHref}
-              className="rounded-full px-3 py-1.5 text-sm font-semibold ring-1 ring-border"
-            >
+            <Link href={settingsHref} className="kashi-btn kashi-frame px-3 py-1.5 text-sm font-semibold">
               {t("changeTarget")}
             </Link>
             <Link
               href={menuHref}
-              className="rounded-full bg-accent px-3 py-1.5 text-sm font-semibold text-accent-fg"
+              className="kashi-btn bg-accent px-3 py-1.5 text-sm font-semibold text-accent-fg"
             >
               {t("editPrices")}
             </Link>
@@ -245,7 +242,7 @@ export async function FoodCostView({
                 <td className="px-4 py-2 text-end">
                   <span
                     className={cn(
-                      "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
+                      "kashi-btn px-2 py-0.5 text-xs font-semibold tabular-nums [--cut:5px]",
                       r.over
                         ? "bg-danger-soft text-danger"
                         : r.foodCostPct > data.target - 5
@@ -358,7 +355,7 @@ export async function MenuEngineeringView({
                     {r.class && Icon ? (
                       <span
                         className={cn(
-                          "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold",
+                          "kashi-btn inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold [--cut:5px]",
                           CLASS_TONE[r.class],
                         )}
                       >
@@ -447,7 +444,7 @@ export async function AnomaliesView({
                       {r.signals.map((s) => (
                         <span
                           key={s}
-                          className="rounded-full bg-danger-soft px-2 py-0.5 text-xs font-semibold text-danger"
+                          className="kashi-btn bg-danger-soft px-2 py-0.5 text-xs font-semibold text-danger [--cut:5px]"
                         >
                           {t(`signal.${s}`)}
                         </span>

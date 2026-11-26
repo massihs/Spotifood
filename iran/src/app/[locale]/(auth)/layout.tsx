@@ -1,4 +1,4 @@
-import { Check, ChefHat, QrCode } from "lucide-react";
+import { Check, ChefHat, QrCode } from "@/components/icons";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Logo } from "@/components/ui/logo";
@@ -40,7 +40,7 @@ export default async function AuthLayout({ children }: LayoutProps<"/[locale]">)
       <aside className="landing-hero relative hidden overflow-hidden text-white lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
         <div className="landing-grid pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="relative">
-          <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white/85 ring-1 ring-white/15">
+          <p className="kashi-btn inline-flex items-center gap-2 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white/85 ring-1 ring-white/15 ring-white/20 [--cut:5px]">
             <span className="size-1.5 rounded-full bg-accent" aria-hidden="true" />
             {t("badge")}
           </p>
@@ -71,13 +71,13 @@ export default async function AuthLayout({ children }: LayoutProps<"/[locale]">)
             ))}
           </div>
           <div className="landing-float absolute start-6 -top-6 flex items-center gap-2.5 rounded-2xl bg-white/95 px-3.5 py-2.5 text-[#1c1917] shadow-xl">
-            <span className="grid size-9 place-items-center rounded-xl bg-accent text-accent-fg">
+            <span className="kashi-tile grid size-9 place-items-center bg-accent text-accent-fg">
               <QrCode className="size-5" aria-hidden="true" />
             </span>
             <span className="text-sm font-bold">{t("mock.table")}</span>
           </div>
           <div className="landing-float-slow absolute end-6 -bottom-2 flex items-center gap-2.5 rounded-2xl bg-white/95 px-3.5 py-2.5 text-[#1c1917] shadow-xl">
-            <span className="grid size-9 place-items-center rounded-xl bg-emerald-500 text-white">
+            <span className="kashi-tile grid size-9 place-items-center bg-emerald-500 text-white">
               <ChefHat className="size-5" aria-hidden="true" />
             </span>
             <span className="text-sm font-bold">{t("float.ready")}</span>

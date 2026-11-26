@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, Check, X } from "lucide-react";
+import { BellRing, Check, X } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { callWaiterAction } from "@/app/[locale]/table/actions";
@@ -57,7 +57,7 @@ export function WaiterCall({
         type="button"
         onClick={() => (setOpen(true), setSent(null), setError(null), setPicked(null), setNote(""))}
         className={cn(
-          "inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-accent ps-3.5 pe-4 text-sm font-semibold text-accent-fg shadow-accent",
+          "kashi-btn inline-flex h-11 shrink-0 items-center gap-2 bg-accent ps-3.5 pe-4 text-sm font-semibold text-accent-fg shadow-accent",
           "atelier:bg-transparent atelier:text-fg atelier:shadow-none atelier:ring-1 atelier:ring-border-strong nuit:shadow-none",
           className,
         )}
@@ -85,7 +85,7 @@ export function WaiterCall({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="grid size-9 place-items-center rounded-full bg-surface-2"
+                className="kashi-tile grid size-9 place-items-center bg-surface-2"
                 aria-label={t("close")}
               >
                 <X className="size-4" />
@@ -93,7 +93,7 @@ export function WaiterCall({
             </div>
             {sent ? (
               <div className="flex flex-col items-center gap-3 py-6 text-center">
-                <span className="grid size-16 place-items-center rounded-full bg-success-soft text-success">
+                <span className="kashi-tile grid size-16 place-items-center bg-success-soft text-success">
                   <Check className="size-8" />
                 </span>
                 <p className="font-bold">{t("sent")}</p>
