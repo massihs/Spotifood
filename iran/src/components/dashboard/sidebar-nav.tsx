@@ -149,13 +149,13 @@ export function SidebarNav({ items, label }: { items: NavItem[]; label: string }
                 onClick={() => !hasActive && toggleCollapsed(section.key)}
                 aria-expanded={open}
                 aria-controls={id}
-                className="group/h flex w-full items-center gap-2 rounded-lg px-3 pt-4 pb-1.5 text-start text-xs font-semibold tracking-wide text-sidebar-muted uppercase hover:text-sidebar-fg"
+                className="group/h flex w-full items-center gap-2 rounded-lg px-3 pt-5 pb-2 text-start text-sm font-bold text-sidebar-muted hover:text-sidebar-fg"
               >
                 <span className="flex-1">{section.label}</span>
                 {!open && badge ? <Badge n={badge} /> : null}
                 <ChevronDown
                   className={cn(
-                    "size-3.5 opacity-0 transition-[transform,opacity] group-hover/h:opacity-100",
+                    "size-4 opacity-0 transition-[transform,opacity] group-hover/h:opacity-100",
                     !open && "-rotate-90 opacity-100 rtl:rotate-90",
                     hasActive && "hidden",
                   )}
@@ -173,7 +173,7 @@ export function SidebarNav({ items, label }: { items: NavItem[]; label: string }
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative flex h-10 items-center gap-3 rounded-xl px-2 text-sm font-medium transition-colors",
+                      "group relative flex h-11 items-center gap-3 rounded-xl px-2 text-base font-medium transition-colors",
                       active
                         ? "bg-sidebar-2 text-sidebar-fg"
                         : "text-sidebar-muted hover:bg-sidebar-2/60 hover:text-sidebar-fg",
@@ -187,7 +187,7 @@ export function SidebarNav({ items, label }: { items: NavItem[]; label: string }
                     ) : null}
                     <span
                       className={cn(
-                        "grid size-7 shrink-0 place-items-center rounded-lg transition-transform group-hover:scale-105 [&_svg]:size-4",
+                        "grid size-8 shrink-0 place-items-center rounded-lg transition-transform group-hover:scale-105 [&_svg]:size-[18px]",
                         active ? "bg-accent text-accent-fg shadow-accent" : toneOf(item, i),
                       )}
                       aria-hidden="true"
@@ -337,7 +337,7 @@ export function MobileTabBar({ items, sheet }: { items: NavItem[]; sheet: ReactN
               {sections(items).map((section) => (
                 <div key={section.key || "top"}>
                   {section.label ? (
-                    <p className="mb-2 px-1 text-xs font-semibold text-fg-subtle">{section.label}</p>
+                    <p className="mb-2 px-1 text-sm font-bold text-fg-muted">{section.label}</p>
                   ) : null}
                   <div className="grid grid-cols-3 gap-2">
                     {section.items.map((item) => {

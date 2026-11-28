@@ -128,7 +128,7 @@ export async function AppShell({
     <div
       data-brand={brand}
       data-kind={kind}
-      className="min-h-dvh bg-bg lg:grid lg:grid-cols-[272px_1fr] print:block print:bg-white"
+      className="min-h-dvh bg-bg lg:grid lg:grid-cols-[296px_1fr] print:block print:bg-white"
     >
       <a
         href="#main"
@@ -251,7 +251,7 @@ export function PageHeader({
 
 export function ShellSkeleton() {
   return (
-    <div className="min-h-dvh bg-bg lg:grid lg:grid-cols-[272px_1fr]" aria-busy="true">
+    <div className="min-h-dvh bg-bg lg:grid lg:grid-cols-[296px_1fr]" aria-busy="true">
       <aside className="hidden bg-sidebar lg:block" />
       <div className="px-4 py-8 sm:px-8">
         <div className="h-8 w-56 animate-pulse rounded-full bg-surface-3" />
