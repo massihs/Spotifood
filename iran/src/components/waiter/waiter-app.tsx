@@ -634,7 +634,7 @@ function CatChip({ on, onClick, children }: { on: boolean; onClick: () => void; 
       onClick={onClick}
       aria-pressed={on}
       className={cn(
-        "kashi-btn inline-flex h-9 shrink-0 items-center gap-1.5 px-3.5 text-sm font-semibold whitespace-nowrap",
+        "kashi-btn inline-flex h-11 shrink-0 items-center gap-2 px-4 text-base font-bold whitespace-nowrap",
         on ? "bg-accent text-accent-fg" : "bg-surface text-fg-muted ring-1 ring-border",
       )}
     >

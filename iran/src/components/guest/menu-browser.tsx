@@ -346,8 +346,8 @@ export function MenuBrowser({
                     aria-current={active === c.id ? "true" : undefined}
                     onClick={() => setActive(c.id)}
                     className={cn(
-                      "kashi-btn flex h-10 shrink-0 items-center gap-2 ps-1.5 pe-4 text-sm font-semibold whitespace-nowrap transition-colors nuit:px-4",
-                      "atelier:h-10 atelier:rounded-none atelier:border-b-2 atelier:px-0 atelier:text-[15px] atelier:font-medium atelier:shadow-none atelier:ring-0",
+                      "kashi-btn flex h-11 shrink-0 items-center gap-2 ps-1.5 pe-4 text-base font-bold whitespace-nowrap transition-colors nuit:px-4",
+                      "atelier:h-11 atelier:rounded-none atelier:border-b-2 atelier:px-0 atelier:text-[17px] atelier:font-medium atelier:shadow-none atelier:ring-0",
                       active === c.id
                         ? "bg-fg text-bg shadow-sm atelier:border-fg atelier:bg-transparent atelier:text-fg nuit:bg-accent nuit:text-accent-fg"
                         : "bg-surface text-fg-muted ring-1 ring-border hover:text-fg atelier:border-transparent atelier:bg-transparent",
@@ -355,11 +355,11 @@ export function MenuBrowser({
                   >
                     <span
                       className={cn(
-                        "grid size-7 place-items-center rounded-full atelier:hidden nuit:hidden",
+                        "grid size-8 place-items-center rounded-full atelier:hidden nuit:hidden",
                         active === c.id ? "bg-accent text-accent-fg" : "bg-accent-soft text-accent-text",
                       )}
                     >
-                      <CategoryIcon icon={c.icon} className="size-4" />
+                      <CategoryIcon icon={c.icon} className="size-[18px]" />
                     </span>
                     {c.name}
                   </a>
@@ -396,7 +396,7 @@ export function MenuBrowser({
               </span>
               <h2
                 id="featured-title"
-                className="font-menu-display text-lg font-extrabold tracking-tight atelier:text-[22px] atelier:font-medium nuit:text-lg nuit:font-medium nuit:text-accent-text"
+                className="font-menu-display text-2xl font-extrabold tracking-tight atelier:text-[28px] atelier:font-medium nuit:text-lg nuit:font-medium nuit:text-accent-text"
               >
                 {t("guest.featured")}
               </h2>
@@ -491,7 +491,7 @@ export function MenuBrowser({
                 </span>
                 <h2
                   id={`h-${c.id}`}
-                  className="min-w-0 font-menu-display text-xl leading-tight font-extrabold tracking-tight atelier:flex-1 atelier:text-[28px] atelier:font-medium nuit:flex-1 nuit:font-medium nuit:text-accent-text"
+                  className="min-w-0 font-menu-display text-2xl leading-tight font-extrabold tracking-tight atelier:flex-1 atelier:text-[32px] atelier:font-medium nuit:flex-1 nuit:font-medium nuit:text-accent-text"
                 >
                   {c.name}
                 </h2>
@@ -499,12 +499,12 @@ export function MenuBrowser({
                   className="h-px min-w-4 flex-1 bg-border atelier:hidden nuit:hidden"
                   aria-hidden="true"
                 />
-                <span className="kashi-btn shrink-0 bg-surface-2 px-2.5 py-1 text-xs font-semibold text-fg-muted [--cut:5px] atelier:bg-transparent atelier:px-0 atelier:pb-1 atelier:font-normal atelier:text-fg-subtle nuit:bg-transparent nuit:px-0">
+                <span className="kashi-btn shrink-0 bg-surface-2 px-3 py-1 text-sm font-semibold text-fg-muted [--cut:5px] atelier:bg-transparent atelier:px-0 atelier:pb-1 atelier:font-normal atelier:text-fg-subtle nuit:bg-transparent nuit:px-0">
                   {shortPrices ? t("guest.priceUnit") : t("guest.items", { count: c.items.length })}
                 </span>
               </div>
               {c.description ? (
-                <p className="mt-1.5 px-4 text-sm leading-6 text-fg-muted atelier:px-5">{c.description}</p>
+                <p className="mt-1.5 px-4 text-base leading-7 text-fg-muted atelier:px-5">{c.description}</p>
               ) : null}
               {view === "grid" ? (
                 <ul className="mt-3 grid grid-cols-2 gap-3 px-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 atelier:gap-x-4 atelier:gap-y-6 atelier:px-5">
@@ -553,8 +553,8 @@ export function MenuBrowser({
                     <CategoryIcon icon={c.icon} className="size-5" />
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold">{c.name}</span>
-                    <span className="block text-xs text-fg-muted">
+                    <span className="block truncate text-base font-bold">{c.name}</span>
+                    <span className="block text-sm text-fg-muted">
                       {t("guest.items", { count: c.items.length })}
                     </span>
                   </span>

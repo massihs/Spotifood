@@ -767,7 +767,7 @@ export function PosTerminal({
             type="button"
             onClick={() => setCategory("all")}
             className={cn(
-              "kashi-btn shrink-0 px-4 py-2 text-sm font-semibold",
+              "kashi-btn shrink-0 px-4 py-2.5 text-base font-bold",
               category === "all" ? "bg-accent text-accent-fg" : "bg-surface ring-1 ring-border",
             )}
           >
@@ -779,7 +779,7 @@ export function PosTerminal({
               type="button"
               onClick={() => setCategory(c.id)}
               className={cn(
-                "kashi-btn inline-flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm font-semibold whitespace-nowrap",
+                "kashi-btn inline-flex shrink-0 items-center gap-2 px-4 py-2.5 text-base font-bold whitespace-nowrap",
                 category === c.id ? "bg-accent text-accent-fg" : "bg-surface ring-1 ring-border",
               )}
             >
